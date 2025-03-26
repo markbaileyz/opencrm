@@ -6,6 +6,7 @@ import CRMFeaturesList from "@/components/CRMFeaturesList";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
 
 const Roadmap = () => {
   return (
@@ -59,6 +60,7 @@ const Roadmap = () => {
       </main>
       
       <Footer />
+      <Toaster />
     </div>
   );
 };
