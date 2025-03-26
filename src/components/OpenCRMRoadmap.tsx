@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -6,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
   CheckCircle, Shield, Code, Database, Users, Calendar, FileText, 
-  Workflow, BarChart, Zap, Network, ChevronLeft, LayoutDashboard, Users as UsersIcon
+  Workflow, BarChart, Zap, Network, ChevronLeft, LayoutDashboard, Users as UsersIcon,
+  Clock, Award, FileCode, Lightbulb, AlertTriangle
 } from "lucide-react";
 
 const PhaseCard = ({ 
@@ -47,6 +49,52 @@ const FeatureItem = ({
         <h4 className="font-medium">{title}</h4>
       </div>
       <div className="pl-9 text-muted-foreground">{children}</div>
+    </div>
+  );
+};
+
+const MilestoneCard = ({ 
+  title, 
+  timeline,
+  status,
+  description,
+  icon: Icon 
+}: { 
+  title: string; 
+  timeline: string;
+  status: "planning" | "in-progress" | "completed";
+  description: string;
+  icon: React.ElementType;
+}) => {
+  const statusColors = {
+    "planning": "text-amber-500 bg-amber-100",
+    "in-progress": "text-blue-500 bg-blue-100",
+    "completed": "text-green-500 bg-green-100"
+  };
+
+  const statusText = {
+    "planning": "Planning",
+    "in-progress": "In Progress",
+    "completed": "Completed"
+  };
+
+  return (
+    <div className="flex gap-4 mb-6 p-4 border rounded-lg hover:shadow-sm transition-shadow">
+      <div className={`rounded-full ${statusColors[status]} p-2 h-fit`}>
+        <Icon className="h-5 w-5" />
+      </div>
+      <div className="flex-1">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2">
+          <h4 className="font-medium text-lg">{title}</h4>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">{timeline}</span>
+            <span className={`text-xs px-2 py-1 rounded ${statusColors[status]}`}>
+              {statusText[status]}
+            </span>
+          </div>
+        </div>
+        <p className="text-muted-foreground mt-1">{description}</p>
+      </div>
     </div>
   );
 };
@@ -115,9 +163,10 @@ const OpenCRMRoadmap = () => {
       </div>
 
       <Tabs defaultValue="phases" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="phases">Development Phases</TabsTrigger>
           <TabsTrigger value="features">Core Features</TabsTrigger>
+          <TabsTrigger value="timeline">Implementation Timeline</TabsTrigger>
         </TabsList>
         
         <TabsContent value="phases" className="mt-6">
@@ -386,6 +435,142 @@ const OpenCRMRoadmap = () => {
                 </FeatureItem>
               </CardContent>
             </Card>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="timeline" className="mt-6">
+          <div className="mb-6 pb-6 border-b">
+            <h3 className="text-xl font-semibold mb-3">Implementation Schedule</h3>
+            <p className="text-muted-foreground mb-4">
+              The OpenCRM development roadmap is organized into key milestones with target completion dates. 
+              Our agile approach allows for iterative improvements based on stakeholder feedback.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+              <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-md">
+                <div className="rounded-full bg-amber-100 p-2">
+                  <Clock className="h-4 w-4 text-amber-500" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Planning</p>
+                  <p className="text-xs text-muted-foreground">Requirements & design phase</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-md">
+                <div className="rounded-full bg-blue-100 p-2">
+                  <Code className="h-4 w-4 text-blue-500" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">In Progress</p>
+                  <p className="text-xs text-muted-foreground">Active development</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 p-3 bg-green-50 rounded-md">
+                <div className="rounded-full bg-green-100 p-2">
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Completed</p>
+                  <p className="text-xs text-muted-foreground">Delivered & deployed</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <h4 className="text-lg font-medium mb-4">2023-2024 Development Timeline</h4>
+            
+            <div className="space-y-3">
+              <MilestoneCard
+                title="Product Definition & Market Analysis" 
+                timeline="Q4 2023"
+                status="completed"
+                description="Defined target market segments, conducted competitive analysis, and established core value propositions."
+                icon={Lightbulb}
+              />
+              
+              <MilestoneCard
+                title="HIPAA Compliance Framework" 
+                timeline="Q4 2023"
+                status="completed"
+                description="Established baseline security and privacy requirements, documentation standards, and compliance monitoring approach."
+                icon={Shield}
+              />
+              
+              <MilestoneCard
+                title="System Architecture & Technology Selection" 
+                timeline="Q1 2024"
+                status="completed"
+                description="Designed multi-tenant architecture, selected technology stack, and established development environment."
+                icon={FileCode}
+              />
+              
+              <MilestoneCard
+                title="Patient Management Module" 
+                timeline="Q1-Q2 2024"
+                status="in-progress"
+                description="Building core patient data management, timeline views, and profile customization features."
+                icon={Users}
+              />
+              
+              <MilestoneCard
+                title="Communication Hub Development" 
+                timeline="Q2 2024"
+                status="in-progress"
+                description="Implementing secure messaging infrastructure, templates, and omnichannel capabilities."
+                icon={Network}
+              />
+              
+              <MilestoneCard
+                title="Appointment & Scheduling System" 
+                timeline="Q2-Q3 2024"
+                status="planning"
+                description="Building provider availability management, patient self-scheduling, and automated reminders."
+                icon={Calendar}
+              />
+              
+              <MilestoneCard
+                title="Workflow Automation Engine" 
+                timeline="Q3 2024"
+                status="planning"
+                description="Developing visual workflow builder, trigger system, and automated actions framework."
+                icon={Workflow}
+              />
+              
+              <MilestoneCard
+                title="EHR Integration & Interoperability" 
+                timeline="Q3-Q4 2024"
+                status="planning"
+                description="Implementing FHIR API endpoints, HL7 integration capabilities, and data synchronization."
+                icon={Database}
+              />
+              
+              <MilestoneCard
+                title="Analytics & Reporting Dashboard" 
+                timeline="Q4 2024"
+                status="planning"
+                description="Building operational metrics tracking, role-based dashboards, and privacy-respecting data aggregation."
+                icon={BarChart}
+              />
+              
+              <MilestoneCard
+                title="Beta Testing & User Acceptance" 
+                timeline="Q4 2024"
+                status="planning"
+                description="Conducting comprehensive testing with healthcare providers and refining based on feedback."
+                icon={AlertTriangle}
+              />
+              
+              <MilestoneCard
+                title="MVP Launch & Initial Deployment" 
+                timeline="Q1 2025"
+                status="planning"
+                description="Official release of the minimum viable product with core functionality to early adopters."
+                icon={Award}
+              />
+            </div>
           </div>
         </TabsContent>
       </Tabs>
