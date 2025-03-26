@@ -76,15 +76,26 @@ const featuresList: FeatureCategory[] = [
     features: [
       {
         name: "Ticket Management",
-        description: "Manage customer service tickets",
+        description: "Manage customer service tickets and support requests",
+        implemented: true,
       },
       {
         name: "Knowledge Base",
         description: "Create and maintain a customer knowledge base",
+        comingSoon: true,
       },
       {
         name: "Service Analytics",
-        description: "Analyze customer service performance",
+        description: "Analyze customer service performance and satisfaction metrics",
+      },
+      {
+        name: "Live Chat Support",
+        description: "Engage with customers through real-time chat support",
+      },
+      {
+        name: "Customer Feedback",
+        description: "Collect and analyze customer feedback to improve service",
+        comingSoon: true,
       },
     ],
   },
