@@ -2,9 +2,10 @@
 import React, { useState } from "react";
 import { Card, CardHeader, CardContent, CardTitle, CardFooter } from "@/components/ui/card";
 import { Feature } from "@/data/featuresList";
-import { Check, Clock, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Check, Clock, ThumbsUp, ThumbsDown, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface FeatureCardProps {
   feature: Feature;
@@ -13,6 +14,7 @@ interface FeatureCardProps {
 const FeatureCard: React.FC<FeatureCardProps> = ({ feature }) => {
   const [votes, setVotes] = useState(feature.votes || 0);
   const [userVoted, setUserVoted] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
 
   const handleVote = (isUpvote: boolean) => {
@@ -57,6 +59,41 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature }) => {
       </CardHeader>
       <CardContent className="flex-grow">
         <p className="text-muted-foreground">{feature.description}</p>
+        
+        {feature.technicalDetails && (
+          <Collapsible 
+            open={isOpen} 
+            onOpenChange={setIsOpen} 
+            className="mt-3 border-t pt-2"
+          >
+            <div className="flex items-center">
+              <CollapsibleTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="p-0 h-6 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                >
+                  {isOpen ? (
+                    <>
+                      <ChevronUp className="h-3 w-3" />
+                      Hide Technical Details
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-3 w-3" />
+                      View Technical Details
+                    </>
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+            </div>
+            <CollapsibleContent className="pt-2">
+              <div className="text-sm bg-muted/50 p-2 rounded-md">
+                <p className="text-muted-foreground">{feature.technicalDetails}</p>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
       </CardContent>
       <CardFooter className="flex justify-between items-center pt-4 border-t">
         <div className="text-sm font-medium">{votes} votes</div>
