@@ -44,7 +44,9 @@ const EmailList = ({
     handleSelectAll,
     handleClearSelection,
     toggleBulkMode,
-    handleBulkAction
+    handleBulkAction,
+    isAllSelected,
+    isIndeterminate
   } = useEmailSelection(emails);
   
   const handleRowClick = (email: Email) => {
@@ -86,6 +88,8 @@ const EmailList = ({
         isBulkMode={isBulkMode}
         sortOption={sortOption}
         onSortChange={onSortChange}
+        isAllSelected={isAllSelected}
+        isIndeterminate={isIndeterminate}
       />
       
       <Table>

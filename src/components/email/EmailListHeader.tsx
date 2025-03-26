@@ -26,6 +26,8 @@ interface EmailListHeaderProps {
   isBulkMode: boolean;
   sortOption: SortOption;
   onSortChange?: (option: SortOption) => void;
+  isAllSelected?: boolean;
+  isIndeterminate?: boolean;
 }
 
 const EmailListHeader: React.FC<EmailListHeaderProps> = ({
@@ -40,14 +42,17 @@ const EmailListHeader: React.FC<EmailListHeaderProps> = ({
   isBulkMode,
   sortOption,
   onSortChange,
+  isAllSelected = false,
+  isIndeterminate = false,
 }) => {
   return (
     <div className="p-2 border-b flex items-center justify-between">
       <div className="flex items-center space-x-2">
         <Checkbox 
-          checked={emails.length > 0 && selectedEmails.length === emails.length} 
+          checked={isAllSelected}
           onCheckedChange={onSelectAll}
           onClick={() => !isBulkMode && toggleBulkMode()}
+          data-state={isIndeterminate ? "indeterminate" : isAllSelected ? "checked" : "unchecked"}
         />
         {selectedEmails.length > 0 && (
           <div className="flex items-center space-x-1">
@@ -55,10 +60,7 @@ const EmailListHeader: React.FC<EmailListHeaderProps> = ({
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={() => {
-                  onArchiveSelected(selectedEmails);
-                  onClearSelection();
-                }}
+                onClick={() => onArchiveSelected(selectedEmails)}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -81,10 +83,7 @@ const EmailListHeader: React.FC<EmailListHeaderProps> = ({
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={() => {
-                  onDeleteSelected(selectedEmails);
-                  onClearSelection();
-                }}
+                onClick={() => onDeleteSelected(selectedEmails)}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -107,10 +106,7 @@ const EmailListHeader: React.FC<EmailListHeaderProps> = ({
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={() => {
-                  onStarSelected(selectedEmails);
-                  onClearSelection();
-                }}
+                onClick={() => onStarSelected(selectedEmails)}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

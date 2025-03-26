@@ -9,11 +9,16 @@ interface EmailSelectionHook {
   handleClearSelection: () => void;
   toggleBulkMode: () => void;
   handleBulkAction: (ids: string[], action: (id: string) => void, callback?: () => void) => void;
+  isAllSelected: boolean;
+  isIndeterminate: boolean;
 }
 
 export function useEmailSelection(emails: { id: string }[]): EmailSelectionHook {
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   const [isBulkMode, setIsBulkMode] = useState(false);
+  
+  const isAllSelected = emails.length > 0 && selectedEmails.length === emails.length;
+  const isIndeterminate = selectedEmails.length > 0 && selectedEmails.length < emails.length;
   
   const handleSelectEmail = (id: string) => {
     if (selectedEmails.includes(id)) {
@@ -59,6 +64,8 @@ export function useEmailSelection(emails: { id: string }[]): EmailSelectionHook 
     handleSelectAll,
     handleClearSelection,
     toggleBulkMode,
-    handleBulkAction
+    handleBulkAction,
+    isAllSelected,
+    isIndeterminate
   };
 }
