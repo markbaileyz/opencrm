@@ -1,12 +1,49 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Email } from "@/types/email";
 import { useToast } from "@/hooks/use-toast";
+import { useEmailActions } from "@/hooks/useEmailActions";
 
 export function useEmailManager(initialEmails: Email[]) {
   const [emails, setEmails] = useState<Email[]>(initialEmails);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const { toast } = useToast();
+  const { getDrafts } = useEmailActions();
+
+  // Load drafts from localStorage on mount
+  useEffect(() => {
+    syncDraftsWithEmails();
+  }, []);
+
+  // Sync local drafts with the email list
+  const syncDraftsWithEmails = () => {
+    const localDrafts = getDrafts();
+    
+    if (localDrafts.length === 0) return;
+    
+    // Convert drafts to Email objects
+    const draftEmails = localDrafts.map((draft: any) => ({
+      id: draft.id,
+      senderName: "You",
+      senderEmail: "you@example.com",
+      recipient: draft.to || "No recipient",
+      subject: draft.subject || "No subject",
+      preview: (draft.message || "").substring(0, 50),
+      body: draft.message || "",
+      date: draft.lastSaved,
+      read: true,
+      starred: false,
+      folder: 'drafts',
+      hasAttachments: false,
+      labels: []
+    }));
+    
+    // Remove any existing drafts from email list
+    const nonDraftEmails = emails.filter(email => email.folder !== 'drafts');
+    
+    // Combine non-drafts with the draft emails
+    setEmails([...nonDraftEmails, ...draftEmails]);
+  };
 
   const handleSelectEmail = (email: Email) => {
     // Mark email as read if it wasn't
@@ -27,6 +64,14 @@ export function useEmailManager(initialEmails: Email[]) {
   };
 
   const handleDeleteEmail = (id: string) => {
+    const targetEmail = emails.find(email => email.id === id);
+    
+    if (targetEmail?.folder === 'drafts') {
+      // If it's a draft, remove it from localStorage too
+      const { deleteDraft } = useEmailActions();
+      deleteDraft(id);
+    }
+    
     setEmails(emails.map(email => 
       email.id === id ? { ...email, folder: 'trash' } : email
     ));
@@ -129,6 +174,19 @@ export function useEmailManager(initialEmails: Email[]) {
     return true;
   };
 
+  const handleEditDraft = (draftId: string) => {
+    const draft = emails.find(email => email.id === draftId);
+    if (draft) {
+      setSelectedEmail(null);
+      return draft;
+    }
+    return null;
+  };
+
+  const refreshDrafts = () => {
+    syncDraftsWithEmails();
+  };
+
   return {
     emails,
     selectedEmail,
@@ -139,6 +197,8 @@ export function useEmailManager(initialEmails: Email[]) {
     handleArchiveEmail,
     handleSendEmail,
     handleAddLabel,
-    handleRemoveLabel
+    handleRemoveLabel,
+    handleEditDraft,
+    refreshDrafts
   };
 }

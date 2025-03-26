@@ -12,6 +12,7 @@ import { SortOption } from "@/utils/emailUtils";
 import EmailListHeader from "./EmailListHeader";
 import EmailListItem from "./EmailListItem";
 import EmailListEmpty from "./EmailListEmpty";
+import EmailPagination from "./EmailPagination";
 import { useEmailSelection } from "@/hooks/useEmailSelection";
 
 interface EmailListProps {
@@ -38,7 +39,9 @@ const EmailList = ({
   onSortChange,
 }: EmailListProps) => {
   const [hoveredEmail, setHoveredEmail] = useState<string | null>(null);
-  
+  const [currentPage, setCurrentPage] = useState(1);
+  const emailsPerPage = 10;
+
   const {
     selectedEmails,
     isBulkMode,
@@ -66,6 +69,17 @@ const EmailList = ({
     }
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Reset selection when changing pages
+    handleClearSelection();
+  };
+
+  // Calculate paginated emails
+  const indexOfLastEmail = currentPage * emailsPerPage;
+  const indexOfFirstEmail = indexOfLastEmail - emailsPerPage;
+  const currentEmails = emails.slice(indexOfFirstEmail, indexOfLastEmail);
+
   if (emails.length === 0) {
     return <EmailListEmpty folder={folder} onComposeClick={onComposeClick} />;
   }
@@ -74,7 +88,7 @@ const EmailList = ({
     <div className="bg-card rounded-md border shadow-sm">
       <EmailListHeader
         selectedEmails={selectedEmails}
-        emails={emails}
+        emails={currentEmails}
         onSelectAll={handleSelectAll}
         onArchiveSelected={onArchiveEmail ? 
           (ids) => handleBulkAction(ids, onArchiveEmail, handleClearSelection) : 
@@ -105,7 +119,7 @@ const EmailList = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {emails.map((email) => (
+          {currentEmails.map((email) => (
             <EmailListItem
               key={email.id}
               email={email}
@@ -121,6 +135,15 @@ const EmailList = ({
           ))}
         </TableBody>
       </Table>
+      
+      <div className="p-4 border-t border-border">
+        <EmailPagination
+          currentPage={currentPage}
+          totalEmails={emails.length}
+          emailsPerPage={emailsPerPage}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </div>
   );
 };

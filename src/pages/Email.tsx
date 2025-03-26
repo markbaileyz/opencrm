@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import ComposeEmail from "@/components/email/ComposeEmail";
@@ -26,6 +27,7 @@ const Email = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>("newest");
+  const [editingDraftId, setEditingDraftId] = useState<string | undefined>(undefined);
   const { toast } = useToast();
   
   const {
@@ -38,20 +40,42 @@ const Email = () => {
     handleArchiveEmail,
     handleSendEmail,
     handleAddLabel,
-    handleRemoveLabel
+    handleRemoveLabel,
+    handleEditDraft,
+    refreshDrafts
   } = useEmailManager(emailData);
 
   const {
     handleReplyEmail,
     handleForwardEmail,
-    refreshEmails
+    refreshEmails,
+    getDrafts
   } = useEmailActions();
+
+  // Periodically refresh drafts
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      if (activeTab === 'drafts') {
+        refreshDrafts();
+      }
+    }, 10000); // Refresh every 10 seconds when on drafts tab
+    
+    return () => clearInterval(refreshInterval);
+  }, [activeTab]);
+
+  // Refresh drafts when switching to drafts tab
+  useEffect(() => {
+    if (activeTab === 'drafts') {
+      refreshDrafts();
+    }
+  }, [activeTab]);
 
   const unreadCounts = calculateUnreadCounts(emails);
   
   const allLabels = getAllLabels(emails);
 
   const handleComposeOpen = () => {
+    setEditingDraftId(undefined);
     setIsComposeOpen(true);
   };
   
@@ -60,11 +84,16 @@ const Email = () => {
     const success = handleSendEmail(data);
     if (success) {
       setIsComposeOpen(false);
+      setEditingDraftId(undefined);
+      
+      // Refresh drafts after sending in case we sent a draft
+      refreshDrafts();
     }
   };
   
   const handleComposeClose = () => {
     setIsComposeOpen(false);
+    setEditingDraftId(undefined);
   };
 
   const handleSearch = (query: string) => {
@@ -84,6 +113,11 @@ const Email = () => {
     });
   };
 
+  const handleOpenDraft = (email: Email) => {
+    setEditingDraftId(email.id);
+    setIsComposeOpen(true);
+  };
+
   const { availableShortcuts } = useEmailKeyboardShortcuts({
     isDetailView: !!selectedEmail,
     onBackToList: handleBackToList,
@@ -96,6 +130,15 @@ const Email = () => {
     onStar: selectedEmail ? () => handleStarEmail(selectedEmail.id) : undefined,
     selectedId: selectedEmail?.id
   });
+
+  // Special handling for drafts folder
+  const handleSelectEmailWrapper = (email: Email) => {
+    if (email.folder === 'drafts') {
+      handleOpenDraft(email);
+    } else {
+      handleSelectEmail(email);
+    }
+  };
 
   let filteredEmails = filterEmails(emails, activeTab, searchQuery, activeFilters);
   
@@ -123,7 +166,7 @@ const Email = () => {
               activeTab={activeTab}
               selectedEmail={selectedEmail}
               filteredEmails={filteredEmails}
-              onSelectEmail={handleSelectEmail}
+              onSelectEmail={handleSelectEmailWrapper}
               onBackToList={handleBackToList}
               onStarEmail={handleStarEmail}
               onDeleteEmail={handleDeleteEmail}
@@ -145,7 +188,8 @@ const Email = () => {
       <ComposeEmail 
         isOpen={isComposeOpen} 
         onClose={handleComposeClose} 
-        onSend={handleComposeSend} 
+        onSend={handleComposeSend}
+        draftId={editingDraftId}
       />
     </DashboardLayout>
   );
