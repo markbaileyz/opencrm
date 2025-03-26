@@ -12,6 +12,7 @@ import { SortOption } from "@/utils/emailUtils";
 import EmailListHeader from "./EmailListHeader";
 import EmailListItem from "./EmailListItem";
 import EmailListEmpty from "./EmailListEmpty";
+import { useEmailSelection } from "@/hooks/useEmailSelection";
 
 interface EmailListProps {
   emails: Email[];
@@ -34,25 +35,17 @@ const EmailList = ({
   sortOption = "newest",
   onSortChange,
 }: EmailListProps) => {
-  const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   const [hoveredEmail, setHoveredEmail] = useState<string | null>(null);
-  const [isBulkMode, setIsBulkMode] = useState(false);
   
-  const handleSelectEmail = (id: string) => {
-    if (selectedEmails.includes(id)) {
-      setSelectedEmails(selectedEmails.filter(emailId => emailId !== id));
-    } else {
-      setSelectedEmails([...selectedEmails, id]);
-    }
-  };
-  
-  const handleSelectAll = () => {
-    if (selectedEmails.length === emails.length) {
-      setSelectedEmails([]);
-    } else {
-      setSelectedEmails(emails.map(email => email.id));
-    }
-  };
+  const {
+    selectedEmails,
+    isBulkMode,
+    handleSelectEmail,
+    handleSelectAll,
+    handleClearSelection,
+    toggleBulkMode,
+    handleBulkAction
+  } = useEmailSelection(emails);
   
   const handleRowClick = (email: Email) => {
     if (isBulkMode) {
@@ -69,36 +62,6 @@ const EmailList = ({
     }
   };
 
-  const handleClearSelection = () => {
-    setSelectedEmails([]);
-    setIsBulkMode(false);
-  };
-
-  const toggleBulkMode = () => {
-    setIsBulkMode(!isBulkMode);
-    if (!isBulkMode) {
-      setSelectedEmails([]);
-    }
-  };
-
-  const handleArchiveSelected = (ids: string[]) => {
-    if (onArchiveEmail) {
-      ids.forEach(id => onArchiveEmail(id));
-    }
-  };
-
-  const handleDeleteSelected = (ids: string[]) => {
-    if (onDeleteEmail) {
-      ids.forEach(id => onDeleteEmail(id));
-    }
-  };
-
-  const handleStarSelected = (ids: string[]) => {
-    if (onStarEmail) {
-      ids.forEach(id => onStarEmail(id));
-    }
-  };
-  
   if (emails.length === 0) {
     return <EmailListEmpty />;
   }
@@ -109,9 +72,15 @@ const EmailList = ({
         selectedEmails={selectedEmails}
         emails={emails}
         onSelectAll={handleSelectAll}
-        onArchiveSelected={onArchiveEmail ? handleArchiveSelected : undefined}
-        onDeleteSelected={onDeleteEmail ? handleDeleteSelected : undefined}
-        onStarSelected={onStarEmail ? handleStarSelected : undefined}
+        onArchiveSelected={onArchiveEmail ? 
+          (ids) => handleBulkAction(ids, onArchiveEmail, handleClearSelection) : 
+          undefined}
+        onDeleteSelected={onDeleteEmail ? 
+          (ids) => handleBulkAction(ids, onDeleteEmail, handleClearSelection) : 
+          undefined}
+        onStarSelected={onStarEmail ? 
+          (ids) => handleBulkAction(ids, onStarEmail, handleClearSelection) : 
+          undefined}
         onClearSelection={handleClearSelection}
         toggleBulkMode={toggleBulkMode}
         isBulkMode={isBulkMode}
