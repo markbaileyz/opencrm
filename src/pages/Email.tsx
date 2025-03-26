@@ -12,12 +12,14 @@ import { useEmailManager } from "@/hooks/useEmailManager";
 import { useEmailKeyboardShortcuts } from "@/hooks/useEmailKeyboardShortcuts";
 import type { Email } from "@/types/email";
 import { useToast } from "@/hooks/use-toast";
+import { SortOption } from "@/components/email/EmailSort";
 
 const Email = () => {
   const [activeTab, setActiveTab] = useState("inbox");
   const [isComposeOpen, setIsComposeOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [sortOption, setSortOption] = useState<SortOption>("newest");
   const { toast } = useToast();
   
   const {
@@ -73,6 +75,15 @@ const Email = () => {
     setActiveFilters(filters);
   };
 
+  const handleSortChange = (option: SortOption) => {
+    setSortOption(option);
+    toast({
+      title: "Sort order changed",
+      description: `Emails sorted by ${option}`,
+      variant: "default",
+    });
+  };
+
   const refreshEmails = () => {
     toast({
       title: "Refreshing emails",
@@ -105,7 +116,7 @@ const Email = () => {
   });
 
   // Filter emails based on the active tab, search query, and active filters
-  const filteredEmails = emails.filter(email => {
+  let filteredEmails = emails.filter(email => {
     // First filter by folder (tab)
     if (email.folder !== activeTab) return false;
     
@@ -120,6 +131,9 @@ const Email = () => {
     return true;
   });
 
+  // Apply sorting to the filtered emails
+  filteredEmails = sortEmails(filteredEmails, sortOption);
+
   // Helper function to check if an email matches the search query
   const emailMatchesSearch = (email: Email, query: string): boolean => {
     const lowerCaseQuery = query.toLowerCase();
@@ -130,6 +144,27 @@ const Email = () => {
       email.preview.toLowerCase().includes(lowerCaseQuery) ||
       email.body.toLowerCase().includes(lowerCaseQuery)
     );
+  };
+
+  // Helper function to sort emails based on the selected sort option
+  const sortEmails = (emails: Email[], sortOption: SortOption): Email[] => {
+    switch (sortOption) {
+      case "newest":
+        return [...emails].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      case "oldest":
+        return [...emails].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      case "unread":
+        return [...emails].sort((a, b) => {
+          if (a.read === b.read) {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+          }
+          return a.read ? 1 : -1;
+        });
+      case "sender":
+        return [...emails].sort((a, b) => a.senderName.localeCompare(b.senderName));
+      default:
+        return emails;
+    }
   };
   
   return (
@@ -161,6 +196,8 @@ const Email = () => {
               onReplyEmail={handleReplyEmail}
               onForwardEmail={handleForwardEmail}
               keyboardShortcuts={availableShortcuts}
+              sortOption={sortOption}
+              onSortChange={handleSortChange}
             />
           </TabsContent>
         </Tabs>

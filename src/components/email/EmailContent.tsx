@@ -3,6 +3,7 @@ import React from "react";
 import type { Email } from "@/types/email";
 import EmailList from "@/components/email/EmailList";
 import EmailDetail from "@/components/email/EmailDetail";
+import { SortOption } from "@/components/email/EmailSort";
 
 interface EmailContentProps {
   activeTab: string;
@@ -16,6 +17,8 @@ interface EmailContentProps {
   onReplyEmail: (email: Email) => void;
   onForwardEmail: (email: Email) => void;
   keyboardShortcuts?: { key: string; action: string }[];
+  sortOption?: SortOption;
+  onSortChange?: (option: SortOption) => void;
 }
 
 const EmailContent: React.FC<EmailContentProps> = ({
@@ -30,6 +33,8 @@ const EmailContent: React.FC<EmailContentProps> = ({
   onReplyEmail,
   onForwardEmail,
   keyboardShortcuts = [],
+  sortOption = "newest", 
+  onSortChange,
 }) => {
   if (selectedEmail) {
     return (
@@ -57,6 +62,8 @@ const EmailContent: React.FC<EmailContentProps> = ({
         onStarEmail={onStarEmail}
         onDeleteEmail={onDeleteEmail}
         onArchiveEmail={onArchiveEmail}
+        sortOption={sortOption}
+        onSortChange={onSortChange}
       />
     </div>
   );
