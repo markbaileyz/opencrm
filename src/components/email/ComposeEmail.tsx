@@ -11,8 +11,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, X, Paperclip, Save } from "lucide-react";
+import { Send, X, Paperclip, Save, FileText, MessageSquare } from "lucide-react";
 import { useEmailActions } from "@/hooks/useEmailActions";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import EmailTemplateSelector from "./EmailTemplateSelector";
+import type { EmailTemplate } from "@/utils/emailTemplates";
+import { useEmailSignature, type EmailSignature } from "@/hooks/useEmailSignature";
+import EmailSignatureManager from "./EmailSignatureManager";
 
 interface ComposeEmailProps {
   isOpen: boolean;
@@ -32,8 +41,11 @@ const ComposeEmail = ({ isOpen, onClose, onSend, draftId }: ComposeEmailProps) =
   const [currentDraftId, setCurrentDraftId] = useState<string | undefined>(draftId);
   const [isReply, setIsReply] = useState(false);
   const [isForward, setIsForward] = useState(false);
+  const [isTemplateOpen, setIsTemplateOpen] = useState(false);
+  const [isSignatureOpen, setIsSignatureOpen] = useState(false);
   
-  const { saveDraft, getDraft, deleteDraft } = useEmailActions();
+  const { saveDraft, getDraft, deleteDraft, autoSaveDraft, stopAutoSave, appendSignature } = useEmailActions();
+  const { getDefaultSignature } = useEmailSignature();
   
   // Load draft if provided
   useEffect(() => {
@@ -61,23 +73,41 @@ const ComposeEmail = ({ isOpen, onClose, onSend, draftId }: ComposeEmailProps) =
           
           // Clear the storage after loading
           sessionStorage.removeItem('emailCompose');
+        } else {
+          // For new messages, append default signature if no draft is loaded
+          const defaultSignature = getDefaultSignature();
+          if (defaultSignature) {
+            setMessage(appendSignature("", defaultSignature));
+          }
         }
       }
     }
   }, [isOpen, draftId]);
   
-  // Auto-save draft every 30 seconds
+  // Auto-save draft using the useEmailActions hook
   useEffect(() => {
     if (!isOpen) return;
     
-    const autoSaveInterval = setInterval(() => {
-      if (to || subject || message) {
-        handleSaveDraft();
-      }
-    }, 30000);
+    // Create draft data object
+    const draftData = {
+      id: currentDraftId,
+      to,
+      cc,
+      bcc,
+      subject,
+      message
+    };
     
-    return () => clearInterval(autoSaveInterval);
-  }, [isOpen, to, subject, message]);
+    // Start auto-save (returns function to stop auto-save)
+    const stopAutoSaveFunc = autoSaveDraft(draftData);
+    
+    // Cleanup on unmount or when component changes
+    return () => {
+      if (stopAutoSaveFunc) {
+        stopAutoSaveFunc();
+      }
+    };
+  }, [isOpen, to, cc, bcc, subject, message, currentDraftId]);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,6 +135,9 @@ const ComposeEmail = ({ isOpen, onClose, onSend, draftId }: ComposeEmailProps) =
       if (currentDraftId) {
         deleteDraft(currentDraftId);
       }
+      
+      // Stop auto-saving when sending the email
+      stopAutoSave();
       
       resetForm();
       setIsSending(false);
@@ -135,6 +168,10 @@ const ComposeEmail = ({ isOpen, onClose, onSend, draftId }: ComposeEmailProps) =
     if (to || subject || message) {
       handleSaveDraft();
     }
+    
+    // Stop auto-saving when closing
+    stopAutoSave();
+    
     resetForm();
     onClose();
   };
@@ -157,6 +194,25 @@ const ComposeEmail = ({ isOpen, onClose, onSend, draftId }: ComposeEmailProps) =
   
   const removeAttachment = (index: number) => {
     setAttachments(attachments.filter((_, i) => i !== index));
+  };
+  
+  const handleApplyTemplate = (template: EmailTemplate) => {
+    // Only overwrite subject and message if they are empty or user confirms
+    const shouldApply = 
+      (!subject && !message) || 
+      window.confirm("Applying this template will replace your current subject and message. Continue?");
+    
+    if (shouldApply) {
+      setSubject(template.subject);
+      setMessage(template.body);
+      setIsTemplateOpen(false);
+    }
+  };
+  
+  const handleSelectSignature = (signature: EmailSignature) => {
+    // Add the signature to the message
+    setMessage(appendSignature(message, signature));
+    setIsSignatureOpen(false);
   };
   
   return (
@@ -208,7 +264,58 @@ const ComposeEmail = ({ isOpen, onClose, onSend, draftId }: ComposeEmailProps) =
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="message">Message</Label>
+              <div className="flex justify-between items-center">
+                <Label htmlFor="message">Message</Label>
+                <div className="flex items-center gap-2">
+                  <Popover open={isSignatureOpen} onOpenChange={setIsSignatureOpen}>
+                    <PopoverTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="gap-1"
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                        <span>Signature</span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[450px] p-4" align="end">
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Email Signatures</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Choose a signature to append to your email
+                        </p>
+                        <EmailSignatureManager 
+                          onSelectSignature={handleSelectSignature} 
+                        />
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  
+                  <Popover open={isTemplateOpen} onOpenChange={setIsTemplateOpen}>
+                    <PopoverTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="gap-1"
+                      >
+                        <FileText className="h-4 w-4" />
+                        <span>Templates</span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[450px] p-4" align="end">
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Email Templates</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Choose a template to quickly compose your email
+                        </p>
+                        <EmailTemplateSelector 
+                          onSelectTemplate={handleApplyTemplate} 
+                        />
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
               <Textarea
                 id="message"
                 placeholder="Write your message here..."

@@ -2,9 +2,11 @@
 import { useState, useEffect, useRef } from "react";
 import type { Email } from "@/types/email";
 import { useToast } from "@/hooks/use-toast";
+import { useEmailSignature, type EmailSignature } from "@/hooks/useEmailSignature";
 
 export function useEmailActions() {
   const { toast } = useToast();
+  const { getDefaultSignature } = useEmailSignature();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastSavedDraft, setLastSavedDraft] = useState<string | null>(null);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
@@ -184,6 +186,24 @@ export function useEmailActions() {
     // Return function to clear the interval
     return stopAutoSave;
   };
+
+  const appendSignature = (message: string, signature?: EmailSignature) => {
+    // Use provided signature or default
+    const sigToUse = signature || getDefaultSignature();
+    
+    if (!sigToUse) {
+      return message;
+    }
+    
+    // Check if message already ends with the signature
+    if (message.trim().endsWith(sigToUse.content.trim())) {
+      return message;
+    }
+    
+    // Add two newlines before signature if message is not empty
+    const separator = message.trim() ? '\n\n' : '';
+    return `${message}${separator}${sigToUse.content}`;
+  };
   
   return {
     handleReplyEmail,
@@ -195,6 +215,7 @@ export function useEmailActions() {
     refreshEmails,
     autoSaveDraft,
     stopAutoSave,
+    appendSignature,
     isRefreshing,
     isAutoSaving,
     lastSavedDraft,
