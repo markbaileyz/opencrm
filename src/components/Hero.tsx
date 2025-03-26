@@ -1,12 +1,42 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router-dom";
 import { ButtonCustom } from "./ui/button-custom";
 import { ArrowRight } from "lucide-react";
 
 const Hero = () => {
+  const location = useLocation();
+  
+  // Function to smoothly scroll to a section
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+  
+  // Link component that handles both router links and anchor links
+  const Link = ({ to, children, ...props }: { to: string, children: React.ReactNode, [key: string]: any }) => {
+    if (to.startsWith('#')) {
+      return (
+        <a
+          href={to}
+          onClick={(e) => {
+            e.preventDefault();
+            scrollToSection(to.substring(1));
+          }}
+          {...props}
+        >
+          {children}
+        </a>
+      );
+    }
+    
+    return <RouterLink to={to} {...props}>{children}</RouterLink>;
+  };
+
   return (
-    <section className="pt-24 pb-16 md:pt-36 md:pb-24">
+    <section className="pt-24 pb-16 md:pt-36 md:pb-24" id="home">
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6 animate-fade-up">

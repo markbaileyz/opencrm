@@ -9,6 +9,11 @@ import { Link } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 
 const Roadmap = () => {
+  // Function to handle smooth scrolling to features list
+  const scrollToFeatures = () => {
+    document.getElementById('features-list')?.scrollIntoView({ behavior: 'smooth' });
+  };
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -25,9 +30,7 @@ const Roadmap = () => {
               <Button 
                 variant="outline" 
                 className="mx-auto"
-                onClick={() => {
-                  document.getElementById('features-list')?.scrollIntoView({ behavior: 'smooth' });
-                }}
+                onClick={scrollToFeatures}
               >
                 Explore Our Roadmap <ChevronDown className="ml-2 h-4 w-4" />
               </Button>

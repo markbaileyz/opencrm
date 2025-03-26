@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ButtonCustom } from "./ui/button-custom";
@@ -23,6 +22,22 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
+  // Handle scroll to section for hash links
+  const scrollToSection = (sectionId: string) => {
+    setIsMobileMenuOpen(false);
+    
+    // If we're not on the home page, go to home first
+    if (location.pathname !== '/') {
+      return;
+    }
+
+    // Otherwise scroll to the section
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -41,19 +56,31 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          <NavLink href="/" active={isActive("/")}>
+          <NavLink href="/" active={isActive("/")} onClick={() => null}>
             Home
           </NavLink>
-          <NavLink href="#features" active={false}>
+          <NavLink 
+            href="/#features" 
+            active={location.pathname === "/" && location.hash === "#features"} 
+            onClick={() => scrollToSection("features")}
+          >
             Features
           </NavLink>
-          <NavLink href="#pricing" active={false}>
+          <NavLink 
+            href="/#pricing" 
+            active={location.pathname === "/" && location.hash === "#pricing"} 
+            onClick={() => scrollToSection("pricing")}
+          >
             Pricing
           </NavLink>
-          <NavLink href="/roadmap" active={isActive("/roadmap")}>
+          <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={() => null}>
             Roadmap
           </NavLink>
-          <NavLink href="#contact" active={false}>
+          <NavLink 
+            href="/#contact" 
+            active={location.pathname === "/" && location.hash === "#contact"} 
+            onClick={() => scrollToSection("contact")}
+          >
             Contact
           </NavLink>
         </nav>
@@ -88,16 +115,28 @@ const Navbar = () => {
             <NavLink href="/" active={isActive("/")} onClick={() => setIsMobileMenuOpen(false)}>
               Home
             </NavLink>
-            <NavLink href="#features" active={false} onClick={() => setIsMobileMenuOpen(false)}>
+            <NavLink 
+              href="/#features" 
+              active={location.pathname === "/" && location.hash === "#features"} 
+              onClick={() => scrollToSection("features")}
+            >
               Features
             </NavLink>
-            <NavLink href="#pricing" active={false} onClick={() => setIsMobileMenuOpen(false)}>
+            <NavLink 
+              href="/#pricing" 
+              active={location.pathname === "/" && location.hash === "#pricing"} 
+              onClick={() => scrollToSection("pricing")}
+            >
               Pricing
             </NavLink>
             <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={() => setIsMobileMenuOpen(false)}>
               Roadmap
             </NavLink>
-            <NavLink href="#contact" active={false} onClick={() => setIsMobileMenuOpen(false)}>
+            <NavLink 
+              href="/#contact" 
+              active={location.pathname === "/" && location.hash === "#contact"} 
+              onClick={() => scrollToSection("contact")}
+            >
               Contact
             </NavLink>
             <div className="flex space-x-4 pt-2">
@@ -126,6 +165,21 @@ interface NavLinkProps {
 }
 
 const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
+  if (href.startsWith("/#")) {
+    // For hash links
+    return (
+      <button
+        className={`font-medium text-sm hover-underline text-left ${
+          active ? "text-primary" : "text-foreground"
+        }`}
+        onClick={onClick}
+      >
+        {children}
+      </button>
+    );
+  }
+  
+  // For regular links
   return (
     <Link
       to={href}
