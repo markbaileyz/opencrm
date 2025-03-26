@@ -12,11 +12,11 @@ const Footer = () => {
           <div>
             <Link to="/" className="flex items-center mb-4">
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
-                Tellescope
+                NextCRM
               </span>
             </Link>
             <p className="text-muted-foreground text-sm max-w-xs">
-              Comprehensive healthcare platform for modern practices, simplifying patient management and care coordination.
+              Comprehensive customer relationship management platform for modern businesses, simplifying client management and service coordination.
             </p>
           </div>
 
@@ -53,7 +53,7 @@ const Footer = () => {
 
         <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center">
           <p className="text-muted-foreground text-sm">
-            © {currentYear} Tellescope. All rights reserved.
+            © {currentYear} NextCRM. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <SocialLink href="#" label="Twitter">
