@@ -8,17 +8,42 @@ import SortOptions from "./roadmap/SortOptions";
 
 interface CRMFeaturesListProps {
   searchQuery?: string;
+  filterType?: FilterType;
+  sortOption?: SortType;
+  categoryFilter?: string | null;
+  setSelectedCategory?: (category: string | null) => void;
 }
 
 export type SortType = "popular" | "az" | "za" | "implemented" | "coming-soon";
 
-const CRMFeaturesList: React.FC<CRMFeaturesListProps> = ({ searchQuery = "" }) => {
-  const [filter, setFilter] = useState<FilterType>("all");
-  const [sortOption, setSortOption] = useState<SortType>("popular");
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+const CRMFeaturesList: React.FC<CRMFeaturesListProps> = ({ 
+  searchQuery = "", 
+  filterType = "all",
+  sortOption = "popular",
+  categoryFilter = null,
+  setSelectedCategory = () => {},
+}) => {
+  const [filter, setFilter] = useState<FilterType>(filterType);
+  const [activeSort, setActiveSort] = useState<SortType>(sortOption);
+  const [activeCategoryFilter, setActiveCategoryFilter] = useState<string | null>(categoryFilter);
+  
+  // Update local state when props change
+  React.useEffect(() => {
+    setFilter(filterType);
+    setActiveSort(sortOption);
+    setActiveCategoryFilter(categoryFilter);
+  }, [filterType, sortOption, categoryFilter]);
   
   // Get all unique category names for the quick filters
   const categoryNames = Array.from(new Set(featuresList.map(category => category.name)));
+  
+  // Handle category filter change
+  const handleCategoryChange = (category: string | null) => {
+    setActiveCategoryFilter(category);
+    if (setSelectedCategory) {
+      setSelectedCategory(category);
+    }
+  };
   
   let filteredFeaturesList = featuresList.map(category => ({
     ...category,
@@ -39,9 +64,9 @@ const CRMFeaturesList: React.FC<CRMFeaturesListProps> = ({ searchQuery = "" }) =
   }));
   
   // Filter by category if categoryFilter is set
-  if (categoryFilter) {
+  if (activeCategoryFilter) {
     filteredFeaturesList = filteredFeaturesList.filter(
-      category => category.name === categoryFilter
+      category => category.name === activeCategoryFilter
     );
   }
   
@@ -52,7 +77,7 @@ const CRMFeaturesList: React.FC<CRMFeaturesListProps> = ({ searchQuery = "" }) =
   filteredFeaturesList = filteredFeaturesList.map(category => {
     let sortedFeatures = [...category.features];
     
-    switch (sortOption) {
+    switch (activeSort) {
       case "popular":
         sortedFeatures.sort((a, b) => (b.votes || 0) - (a.votes || 0));
         break;
@@ -95,16 +120,20 @@ const CRMFeaturesList: React.FC<CRMFeaturesListProps> = ({ searchQuery = "" }) =
       </div>
 
       <div className="flex flex-col gap-6 mb-8">
-        <FeatureFilters filter={filter} setFilter={setFilter} />
+        {!filterType && (
+          <FeatureFilters filter={filter} setFilter={setFilter} />
+        )}
         
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <CategoryQuickFilters 
             categories={categoryNames} 
-            activeCategory={categoryFilter} 
-            setActiveCategory={setCategoryFilter} 
+            activeCategory={activeCategoryFilter} 
+            setActiveCategory={handleCategoryChange} 
           />
           
-          <SortOptions sortOption={sortOption} setSortOption={setSortOption} />
+          {!sortOption && (
+            <SortOptions sortOption={activeSort} setSortOption={setActiveSort} />
+          )}
         </div>
       </div>
 
@@ -113,8 +142,8 @@ const CRMFeaturesList: React.FC<CRMFeaturesListProps> = ({ searchQuery = "" }) =
           <p className="text-xl text-muted-foreground">
             {searchQuery 
               ? `No features found matching "${searchQuery}". Try another search term.` 
-              : categoryFilter
-                ? `No features found in category "${categoryFilter}" with the current filters.`
+              : activeCategoryFilter
+                ? `No features found in category "${activeCategoryFilter}" with the current filters.`
                 : "No features found matching the selected filter."}
           </p>
         </div>
