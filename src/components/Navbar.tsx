@@ -50,6 +50,9 @@ const Navbar = () => {
           <NavLink href="#pricing" active={false}>
             Pricing
           </NavLink>
+          <NavLink href="/roadmap" active={isActive("/roadmap")}>
+            Roadmap
+          </NavLink>
           <NavLink href="#contact" active={false}>
             Contact
           </NavLink>
@@ -90,6 +93,9 @@ const Navbar = () => {
             </NavLink>
             <NavLink href="#pricing" active={false} onClick={() => setIsMobileMenuOpen(false)}>
               Pricing
+            </NavLink>
+            <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={() => setIsMobileMenuOpen(false)}>
+              Roadmap
             </NavLink>
             <NavLink href="#contact" active={false} onClick={() => setIsMobileMenuOpen(false)}>
               Contact
