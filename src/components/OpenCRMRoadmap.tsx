@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,8 +8,10 @@ import {
   CheckCircle, Shield, Code, Database, Users, Calendar, FileText, 
   Workflow, BarChart, Zap, Network, ChevronLeft, LayoutDashboard, Users as UsersIcon,
   Clock, Award, FileCode, Lightbulb, AlertTriangle, Server, Lock, Cloud, 
-  ChevronsUpDown, Layers, GitBranch, FileJson, Globe
+  ChevronsUpDown, Layers, GitBranch, FileJson, Globe, Info, PlusCircle, ChevronDown, ChevronRight
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 
 const PhaseCard = ({ 
   title, 
@@ -150,7 +152,373 @@ const TechComponent = ({
   );
 };
 
+const TimelineItem = ({ 
+  title, 
+  timeline,
+  status,
+  description,
+  icon: Icon,
+  details,
+  completion = 0
+}: { 
+  title: string; 
+  timeline: string;
+  status: "planning" | "in-progress" | "completed";
+  description: string;
+  icon: React.ElementType;
+  details?: string[];
+  completion?: number;
+}) => {
+  const [expanded, setExpanded] = useState(false);
+  
+  const statusColors = {
+    "planning": "text-amber-500 bg-amber-100",
+    "in-progress": "text-blue-500 bg-blue-100",
+    "completed": "text-green-500 bg-green-100"
+  };
+
+  const statusText = {
+    "planning": "Planning",
+    "in-progress": "In Progress",
+    "completed": "Completed"
+  };
+
+  const progressColors = {
+    "planning": "bg-amber-500",
+    "in-progress": "bg-blue-500",
+    "completed": "bg-green-500"
+  };
+
+  return (
+    <div className={`border rounded-lg hover:shadow-sm transition-all duration-300 ${expanded ? 'mb-8' : 'mb-4'}`}>
+      <div className="flex gap-4 p-4">
+        <div className={`rounded-full ${statusColors[status]} p-2 h-fit`}>
+          <Icon className="h-5 w-5" />
+        </div>
+        <div className="flex-1">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2">
+            <h4 className="font-medium text-lg">{title}</h4>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">{timeline}</span>
+              <span className={`text-xs px-2 py-1 rounded ${statusColors[status]}`}>
+                {statusText[status]}
+              </span>
+            </div>
+          </div>
+          <p className="text-muted-foreground mt-1 mb-2">{description}</p>
+          
+          <div className="flex items-center gap-2 mt-3">
+            <Progress 
+              value={completion} 
+              className="h-2 flex-1" 
+              indicatorStyle={{
+                background: progressColors[status]
+              }}
+            />
+            <span className="text-xs font-medium">{completion}%</span>
+            
+            {details && details.length > 0 && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="p-0 h-7 w-7" 
+                onClick={() => setExpanded(!expanded)}
+              >
+                {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      {expanded && details && (
+        <div className="px-4 pb-4 pt-0 ml-11 border-t mt-2">
+          <h5 className="text-sm font-medium mb-2">Milestone Details</h5>
+          <ul className="space-y-2">
+            {details.map((detail, index) => (
+              <li key={index} className="flex items-start gap-2">
+                <div className="rounded-full bg-primary/10 p-1 mt-0.5">
+                  <PlusCircle className="h-3 w-3 text-primary" />
+                </div>
+                <span className="text-sm">{detail}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const MilestoneGroup = ({ 
+  title, 
+  description, 
+  milestones 
+}: { 
+  title: string; 
+  description: string; 
+  milestones: Array<{ 
+    title: string; 
+    timeline: string; 
+    status: "planning" | "in-progress" | "completed"; 
+    description: string; 
+    icon: React.ElementType;
+    details?: string[];
+    completion?: number;
+  }>; 
+}) => {
+  const [expanded, setExpanded] = useState(true);
+  
+  const completedCount = milestones.filter(m => m.status === "completed").length;
+  const inProgressCount = milestones.filter(m => m.status === "in-progress").length;
+  const totalCount = milestones.length;
+  
+  const completionPercentage = Math.round((completedCount + (inProgressCount * 0.5)) / totalCount * 100);
+  
+  return (
+    <div className="mb-8 animate-fade-up">
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="text-xl font-semibold">{title}</h3>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="p-0 h-7 w-7" 
+              onClick={() => setExpanded(!expanded)}
+            >
+              {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            </Button>
+          </div>
+          <p className="text-muted-foreground text-sm">{description}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">{completionPercentage}%</span>
+          <span className="text-xs text-muted-foreground">
+            {completedCount} of {totalCount} completed
+          </span>
+        </div>
+      </div>
+      
+      <div className="mb-4">
+        <Progress 
+          value={completionPercentage} 
+          className="h-2"
+          style={{ background: "hsl(var(--secondary))" }}
+          indicatorStyle={{
+            background: completionPercentage === 100 
+              ? "hsl(var(--success, 142 76% 36%))" 
+              : "hsl(var(--primary))"
+          }}
+        />
+      </div>
+      
+      {expanded && (
+        <div className="space-y-3">
+          {milestones.map((milestone, index) => (
+            <TimelineItem
+              key={index}
+              {...milestone}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const DevelopmentProgress = ({ value }: { value: number }) => {
+  return (
+    <div className="mb-6">
+      <div className="flex justify-between mb-2">
+        <span className="text-sm font-medium">Overall Development Progress</span>
+        <span className="text-sm font-medium">{value}%</span>
+      </div>
+      <div className="relative h-8 bg-background border rounded-lg overflow-hidden">
+        <Progress
+          value={value}
+          className="h-full"
+          indicatorStyle={{
+            background: "linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--success)) 100%)"
+          }}
+        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-sm font-semibold mix-blend-difference text-white">Target Release: Q1 2025</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const OpenCRMRoadmap = () => {
+  const [activeAccordion, setActiveAccordion] = useState<string | null>("prd");
+  
+  const foundationMilestones = [
+    {
+      title: "Product Definition & Market Analysis",
+      timeline: "Q4 2023",
+      status: "completed" as const,
+      description: "Defined target market segments, conducted competitive analysis, and established core value propositions.",
+      icon: Lightbulb,
+      details: [
+        "Completed market research for healthcare CRM landscape",
+        "Identified primary target segments (small practices, digital health startups)",
+        "Established initial pricing strategy and business model",
+        "Completed competitive analysis of existing solutions"
+      ],
+      completion: 100
+    },
+    {
+      title: "HIPAA Compliance Framework",
+      timeline: "Q4 2023",
+      status: "completed" as const,
+      description: "Established baseline security and privacy requirements, documentation standards, and compliance monitoring approach.",
+      icon: Shield,
+      details: [
+        "Documented required HIPAA Security Rule safeguards",
+        "Created Privacy Rule implementation guidelines",
+        "Established BAA templates and management process",
+        "Developed data breach response procedures"
+      ],
+      completion: 100
+    },
+    {
+      title: "System Architecture & Technology Selection",
+      timeline: "Q1 2024",
+      status: "completed" as const,
+      description: "Designed multi-tenant architecture, selected technology stack, and established development environment.",
+      icon: FileCode,
+      details: [
+        "Finalized microservices architecture design",
+        "Selected frontend and backend technology stack",
+        "Implemented development environment with CI/CD pipeline",
+        "Created architecture documentation and diagrams"
+      ],
+      completion: 100
+    }
+  ];
+  
+  const developmentMilestones = [
+    {
+      title: "Patient Management Module",
+      timeline: "Q1-Q2 2024",
+      status: "in-progress" as const,
+      description: "Building core patient data management, timeline views, and profile customization features.",
+      icon: Users,
+      details: [
+        "Completed patient demographics module",
+        "Implemented patient interaction timeline",
+        "Currently building custom fields functionality",
+        "Preparing for integration with document management"
+      ],
+      completion: 65
+    },
+    {
+      title: "Communication Hub Development",
+      timeline: "Q2 2024",
+      status: "in-progress" as const,
+      description: "Implementing secure messaging infrastructure, templates, and omnichannel capabilities.",
+      icon: Network,
+      details: [
+        "Completed secure messaging backend",
+        "Implemented message encryption and audit logging",
+        "Currently building template system",
+        "Planning SMS integration implementation"
+      ],
+      completion: 40
+    },
+    {
+      title: "Appointment & Scheduling System",
+      timeline: "Q2-Q3 2024",
+      status: "planning" as const,
+      description: "Building provider availability management, patient self-scheduling, and automated reminders.",
+      icon: Calendar,
+      details: [
+        "Finalized scheduling system requirements",
+        "Created UI/UX design prototypes",
+        "Planning development sprints",
+        "Researching calendar integration options"
+      ],
+      completion: 15
+    }
+  ];
+  
+  const advancedMilestones = [
+    {
+      title: "Workflow Automation Engine",
+      timeline: "Q3 2024",
+      status: "planning" as const,
+      description: "Developing visual workflow builder, trigger system, and automated actions framework.",
+      icon: Workflow,
+      details: [
+        "Completed initial workflow engine design",
+        "Prototyped core automation concepts",
+        "Planning development phases",
+        "Researching workflow template options"
+      ],
+      completion: 10
+    },
+    {
+      title: "EHR Integration & Interoperability",
+      timeline: "Q3-Q4 2024",
+      status: "planning" as const,
+      description: "Implementing FHIR API endpoints, HL7 integration capabilities, and data synchronization.",
+      icon: Database,
+      details: [
+        "Defined FHIR resource implementation approach",
+        "Researched HL7 v2 integration pathways",
+        "Created preliminary API documentation",
+        "Planning testing strategy for interoperability"
+      ],
+      completion: 5
+    }
+  ];
+  
+  const launchMilestones = [
+    {
+      title: "Analytics & Reporting Dashboard",
+      timeline: "Q4 2024",
+      status: "planning" as const,
+      description: "Building operational metrics tracking, role-based dashboards, and privacy-respecting data aggregation.",
+      icon: BarChart,
+      details: [
+        "Identified key performance metrics",
+        "Created dashboard mockups",
+        "Planning data warehouse architecture",
+        "Researching visualization libraries"
+      ],
+      completion: 5
+    },
+    {
+      title: "Beta Testing & User Acceptance",
+      timeline: "Q4 2024",
+      status: "planning" as const,
+      description: "Conducting comprehensive testing with healthcare providers and refining based on feedback.",
+      icon: AlertTriangle,
+      details: [
+        "Developed testing strategy",
+        "Initial recruitment of beta testers",
+        "Created feedback collection tools",
+        "Planning user acceptance test scenarios"
+      ],
+      completion: 5
+    },
+    {
+      title: "MVP Launch & Initial Deployment",
+      timeline: "Q1 2025",
+      status: "planning" as const,
+      description: "Official release of the minimum viable product with core functionality to early adopters.",
+      icon: Award,
+      details: [
+        "Created launch strategy",
+        "Developed onboarding materials",
+        "Planning marketing activities",
+        "Establishing support infrastructure"
+      ],
+      completion: 0
+    }
+  ];
+  
   return (
     <div className="space-y-8 animate-fade-up">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -213,7 +581,7 @@ const OpenCRMRoadmap = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="phases" className="w-full">
+      <Tabs defaultValue="timeline" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="phases">Development Phases</TabsTrigger>
           <TabsTrigger value="features">Core Features</TabsTrigger>

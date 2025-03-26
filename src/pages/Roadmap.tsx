@@ -1,14 +1,16 @@
 
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CRMFeaturesList from "@/components/CRMFeaturesList";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Filter, FileText } from "lucide-react";
+import { ChevronDown, Filter, FileText, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 
 const Roadmap = () => {
+  const [showFilters, setShowFilters] = useState(false);
+  
   // Function to handle smooth scrolling to features list
   const scrollToFeatures = () => {
     document.getElementById('features-list')?.scrollIntoView({ behavior: 'smooth' });
@@ -34,9 +36,18 @@ const Roadmap = () => {
               >
                 Explore Our Roadmap <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={() => setShowFilters(!showFilters)}
+                className={showFilters ? "bg-primary/10" : ""}
+              >
                 <Filter className="h-4 w-4" />
                 <span className="sr-only">Filter features</span>
+              </Button>
+              <Button variant="outline" size="icon">
+                <Search className="h-4 w-4" />
+                <span className="sr-only">Search features</span>
               </Button>
             </div>
           </div>
