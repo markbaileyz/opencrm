@@ -22,6 +22,7 @@ const data: MindMapNode = {
         { id: 'pricing', label: 'Pricing', description: 'Service pricing tiers' },
         { id: 'roadmap', label: 'Roadmap', description: 'Future development plans' },
         { id: 'mindmap', label: 'Mind Map', description: 'Visual site structure overview' },
+        { id: 'healthcare-crm', label: 'Healthcare CRM', description: 'Healthcare CRM Enhancement Strategies' },
       ]
     },
     {
@@ -60,6 +61,17 @@ const data: MindMapNode = {
         { id: 'profile', label: 'Profile Settings', description: 'Personal information and preferences' },
         { id: 'notifications', label: 'Notifications', description: 'Communication preferences' },
         { id: 'security', label: 'Security', description: 'Password and security settings' },
+      ]
+    },
+    {
+      id: 'healthcare',
+      label: 'Healthcare CRM',
+      description: 'Healthcare-specific CRM features',
+      children: [
+        { id: 'security', label: 'Data Security', description: 'HIPAA compliance and patient data protection' },
+        { id: 'engagement', label: 'Community Engagement', description: 'Patient feedback and education' },
+        { id: 'payments', label: 'Payment Optimization', description: 'Streamlined healthcare billing' },
+        { id: 'advanced', label: 'Advanced Enhancements', description: 'AI and automation features' },
       ]
     },
   ]

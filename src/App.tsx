@@ -11,6 +11,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import Roadmap from "@/pages/Roadmap";
 import MindMap from "@/pages/MindMap";
+import HealthcareCRM from "@/pages/HealthcareCRM";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/roadmap" element={<Roadmap />} />
         <Route path="/mind-map" element={<MindMap />} />
+        <Route path="/healthcare-crm" element={<HealthcareCRM />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </ThemeProvider>
