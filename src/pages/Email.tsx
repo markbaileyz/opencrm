@@ -28,6 +28,14 @@ const Email = () => {
     handleSendEmail
   } = useEmailManager(emailData);
 
+  // Calculate unread counts for each folder
+  const unreadCounts = emails.reduce((counts, email) => {
+    if (!email.read) {
+      counts[email.folder] = (counts[email.folder] || 0) + 1;
+    }
+    return counts;
+  }, {} as Record<string, number>);
+
   const handleComposeOpen = () => {
     setIsComposeOpen(true);
   };
@@ -103,6 +111,7 @@ const Email = () => {
             activeTab={activeTab} 
             onFilterChange={handleFilterChange}
             activeFilters={activeFilters}
+            unreadCounts={unreadCounts}
           />
           
           <TabsContent value={activeTab}>

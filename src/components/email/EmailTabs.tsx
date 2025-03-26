@@ -17,17 +17,20 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface EmailTabsProps {
   activeTab: string;
   onFilterChange?: (filters: string[]) => void;
   activeFilters?: string[];
+  unreadCounts?: Record<string, number>;
 }
 
 const EmailTabs: React.FC<EmailTabsProps> = ({ 
   activeTab,
   onFilterChange = () => {},
-  activeFilters = []
+  activeFilters = [],
+  unreadCounts = {}
 }) => {
   const handleFilterToggle = (value: string) => {
     if (activeFilters.includes(value)) {
@@ -43,6 +46,11 @@ const EmailTabs: React.FC<EmailTabsProps> = ({
         <TabsTrigger value="inbox" className="gap-2">
           <Inbox className="h-4 w-4" />
           <span className="hidden sm:inline">Inbox</span>
+          {unreadCounts.inbox > 0 && (
+            <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+              {unreadCounts.inbox}
+            </Badge>
+          )}
         </TabsTrigger>
         <TabsTrigger value="sent" className="gap-2">
           <Send className="h-4 w-4" />
@@ -51,6 +59,11 @@ const EmailTabs: React.FC<EmailTabsProps> = ({
         <TabsTrigger value="drafts" className="gap-2">
           <MailOpen className="h-4 w-4" />
           <span className="hidden sm:inline">Drafts</span>
+          {unreadCounts.drafts > 0 && (
+            <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+              {unreadCounts.drafts}
+            </Badge>
+          )}
         </TabsTrigger>
         <TabsTrigger value="trash" className="gap-2">
           <Trash className="h-4 w-4" />
@@ -67,6 +80,11 @@ const EmailTabs: React.FC<EmailTabsProps> = ({
           <Button variant="outline" size="sm" className="gap-2">
             <Filter className="h-4 w-4" />
             <span className="hidden sm:inline">Filters</span>
+            {activeFilters.length > 0 && (
+              <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+                {activeFilters.length}
+              </Badge>
+            )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
