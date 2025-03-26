@@ -77,7 +77,7 @@ const OrganizationsFilters: React.FC = () => {
             <SelectValue placeholder="Organization Type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Types</SelectItem>
+            <SelectItem value="all">All Types</SelectItem>
             {organizationTypes.map((type) => (
               <SelectItem key={type} value={type}>
                 {type}
@@ -93,7 +93,7 @@ const OrganizationsFilters: React.FC = () => {
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Statuses</SelectItem>
+            <SelectItem value="all">All Statuses</SelectItem>
             {organizationStatuses.map((status) => (
               <SelectItem key={status} value={status}>
                 {status}
