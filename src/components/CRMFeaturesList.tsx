@@ -1,3 +1,4 @@
+
 import React from "react";
 
 // Define feature categories and their features
@@ -55,10 +56,12 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Lead Conversion",
         description: "Convert qualified leads into customers with streamlined processes",
+        implemented: true,
       },
       {
         name: "Lead Source Tracking",
         description: "Track and analyze which sources generate the most valuable leads",
+        comingSoon: true,
       },
     ],
   },
@@ -78,6 +81,7 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Forecasting",
         description: "Forecast future sales and revenue",
+        comingSoon: true,
       },
       {
         name: "Opportunity Management",
@@ -107,10 +111,12 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Service Analytics",
         description: "Analyze customer service performance and satisfaction metrics",
+        comingSoon: true,
       },
       {
         name: "Live Chat Support",
         description: "Engage with customers through real-time chat support",
+        implemented: true,
       },
       {
         name: "Customer Feedback",
@@ -135,6 +141,7 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Automation",
         description: "Automate marketing workflows and tasks",
+        implemented: true,
       },
       {
         name: "Social Media Integration",
@@ -144,6 +151,7 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Content Calendar",
         description: "Plan and schedule marketing content across channels",
+        implemented: true,
       },
     ],
   },
