@@ -2,10 +2,11 @@
 import React, { useState } from "react";
 import { Card, CardHeader, CardContent, CardTitle, CardFooter } from "@/components/ui/card";
 import { Feature } from "@/data/featuresList";
-import { Check, Clock, ThumbsUp, ThumbsDown, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, Clock, ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Progress } from "@/components/ui/progress";
 
 interface FeatureCardProps {
   feature: Feature;
@@ -38,6 +39,15 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature }) => {
     });
   };
 
+  // Calculate implementation progress percentage
+  const getImplementationProgress = () => {
+    if (feature.implemented) return 100;
+    if (feature.comingSoon) return feature.progress || 25; // Default to 25% if coming soon
+    return 0;
+  };
+
+  const implementationProgress = getImplementationProgress();
+
   return (
     <Card className="transition-all hover:shadow-md hover:scale-[1.02] duration-200 animate-scale-in flex flex-col">
       <CardHeader className="pb-2">
@@ -59,6 +69,28 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature }) => {
       </CardHeader>
       <CardContent className="flex-grow">
         <p className="text-muted-foreground">{feature.description}</p>
+        
+        {/* Implementation Progress Bar - New Addition */}
+        {(feature.implemented || feature.comingSoon) && (
+          <div className="mt-3 mb-2">
+            <div className="flex items-center justify-between text-xs mb-1">
+              <span className="text-muted-foreground">Implementation Progress</span>
+              <span className="font-medium">{implementationProgress}%</span>
+            </div>
+            <Progress 
+              value={implementationProgress} 
+              className="h-1.5" 
+              style={{
+                background: "hsl(var(--secondary))",
+              }}
+              indicatorStyle={{
+                background: feature.implemented 
+                  ? "hsl(var(--success, 142 76% 36%))" 
+                  : "hsl(var(--primary))"
+              }}
+            />
+          </div>
+        )}
         
         {feature.technicalDetails && (
           <Collapsible 
@@ -89,6 +121,10 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature }) => {
             </div>
             <CollapsibleContent className="pt-2">
               <div className="text-sm bg-muted/50 p-2 rounded-md">
+                <div className="flex items-center gap-1 mb-1 text-xs font-medium text-muted-foreground">
+                  <FileText className="h-3 w-3" />
+                  Technical Specifications
+                </div>
                 <p className="text-muted-foreground">{feature.technicalDetails}</p>
               </div>
             </CollapsibleContent>
