@@ -28,7 +28,7 @@ const Dashboard = () => {
   const isDoctor = user?.email.includes("doctor");
   
   // Simulated data
-  const patientActivityData = [
+  const customerActivityData = [
     { name: "Jan", value: 24 },
     { name: "Feb", value: 28 },
     { name: "Mar", value: 32 },
@@ -49,21 +49,21 @@ const Dashboard = () => {
         <div>
           <h1 className="text-2xl font-bold mb-2">Dashboard</h1>
           <p className="text-muted-foreground">
-            {isAdmin ? "Welcome to your admin dashboard" : "Welcome to your healthcare dashboard"}
+            {isAdmin ? "Welcome to your admin dashboard" : "Welcome to your NextCRM dashboard"}
           </p>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-up">
           <StatCard
-            title="Total Patients"
+            title="Total Customers"
             value={isAdmin ? "1,284" : "763"}
             icon={<Users className="h-5 w-5 text-primary" />}
             description={`${isAdmin ? "42" : "12"} new this month`}
             trend="up"
           />
           <StatCard
-            title="Appointments"
+            title="Meetings"
             value={isAdmin ? "342" : "56"}
             icon={<Calendar className="h-5 w-5 text-primary" />}
             description={`${isAdmin ? "18" : "8"} today`}
@@ -77,7 +77,7 @@ const Dashboard = () => {
             trend="neutral"
           />
           <StatCard
-            title="Patient Satisfaction"
+            title="Customer Satisfaction"
             value={isAdmin ? "92%" : "94%"}
             icon={<TrendingUp className="h-5 w-5 text-primary" />}
             description="3% increase"
@@ -89,13 +89,13 @@ const Dashboard = () => {
         <div className="space-y-6 animate-fade-up delay-200">
           <Card>
             <CardHeader>
-              <CardTitle>Patient Activity</CardTitle>
+              <CardTitle>Customer Activity</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
-                    data={patientActivityData}
+                    data={customerActivityData}
                     margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -120,14 +120,14 @@ const Dashboard = () => {
           {/* Recent Appointments */}
           <Card>
             <CardHeader>
-              <CardTitle>Today's Appointments</CardTitle>
+              <CardTitle>Today's Meetings</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <AppointmentItem
                   name="Sarah Johnson"
                   time="9:00 AM"
-                  type="Check-up"
+                  type="Check-in"
                   status="completed"
                 />
                 <AppointmentItem
@@ -145,7 +145,7 @@ const Dashboard = () => {
                 <AppointmentItem
                   name="Michael Williams"
                   time="3:00 PM"
-                  type="New Patient"
+                  type="New Client"
                   status="upcoming"
                 />
                 <AppointmentItem
@@ -166,30 +166,30 @@ const Dashboard = () => {
             <CardContent>
               <div className="space-y-4">
                 <MessageItem
-                  name="Dr. Rebecca Lee"
-                  message="Updated lab results for patient #12948"
+                  name="Sales Team"
+                  message="Updated leads report for Q3 available"
                   time="10m ago"
                   unread
                 />
                 <MessageItem
-                  name="Nurse Martinez"
-                  message="Question about medication for Johnson, T."
+                  name="Support Agent"
+                  message="Question about subscription for Johnson, T."
                   time="32m ago"
                   unread
                 />
                 <MessageItem
                   name="Front Desk"
-                  message="New appointment request from Davis family"
+                  message="New meeting request from Davis Corp"
                   time="1h ago"
                 />
                 <MessageItem
-                  name="Dr. James Wilson"
-                  message="Follow-up notes from today's meeting"
+                  name="Marketing Team"
+                  message="Follow-up notes from today's campaign review"
                   time="3h ago"
                 />
                 <MessageItem
-                  name="Sarah (Patient)"
-                  message="Thank you for the great care yesterday!"
+                  name="Sarah (Client)"
+                  message="Thank you for the great service yesterday!"
                   time="1d ago"
                 />
               </div>

@@ -12,14 +12,14 @@ const Hero = () => {
           <div className="space-y-6 animate-fade-up">
             <div>
               <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-                Patient management simplified
+                Customer management simplified
               </span>
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
-              Your complete healthcare solution
+              Your complete CRM solution
             </h1>
             <p className="text-lg text-muted-foreground max-w-lg">
-              Tellescope makes it easy to connect with patients and provide the best care possible, all in one intuitive platform.
+              NextCRM makes it easy to connect with customers and provide the best service possible, all in one intuitive platform.
             </p>
             <div className="flex flex-wrap gap-4 pt-2">
               <Link to="/login">
@@ -40,7 +40,7 @@ const Hero = () => {
               <div className="aspect-video rounded-xl overflow-hidden shadow-md">
                 <img 
                   src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=1470" 
-                  alt="Patient Dashboard" 
+                  alt="Customer Dashboard" 
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -53,8 +53,8 @@ const Hero = () => {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium text-sm">Secure patient portal</p>
-                  <p className="text-xs text-muted-foreground">HIPAA compliant</p>
+                  <p className="font-medium text-sm">Secure customer portal</p>
+                  <p className="text-xs text-muted-foreground">Fully encrypted</p>
                 </div>
               </div>
             </div>
@@ -65,8 +65,8 @@ const Hero = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-24 animate-fade-up delay-400">
           <StatBox value="98%" label="Customer satisfaction" />
           <StatBox value="24/7" label="Support available" />
-          <StatBox value="10k+" label="Healthcare providers" />
-          <StatBox value="1M+" label="Patients served" />
+          <StatBox value="10k+" label="Businesses using NextCRM" />
+          <StatBox value="1M+" label="Customers managed" />
         </div>
       </div>
     </section>

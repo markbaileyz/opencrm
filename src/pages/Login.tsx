@@ -9,7 +9,7 @@ const Login = () => {
       <div className="mb-8 text-center">
         <Link to="/" className="inline-block">
           <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
-            Tellescope
+            NextCRM
           </span>
         </Link>
       </div>

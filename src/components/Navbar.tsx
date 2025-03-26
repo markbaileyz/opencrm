@@ -35,7 +35,7 @@ const Navbar = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center">
           <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
-            Tellescope
+            NextCRM
           </span>
         </Link>
 

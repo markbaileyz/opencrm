@@ -32,7 +32,7 @@ const LoginForm = ({ isSignUp = false }: LoginFormProps) => {
       if (email.includes("test") || email === "admin@example.com" || email === "doctor@example.com" || email === "nurse@example.com") {
         // Login successfully
         login({ email });
-        toast.success(`Welcome back, ${email}!`);
+        toast.success(`Welcome to NextCRM, ${email}!`);
         navigate("/dashboard");
       } else {
         // Show error for any other email
