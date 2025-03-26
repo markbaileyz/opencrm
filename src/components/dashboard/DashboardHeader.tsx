@@ -1,12 +1,12 @@
 
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import StatsGrid from "./StatsGrid";
 import { Search, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import NotificationCenter from "./NotificationCenter";
+import ProfileMenu from "./ProfileMenu";
 
 interface DashboardHeaderProps {
   isAdmin: boolean;
@@ -15,15 +15,6 @@ interface DashboardHeaderProps {
 const DashboardHeader = ({ isAdmin }: DashboardHeaderProps) => {
   const { user } = useAuth();
   
-  const getInitials = (name: string) => {
-    if (!name) return "U";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
@@ -47,10 +38,7 @@ const DashboardHeader = ({ isAdmin }: DashboardHeaderProps) => {
             <Sparkles className="h-4 w-4" />
             <span className="hidden md:inline">AI Assistant</span>
           </Button>
-          <Avatar className="h-9 w-9">
-            <AvatarImage src={user?.photoURL || ""} />
-            <AvatarFallback>{getInitials(user?.displayName || "User")}</AvatarFallback>
-          </Avatar>
+          <ProfileMenu />
         </div>
       </div>
       
