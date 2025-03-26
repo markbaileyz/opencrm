@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import ComposeEmail from "@/components/email/ComposeEmail";
@@ -7,12 +7,15 @@ import { emailData } from "@/data/emailData";
 import EmailHeader from "@/components/email/EmailHeader";
 import EmailTabs from "@/components/email/EmailTabs";
 import EmailContent from "@/components/email/EmailContent";
+import EmailSearch from "@/components/email/EmailSearch";
 import { useEmailManager } from "@/hooks/useEmailManager";
 import type { Email } from "@/types/email";
 
 const Email = () => {
   const [activeTab, setActiveTab] = useState("inbox");
   const [isComposeOpen, setIsComposeOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
   
   const {
     emails,
@@ -51,15 +54,56 @@ const Email = () => {
     // Implementation for pre-filling forward can be added later
   };
 
-  const filteredEmails = emails.filter(email => email.folder === activeTab);
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleFilterChange = (filters: string[]) => {
+    setActiveFilters(filters);
+  };
+
+  // Filter emails based on the active tab, search query, and active filters
+  const filteredEmails = emails.filter(email => {
+    // First filter by folder (tab)
+    if (email.folder !== activeTab) return false;
+    
+    // Then apply search query if present
+    if (searchQuery && !emailMatchesSearch(email, searchQuery)) return false;
+    
+    // Then apply active filters
+    if (activeFilters.includes("starred") && !email.starred) return false;
+    if (activeFilters.includes("unread") && email.read) return false;
+    if (activeFilters.includes("attachments") && !email.hasAttachments) return false;
+    
+    return true;
+  });
+
+  // Helper function to check if an email matches the search query
+  const emailMatchesSearch = (email: Email, query: string): boolean => {
+    const lowerCaseQuery = query.toLowerCase();
+    return (
+      email.subject.toLowerCase().includes(lowerCaseQuery) ||
+      email.senderName.toLowerCase().includes(lowerCaseQuery) ||
+      email.senderEmail.toLowerCase().includes(lowerCaseQuery) ||
+      email.preview.toLowerCase().includes(lowerCaseQuery) ||
+      email.body.toLowerCase().includes(lowerCaseQuery)
+    );
+  };
   
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <EmailHeader onComposeClick={handleComposeOpen} />
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <EmailHeader onComposeClick={handleComposeOpen} />
+          <EmailSearch onSearch={handleSearch} />
+        </div>
         
         <Tabs defaultValue="inbox" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <EmailTabs activeTab={activeTab} />
+          <EmailTabs 
+            activeTab={activeTab} 
+            onFilterChange={handleFilterChange}
+            activeFilters={activeFilters}
+          />
           
           <TabsContent value={activeTab}>
             <EmailContent 
