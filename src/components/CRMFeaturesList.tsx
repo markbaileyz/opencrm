@@ -1,4 +1,6 @@
-import React from "react";
+
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Define feature categories and their features
 interface Feature {
@@ -156,7 +158,21 @@ const featuresList: FeatureCategory[] = [
   },
 ];
 
+type FilterType = "all" | "implemented" | "coming-soon";
+
 const CRMFeaturesList = () => {
+  const [filter, setFilter] = useState<FilterType>("all");
+  
+  const filteredFeaturesList = featuresList.map(category => ({
+    ...category,
+    features: category.features.filter(feature => {
+      if (filter === "all") return true;
+      if (filter === "implemented") return feature.implemented;
+      if (filter === "coming-soon") return feature.comingSoon;
+      return true;
+    })
+  })).filter(category => category.features.length > 0);
+
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="text-center mb-16">
@@ -167,37 +183,85 @@ const CRMFeaturesList = () => {
         </p>
       </div>
 
-      <div className="space-y-16">
-        {featuresList.map((category) => (
-          <div key={category.name} className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 border-b pb-2">{category.name}</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {category.features.map((feature) => (
-                <div 
-                  key={feature.name}
-                  className="border rounded-lg p-6 transition-all hover:shadow-md"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-lg font-semibold">{feature.name}</h3>
-                    {feature.implemented && (
-                      <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                        Implemented
-                      </span>
-                    )}
-                    {feature.comingSoon && (
-                      <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                        Coming Soon
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+      <div className="flex justify-center mb-8">
+        <div className="inline-flex rounded-md shadow-sm">
+          <button
+            type="button"
+            className={`px-4 py-2 text-sm font-medium border rounded-l-lg ${
+              filter === "all"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-background text-foreground border-border hover:bg-muted"
+            }`}
+            onClick={() => setFilter("all")}
+          >
+            All Features
+          </button>
+          <button
+            type="button"
+            className={`px-4 py-2 text-sm font-medium border-t border-b border-r ${
+              filter === "implemented"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-background text-foreground border-border hover:bg-muted"
+            }`}
+            onClick={() => setFilter("implemented")}
+          >
+            Implemented
+          </button>
+          <button
+            type="button"
+            className={`px-4 py-2 text-sm font-medium border-t border-b border-r rounded-r-lg ${
+              filter === "coming-soon"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-background text-foreground border-border hover:bg-muted"
+            }`}
+            onClick={() => setFilter("coming-soon")}
+          >
+            Coming Soon
+          </button>
+        </div>
       </div>
+
+      {filteredFeaturesList.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-xl text-muted-foreground">No features found matching the selected filter.</p>
+        </div>
+      ) : (
+        <div className="space-y-16">
+          {filteredFeaturesList.map((category) => (
+            <div key={category.name} className="mb-12">
+              <h2 className="text-2xl font-bold mb-6 border-b pb-2">{category.name}</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {category.features.map((feature) => (
+                  <Card 
+                    key={feature.name}
+                    className="transition-all hover:shadow-md"
+                  >
+                    <CardHeader className="pb-2">
+                      <div className="flex items-start justify-between">
+                        <CardTitle className="text-lg">{feature.name}</CardTitle>
+                        {feature.implemented && (
+                          <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                            Implemented
+                          </span>
+                        )}
+                        {feature.comingSoon && (
+                          <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                            Coming Soon
+                          </span>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground">{feature.description}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
