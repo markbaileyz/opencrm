@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Email } from "@/types/email";
 import { useToast } from "@/hooks/use-toast";
 
@@ -7,6 +7,19 @@ export function useEmailActions() {
   const { toast } = useToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastSavedDraft, setLastSavedDraft] = useState<string | null>(null);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
+
+  // Auto-save interval reference
+  const [autoSaveIntervalRef, setAutoSaveIntervalRef] = useState<NodeJS.Timeout | null>(null);
+
+  // Clean up auto-save on unmount
+  useEffect(() => {
+    return () => {
+      if (autoSaveIntervalRef) {
+        clearInterval(autoSaveIntervalRef);
+      }
+    };
+  }, [autoSaveIntervalRef]);
 
   const handleReplyEmail = (email: Email, setIsComposeOpen: (value: boolean) => void) => {
     // Pre-fill reply data
@@ -134,6 +147,19 @@ export function useEmailActions() {
   };
 
   const autoSaveDraft = (draftData: any, intervalMs = 30000) => {
+    // Clear any existing interval
+    if (autoSaveIntervalRef) {
+      clearInterval(autoSaveIntervalRef);
+      setAutoSaveIntervalRef(null);
+    }
+    
+    if (!draftData || Object.keys(draftData).length === 0) {
+      setIsAutoSaving(false);
+      return;
+    }
+    
+    setIsAutoSaving(true);
+    
     // Setup auto-save at specified interval
     const intervalId = setInterval(() => {
       if (draftData && Object.keys(draftData).length > 0) {
@@ -141,8 +167,14 @@ export function useEmailActions() {
       }
     }, intervalMs);
     
+    setAutoSaveIntervalRef(intervalId);
+    
     // Return function to clear the interval
-    return () => clearInterval(intervalId);
+    return () => {
+      clearInterval(intervalId);
+      setIsAutoSaving(false);
+      setAutoSaveIntervalRef(null);
+    };
   };
   
   return {
@@ -155,6 +187,7 @@ export function useEmailActions() {
     refreshEmails,
     autoSaveDraft,
     isRefreshing,
+    isAutoSaving,
     lastSavedDraft
   };
 }

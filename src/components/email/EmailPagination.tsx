@@ -71,6 +71,26 @@ const EmailPagination: React.FC<EmailPaginationProps> = ({
   const startEmail = Math.min((currentPage - 1) * emailsPerPage + 1, totalEmails);
   const endEmail = Math.min(currentPage * emailsPerPage, totalEmails);
   
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent, newPage: number) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onPageChange(newPage);
+    }
+  };
+  
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      onPageChange(currentPage - 1);
+    }
+  };
+  
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      onPageChange(currentPage + 1);
+    }
+  };
+  
   return (
     <div className="flex flex-col sm:flex-row justify-between items-center gap-4 w-full">
       <div className="text-sm text-muted-foreground">
@@ -83,23 +103,29 @@ const EmailPagination: React.FC<EmailPaginationProps> = ({
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
+              onClick={goToPreviousPage}
+              onKeyDown={(e) => handleKeyDown(e, currentPage - 1)}
               className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
               aria-disabled={currentPage === 1}
+              tabIndex={currentPage === 1 ? -1 : 0}
             />
           </PaginationItem>
           
           {pageNumbers.map((page, index) => (
             <PaginationItem key={`page-${index}`}>
               {page === "ellipsis" ? (
-                <span className="px-2 py-2 text-muted-foreground">...</span>
+                <span className="px-2 py-2 text-muted-foreground" aria-hidden="true">...</span>
               ) : (
                 <PaginationLink
                   isActive={currentPage === page}
                   onClick={() => onPageChange(page as number)}
+                  onKeyDown={(e) => handleKeyDown(e, page as number)}
                   className={`cursor-pointer ${
                     currentPage === page ? "bg-primary text-primary-foreground" : ""
                   }`}
+                  aria-current={currentPage === page ? "page" : undefined}
+                  aria-label={`Page ${page}`}
+                  tabIndex={0}
                 >
                   {page}
                 </PaginationLink>
@@ -109,9 +135,11 @@ const EmailPagination: React.FC<EmailPaginationProps> = ({
           
           <PaginationItem>
             <PaginationNext
-              onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
+              onClick={goToNextPage}
+              onKeyDown={(e) => handleKeyDown(e, currentPage + 1)}
               className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
               aria-disabled={currentPage === totalPages}
+              tabIndex={currentPage === totalPages ? -1 : 0}
             />
           </PaginationItem>
         </PaginationContent>

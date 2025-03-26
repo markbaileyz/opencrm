@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Table, 
   TableBody, 
@@ -40,7 +40,12 @@ const EmailList = ({
 }: EmailListProps) => {
   const [hoveredEmail, setHoveredEmail] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const emailsPerPage = 15; // Increased from 10 to display more emails
+  const emailsPerPage = 15; // Display 15 emails per page
+
+  // Reset to page 1 when email list changes (e.g., due to filtering or sorting)
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [emails.length, folder, sortOption]);
 
   const {
     selectedEmails,
