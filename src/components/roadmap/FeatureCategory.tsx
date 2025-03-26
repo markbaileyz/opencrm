@@ -16,7 +16,7 @@ const FeatureCategory: React.FC<FeatureCategoryProps> = ({ category }) => {
   const implementationPercentage = Math.round((implementedFeatures / totalFeatures) * 100);
   
   return (
-    <div className="mb-12">
+    <div className="mb-12 animate-fade-up">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
         <h2 className="text-2xl font-bold pb-2">{category.name}</h2>
         <div className="flex items-center gap-3">
@@ -28,7 +28,21 @@ const FeatureCategory: React.FC<FeatureCategoryProps> = ({ category }) => {
       </div>
       
       <div className="mb-6">
-        <Progress value={implementationPercentage} className="h-2" />
+        <Progress 
+          value={implementationPercentage} 
+          className="h-2" 
+          // Color the progress bar based on percentage
+          style={{
+            background: "hsl(var(--secondary))",
+          }}
+          indicatorStyle={{
+            background: implementationPercentage === 100 
+              ? "hsl(var(--success, 142 76% 36%))" 
+              : implementationPercentage > 50 
+                ? "hsl(var(--primary))" 
+                : "hsl(var(--warning, 38 92% 50%))"
+          }}
+        />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
