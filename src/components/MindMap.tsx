@@ -23,6 +23,7 @@ const data: MindMapNode = {
         { id: 'roadmap', label: 'Roadmap', description: 'Future development plans' },
         { id: 'mindmap', label: 'Mind Map', description: 'Visual site structure overview' },
         { id: 'healthcare-crm', label: 'Healthcare CRM', description: 'Healthcare CRM Enhancement Strategies' },
+        { id: 'open-crm-roadmap', label: 'OpenCRM Roadmap', description: 'Comprehensive development plan for HIPAA-compliant CRM' },
       ]
     },
     {
