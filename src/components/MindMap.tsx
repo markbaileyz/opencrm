@@ -71,13 +71,20 @@ interface MindMapProps {
 
 const MindMap = ({ className }: MindMapProps) => {
   const renderNode = (node: MindMapNode, level: number = 0) => {
-    const nodeColor = level === 0 ? 'bg-primary/10' : 
-                     level === 1 ? 'bg-secondary/30' : 
-                     'bg-accent/20';
+    const baseStyles = 'transition-all duration-300 hover:shadow-md';
+    
+    let colorClasses;
+    if (level === 0) {
+      colorClasses = 'border-l-primary bg-primary/10';
+    } else if (level === 1) {
+      colorClasses = 'border-l-secondary bg-secondary/20';
+    } else {
+      colorClasses = 'border-l-muted bg-muted/10';
+    }
     
     return (
       <div key={node.id} className={`mb-4 ${level > 0 ? 'ml-6' : ''}`}>
-        <Card className={`${nodeColor} border-l-4 ${level === 0 ? 'border-l-primary' : level === 1 ? 'border-l-secondary' : 'border-l-accent'}`}>
+        <Card className={`${baseStyles} ${colorClasses} border-l-4`}>
           <CardHeader className="py-3">
             <CardTitle className="text-lg">{node.label}</CardTitle>
             {node.description && <CardDescription>{node.description}</CardDescription>}
