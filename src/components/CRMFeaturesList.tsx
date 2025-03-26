@@ -1,3 +1,4 @@
+
 import React from "react";
 
 // Define feature categories and their features
@@ -68,15 +69,26 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Deal Tracking",
         description: "Track deals through your sales pipeline",
-        comingSoon: true,
+        implemented: true,
       },
       {
         name: "Sales Analytics",
         description: "Analyze sales data and performance",
+        comingSoon: true,
       },
       {
         name: "Forecasting",
         description: "Forecast future sales and revenue",
+      },
+      {
+        name: "Opportunity Management",
+        description: "Manage and prioritize sales opportunities",
+        implemented: true,
+      },
+      {
+        name: "Sales Goals",
+        description: "Set and track sales targets for individuals and teams",
+        comingSoon: true,
       },
     ],
   },
