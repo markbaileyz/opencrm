@@ -25,6 +25,12 @@
    - Vote counters
    - User feedback via toasts
 
+5. Strategic Planning
+   - OpenCRM roadmap document added
+   - Healthcare CRM strategy overview
+   - Development phases documentation
+   - Core features breakdown
+
 ## Next Steps
 1. Additional User Interaction Features
    - Sort options
@@ -35,6 +41,7 @@
 - None currently tracked
 
 ## Last Updated
-- Added feature voting system
-- Implemented vote counters and user feedback
-- Added disabled state for already implemented features
+- Added OpenCRM strategic roadmap
+- Added navigation between roadmap components
+- Improved cross-linking between roadmap resources
+

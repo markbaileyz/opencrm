@@ -1,9 +1,13 @@
-
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle, Shield, Code, Database, Users, Calendar, FileText, Workflow, BarChart, Zap, Network } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { 
+  CheckCircle, Shield, Code, Database, Users, Calendar, FileText, 
+  Workflow, BarChart, Zap, Network, ChevronLeft, LayoutDashboard, Users as UsersIcon
+} from "lucide-react";
 
 const PhaseCard = ({ 
   title, 
@@ -50,6 +54,30 @@ const FeatureItem = ({
 const OpenCRMRoadmap = () => {
   return (
     <div className="space-y-8 animate-fade-up">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <Button variant="outline" size="sm" asChild className="w-fit">
+          <Link to="/roadmap" className="flex items-center gap-2">
+            <ChevronLeft className="h-4 w-4" />
+            Back to Roadmap
+          </Link>
+        </Button>
+        
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" asChild>
+            <Link to="/dashboard" className="flex items-center gap-2">
+              <LayoutDashboard className="h-4 w-4" />
+              Demo Dashboard
+            </Link>
+          </Button>
+          <Button size="sm" variant="outline" asChild>
+            <Link to="/healthcare-crm" className="flex items-center gap-2">
+              <UsersIcon className="h-4 w-4" />
+              CRM Strategies
+            </Link>
+          </Button>
+        </div>
+      </div>
+
       <div>
         <h2 className="text-3xl font-bold mb-3">OpenCRM Strategic Roadmap</h2>
         <p className="text-muted-foreground text-lg mb-6">
