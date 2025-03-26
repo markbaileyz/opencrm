@@ -49,12 +49,22 @@ export function useEmailSelection(emails: { id: string }[]): EmailSelectionHook 
   };
 
   const handleBulkAction = (ids: string[], action: (id: string) => void, callback?: () => void) => {
-    if (action) {
-      ids.forEach(id => action(id));
-    }
+    if (ids.length === 0) return;
+    
+    // Apply the action to each selected email ID
+    ids.forEach(id => {
+      if (action) {
+        action(id);
+      }
+    });
+    
+    // Execute callback function if provided
     if (callback) {
       callback();
     }
+    
+    // Clear selection after bulk action is complete
+    handleClearSelection();
   };
   
   return {
