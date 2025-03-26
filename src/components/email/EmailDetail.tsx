@@ -1,12 +1,27 @@
 
 import React from "react";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowLeft, Star, StarOff, Trash, Archive, Reply, Forward } from "lucide-react";
+import { 
+  ArrowLeft, 
+  Star, 
+  StarOff, 
+  Trash, 
+  Archive, 
+  Reply, 
+  Forward,
+  Keyboard
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Email } from "@/types/email";
 import { Separator } from "@/components/ui/separator";
 import { Avatar } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 
 interface EmailDetailProps {
   email: Email;
@@ -16,6 +31,7 @@ interface EmailDetailProps {
   onArchive: (id: string) => void;
   onReply: (email: Email) => void;
   onForward: (email: Email) => void;
+  keyboardShortcuts?: { key: string; action: string }[];
 }
 
 const EmailDetail = ({
@@ -26,6 +42,7 @@ const EmailDetail = ({
   onArchive,
   onReply,
   onForward,
+  keyboardShortcuts = [],
 }: EmailDetailProps) => {
   if (!email) return null;
 
@@ -36,40 +53,100 @@ const EmailDetail = ({
     <div className="bg-card rounded-md border shadow-sm flex flex-col h-full">
       <div className="p-3 border-b flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={onBack}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" onClick={onBack}>
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                Back to list (Esc)
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <h3 className="text-lg font-medium">{email.subject}</h3>
         </div>
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onStar(email.id)}
-            title={email.starred ? "Unstar" : "Star"}
-          >
-            {email.starred ? (
-              <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-            ) : (
-              <StarOff className="h-4 w-4" />
-            )}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onArchive(email.id)}
-            title="Archive"
-          >
-            <Archive className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDelete(email.id)}
-            title="Delete"
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onStar(email.id)}
+                >
+                  {email.starred ? (
+                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                  ) : (
+                    <StarOff className="h-4 w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                {email.starred ? "Unstar (s)" : "Star (s)"}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onArchive(email.id)}
+                >
+                  <Archive className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                Archive (a)
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onDelete(email.id)}
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                Delete (d)
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
+          {keyboardShortcuts.length > 0 && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <Keyboard className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <div className="text-xs">
+                    <p className="font-semibold mb-1">Keyboard shortcuts:</p>
+                    <ul className="space-y-1">
+                      {keyboardShortcuts.map((shortcut, index) => (
+                        <li key={index} className="flex justify-between gap-4">
+                          <span className="font-mono bg-muted px-1 rounded">{shortcut.key}</span>
+                          <span>{shortcut.action}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
       </div>
 
@@ -128,24 +205,43 @@ const EmailDetail = ({
 
       <div className="p-3 border-t">
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="gap-1" 
-            onClick={() => onReply(email)}
-          >
-            <Reply className="h-4 w-4" />
-            Reply
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="gap-1" 
-            onClick={() => onForward(email)}
-          >
-            <Forward className="h-4 w-4" />
-            Forward
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-1" 
+                  onClick={() => onReply(email)}
+                >
+                  <Reply className="h-4 w-4" />
+                  Reply
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                Reply (r)
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-1" 
+                  onClick={() => onForward(email)}
+                >
+                  <Forward className="h-4 w-4" />
+                  Forward
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                Forward (f)
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
     </div>

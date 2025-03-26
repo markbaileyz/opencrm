@@ -9,13 +9,16 @@ import EmailTabs from "@/components/email/EmailTabs";
 import EmailContent from "@/components/email/EmailContent";
 import EmailSearch from "@/components/email/EmailSearch";
 import { useEmailManager } from "@/hooks/useEmailManager";
+import { useEmailKeyboardShortcuts } from "@/hooks/useEmailKeyboardShortcuts";
 import type { Email } from "@/types/email";
+import { useToast } from "@/hooks/use-toast";
 
 const Email = () => {
   const [activeTab, setActiveTab] = useState("inbox");
   const [isComposeOpen, setIsComposeOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const { toast } = useToast();
   
   const {
     emails,
@@ -69,6 +72,37 @@ const Email = () => {
   const handleFilterChange = (filters: string[]) => {
     setActiveFilters(filters);
   };
+
+  const refreshEmails = () => {
+    toast({
+      title: "Refreshing emails",
+      description: "Checking for new emails...",
+      variant: "default",
+    });
+    // In a real application, this would fetch new emails from the server
+    // For now, we'll just show a toast message
+    setTimeout(() => {
+      toast({
+        title: "Emails refreshed",
+        description: "Your inbox is up to date",
+        variant: "success",
+      });
+    }, 1000);
+  };
+
+  // Set up keyboard shortcuts
+  const { availableShortcuts } = useEmailKeyboardShortcuts({
+    isDetailView: !!selectedEmail,
+    onBackToList: handleBackToList,
+    onComposeNew: handleComposeOpen,
+    onReply: selectedEmail ? () => handleReplyEmail(selectedEmail) : undefined,
+    onForward: selectedEmail ? () => handleForwardEmail(selectedEmail) : undefined,
+    onArchive: selectedEmail ? () => handleArchiveEmail(selectedEmail.id) : undefined,
+    onDelete: selectedEmail ? () => handleDeleteEmail(selectedEmail.id) : undefined,
+    onRefresh: refreshEmails,
+    onStar: selectedEmail ? () => handleStarEmail(selectedEmail.id) : undefined,
+    selectedId: selectedEmail?.id
+  });
 
   // Filter emails based on the active tab, search query, and active filters
   const filteredEmails = emails.filter(email => {
@@ -126,6 +160,7 @@ const Email = () => {
               onArchiveEmail={handleArchiveEmail}
               onReplyEmail={handleReplyEmail}
               onForwardEmail={handleForwardEmail}
+              keyboardShortcuts={availableShortcuts}
             />
           </TabsContent>
         </Tabs>

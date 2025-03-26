@@ -15,6 +15,7 @@ interface EmailContentProps {
   onArchiveEmail: (id: string) => void;
   onReplyEmail: (email: Email) => void;
   onForwardEmail: (email: Email) => void;
+  keyboardShortcuts?: { key: string; action: string }[];
 }
 
 const EmailContent: React.FC<EmailContentProps> = ({
@@ -28,6 +29,7 @@ const EmailContent: React.FC<EmailContentProps> = ({
   onArchiveEmail,
   onReplyEmail,
   onForwardEmail,
+  keyboardShortcuts = [],
 }) => {
   if (selectedEmail) {
     return (
@@ -40,6 +42,7 @@ const EmailContent: React.FC<EmailContentProps> = ({
           onArchive={onArchiveEmail}
           onReply={onReplyEmail}
           onForward={onForwardEmail}
+          keyboardShortcuts={keyboardShortcuts}
         />
       </div>
     );
