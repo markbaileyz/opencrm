@@ -84,7 +84,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       >
         <div className="mb-8 px-4">
           <Link to="/" className="flex items-center text-lg font-semibold">
-            NextCRM
+            OpenSRM
           </Link>
         </div>
         <nav className="space-y-4">

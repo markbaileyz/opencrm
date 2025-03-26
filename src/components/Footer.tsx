@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -27,7 +28,7 @@ const Footer = () => {
           <div>
             <Link to="/" className="flex items-center mb-4">
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
-                NextCRM
+                OpenSRM
               </span>
             </Link>
             <p className="text-muted-foreground text-sm max-w-xs">
@@ -68,7 +69,7 @@ const Footer = () => {
 
         <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center">
           <p className="text-muted-foreground text-sm">
-            © {currentYear} NextCRM. All rights reserved.
+            © {currentYear} OpenSRM. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <SocialLink href="https://twitter.com" label="Twitter">

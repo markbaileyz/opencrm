@@ -1,5 +1,5 @@
 
-# NextCRM Project
+# OpenSRM Project
 
 ## Project info
 
