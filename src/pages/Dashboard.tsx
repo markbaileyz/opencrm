@@ -9,6 +9,7 @@ import AppointmentList from "@/components/dashboard/AppointmentList";
 import MessageList from "@/components/dashboard/MessageList";
 import SalesPipeline from "@/components/dashboard/SalesPipeline";
 import RecentContacts from "@/components/dashboard/RecentContacts";
+import RealtimeMetricsChart from "@/components/dashboard/RealtimeMetricsChart";
 import { OrganizationsProvider } from "@/context/OrganizationsContext";
 
 const Dashboard = () => {
@@ -41,6 +42,9 @@ const Dashboard = () => {
           {/* Key Metrics */}
           <KeyMetrics />
 
+          {/* Real-time Metrics */}
+          <RealtimeMetricsChart />
+
           {/* Sales Pipeline */}
           <div className="grid grid-cols-1 gap-6 animate-fade-up delay-100">
             <SalesPipeline />
@@ -66,4 +70,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
