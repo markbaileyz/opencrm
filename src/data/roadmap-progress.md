@@ -25,6 +25,8 @@
    - Vote counters
    - User feedback via toasts
    - Search functionality
+   - Sort options
+   - Category quick-filters
 
 5. Strategic Planning
    - OpenCRM roadmap document added
@@ -46,15 +48,11 @@
    - Expandable milestone details
 
 ## Next Steps
-1. Additional User Interaction Features
-   - Sort options
-   - Category quick-filters
-
-2. UI Enhancements
+1. UI Enhancements
    - Collapsible technical details sections
    - Progress indicators for feature implementation
 
-3. Content Development
+2. Content Development
    - Case studies or example implementations
    - Challenges and solutions documentation
    - FAQ section for common questions
@@ -63,7 +61,9 @@
 - None currently tracked
 
 ## Last Updated
+- Added sort options and category quick-filters to the roadmap
 - Added search functionality for features
 - Added interactive visualization for development timeline
 - Added detailed technical specifications section
 - Improved milestone tracking with expandable details
+
