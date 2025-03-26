@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import ComposeEmail from "@/components/email/ComposeEmail";
@@ -10,9 +10,15 @@ import EmailContent from "@/components/email/EmailContent";
 import EmailSearch from "@/components/email/EmailSearch";
 import { useEmailManager } from "@/hooks/useEmailManager";
 import { useEmailKeyboardShortcuts } from "@/hooks/useEmailKeyboardShortcuts";
+import { useEmailActions } from "@/hooks/useEmailActions";
 import type { Email } from "@/types/email";
 import { useToast } from "@/hooks/use-toast";
 import { SortOption } from "@/components/email/EmailSort";
+import { 
+  filterEmails, 
+  sortEmails, 
+  calculateUnreadCounts 
+} from "@/utils/emailUtils";
 
 const Email = () => {
   const [activeTab, setActiveTab] = useState("inbox");
@@ -33,13 +39,14 @@ const Email = () => {
     handleSendEmail
   } = useEmailManager(emailData);
 
+  const {
+    handleReplyEmail,
+    handleForwardEmail,
+    refreshEmails
+  } = useEmailActions();
+
   // Calculate unread counts for each folder
-  const unreadCounts = emails.reduce((counts, email) => {
-    if (!email.read) {
-      counts[email.folder] = (counts[email.folder] || 0) + 1;
-    }
-    return counts;
-  }, {} as Record<string, number>);
+  const unreadCounts = calculateUnreadCounts(emails);
 
   const handleComposeOpen = () => {
     setIsComposeOpen(true);
@@ -55,16 +62,6 @@ const Email = () => {
   
   const handleComposeClose = () => {
     setIsComposeOpen(false);
-  };
-
-  const handleReplyEmail = (email: Email) => {
-    setIsComposeOpen(true);
-    // Implementation for pre-filling reply can be added later
-  };
-
-  const handleForwardEmail = (email: Email) => {
-    setIsComposeOpen(true);
-    // Implementation for pre-filling forward can be added later
   };
 
   const handleSearch = (query: string) => {
@@ -84,30 +81,13 @@ const Email = () => {
     });
   };
 
-  const refreshEmails = () => {
-    toast({
-      title: "Refreshing emails",
-      description: "Checking for new emails...",
-      variant: "default",
-    });
-    // In a real application, this would fetch new emails from the server
-    // For now, we'll just show a toast message
-    setTimeout(() => {
-      toast({
-        title: "Emails refreshed",
-        description: "Your inbox is up to date",
-        variant: "success",
-      });
-    }, 1000);
-  };
-
   // Set up keyboard shortcuts
   const { availableShortcuts } = useEmailKeyboardShortcuts({
     isDetailView: !!selectedEmail,
     onBackToList: handleBackToList,
     onComposeNew: handleComposeOpen,
-    onReply: selectedEmail ? () => handleReplyEmail(selectedEmail) : undefined,
-    onForward: selectedEmail ? () => handleForwardEmail(selectedEmail) : undefined,
+    onReply: selectedEmail ? () => handleReplyEmail(selectedEmail, setIsComposeOpen) : undefined,
+    onForward: selectedEmail ? () => handleForwardEmail(selectedEmail, setIsComposeOpen) : undefined,
     onArchive: selectedEmail ? () => handleArchiveEmail(selectedEmail.id) : undefined,
     onDelete: selectedEmail ? () => handleDeleteEmail(selectedEmail.id) : undefined,
     onRefresh: refreshEmails,
@@ -115,55 +95,9 @@ const Email = () => {
     selectedId: selectedEmail?.id
   });
 
-  // Helper function to check if an email matches the search query
-  const emailMatchesSearch = (email: Email, query: string): boolean => {
-    const lowerCaseQuery = query.toLowerCase();
-    return (
-      email.subject.toLowerCase().includes(lowerCaseQuery) ||
-      email.senderName.toLowerCase().includes(lowerCaseQuery) ||
-      email.senderEmail.toLowerCase().includes(lowerCaseQuery) ||
-      email.preview.toLowerCase().includes(lowerCaseQuery) ||
-      email.body.toLowerCase().includes(lowerCaseQuery)
-    );
-  };
-
-  // Helper function to sort emails based on the selected sort option
-  const sortEmails = (emails: Email[], sortOption: SortOption): Email[] => {
-    switch (sortOption) {
-      case "newest":
-        return [...emails].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-      case "oldest":
-        return [...emails].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      case "unread":
-        return [...emails].sort((a, b) => {
-          if (a.read === b.read) {
-            return new Date(b.date).getTime() - new Date(a.date).getTime();
-          }
-          return a.read ? 1 : -1;
-        });
-      case "sender":
-        return [...emails].sort((a, b) => a.senderName.localeCompare(b.senderName));
-      default:
-        return emails;
-    }
-  };
-
-  // Filter emails based on the active tab, search query, and active filters
-  let filteredEmails = emails.filter(email => {
-    // First filter by folder (tab)
-    if (email.folder !== activeTab) return false;
-    
-    // Then apply search query if present
-    if (searchQuery && !emailMatchesSearch(email, searchQuery)) return false;
-    
-    // Then apply active filters
-    if (activeFilters.includes("starred") && !email.starred) return false;
-    if (activeFilters.includes("unread") && email.read) return false;
-    if (activeFilters.includes("attachments") && !email.hasAttachments) return false;
-    
-    return true;
-  });
-
+  // Apply filtering and sorting to emails
+  let filteredEmails = filterEmails(emails, activeTab, searchQuery, activeFilters);
+  
   // Apply sorting to the filtered emails
   filteredEmails = sortEmails(filteredEmails, sortOption);
   
@@ -193,8 +127,8 @@ const Email = () => {
               onStarEmail={handleStarEmail}
               onDeleteEmail={handleDeleteEmail}
               onArchiveEmail={handleArchiveEmail}
-              onReplyEmail={handleReplyEmail}
-              onForwardEmail={handleForwardEmail}
+              onReplyEmail={(email) => handleReplyEmail(email, setIsComposeOpen)}
+              onForwardEmail={(email) => handleForwardEmail(email, setIsComposeOpen)}
               keyboardShortcuts={availableShortcuts}
               sortOption={sortOption}
               onSortChange={handleSortChange}

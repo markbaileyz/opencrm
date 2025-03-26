@@ -8,8 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-export type SortOption = "newest" | "oldest" | "unread" | "sender";
+import { SortOption } from "@/utils/emailUtils";
 
 interface EmailSortProps {
   value: SortOption;

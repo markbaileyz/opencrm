@@ -3,7 +3,7 @@ import React from "react";
 import type { Email } from "@/types/email";
 import EmailList from "@/components/email/EmailList";
 import EmailDetail from "@/components/email/EmailDetail";
-import { SortOption } from "@/components/email/EmailSort";
+import { SortOption } from "@/utils/emailUtils";
 
 interface EmailContentProps {
   activeTab: string;

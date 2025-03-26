@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { Email } from "@/types/email";
-import EmailSort, { SortOption } from "./EmailSort";
+import EmailSort from "./EmailSort";
+import { SortOption } from "@/utils/emailUtils";
 import {
   DropdownMenu,
   DropdownMenuContent,
