@@ -13,6 +13,7 @@ interface AuthContextType {
   login: (user: User) => void;
   logout: () => void;
   updateProfile: (profileData: Partial<User>) => void;
+  uploadProfileImage: (file: File) => Promise<string>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -21,6 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   login: () => {},
   logout: () => {},
   updateProfile: () => {},
+  uploadProfileImage: async () => "",
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -64,8 +66,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const uploadProfileImage = async (file: File): Promise<string> => {
+    // In a real application, this would upload to a storage service
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const photoURL = e.target?.result as string;
+        if (user) {
+          updateProfile({ photoURL });
+        }
+        resolve(photoURL);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, updateProfile, uploadProfileImage }}>
       {children}
     </AuthContext.Provider>
   );

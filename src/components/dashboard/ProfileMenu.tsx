@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -23,14 +23,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Settings, LogOut } from "lucide-react";
+import { User, Settings, LogOut, Upload, Camera } from "lucide-react";
 
 const ProfileMenu = () => {
-  const { user, logout, updateProfile } = useAuth();
+  const { user, logout, updateProfile, uploadProfileImage } = useAuth();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [photoURL, setPhotoURL] = useState(user?.photoURL || "");
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const getInitials = (name: string) => {
     if (!name) return "U";
@@ -57,6 +59,35 @@ const ProfileMenu = () => {
       description: "Your profile has been successfully updated",
       variant: "success",
     });
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const photoURL = await uploadProfileImage(file);
+      setPhotoURL(photoURL);
+      toast({
+        title: "Image uploaded",
+        description: "Your profile image has been successfully uploaded",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Upload failed",
+        description: "There was an error uploading your image",
+        variant: "destructive",
+      });
+      console.error(error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const triggerFileUpload = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -90,6 +121,24 @@ const ProfileMenu = () => {
                   Make changes to your profile information here. Click save when you're done.
                 </DialogDescription>
               </DialogHeader>
+              <div className="flex justify-center my-4">
+                <div className="relative">
+                  <Avatar className="h-24 w-24 cursor-pointer" onClick={triggerFileUpload}>
+                    <AvatarImage src={photoURL} />
+                    <AvatarFallback className="text-xl">{getInitials(displayName || "User")}</AvatarFallback>
+                    <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1 shadow-md">
+                      <Camera className="h-4 w-4" />
+                    </div>
+                  </Avatar>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
+              </div>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="name" className="text-right">
@@ -102,24 +151,14 @@ const ProfileMenu = () => {
                     className="col-span-3"
                   />
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="photoURL" className="text-right">
-                    Photo URL
-                  </Label>
-                  <Input
-                    id="photoURL"
-                    value={photoURL}
-                    onChange={(e) => setPhotoURL(e.target.value)}
-                    placeholder="https://example.com/avatar.png"
-                    className="col-span-3"
-                  />
-                </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleUpdateProfile}>Save changes</Button>
+                <Button onClick={handleUpdateProfile} disabled={isUploading}>
+                  {isUploading ? "Uploading..." : "Save changes"}
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>

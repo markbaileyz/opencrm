@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import StatsGrid from "./StatsGrid";
 import { Search, Sparkles } from "lucide-react";
@@ -14,6 +14,13 @@ interface DashboardHeaderProps {
 
 const DashboardHeader = ({ isAdmin }: DashboardHeaderProps) => {
   const { user } = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Searching for:", searchQuery);
+    // Implement search functionality
+  };
   
   return (
     <div className="space-y-6">
@@ -25,14 +32,16 @@ const DashboardHeader = ({ isAdmin }: DashboardHeaderProps) => {
           </p>
         </div>
         <div className="flex w-full md:w-auto gap-2 items-center">
-          <div className="relative w-full md:w-[240px]">
+          <form onSubmit={handleSearch} className="relative w-full md:w-[240px]">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search..."
               className="w-full pl-8 bg-background"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
-          </div>
+          </form>
           <NotificationCenter />
           <Button variant="outline" size="sm" className="gap-2">
             <Sparkles className="h-4 w-4" />
