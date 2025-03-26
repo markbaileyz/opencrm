@@ -6,21 +6,44 @@ import { Button } from "@/components/ui/button";
 import { Plus, Mail, MailOpen, Send, Trash, Archive, Inbox } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import EmailList from "@/components/email/EmailList";
+import EmailDetail from "@/components/email/EmailDetail";
 import ComposeEmail from "@/components/email/ComposeEmail";
+import { Email } from "@/types/email";
 import { emailData } from "@/data/emailData";
 
 const Email = () => {
   const [activeTab, setActiveTab] = useState("inbox");
   const [isComposeOpen, setIsComposeOpen] = useState(false);
+  const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
+  const [emails, setEmails] = useState(emailData);
   const { toast } = useToast();
-  
+
   const handleComposeOpen = () => {
     setIsComposeOpen(true);
   };
   
   const handleComposeSend = (data: any) => {
     console.log("Email sent:", data);
+    
+    // Create a new email and add it to the sent folder
+    const newEmail: Email = {
+      id: `email-${Date.now()}`,
+      senderName: "You",
+      senderEmail: "you@example.com",
+      recipient: data.to,
+      subject: data.subject,
+      preview: data.message.substring(0, 50),
+      body: data.message,
+      date: new Date().toISOString(),
+      read: true,
+      starred: false,
+      folder: 'sent',
+      hasAttachments: data.attachments.length > 0,
+    };
+    
+    setEmails([newEmail, ...emails]);
     setIsComposeOpen(false);
+    
     toast({
       title: "Email sent",
       description: "Your email has been sent successfully.",
@@ -31,6 +54,74 @@ const Email = () => {
   const handleComposeClose = () => {
     setIsComposeOpen(false);
   };
+
+  const handleSelectEmail = (email: Email) => {
+    // Mark email as read if it wasn't
+    if (!email.read) {
+      markEmailAsRead(email.id);
+    }
+    setSelectedEmail(email);
+  };
+
+  const handleBackToList = () => {
+    setSelectedEmail(null);
+  };
+
+  const handleStarEmail = (id: string) => {
+    setEmails(emails.map(email => 
+      email.id === id ? { ...email, starred: !email.starred } : email
+    ));
+  };
+
+  const handleDeleteEmail = (id: string) => {
+    setEmails(emails.map(email => 
+      email.id === id ? { ...email, folder: 'trash' } : email
+    ));
+    
+    if (selectedEmail && selectedEmail.id === id) {
+      setSelectedEmail(null);
+    }
+    
+    toast({
+      title: "Email deleted",
+      description: "The email has been moved to trash.",
+      variant: "default",
+    });
+  };
+
+  const handleArchiveEmail = (id: string) => {
+    setEmails(emails.map(email => 
+      email.id === id ? { ...email, folder: 'archive' } : email
+    ));
+    
+    if (selectedEmail && selectedEmail.id === id) {
+      setSelectedEmail(null);
+    }
+    
+    toast({
+      title: "Email archived",
+      description: "The email has been archived.",
+      variant: "default",
+    });
+  };
+
+  const markEmailAsRead = (id: string) => {
+    setEmails(emails.map(email => 
+      email.id === id ? { ...email, read: true } : email
+    ));
+  };
+
+  const handleReplyEmail = (email: Email) => {
+    setIsComposeOpen(true);
+    // Implementation for pre-filling reply can be added later
+  };
+
+  const handleForwardEmail = (email: Email) => {
+    setIsComposeOpen(true);
+    // Implementation for pre-filling forward can be added later
+  };
+
+  const filteredEmails = emails.filter(email => email.folder === activeTab);
   
   return (
     <DashboardLayout>
@@ -74,40 +165,32 @@ const Email = () => {
             </TabsList>
           </div>
           
-          <TabsContent value="inbox" className="mt-0">
-            <EmailList 
-              emails={emailData.filter(email => email.folder === 'inbox')} 
-              folder="inbox" 
-            />
-          </TabsContent>
+          {activeTab && !selectedEmail ? (
+            <div className="mt-0">
+              <EmailList 
+                emails={filteredEmails}
+                folder={activeTab}
+                onSelectEmail={handleSelectEmail}
+                onStarEmail={handleStarEmail}
+                onDeleteEmail={handleDeleteEmail}
+                onArchiveEmail={handleArchiveEmail}
+              />
+            </div>
+          ) : null}
           
-          <TabsContent value="sent" className="mt-0">
-            <EmailList 
-              emails={emailData.filter(email => email.folder === 'sent')} 
-              folder="sent" 
-            />
-          </TabsContent>
-          
-          <TabsContent value="drafts" className="mt-0">
-            <EmailList 
-              emails={emailData.filter(email => email.folder === 'drafts')} 
-              folder="drafts" 
-            />
-          </TabsContent>
-          
-          <TabsContent value="trash" className="mt-0">
-            <EmailList 
-              emails={emailData.filter(email => email.folder === 'trash')} 
-              folder="trash" 
-            />
-          </TabsContent>
-          
-          <TabsContent value="archive" className="mt-0">
-            <EmailList 
-              emails={emailData.filter(email => email.folder === 'archive')} 
-              folder="archive" 
-            />
-          </TabsContent>
+          {selectedEmail && (
+            <div className="mt-0">
+              <EmailDetail 
+                email={selectedEmail}
+                onBack={handleBackToList}
+                onStar={handleStarEmail}
+                onDelete={handleDeleteEmail}
+                onArchive={handleArchiveEmail}
+                onReply={handleReplyEmail}
+                onForward={handleForwardEmail}
+              />
+            </div>
+          )}
         </Tabs>
       </div>
       

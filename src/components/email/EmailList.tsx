@@ -18,9 +18,20 @@ import { Email } from "@/types/email";
 interface EmailListProps {
   emails: Email[];
   folder: string;
+  onSelectEmail: (email: Email) => void;
+  onStarEmail?: (id: string) => void;
+  onDeleteEmail?: (id: string) => void;
+  onArchiveEmail?: (id: string) => void;
 }
 
-const EmailList = ({ emails, folder }: EmailListProps) => {
+const EmailList = ({ 
+  emails, 
+  folder, 
+  onSelectEmail,
+  onStarEmail,
+  onDeleteEmail,
+  onArchiveEmail
+}: EmailListProps) => {
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   const [hoveredEmail, setHoveredEmail] = useState<string | null>(null);
   
@@ -41,8 +52,14 @@ const EmailList = ({ emails, folder }: EmailListProps) => {
   };
   
   const handleRowClick = (email: Email) => {
-    console.log("Email clicked:", email);
-    // Will implement email viewing functionality later
+    onSelectEmail(email);
+  };
+
+  const handleStarClick = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (onStarEmail) {
+      onStarEmail(id);
+    }
   };
   
   if (emails.length === 0) {
@@ -64,12 +81,24 @@ const EmailList = ({ emails, folder }: EmailListProps) => {
           />
           {selectedEmails.length > 0 && (
             <div className="flex items-center space-x-1">
-              <Button variant="ghost" size="sm">
-                <Archive className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm">
-                <Trash className="h-4 w-4" />
-              </Button>
+              {onArchiveEmail && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => selectedEmails.forEach(id => onArchiveEmail(id))}
+                >
+                  <Archive className="h-4 w-4" />
+                </Button>
+              )}
+              {onDeleteEmail && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => selectedEmails.forEach(id => onDeleteEmail(id))}
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -106,10 +135,16 @@ const EmailList = ({ emails, folder }: EmailListProps) => {
               </TableCell>
               <TableCell className="py-2">
                 {email.starred ? (
-                  <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                  <Star 
+                    className="h-4 w-4 text-yellow-400 fill-yellow-400" 
+                    onClick={(e) => handleStarClick(e, email.id)}
+                  />
                 ) : (
                   hoveredEmail === email.id && (
-                    <StarOff className="h-4 w-4 text-muted-foreground" />
+                    <StarOff 
+                      className="h-4 w-4 text-muted-foreground" 
+                      onClick={(e) => handleStarClick(e, email.id)}
+                    />
                   )
                 )}
               </TableCell>
