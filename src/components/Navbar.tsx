@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ButtonCustom } from "./ui/button-custom";
@@ -10,7 +9,6 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -19,22 +17,18 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Check if current path is active
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
-  // Handle scroll to section for hash links
   const scrollToSection = (sectionId: string) => {
     setIsMobileMenuOpen(false);
     
-    // If we're not on the home page, navigate to home with the hash
     if (location.pathname !== '/') {
       navigate(`/#${sectionId}`);
       return;
     }
 
-    // Otherwise scroll to the section
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -50,14 +44,12 @@ const Navbar = () => {
       }`}
     >
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
-        {/* Logo */}
         <Link to="/" className="flex items-center">
           <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
             OpenSRM
           </span>
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           <NavLink href="/" active={isActive("/")} onClick={() => null}>
             Home
@@ -79,16 +71,11 @@ const Navbar = () => {
           <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={() => null}>
             Roadmap
           </NavLink>
-          <NavLink 
-            href="/#contact" 
-            active={location.pathname === "/" && location.hash === "#contact"} 
-            onClick={() => scrollToSection("contact")}
-          >
-            Contact
+          <NavLink href="/mind-map" active={isActive("/mind-map")} onClick={() => null}>
+            Mind Map
           </NavLink>
         </nav>
 
-        {/* Auth Buttons */}
         <div className="hidden md:flex items-center space-x-4">
           <Link to="/login">
             <ButtonCustom variant="ghost">Login</ButtonCustom>
@@ -98,7 +85,6 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Mobile Menu Button */}
         <button
           className="md:hidden"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -111,7 +97,6 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden glass animate-fade-down py-4">
           <nav className="container mx-auto px-4 flex flex-col space-y-4">
@@ -135,12 +120,8 @@ const Navbar = () => {
             <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={() => setIsMobileMenuOpen(false)}>
               Roadmap
             </NavLink>
-            <NavLink 
-              href="/#contact" 
-              active={location.pathname === "/" && location.hash === "#contact"} 
-              onClick={() => scrollToSection("contact")}
-            >
-              Contact
+            <NavLink href="/mind-map" active={isActive("/mind-map")} onClick={() => setIsMobileMenuOpen(false)}>
+              Mind Map
             </NavLink>
             <div className="flex space-x-4 pt-2">
               <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
@@ -159,7 +140,6 @@ const Navbar = () => {
   );
 };
 
-// NavLink Component
 interface NavLinkProps {
   href: string;
   active: boolean;
@@ -193,7 +173,6 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
   };
   
   if (href.startsWith("/#")) {
-    // For hash links
     return (
       <a
         href={href}
@@ -207,7 +186,6 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
     );
   }
   
-  // For regular links
   return (
     <Link
       to={href}

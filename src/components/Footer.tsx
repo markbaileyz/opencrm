@@ -43,6 +43,7 @@ const Footer = () => {
               <FooterLink href="/#pricing" sectionId="pricing">Pricing</FooterLink>
               <FooterLink href="/#testimonials" sectionId="testimonials">Testimonials</FooterLink>
               <FooterLink href="/roadmap">Roadmap</FooterLink>
+              <FooterLink href="/mind-map">Mind Map</FooterLink>
             </ul>
           </div>
 
@@ -52,7 +53,7 @@ const Footer = () => {
               <FooterLink href="/#about" sectionId="about">About Us</FooterLink>
               <FooterLink href="/#careers" sectionId="careers">Careers</FooterLink>
               <FooterLink href="/#blog" sectionId="blog">Blog</FooterLink>
-              <FooterLink href="/#contact" sectionId="contact">Contact</FooterLink>
+              <FooterLink href="/contacts">Contact</FooterLink>
             </ul>
           </div>
 
