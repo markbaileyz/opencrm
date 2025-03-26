@@ -1,4 +1,3 @@
-
 import React from "react";
 
 // Define feature categories and their features
@@ -31,7 +30,7 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Import/Export",
         description: "Easily import and export contact data",
-        comingSoon: true,
+        implemented: true,
       },
     ],
   },
