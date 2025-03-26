@@ -3,6 +3,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface User {
   email: string;
+  displayName?: string;
+  photoURL?: string;
 }
 
 interface AuthContextType {
