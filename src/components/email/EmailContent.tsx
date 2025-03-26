@@ -16,6 +16,7 @@ interface EmailContentProps {
   onArchiveEmail: (id: string) => void;
   onReplyEmail: (email: Email) => void;
   onForwardEmail: (email: Email) => void;
+  onComposeClick?: () => void;
   onAddLabel?: (id: string, label: string) => void;
   onRemoveLabel?: (id: string, label: string) => void;
   allLabels?: string[];
@@ -35,6 +36,7 @@ const EmailContent: React.FC<EmailContentProps> = ({
   onArchiveEmail,
   onReplyEmail,
   onForwardEmail,
+  onComposeClick,
   onAddLabel,
   onRemoveLabel,
   allLabels = [],
@@ -71,6 +73,7 @@ const EmailContent: React.FC<EmailContentProps> = ({
         onStarEmail={onStarEmail}
         onDeleteEmail={onDeleteEmail}
         onArchiveEmail={onArchiveEmail}
+        onComposeClick={onComposeClick}
         sortOption={sortOption}
         onSortChange={onSortChange}
       />

@@ -21,6 +21,7 @@ interface EmailListProps {
   onStarEmail?: (id: string) => void;
   onDeleteEmail?: (id: string) => void;
   onArchiveEmail?: (id: string) => void;
+  onComposeClick?: () => void;
   sortOption?: SortOption;
   onSortChange?: (option: SortOption) => void;
 }
@@ -32,6 +33,7 @@ const EmailList = ({
   onStarEmail,
   onDeleteEmail,
   onArchiveEmail,
+  onComposeClick,
   sortOption = "newest",
   onSortChange,
 }: EmailListProps) => {
@@ -65,7 +67,7 @@ const EmailList = ({
   };
 
   if (emails.length === 0) {
-    return <EmailListEmpty folder={folder} />;
+    return <EmailListEmpty folder={folder} onComposeClick={onComposeClick} />;
   }
   
   return (

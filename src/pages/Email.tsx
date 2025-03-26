@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -48,10 +47,8 @@ const Email = () => {
     refreshEmails
   } = useEmailActions();
 
-  // Calculate unread counts for each folder
   const unreadCounts = calculateUnreadCounts(emails);
   
-  // Get all unique labels from emails
   const allLabels = getAllLabels(emails);
 
   const handleComposeOpen = () => {
@@ -87,7 +84,6 @@ const Email = () => {
     });
   };
 
-  // Set up keyboard shortcuts
   const { availableShortcuts } = useEmailKeyboardShortcuts({
     isDetailView: !!selectedEmail,
     onBackToList: handleBackToList,
@@ -101,10 +97,8 @@ const Email = () => {
     selectedId: selectedEmail?.id
   });
 
-  // Apply filtering and sorting to emails
   let filteredEmails = filterEmails(emails, activeTab, searchQuery, activeFilters);
   
-  // Apply sorting to the filtered emails
   filteredEmails = sortEmails(filteredEmails, sortOption);
   
   return (
@@ -136,6 +130,7 @@ const Email = () => {
               onArchiveEmail={handleArchiveEmail}
               onReplyEmail={(email) => handleReplyEmail(email, setIsComposeOpen)}
               onForwardEmail={(email) => handleForwardEmail(email, setIsComposeOpen)}
+              onComposeClick={handleComposeOpen}
               onAddLabel={handleAddLabel}
               onRemoveLabel={handleRemoveLabel}
               allLabels={allLabels}
