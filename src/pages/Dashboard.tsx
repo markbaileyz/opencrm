@@ -9,6 +9,7 @@ import AppointmentList from "@/components/dashboard/AppointmentList";
 import MessageList from "@/components/dashboard/MessageList";
 import SalesPipeline from "@/components/dashboard/SalesPipeline";
 import RecentContacts from "@/components/dashboard/RecentContacts";
+import { OrganizationsProvider } from "@/context/OrganizationsContext";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -32,34 +33,37 @@ const Dashboard = () => {
   ];
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        <DashboardHeader isAdmin={isAdmin} />
-        
-        {/* Key Metrics */}
-        <KeyMetrics />
+    <OrganizationsProvider>
+      <DashboardLayout>
+        <div className="space-y-6">
+          <DashboardHeader isAdmin={isAdmin} />
+          
+          {/* Key Metrics */}
+          <KeyMetrics />
 
-        {/* Sales Pipeline */}
-        <div className="grid grid-cols-1 gap-6 animate-fade-up delay-100">
-          <SalesPipeline />
-        </div>
+          {/* Sales Pipeline */}
+          <div className="grid grid-cols-1 gap-6 animate-fade-up delay-100">
+            <SalesPipeline />
+          </div>
 
-        {/* Activity Chart */}
-        <div className="space-y-6 animate-fade-up delay-200">
-          <ActivityChart data={customerActivityData} />
-        </div>
+          {/* Activity Chart */}
+          <div className="space-y-6 animate-fade-up delay-200">
+            <ActivityChart data={customerActivityData} />
+          </div>
 
-        {/* Recent items grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-up delay-300">
-          <RecentContacts />
-          <div className="space-y-6">
-            <AppointmentList />
-            <MessageList />
+          {/* Recent items grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-up delay-300">
+            <RecentContacts />
+            <div className="space-y-6">
+              <AppointmentList />
+              <MessageList />
+            </div>
           </div>
         </div>
-      </div>
-    </DashboardLayout>
+      </DashboardLayout>
+    </OrganizationsProvider>
   );
 };
 
 export default Dashboard;
+

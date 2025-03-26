@@ -12,6 +12,8 @@ export interface Organization {
   contactPersonPhone?: string;
   status: OrganizationStatus;
   notes?: string;
+  specialties?: string[];
+  size?: OrganizationSize;
   createdAt: string;
   updatedAt: string;
 }
@@ -22,6 +24,10 @@ export type OrganizationType =
   | "Laboratory"
   | "Pharmacy"
   | "Insurance"
+  | "SpecialtyCare"
+  | "RehabCenter"
+  | "NursingHome"
+  | "HomeHealthcare"
   | "Other";
 
 export type OrganizationStatus = 
@@ -30,8 +36,16 @@ export type OrganizationStatus =
   | "Pending"
   | "Archived";
 
+export type OrganizationSize =
+  | "Small"
+  | "Medium"
+  | "Large"
+  | "Enterprise";
+
 export interface OrganizationFilters {
   search?: string;
   type?: OrganizationType;
   status?: OrganizationStatus;
+  size?: OrganizationSize;
 }
+

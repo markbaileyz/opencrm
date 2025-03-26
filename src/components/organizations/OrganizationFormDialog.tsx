@@ -1,5 +1,6 @@
+
 import React from "react";
-import { Organization, OrganizationType, OrganizationStatus } from "@/types/organization";
+import { Organization, OrganizationType, OrganizationStatus, OrganizationSize } from "@/types/organization";
 import { useOrganizations } from "@/context/OrganizationsContext";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -30,11 +31,37 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+
+const HEALTHCARE_SPECIALTIES = [
+  "Cardiology",
+  "Orthopedics",
+  "Neurology",
+  "Oncology",
+  "Pediatrics",
+  "Dermatology",
+  "Ophthalmology",
+  "Psychiatry",
+  "Radiology",
+  "Emergency Medicine",
+  "General Surgery",
+  "Family Medicine",
+  "Internal Medicine",
+  "Obstetrics & Gynecology",
+  "Urology",
+  "Gastroenterology",
+  "Endocrinology",
+  "Pulmonology",
+  "Rheumatology",
+];
 
 // Define the form schema
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
-  type: z.enum(["Hospital", "Clinic", "Laboratory", "Pharmacy", "Insurance", "Other"]),
+  type: z.enum([
+    "Hospital", "Clinic", "Laboratory", "Pharmacy", "Insurance", 
+    "SpecialtyCare", "RehabCenter", "NursingHome", "HomeHealthcare", "Other"
+  ]),
   address: z.string().min(5, "Address must be at least 5 characters"),
   phone: z.string().min(6, "Phone must be at least 6 characters"),
   email: z.string().email("Invalid email address"),
@@ -44,6 +71,8 @@ const formSchema = z.object({
   contactPersonPhone: z.string().optional().or(z.literal("")),
   status: z.enum(["Active", "Inactive", "Pending", "Archived"]),
   notes: z.string().optional().or(z.literal("")),
+  specialties: z.array(z.string()).optional(),
+  size: z.enum(["Small", "Medium", "Large", "Enterprise"]).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -77,6 +106,8 @@ const OrganizationFormDialog: React.FC<OrganizationFormDialogProps> = ({
           contactPersonPhone: organization.contactPersonPhone || "",
           status: organization.status,
           notes: organization.notes || "",
+          specialties: organization.specialties || [],
+          size: organization.size || "Small",
         }
       : {
           name: "",
@@ -90,6 +121,8 @@ const OrganizationFormDialog: React.FC<OrganizationFormDialogProps> = ({
           contactPersonPhone: "",
           status: "Active" as OrganizationStatus,
           notes: "",
+          specialties: [],
+          size: "Small" as OrganizationSize,
         },
   });
 
@@ -112,11 +145,24 @@ const OrganizationFormDialog: React.FC<OrganizationFormDialogProps> = ({
         contactPersonEmail: data.contactPersonEmail || undefined,
         contactPersonPhone: data.contactPersonPhone || undefined,
         notes: data.notes || undefined,
+        specialties: data.specialties,
+        size: data.size,
       };
       
       addOrganization(newOrgData);
     }
     onOpenChange(false);
+  };
+
+  const selectedSpecialties = form.watch("specialties") || [];
+
+  const toggleSpecialty = (specialty: string) => {
+    const current = selectedSpecialties;
+    const updated = current.includes(specialty)
+      ? current.filter(item => item !== specialty)
+      : [...current, specialty];
+    
+    form.setValue("specialties", updated, { shouldValidate: true });
   };
 
   return (
@@ -169,7 +215,37 @@ const OrganizationFormDialog: React.FC<OrganizationFormDialogProps> = ({
                         <SelectItem value="Laboratory">Laboratory</SelectItem>
                         <SelectItem value="Pharmacy">Pharmacy</SelectItem>
                         <SelectItem value="Insurance">Insurance</SelectItem>
+                        <SelectItem value="SpecialtyCare">Specialty Care</SelectItem>
+                        <SelectItem value="RehabCenter">Rehab Center</SelectItem>
+                        <SelectItem value="NursingHome">Nursing Home</SelectItem>
+                        <SelectItem value="HomeHealthcare">Home Healthcare</SelectItem>
                         <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="size"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Size</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select size" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Small">Small</SelectItem>
+                        <SelectItem value="Medium">Medium</SelectItem>
+                        <SelectItem value="Large">Large</SelectItem>
+                        <SelectItem value="Enterprise">Enterprise</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -228,6 +304,23 @@ const OrganizationFormDialog: React.FC<OrganizationFormDialogProps> = ({
                   </FormItem>
                 )}
               />
+              <div className="sm:col-span-2">
+                <h3 className="text-sm font-medium mb-3">Specialties</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {HEALTHCARE_SPECIALTIES.map((specialty) => (
+                    <div key={specialty} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`specialty-${specialty}`}
+                        checked={selectedSpecialties.includes(specialty)}
+                        onCheckedChange={() => toggleSpecialty(specialty)}
+                      />
+                      <label htmlFor={`specialty-${specialty}`} className="text-sm cursor-pointer">
+                        {specialty}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
               <div className="sm:col-span-2">
                 <h3 className="text-sm font-medium mb-3">Contact Person Information</h3>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -326,3 +419,4 @@ const OrganizationFormDialog: React.FC<OrganizationFormDialogProps> = ({
 };
 
 export default OrganizationFormDialog;
+
