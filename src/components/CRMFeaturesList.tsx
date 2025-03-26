@@ -1,4 +1,3 @@
-
 import React from "react";
 
 // Define feature categories and their features
@@ -105,14 +104,25 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Email Campaigns",
         description: "Create and send personalized email campaigns",
+        implemented: true,
       },
       {
         name: "Campaign Analytics",
         description: "Track and analyze marketing campaign performance",
+        comingSoon: true,
       },
       {
         name: "Automation",
         description: "Automate marketing workflows and tasks",
+      },
+      {
+        name: "Social Media Integration",
+        description: "Connect and manage social media accounts within the CRM",
+        comingSoon: true,
+      },
+      {
+        name: "Content Calendar",
+        description: "Plan and schedule marketing content across channels",
       },
     ],
   },
