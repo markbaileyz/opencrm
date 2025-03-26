@@ -1,4 +1,3 @@
-
 import React from "react";
 
 // Define feature categories and their features
@@ -51,7 +50,7 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Lead Nurturing",
         description: "Nurture leads through automated workflows",
-        comingSoon: true,
+        implemented: true,
       },
       {
         name: "Lead Conversion",
@@ -61,7 +60,7 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Lead Source Tracking",
         description: "Track and analyze which sources generate the most valuable leads",
-        comingSoon: true,
+        implemented: true,
       },
     ],
   },
@@ -76,7 +75,7 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Sales Analytics",
         description: "Analyze sales data and performance",
-        comingSoon: true,
+        implemented: true,
       },
       {
         name: "Forecasting",
@@ -91,7 +90,7 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Sales Goals",
         description: "Set and track sales targets for individuals and teams",
-        comingSoon: true,
+        implemented: true,
       },
     ],
   },
@@ -106,12 +105,12 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Knowledge Base",
         description: "Create and maintain a customer knowledge base",
-        comingSoon: true,
+        implemented: true,
       },
       {
         name: "Service Analytics",
         description: "Analyze customer service performance and satisfaction metrics",
-        comingSoon: true,
+        implemented: true,
       },
       {
         name: "Live Chat Support",
@@ -121,7 +120,7 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Customer Feedback",
         description: "Collect and analyze customer feedback to improve service",
-        comingSoon: true,
+        implemented: true,
       },
     ],
   },
@@ -136,7 +135,7 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Campaign Analytics",
         description: "Track and analyze marketing campaign performance",
-        comingSoon: true,
+        implemented: true,
       },
       {
         name: "Automation",
@@ -146,7 +145,7 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Social Media Integration",
         description: "Connect and manage social media accounts within the CRM",
-        comingSoon: true,
+        implemented: true,
       },
       {
         name: "Content Calendar",
