@@ -26,7 +26,7 @@ const Roadmap = () => {
                 document.getElementById('features-list')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              View Roadmap <ChevronDown className="ml-2 h-4 w-4" />
+              Explore Our Roadmap <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </div>
