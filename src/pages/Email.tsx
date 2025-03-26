@@ -13,11 +13,11 @@ import { useEmailKeyboardShortcuts } from "@/hooks/useEmailKeyboardShortcuts";
 import { useEmailActions } from "@/hooks/useEmailActions";
 import type { Email } from "@/types/email";
 import { useToast } from "@/hooks/use-toast";
-import { SortOption } from "@/components/email/EmailSort";
 import { 
   filterEmails, 
   sortEmails, 
-  calculateUnreadCounts 
+  calculateUnreadCounts,
+  SortOption 
 } from "@/utils/emailUtils";
 
 const Email = () => {
