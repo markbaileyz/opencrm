@@ -65,7 +65,7 @@ const EmailList = ({
   };
 
   if (emails.length === 0) {
-    return <EmailListEmpty />;
+    return <EmailListEmpty folder={folder} />;
   }
   
   return (
