@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -8,7 +7,8 @@ import { Link } from "react-router-dom";
 import { 
   CheckCircle, Shield, Code, Database, Users, Calendar, FileText, 
   Workflow, BarChart, Zap, Network, ChevronLeft, LayoutDashboard, Users as UsersIcon,
-  Clock, Award, FileCode, Lightbulb, AlertTriangle
+  Clock, Award, FileCode, Lightbulb, AlertTriangle, Server, Lock, Cloud, 
+  ChevronsUpDown, Layers, GitBranch, FileJson, Globe
 } from "lucide-react";
 
 const PhaseCard = ({ 
@@ -99,6 +99,57 @@ const MilestoneCard = ({
   );
 };
 
+const TechStackCard = ({ 
+  title, 
+  icon: Icon, 
+  children 
+}: { 
+  title: string; 
+  icon: React.ElementType; 
+  children: React.ReactNode 
+}) => {
+  return (
+    <Card className="mb-6">
+      <CardHeader className="flex flex-row items-center gap-2 pb-2">
+        <div className="rounded-full bg-primary/10 p-2">
+          <Icon className="h-5 w-5 text-primary" />
+        </div>
+        <CardTitle className="text-xl">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>{children}</CardContent>
+    </Card>
+  );
+};
+
+const TechComponent = ({
+  name,
+  description,
+  tags = []
+}: {
+  name: string;
+  description: string;
+  tags?: string[];
+}) => {
+  return (
+    <div className="p-4 border rounded-lg mb-4">
+      <h4 className="font-medium text-lg mb-1">{name}</h4>
+      <p className="text-muted-foreground text-sm mb-2">{description}</p>
+      {tags.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <span 
+              key={tag} 
+              className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const OpenCRMRoadmap = () => {
   return (
     <div className="space-y-8 animate-fade-up">
@@ -163,10 +214,11 @@ const OpenCRMRoadmap = () => {
       </div>
 
       <Tabs defaultValue="phases" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="phases">Development Phases</TabsTrigger>
           <TabsTrigger value="features">Core Features</TabsTrigger>
           <TabsTrigger value="timeline">Implementation Timeline</TabsTrigger>
+          <TabsTrigger value="technical">Technical Specs</TabsTrigger>
         </TabsList>
         
         <TabsContent value="phases" className="mt-6">
@@ -572,6 +624,339 @@ const OpenCRMRoadmap = () => {
               />
             </div>
           </div>
+        </TabsContent>
+        
+        <TabsContent value="technical" className="mt-6">
+          <div className="text-center mb-6">
+            <h3 className="text-xl font-semibold">Technical Documentation</h3>
+            <p className="text-muted-foreground mt-2">
+              Comprehensive specifications for our HIPAA-compliant healthcare CRM platform
+            </p>
+          </div>
+
+          <TechStackCard title="Architecture" icon={Layers}>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="architecture-overview">
+                <AccordionTrigger>System Architecture Overview</AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-4">
+                    <p className="text-muted-foreground">
+                      OpenCRM employs a microservices architecture to ensure scalability, maintainability, and security 
+                      isolation between different system components.
+                    </p>
+                    
+                    <div className="p-4 bg-primary/5 rounded-lg border">
+                      <h5 className="font-medium mb-2">Key Architecture Principles:</h5>
+                      <ul className="space-y-2">
+                        <li className="flex items-start">
+                          <span className="text-primary mr-2">•</span>
+                          <span>Modular microservices with clear boundaries and responsibilities</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-primary mr-2">•</span>
+                          <span>API-first design with comprehensive documentation</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-primary mr-2">•</span>
+                          <span>Multi-tenant data model with strict isolation</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-primary mr-2">•</span>
+                          <span>Containerized deployment for consistent environments</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-primary mr-2">•</span>
+                          <span>Event-driven communication for service decoupling</span>
+                        </li>
+                      </ul>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                      <div className="p-4 border rounded-lg">
+                        <h5 className="font-medium flex items-center gap-2 mb-2">
+                          <Users className="h-4 w-4" /> Frontend Layer
+                        </h5>
+                        <p className="text-sm text-muted-foreground">
+                          React-based SPA with responsive design and accessibility features
+                        </p>
+                      </div>
+                      
+                      <div className="p-4 border rounded-lg">
+                        <h5 className="font-medium flex items-center gap-2 mb-2">
+                          <Server className="h-4 w-4" /> API Layer
+                        </h5>
+                        <p className="text-sm text-muted-foreground">
+                          REST and GraphQL APIs with comprehensive authentication and authorization
+                        </p>
+                      </div>
+                      
+                      <div className="p-4 border rounded-lg">
+                        <h5 className="font-medium flex items-center gap-2 mb-2">
+                          <Database className="h-4 w-4" /> Data Layer
+                        </h5>
+                        <p className="text-sm text-muted-foreground">
+                          Polyglot persistence with encrypted data stores and audit logging
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="multi-tenancy">
+                <AccordionTrigger>Multi-Tenant Architecture</AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-4">
+                    <p className="text-muted-foreground">
+                      Our multi-tenant architecture is designed to securely isolate customer data while maximizing resource efficiency.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-4 border rounded-lg">
+                        <h5 className="font-medium mb-2">Database Isolation</h5>
+                        <ul className="space-y-1 text-sm text-muted-foreground">
+                          <li>• Tenant identifier in all database queries</li>
+                          <li>• Row-level security enforced at database tier</li>
+                          <li>• Tenant-specific encryption keys</li>
+                          <li>• Automated tenant data segregation testing</li>
+                        </ul>
+                      </div>
+                      
+                      <div className="p-4 border rounded-lg">
+                        <h5 className="font-medium mb-2">Resource Allocation</h5>
+                        <ul className="space-y-1 text-sm text-muted-foreground">
+                          <li>• Dynamic resource scaling per tenant</li>
+                          <li>• Tenant-specific rate limiting</li>
+                          <li>• Activity monitoring for unusual patterns</li>
+                          <li>• Resource isolation during peak loads</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </TechStackCard>
+          
+          <TechStackCard title="Technology Stack" icon={Code}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-medium mb-3">Frontend Technologies</h4>
+                <div className="space-y-3">
+                  <TechComponent 
+                    name="React" 
+                    description="Component-based UI library for building the interactive user interface" 
+                    tags={["TypeScript", "Hooks", "Context API"]}
+                  />
+                  <TechComponent 
+                    name="TailwindCSS" 
+                    description="Utility-first CSS framework for responsive design with accessibility focus" 
+                    tags={["Responsive", "Custom Components", "Theme System"]}
+                  />
+                  <TechComponent 
+                    name="React Query" 
+                    description="Data fetching library for managing server state with caching" 
+                    tags={["Server State", "Caching", "Background Updates"]}
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium mb-3">Backend Technologies</h4>
+                <div className="space-y-3">
+                  <TechComponent 
+                    name="Node.js" 
+                    description="JavaScript runtime for building scalable server-side applications" 
+                    tags={["Express", "TypeScript", "API Layer"]}
+                  />
+                  <TechComponent 
+                    name="PostgreSQL" 
+                    description="Advanced relational database with JSONB support for flexible schemas" 
+                    tags={["RLS", "Encryption", "Audit Logging"]}
+                  />
+                  <TechComponent 
+                    name="Redis" 
+                    description="In-memory data structure store for caching and real-time features" 
+                    tags={["Caching", "Session Store", "Pub/Sub"]}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6">
+              <h4 className="font-medium mb-3">Infrastructure & DevOps</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <TechComponent 
+                  name="Docker & Kubernetes" 
+                  description="Containerization for consistent environments and orchestration" 
+                  tags={["Containers", "Orchestration", "Scaling"]}
+                />
+                <TechComponent 
+                  name="AWS" 
+                  description="Cloud infrastructure with healthcare compliance capabilities" 
+                  tags={["EC2", "S3", "RDS", "CloudWatch"]}
+                />
+                <TechComponent 
+                  name="CI/CD Pipeline" 
+                  description="Automated testing and deployment with security scanning" 
+                  tags={["GitHub Actions", "Jest", "Cypress"]}
+                />
+              </div>
+            </div>
+          </TechStackCard>
+          
+          <TechStackCard title="Security & Compliance" icon={Shield}>
+            <div className="space-y-4">
+              <p className="text-muted-foreground">
+                Security and compliance are foundational to our platform, with comprehensive controls at every layer.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <div className="p-4 border rounded-lg">
+                    <h5 className="font-medium flex items-center gap-2 mb-2">
+                      <Lock className="h-4 w-4" /> Data Security
+                    </h5>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li>• AES-256 encryption for data at rest</li>
+                      <li>• TLS 1.3 for data in transit</li>
+                      <li>• Field-level encryption for sensitive PHI</li>
+                      <li>• Secure key management with rotation</li>
+                      <li>• Comprehensive audit logging</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <h5 className="font-medium flex items-center gap-2 mb-2">
+                      <Users className="h-4 w-4" /> Access Controls
+                    </h5>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li>• Role-Based Access Control (RBAC)</li>
+                      <li>• Multi-factor authentication</li>
+                      <li>• OAuth 2.0 and OIDC integration</li>
+                      <li>• Least privilege principle enforcement</li>
+                      <li>• Session management and timeouts</li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="p-4 border rounded-lg">
+                    <h5 className="font-medium flex items-center gap-2 mb-2">
+                      <FileText className="h-4 w-4" /> Compliance Framework
+                    </h5>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li>• HIPAA Security Rule mapped controls</li>
+                      <li>• SOC 2 Type II compliance</li>
+                      <li>• HITRUST CSF aligned security measures</li>
+                      <li>• Continuous compliance monitoring</li>
+                      <li>• Regular penetration testing</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <h5 className="font-medium flex items-center gap-2 mb-2">
+                      <AlertTriangle className="h-4 w-4" /> Incident Response
+                    </h5>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li>• Automated threat detection</li>
+                      <li>• 24/7 security monitoring</li>
+                      <li>• Defined incident response plan</li>
+                      <li>• Breach notification procedures</li>
+                      <li>• Regular incident response drills</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TechStackCard>
+          
+          <TechStackCard title="Integration Capabilities" icon={Network}>
+            <div className="space-y-4">
+              <p className="text-muted-foreground">
+                Our platform is designed for seamless integration with healthcare systems and third-party services.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-medium mb-3">Healthcare Standards Support</h4>
+                  <div className="space-y-3">
+                    <TechComponent 
+                      name="FHIR API Support" 
+                      description="RESTful FHIR R4 API for interoperability with modern healthcare systems" 
+                      tags={["R4", "Patient Resource", "Appointment Resource"]}
+                    />
+                    <TechComponent 
+                      name="HL7 v2 Integration" 
+                      description="Support for legacy systems using HL7 v2.x messages" 
+                      tags={["ADT", "SIU", "MDM"]}
+                    />
+                    <TechComponent 
+                      name="DICOM Compatibility" 
+                      description="Support for imaging and documents using DICOM standard" 
+                      tags={["Metadata", "Viewing", "Storage"]}
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-3">API & Integration Frameworks</h4>
+                  <div className="space-y-3">
+                    <TechComponent 
+                      name="REST API" 
+                      description="Comprehensive RESTful API with versioning and documentation" 
+                      tags={["OpenAPI", "Swagger", "JWT Auth"]}
+                    />
+                    <TechComponent 
+                      name="GraphQL API" 
+                      description="Flexible data querying for complex frontend requirements" 
+                      tags={["Apollo", "Schema Stitching", "Subscriptions"]}
+                    />
+                    <TechComponent 
+                      name="Webhook System" 
+                      description="Event-based notifications for real-time integration" 
+                      tags={["OAuth", "Custom Events", "Delivery Guarantees"]}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-4">
+                <h4 className="font-medium mb-3">Third-Party Integrations</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 border rounded-lg">
+                    <h5 className="font-medium mb-2">EHR Systems</h5>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li>• Epic</li>
+                      <li>• Cerner</li>
+                      <li>• Athenahealth</li>
+                      <li>• Allscripts</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <h5 className="font-medium mb-2">Communication</h5>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li>• Twilio</li>
+                      <li>• SendGrid</li>
+                      <li>• Zoom</li>
+                      <li>• Microsoft Teams</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <h5 className="font-medium mb-2">Billing & Payment</h5>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li>• Stripe</li>
+                      <li>• Square</li>
+                      <li>• Eligible</li>
+                      <li>• Change Healthcare</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TechStackCard>
         </TabsContent>
       </Tabs>
       
