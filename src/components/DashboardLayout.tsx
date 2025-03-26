@@ -1,5 +1,6 @@
+
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/context/AuthContext";
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -21,7 +23,9 @@ interface DashboardLayoutProps {
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const { logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { toast } = useToast();
   
   const sidebarItems = [
     {
@@ -47,6 +51,15 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     setIsSidebarOpen(!isSidebarOpen);
   };
   
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out.",
+    });
+    navigate("/");
+  };
+  
   return (
     <div className="flex h-screen">
       {/* Mobile Sidebar Button */}
@@ -64,7 +77,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       {/* Sidebar */}
       <aside
         className={cn(
-          "w-64 flex-shrink-0 bg-secondary border-r border-r-muted py-4 px-2 hidden md:block",
+          "w-64 flex-shrink-0 bg-secondary border-r border-r-muted py-4 px-2 fixed h-full z-40 md:relative",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full",
           "transition-transform duration-300 ease-in-out md:translate-x-0"
         )}
@@ -93,7 +106,11 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         </nav>
         <Separator className="my-6" />
         <div className="p-4">
-          <Button variant="outline" className="w-full" onClick={logout}>
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            onClick={handleLogout}
+          >
             <LogOut className="h-4 w-4 mr-2" />
             Logout
           </Button>
@@ -101,7 +118,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 overflow-auto">
         {children}
       </div>
     </div>
