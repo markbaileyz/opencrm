@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardHeader, CardContent, CardTitle, CardFooter } from "@/components/ui/card";
 import { Feature, Comment } from "@/data/featuresList";
@@ -42,6 +41,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature }) => {
     toast({
       title: `Vote recorded: ${isUpvote ? "Upvote" : "Downvote"}`,
       description: `Thanks for your feedback on "${feature.name}"`,
+      variant: isUpvote ? "success" : "info",
     });
   };
 
@@ -55,7 +55,14 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature }) => {
   const implementationProgress = getImplementationProgress();
 
   const addComment = () => {
-    if (!newComment.trim()) return;
+    if (!newComment.trim()) {
+      toast({
+        title: "Empty comment",
+        description: "Please enter a comment before submitting",
+        variant: "warning",
+      });
+      return;
+    }
     
     const comment: Comment = {
       id: uuidv4(),
@@ -70,6 +77,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature }) => {
     toast({
       title: "Comment added",
       description: "Your comment has been added to this feature",
+      variant: "success",
     });
   };
 
