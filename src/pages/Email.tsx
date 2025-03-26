@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import EmailList from "@/components/email/EmailList";
 import EmailDetail from "@/components/email/EmailDetail";
 import ComposeEmail from "@/components/email/ComposeEmail";
-import { Email } from "@/types/email";
+import type { Email } from "@/types/email";
 import { emailData } from "@/data/emailData";
 
 const Email = () => {
