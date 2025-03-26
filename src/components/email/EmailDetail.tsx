@@ -22,6 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@/components/ui/tooltip";
+import EmailLabels from "./EmailLabels";
 
 interface EmailDetailProps {
   email: Email;
@@ -31,6 +32,9 @@ interface EmailDetailProps {
   onArchive: (id: string) => void;
   onReply: (email: Email) => void;
   onForward: (email: Email) => void;
+  onAddLabel?: (id: string, label: string) => void;
+  onRemoveLabel?: (id: string, label: string) => void;
+  allLabels?: string[];
   keyboardShortcuts?: { key: string; action: string }[];
 }
 
@@ -42,12 +46,27 @@ const EmailDetail = ({
   onArchive,
   onReply,
   onForward,
+  onAddLabel,
+  onRemoveLabel,
+  allLabels = [],
   keyboardShortcuts = [],
 }: EmailDetailProps) => {
   if (!email) return null;
 
   // Extract first letter of sender name for avatar
   const senderInitial = email.senderName.charAt(0).toUpperCase();
+
+  const handleAddLabel = (label: string) => {
+    if (onAddLabel) {
+      onAddLabel(email.id, label);
+    }
+  };
+
+  const handleRemoveLabel = (label: string) => {
+    if (onRemoveLabel) {
+      onRemoveLabel(email.id, label);
+    }
+  };
 
   return (
     <div className="bg-card rounded-md border shadow-sm flex flex-col h-full">
@@ -176,6 +195,17 @@ const EmailDetail = ({
               </div>
             )}
           </div>
+
+          {onAddLabel && onRemoveLabel && (
+            <div className="mb-4">
+              <EmailLabels 
+                labels={email.labels || []}
+                allLabels={allLabels}
+                onAddLabel={handleAddLabel}
+                onRemoveLabel={handleRemoveLabel}
+              />
+            </div>
+          )}
 
           <Separator className="my-4" />
           

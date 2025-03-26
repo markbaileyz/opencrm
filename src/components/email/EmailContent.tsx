@@ -16,6 +16,9 @@ interface EmailContentProps {
   onArchiveEmail: (id: string) => void;
   onReplyEmail: (email: Email) => void;
   onForwardEmail: (email: Email) => void;
+  onAddLabel?: (id: string, label: string) => void;
+  onRemoveLabel?: (id: string, label: string) => void;
+  allLabels?: string[];
   keyboardShortcuts?: { key: string; action: string }[];
   sortOption?: SortOption;
   onSortChange?: (option: SortOption) => void;
@@ -32,6 +35,9 @@ const EmailContent: React.FC<EmailContentProps> = ({
   onArchiveEmail,
   onReplyEmail,
   onForwardEmail,
+  onAddLabel,
+  onRemoveLabel,
+  allLabels = [],
   keyboardShortcuts = [],
   sortOption = "newest", 
   onSortChange,
@@ -47,6 +53,9 @@ const EmailContent: React.FC<EmailContentProps> = ({
           onArchive={onArchiveEmail}
           onReply={onReplyEmail}
           onForward={onForwardEmail}
+          onAddLabel={onAddLabel}
+          onRemoveLabel={onRemoveLabel}
+          allLabels={allLabels}
           keyboardShortcuts={keyboardShortcuts}
         />
       </div>

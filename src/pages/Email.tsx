@@ -17,6 +17,7 @@ import {
   filterEmails, 
   sortEmails, 
   calculateUnreadCounts,
+  getAllLabels,
   SortOption 
 } from "@/utils/emailUtils";
 
@@ -36,7 +37,9 @@ const Email = () => {
     handleStarEmail,
     handleDeleteEmail,
     handleArchiveEmail,
-    handleSendEmail
+    handleSendEmail,
+    handleAddLabel,
+    handleRemoveLabel
   } = useEmailManager(emailData);
 
   const {
@@ -47,6 +50,9 @@ const Email = () => {
 
   // Calculate unread counts for each folder
   const unreadCounts = calculateUnreadCounts(emails);
+  
+  // Get all unique labels from emails
+  const allLabels = getAllLabels(emails);
 
   const handleComposeOpen = () => {
     setIsComposeOpen(true);
@@ -115,6 +121,7 @@ const Email = () => {
             onFilterChange={handleFilterChange}
             activeFilters={activeFilters}
             unreadCounts={unreadCounts}
+            availableLabels={allLabels}
           />
           
           <TabsContent value={activeTab}>
@@ -129,6 +136,9 @@ const Email = () => {
               onArchiveEmail={handleArchiveEmail}
               onReplyEmail={(email) => handleReplyEmail(email, setIsComposeOpen)}
               onForwardEmail={(email) => handleForwardEmail(email, setIsComposeOpen)}
+              onAddLabel={handleAddLabel}
+              onRemoveLabel={handleRemoveLabel}
+              allLabels={allLabels}
               keyboardShortcuts={availableShortcuts}
               sortOption={sortOption}
               onSortChange={handleSortChange}

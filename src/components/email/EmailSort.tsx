@@ -20,6 +20,7 @@ const sortOptions = [
   { value: "oldest", label: "Oldest first" },
   { value: "unread", label: "Unread first" },
   { value: "sender", label: "Sender name" },
+  { value: "subject", label: "Subject" },
 ];
 
 const EmailSort: React.FC<EmailSortProps> = ({ value, onChange }) => {

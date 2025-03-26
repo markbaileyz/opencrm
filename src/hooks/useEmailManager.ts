@@ -63,6 +63,42 @@ export function useEmailManager(initialEmails: Email[]) {
       email.id === id ? { ...email, read: true } : email
     ));
   };
+
+  const handleAddLabel = (id: string, label: string) => {
+    setEmails(emails.map(email => {
+      if (email.id === id) {
+        const existingLabels = email.labels || [];
+        if (!existingLabels.includes(label)) {
+          return { ...email, labels: [...existingLabels, label] };
+        }
+      }
+      return email;
+    }));
+    
+    toast({
+      title: "Label added",
+      description: `The label "${label}" has been added to the email.`,
+      variant: "default",
+    });
+  };
+
+  const handleRemoveLabel = (id: string, label: string) => {
+    setEmails(emails.map(email => {
+      if (email.id === id && email.labels) {
+        return { 
+          ...email, 
+          labels: email.labels.filter(l => l !== label) 
+        };
+      }
+      return email;
+    }));
+    
+    toast({
+      title: "Label removed",
+      description: `The label "${label}" has been removed from the email.`,
+      variant: "default",
+    });
+  };
   
   const handleSendEmail = (data: any) => {
     // Create a new email and add it to the sent folder
@@ -79,6 +115,7 @@ export function useEmailManager(initialEmails: Email[]) {
       starred: false,
       folder: 'sent',
       hasAttachments: data.attachments.length > 0,
+      labels: data.labels || [],
     };
     
     setEmails([newEmail, ...emails]);
@@ -100,6 +137,8 @@ export function useEmailManager(initialEmails: Email[]) {
     handleStarEmail,
     handleDeleteEmail,
     handleArchiveEmail,
-    handleSendEmail
+    handleSendEmail,
+    handleAddLabel,
+    handleRemoveLabel
   };
 }
