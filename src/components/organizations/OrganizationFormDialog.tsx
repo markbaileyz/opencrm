@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Organization, OrganizationType, OrganizationStatus } from "@/types/organization";
 import { useOrganizations } from "@/context/OrganizationsContext";
@@ -101,7 +100,21 @@ const OrganizationFormDialog: React.FC<OrganizationFormDialogProps> = ({
         ...data,
       });
     } else {
-      addOrganization(data);
+      const newOrgData = {
+        name: data.name,
+        type: data.type,
+        address: data.address,
+        phone: data.phone,
+        email: data.email,
+        status: data.status,
+        website: data.website || undefined,
+        contactPersonName: data.contactPersonName || undefined,
+        contactPersonEmail: data.contactPersonEmail || undefined,
+        contactPersonPhone: data.contactPersonPhone || undefined,
+        notes: data.notes || undefined,
+      };
+      
+      addOrganization(newOrgData);
     }
     onOpenChange(false);
   };
