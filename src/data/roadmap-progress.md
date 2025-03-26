@@ -24,6 +24,7 @@
    - Feature voting system (upvote/downvote)
    - Vote counters
    - User feedback via toasts
+   - Search functionality
 
 5. Strategic Planning
    - OpenCRM roadmap document added
@@ -48,7 +49,6 @@
 1. Additional User Interaction Features
    - Sort options
    - Category quick-filters
-   - Search functionality
 
 2. UI Enhancements
    - Collapsible technical details sections
@@ -63,7 +63,7 @@
 - None currently tracked
 
 ## Last Updated
+- Added search functionality for features
 - Added interactive visualization for development timeline
 - Added detailed technical specifications section
 - Improved milestone tracking with expandable details
-

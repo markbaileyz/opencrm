@@ -7,9 +7,12 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, Filter, FileText, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
+import { Input } from "@/components/ui/input";
 
 const Roadmap = () => {
   const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
   
   // Function to handle smooth scrolling to features list
   const scrollToFeatures = () => {
@@ -45,11 +48,28 @@ const Roadmap = () => {
                 <Filter className="h-4 w-4" />
                 <span className="sr-only">Filter features</span>
               </Button>
-              <Button variant="outline" size="icon">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={() => setShowSearch(!showSearch)}
+                className={showSearch ? "bg-primary/10" : ""}
+              >
                 <Search className="h-4 w-4" />
                 <span className="sr-only">Search features</span>
               </Button>
             </div>
+            
+            {showSearch && (
+              <div className="mt-4 max-w-md mx-auto animate-fade-down">
+                <Input
+                  type="text"
+                  placeholder="Search features..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+            )}
           </div>
         </div>
         
@@ -69,7 +89,7 @@ const Roadmap = () => {
         </div>
         
         <div id="features-list">
-          <CRMFeaturesList />
+          <CRMFeaturesList searchQuery={searchQuery} />
         </div>
         
         <div className="container mx-auto px-4 py-12 text-center">

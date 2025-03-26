@@ -4,16 +4,28 @@ import { featuresList } from "@/data/featuresList";
 import FeatureFilters, { FilterType } from "./roadmap/FeatureFilters";
 import FeatureCategory from "./roadmap/FeatureCategory";
 
-const CRMFeaturesList = () => {
+interface CRMFeaturesListProps {
+  searchQuery?: string;
+}
+
+const CRMFeaturesList: React.FC<CRMFeaturesListProps> = ({ searchQuery = "" }) => {
   const [filter, setFilter] = useState<FilterType>("all");
   
   const filteredFeaturesList = featuresList.map(category => ({
     ...category,
     features: category.features.filter(feature => {
-      if (filter === "all") return true;
-      if (filter === "implemented") return feature.implemented;
-      if (filter === "coming-soon") return feature.comingSoon;
-      return true;
+      // Filter by status
+      const statusMatch = 
+        filter === "all" || 
+        (filter === "implemented" && feature.implemented) || 
+        (filter === "coming-soon" && feature.comingSoon);
+      
+      // Filter by search query
+      const searchMatch = searchQuery === "" || 
+        feature.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        feature.description.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      return statusMatch && searchMatch;
     })
   })).filter(category => category.features.length > 0);
 
@@ -31,7 +43,11 @@ const CRMFeaturesList = () => {
 
       {filteredFeaturesList.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-xl text-muted-foreground">No features found matching the selected filter.</p>
+          <p className="text-xl text-muted-foreground">
+            {searchQuery 
+              ? `No features found matching "${searchQuery}". Try another search term.` 
+              : "No features found matching the selected filter."}
+          </p>
         </div>
       ) : (
         <div className="space-y-16">
