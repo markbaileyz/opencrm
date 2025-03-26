@@ -2,7 +2,7 @@
 import React, { useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { useTheme } from "@/components/theme-provider";
+import { useTheme as useNextTheme } from "next-themes";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +29,7 @@ import { User, Settings, LogOut, Upload, Camera, Sun, Moon } from "lucide-react"
 const ProfileMenu = () => {
   const { user, logout, updateProfile, uploadProfileImage } = useAuth();
   const { toast } = useToast();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useNextTheme();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [photoURL, setPhotoURL] = useState(user?.photoURL || "");
