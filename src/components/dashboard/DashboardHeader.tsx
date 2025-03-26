@@ -7,6 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import NotificationCenter from "./NotificationCenter";
 import ProfileMenu from "./ProfileMenu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 interface DashboardHeaderProps {
   isAdmin: boolean;
@@ -15,11 +25,40 @@ interface DashboardHeaderProps {
 const DashboardHeader = ({ isAdmin }: DashboardHeaderProps) => {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
+  const [aiQuery, setAiQuery] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { toast } = useToast();
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Searching for:", searchQuery);
     // Implement search functionality
+    if (searchQuery.trim()) {
+      toast({
+        title: "Search initiated",
+        description: `Searching for "${searchQuery}"`,
+      });
+    }
+  };
+  
+  const handleAIAssistant = () => {
+    if (!aiQuery.trim()) return;
+    
+    setIsProcessing(true);
+    
+    // Simulate AI processing
+    setTimeout(() => {
+      setIsProcessing(false);
+      setAiQuery("");
+      setIsAIDialogOpen(false);
+      
+      toast({
+        title: "AI Assistant Response",
+        description: "Your query has been processed. Check the dashboard for insights.",
+        variant: "success",
+      });
+    }, 1500);
   };
   
   return (
@@ -43,10 +82,41 @@ const DashboardHeader = ({ isAdmin }: DashboardHeaderProps) => {
             />
           </form>
           <NotificationCenter />
-          <Button variant="outline" size="sm" className="gap-2">
-            <Sparkles className="h-4 w-4" />
-            <span className="hidden md:inline">AI Assistant</span>
-          </Button>
+          <Dialog open={isAIDialogOpen} onOpenChange={setIsAIDialogOpen}>
+            <Button 
+              onClick={() => setIsAIDialogOpen(true)} 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span className="hidden md:inline">AI Assistant</span>
+            </Button>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Ask the AI Assistant</DialogTitle>
+                <DialogDescription>
+                  Describe what you need help with, and our AI will analyze your data and provide insights.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="mt-4 space-y-4">
+                <Textarea 
+                  placeholder="e.g., Show me the contacts with the highest activity this month" 
+                  value={aiQuery}
+                  onChange={(e) => setAiQuery(e.target.value)}
+                  className="min-h-[120px]"
+                />
+              </div>
+              <DialogFooter className="mt-4">
+                <Button variant="outline" onClick={() => setIsAIDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleAIAssistant} disabled={isProcessing || !aiQuery.trim()}>
+                  {isProcessing ? "Processing..." : "Get Insights"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
           <ProfileMenu />
         </div>
       </div>

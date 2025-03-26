@@ -2,6 +2,7 @@
 import React, { useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useTheme } from "@/components/theme-provider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,11 +24,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Settings, LogOut, Upload, Camera } from "lucide-react";
+import { User, Settings, LogOut, Upload, Camera, Sun, Moon } from "lucide-react";
 
 const ProfileMenu = () => {
   const { user, logout, updateProfile, uploadProfileImage } = useAuth();
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [photoURL, setPhotoURL] = useState(user?.photoURL || "");
@@ -88,6 +90,14 @@ const ProfileMenu = () => {
 
   const triggerFileUpload = () => {
     fileInputRef.current?.click();
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+    toast({
+      title: `Theme updated`,
+      description: `Switched to ${theme === "dark" ? "light" : "dark"} mode`,
+    });
   };
 
   return (
@@ -162,6 +172,14 @@ const ProfileMenu = () => {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          <DropdownMenuItem onClick={toggleTheme}>
+            {theme === "dark" ? (
+              <Sun className="mr-2 h-4 w-4" />
+            ) : (
+              <Moon className="mr-2 h-4 w-4" />
+            )}
+            {theme === "dark" ? "Light Mode" : "Dark Mode"}
+          </DropdownMenuItem>
           <DropdownMenuItem>
             <Settings className="mr-2 h-4 w-4" />
             Settings
