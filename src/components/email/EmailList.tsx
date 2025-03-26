@@ -1,29 +1,17 @@
 
 import React, { useState } from "react";
-import { formatDistanceToNow } from "date-fns";
-import { Star, StarOff, Trash, Archive, Mail, MoreHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Table, 
   TableBody, 
-  TableCell, 
   TableHead, 
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
 import { Email } from "@/types/email";
-import EmailSort from "./EmailSort";
 import { SortOption } from "@/utils/emailUtils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import EmailListHeader from "./EmailListHeader";
+import EmailListItem from "./EmailListItem";
+import EmailListEmpty from "./EmailListEmpty";
 
 interface EmailListProps {
   emails: Email[];
@@ -92,110 +80,44 @@ const EmailList = ({
       setSelectedEmails([]);
     }
   };
+
+  const handleArchiveSelected = (ids: string[]) => {
+    if (onArchiveEmail) {
+      ids.forEach(id => onArchiveEmail(id));
+    }
+  };
+
+  const handleDeleteSelected = (ids: string[]) => {
+    if (onDeleteEmail) {
+      ids.forEach(id => onDeleteEmail(id));
+    }
+  };
+
+  const handleStarSelected = (ids: string[]) => {
+    if (onStarEmail) {
+      ids.forEach(id => onStarEmail(id));
+    }
+  };
   
   if (emails.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 space-y-3 bg-muted/30 rounded-lg border border-dashed border-muted">
-        <Mail className="h-12 w-12 text-muted-foreground/50" />
-        <p className="text-muted-foreground">No emails in this folder</p>
-      </div>
-    );
+    return <EmailListEmpty />;
   }
   
   return (
     <div className="bg-card rounded-md border shadow-sm">
-      <div className="p-2 border-b flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            checked={emails.length > 0 && selectedEmails.length === emails.length} 
-            onCheckedChange={handleSelectAll}
-            onClick={() => !isBulkMode && setIsBulkMode(true)}
-          />
-          {selectedEmails.length > 0 && (
-            <div className="flex items-center space-x-1">
-              {onArchiveEmail && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => {
-                    selectedEmails.forEach(id => onArchiveEmail(id));
-                    handleClearSelection();
-                  }}
-                >
-                  <Archive className="h-4 w-4" />
-                  <span className="ml-1 hidden sm:inline">Archive</span>
-                </Button>
-              )}
-              {onDeleteEmail && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => {
-                    selectedEmails.forEach(id => onDeleteEmail(id));
-                    handleClearSelection();
-                  }}
-                >
-                  <Trash className="h-4 w-4" />
-                  <span className="ml-1 hidden sm:inline">Delete</span>
-                </Button>
-              )}
-              {onStarEmail && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => {
-                    selectedEmails.forEach(id => onStarEmail(id));
-                    handleClearSelection();
-                  }}
-                >
-                  <Star className="h-4 w-4" />
-                  <span className="ml-1 hidden sm:inline">Star</span>
-                </Button>
-              )}
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleClearSelection}
-              >
-                <span>Cancel ({selectedEmails.length})</span>
-              </Button>
-            </div>
-          )}
-          {selectedEmails.length === 0 && (
-            <Button
-              variant={isBulkMode ? "secondary" : "ghost"}
-              size="sm"
-              onClick={toggleBulkMode}
-            >
-              {isBulkMode ? "Exit selection" : "Select"}
-            </Button>
-          )}
-        </div>
-        <div className="flex items-center space-x-2">
-          {onSortChange && (
-            <EmailSort 
-              value={sortOption} 
-              onChange={(value) => onSortChange(value)} 
-            />
-          )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">More options</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={toggleBulkMode}>
-                {isBulkMode ? "Exit selection mode" : "Select multiple"}
-              </DropdownMenuItem>
-              <DropdownMenuItem>Mark all as read</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+      <EmailListHeader
+        selectedEmails={selectedEmails}
+        emails={emails}
+        onSelectAll={handleSelectAll}
+        onArchiveSelected={onArchiveEmail ? handleArchiveSelected : undefined}
+        onDeleteSelected={onDeleteEmail ? handleDeleteSelected : undefined}
+        onStarSelected={onStarEmail ? handleStarSelected : undefined}
+        onClearSelection={handleClearSelection}
+        toggleBulkMode={toggleBulkMode}
+        isBulkMode={isBulkMode}
+        sortOption={sortOption}
+        onSortChange={onSortChange}
+      />
       
       <Table>
         <TableHeader>
@@ -209,54 +131,18 @@ const EmailList = ({
         </TableHeader>
         <TableBody>
           {emails.map((email) => (
-            <TableRow 
+            <EmailListItem
               key={email.id}
-              className={cn(
-                "cursor-pointer hover:bg-muted/50",
-                !email.read && "font-medium bg-muted/20",
-                selectedEmails.includes(email.id) && "bg-muted/40"
-              )}
-              onClick={() => handleRowClick(email)}
+              email={email}
+              isSelected={selectedEmails.includes(email.id)}
+              isBulkMode={isBulkMode}
+              isHovered={hoveredEmail === email.id}
+              onSelect={handleSelectEmail}
+              onStarClick={handleStarClick}
+              onClick={handleRowClick}
               onMouseEnter={() => setHoveredEmail(email.id)}
               onMouseLeave={() => setHoveredEmail(null)}
-            >
-              <TableCell className="py-2">
-                <Checkbox 
-                  checked={selectedEmails.includes(email.id)} 
-                  onCheckedChange={() => handleSelectEmail(email.id)}
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </TableCell>
-              <TableCell className="py-2">
-                {email.starred ? (
-                  <Star 
-                    className="h-4 w-4 text-yellow-400 fill-yellow-400" 
-                    onClick={(e) => handleStarClick(e, email.id)}
-                  />
-                ) : (
-                  hoveredEmail === email.id && (
-                    <StarOff 
-                      className="h-4 w-4 text-muted-foreground" 
-                      onClick={(e) => handleStarClick(e, email.id)}
-                    />
-                  )
-                )}
-              </TableCell>
-              <TableCell className="py-2 font-medium">
-                {email.senderName}
-              </TableCell>
-              <TableCell className="py-2 max-w-[400px] truncate">
-                <div className="flex space-x-2">
-                  <span>{email.subject}</span>
-                  <span className="text-muted-foreground truncate">
-                    - {email.preview}
-                  </span>
-                </div>
-              </TableCell>
-              <TableCell className="py-2 text-right text-muted-foreground text-sm">
-                {formatDistanceToNow(new Date(email.date), { addSuffix: true })}
-              </TableCell>
-            </TableRow>
+            />
           ))}
         </TableBody>
       </Table>
