@@ -47,6 +47,39 @@ const EmailList = ({
     setCurrentPage(1);
   }, [emails.length, folder, sortOption]);
 
+  // Handle keyboard shortcuts for pagination
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger shortcuts when typing in input fields
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      // Page navigation
+      if (e.key === '[' || e.key === ',') {
+        // Previous page
+        if (currentPage > 1) {
+          setCurrentPage(prev => prev - 1);
+          scrollToTop();
+        }
+        e.preventDefault();
+      } else if (e.key === ']' || e.key === '.') {
+        // Next page
+        if (currentPage < Math.ceil(emails.length / emailsPerPage)) {
+          setCurrentPage(prev => prev + 1);
+          scrollToTop();
+        }
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentPage, emails.length, emailsPerPage]);
+
   const {
     selectedEmails,
     isBulkMode,
@@ -78,6 +111,10 @@ const EmailList = ({
     setCurrentPage(page);
     // Reset selection when changing pages
     handleClearSelection();
+    scrollToTop();
+  };
+
+  const scrollToTop = () => {
     // Scroll to top of list when changing pages
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -115,33 +152,35 @@ const EmailList = ({
         isIndeterminate={isIndeterminate}
       />
       
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[50px]"></TableHead>
-            <TableHead className="w-[30px]"></TableHead>
-            <TableHead>Sender</TableHead>
-            <TableHead>Subject</TableHead>
-            <TableHead className="text-right">Date</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {currentEmails.map((email) => (
-            <EmailListItem
-              key={email.id}
-              email={email}
-              isSelected={selectedEmails.includes(email.id)}
-              isBulkMode={isBulkMode}
-              isHovered={hoveredEmail === email.id}
-              onSelect={handleSelectEmail}
-              onStarClick={handleStarClick}
-              onClick={handleRowClick}
-              onMouseEnter={() => setHoveredEmail(email.id)}
-              onMouseLeave={() => setHoveredEmail(null)}
-            />
-          ))}
-        </TableBody>
-      </Table>
+      <div role="region" aria-label={`${folder} emails, page ${currentPage}`}>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className="w-[30px]"></TableHead>
+              <TableHead>Sender</TableHead>
+              <TableHead>Subject</TableHead>
+              <TableHead className="text-right">Date</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentEmails.map((email) => (
+              <EmailListItem
+                key={email.id}
+                email={email}
+                isSelected={selectedEmails.includes(email.id)}
+                isBulkMode={isBulkMode}
+                isHovered={hoveredEmail === email.id}
+                onSelect={handleSelectEmail}
+                onStarClick={handleStarClick}
+                onClick={handleRowClick}
+                onMouseEnter={() => setHoveredEmail(email.id)}
+                onMouseLeave={() => setHoveredEmail(null)}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
       
       <div className="p-4 border-t border-border">
         <EmailPagination

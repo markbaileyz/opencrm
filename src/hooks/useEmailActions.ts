@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { Email } from "@/types/email";
 import { useToast } from "@/hooks/use-toast";
 
@@ -8,18 +8,19 @@ export function useEmailActions() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastSavedDraft, setLastSavedDraft] = useState<string | null>(null);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [draftSaveCount, setDraftSaveCount] = useState(0);
 
   // Auto-save interval reference
-  const [autoSaveIntervalRef, setAutoSaveIntervalRef] = useState<NodeJS.Timeout | null>(null);
+  const autoSaveIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Clean up auto-save on unmount
   useEffect(() => {
     return () => {
-      if (autoSaveIntervalRef) {
-        clearInterval(autoSaveIntervalRef);
+      if (autoSaveIntervalRef.current) {
+        clearInterval(autoSaveIntervalRef.current);
       }
     };
-  }, [autoSaveIntervalRef]);
+  }, []);
 
   const handleReplyEmail = (email: Email, setIsComposeOpen: (value: boolean) => void) => {
     // Pre-fill reply data
@@ -87,12 +88,16 @@ export function useEmailActions() {
     
     localStorage.setItem('emailDrafts', JSON.stringify(drafts));
     setLastSavedDraft(draftId);
+    setDraftSaveCount(prev => prev + 1);
     
-    toast({
-      title: "Draft saved",
-      description: "Your email draft has been saved",
-      variant: "default",
-    });
+    // Only show toast if not auto-saving or if it's the first auto-save
+    if (!isAutoSaving || draftSaveCount === 0) {
+      toast({
+        title: "Draft saved",
+        description: "Your email draft has been saved",
+        variant: "default",
+      });
+    }
     
     return draftId;
   };
@@ -146,18 +151,25 @@ export function useEmailActions() {
     });
   };
 
+  const stopAutoSave = () => {
+    if (autoSaveIntervalRef.current) {
+      clearInterval(autoSaveIntervalRef.current);
+      autoSaveIntervalRef.current = null;
+      setIsAutoSaving(false);
+      setDraftSaveCount(0);
+    }
+  };
+
   const autoSaveDraft = (draftData: any, intervalMs = 30000) => {
     // Clear any existing interval
-    if (autoSaveIntervalRef) {
-      clearInterval(autoSaveIntervalRef);
-      setAutoSaveIntervalRef(null);
-    }
+    stopAutoSave();
     
     if (!draftData || Object.keys(draftData).length === 0) {
-      setIsAutoSaving(false);
       return;
     }
     
+    // Save immediately
+    saveDraft(draftData);
     setIsAutoSaving(true);
     
     // Setup auto-save at specified interval
@@ -167,14 +179,10 @@ export function useEmailActions() {
       }
     }, intervalMs);
     
-    setAutoSaveIntervalRef(intervalId);
+    autoSaveIntervalRef.current = intervalId;
     
     // Return function to clear the interval
-    return () => {
-      clearInterval(intervalId);
-      setIsAutoSaving(false);
-      setAutoSaveIntervalRef(null);
-    };
+    return stopAutoSave;
   };
   
   return {
@@ -186,8 +194,10 @@ export function useEmailActions() {
     deleteDraft,
     refreshEmails,
     autoSaveDraft,
+    stopAutoSave,
     isRefreshing,
     isAutoSaving,
-    lastSavedDraft
+    lastSavedDraft,
+    draftSaveCount
   };
 }

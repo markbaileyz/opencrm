@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -8,6 +8,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface EmailPaginationProps {
@@ -24,6 +26,7 @@ const EmailPagination: React.FC<EmailPaginationProps> = ({
   onPageChange,
 }) => {
   const totalPages = Math.ceil(totalEmails / emailsPerPage);
+  const [jumpToPage, setJumpToPage] = useState<string>("");
   
   if (totalPages <= 1) return null;
 
@@ -90,6 +93,15 @@ const EmailPagination: React.FC<EmailPaginationProps> = ({
       onPageChange(currentPage + 1);
     }
   };
+
+  const handleJumpToPage = (e: React.FormEvent) => {
+    e.preventDefault();
+    const pageNum = parseInt(jumpToPage);
+    if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
+      onPageChange(pageNum);
+      setJumpToPage("");
+    }
+  };
   
   return (
     <div className="flex flex-col sm:flex-row justify-between items-center gap-4 w-full">
@@ -99,51 +111,81 @@ const EmailPagination: React.FC<EmailPaginationProps> = ({
         <span className="font-medium">{totalEmails}</span> emails
       </div>
       
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              onClick={goToPreviousPage}
-              onKeyDown={(e) => handleKeyDown(e, currentPage - 1)}
-              className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-              aria-disabled={currentPage === 1}
-              tabIndex={currentPage === 1 ? -1 : 0}
+      <div className="flex flex-col sm:flex-row items-center gap-4">
+        {totalPages > 7 && (
+          <form onSubmit={handleJumpToPage} className="flex items-center gap-2">
+            <Input
+              type="text"
+              value={jumpToPage}
+              onChange={(e) => setJumpToPage(e.target.value)}
+              className="w-16 h-8 text-sm"
+              placeholder="Page"
+              aria-label="Jump to page"
             />
-          </PaginationItem>
-          
-          {pageNumbers.map((page, index) => (
-            <PaginationItem key={`page-${index}`}>
-              {page === "ellipsis" ? (
-                <span className="px-2 py-2 text-muted-foreground" aria-hidden="true">...</span>
-              ) : (
-                <PaginationLink
-                  isActive={currentPage === page}
-                  onClick={() => onPageChange(page as number)}
-                  onKeyDown={(e) => handleKeyDown(e, page as number)}
-                  className={`cursor-pointer ${
-                    currentPage === page ? "bg-primary text-primary-foreground" : ""
-                  }`}
-                  aria-current={currentPage === page ? "page" : undefined}
-                  aria-label={`Page ${page}`}
-                  tabIndex={0}
-                >
-                  {page}
-                </PaginationLink>
-              )}
+            <Button 
+              type="submit" 
+              variant="outline" 
+              size="sm"
+              aria-label="Go to page"
+              className="h-8"
+            >
+              Go
+            </Button>
+          </form>
+        )}
+        
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={goToPreviousPage}
+                onKeyDown={(e) => handleKeyDown(e, currentPage - 1)}
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                aria-disabled={currentPage === 1}
+                tabIndex={currentPage === 1 ? -1 : 0}
+                aria-label="Previous page"
+              />
             </PaginationItem>
-          ))}
-          
-          <PaginationItem>
-            <PaginationNext
-              onClick={goToNextPage}
-              onKeyDown={(e) => handleKeyDown(e, currentPage + 1)}
-              className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-              aria-disabled={currentPage === totalPages}
-              tabIndex={currentPage === totalPages ? -1 : 0}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+            
+            {pageNumbers.map((page, index) => (
+              <PaginationItem key={`page-${index}`} className="hidden sm:inline-block">
+                {page === "ellipsis" ? (
+                  <span className="px-2 py-2 text-muted-foreground" aria-hidden="true">...</span>
+                ) : (
+                  <PaginationLink
+                    isActive={currentPage === page}
+                    onClick={() => onPageChange(page as number)}
+                    onKeyDown={(e) => handleKeyDown(e, page as number)}
+                    className={`cursor-pointer ${
+                      currentPage === page ? "bg-primary text-primary-foreground" : ""
+                    }`}
+                    aria-current={currentPage === page ? "page" : undefined}
+                    aria-label={`Page ${page}`}
+                    tabIndex={0}
+                  >
+                    {page}
+                  </PaginationLink>
+                )}
+              </PaginationItem>
+            ))}
+            
+            <PaginationItem>
+              <PaginationNext
+                onClick={goToNextPage}
+                onKeyDown={(e) => handleKeyDown(e, currentPage + 1)}
+                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                aria-disabled={currentPage === totalPages}
+                tabIndex={currentPage === totalPages ? -1 : 0}
+                aria-label="Next page"
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+
+        <span className="text-sm text-muted-foreground hidden sm:inline-block">
+          Page {currentPage} of {totalPages}
+        </span>
+      </div>
     </div>
   );
 };
