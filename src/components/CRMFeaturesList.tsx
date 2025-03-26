@@ -40,15 +40,25 @@ const featuresList: FeatureCategory[] = [
       {
         name: "Lead Capture",
         description: "Capture leads from various sources",
-        comingSoon: true,
+        implemented: true,
       },
       {
         name: "Lead Scoring",
         description: "Score leads based on engagement and potential",
+        comingSoon: true,
       },
       {
         name: "Lead Nurturing",
         description: "Nurture leads through automated workflows",
+        comingSoon: true,
+      },
+      {
+        name: "Lead Conversion",
+        description: "Convert qualified leads into customers with streamlined processes",
+      },
+      {
+        name: "Lead Source Tracking",
+        description: "Track and analyze which sources generate the most valuable leads",
       },
     ],
   },
