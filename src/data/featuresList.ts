@@ -5,6 +5,7 @@ import { leadManagement } from './categories/leadManagement';
 import { salesPipeline } from './categories/salesPipeline';
 import { customerService } from './categories/customerService';
 import { marketing } from './categories/marketing';
+import { integration } from './categories/integration';
 
 // Re-export the types
 export * from './types';
@@ -15,5 +16,6 @@ export const featuresList: FeatureCategory[] = [
   leadManagement,
   salesPipeline,
   customerService,
-  marketing
+  marketing,
+  integration
 ];
