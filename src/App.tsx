@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
+import Contacts from "@/pages/Contacts";  // Add this import
 import NotFound from "@/pages/NotFound";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
@@ -22,6 +23,7 @@ function App() {
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/contacts" element={<Contacts />} />  {/* Add this route */}
         <Route path="/roadmap" element={<Roadmap />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

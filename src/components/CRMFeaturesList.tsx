@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Check, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -19,7 +18,7 @@ const featuresList: FeatureItem[] = [
     id: "contact-mgmt",
     name: "Contact Management",
     description: "Create and manage customer profiles with detailed information",
-    implemented: false,
+    implemented: true,
     category: "Core CRM"
   },
   {
