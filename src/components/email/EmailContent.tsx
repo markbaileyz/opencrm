@@ -44,6 +44,12 @@ const EmailContent: React.FC<EmailContentProps> = ({
   sortOption = "newest", 
   onSortChange,
 }) => {
+  // Pattern background styles
+  const patternBackground = {
+    backgroundImage: `radial-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px)`,
+    backgroundSize: `20px 20px`,
+  };
+
   if (selectedEmail) {
     return (
       <div className="mt-0">
@@ -65,7 +71,7 @@ const EmailContent: React.FC<EmailContentProps> = ({
   }
 
   return (
-    <div className="mt-0">
+    <div className="mt-0 relative" style={patternBackground}>
       <EmailList 
         emails={filteredEmails}
         folder={activeTab}

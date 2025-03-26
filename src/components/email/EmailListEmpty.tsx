@@ -1,7 +1,8 @@
 
 import React from "react";
-import { Mail, Inbox, Archive, Trash, AlertCircle, Send } from "lucide-react";
+import { Mail, Inbox, Archive, Trash, AlertCircle, Send, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
 interface EmailListEmptyProps {
   folder?: string;
@@ -53,7 +54,7 @@ const EmailListEmpty: React.FC<EmailListEmptyProps> = ({
         };
       case "drafts":
         return {
-          icon: <Mail className="h-16 w-16 text-muted-foreground/50" />,
+          icon: <FileText className="h-16 w-16 text-muted-foreground/50" />,
           message: "No draft emails",
           description: "You don't have any emails saved as drafts",
           action: onComposeClick ? (
@@ -75,12 +76,50 @@ const EmailListEmpty: React.FC<EmailListEmptyProps> = ({
   const { icon, message, description, action } = getFolderDetails();
 
   return (
-    <div className="flex flex-col items-center justify-center py-16 space-y-4 bg-muted/30 rounded-lg border border-dashed border-muted">
-      {icon}
-      <h3 className="text-xl font-medium">{message}</h3>
-      <p className="text-muted-foreground text-center max-w-md">{description}</p>
-      {action}
-    </div>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col items-center justify-center py-16 space-y-4 bg-muted/30 rounded-lg border border-dashed border-muted"
+    >
+      <motion.div
+        initial={{ scale: 0.8 }}
+        animate={{ scale: 1 }}
+        transition={{ 
+          duration: 0.5,
+          delay: 0.2,
+          type: "spring",
+          stiffness: 100 
+        }}
+      >
+        {icon}
+      </motion.div>
+      <motion.h3 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="text-xl font-medium"
+      >
+        {message}
+      </motion.h3>
+      <motion.p 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="text-muted-foreground text-center max-w-md"
+      >
+        {description}
+      </motion.p>
+      {action && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          {action}
+        </motion.div>
+      )}
+    </motion.div>
   );
 };
 
