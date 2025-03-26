@@ -19,6 +19,8 @@
    - Status icons (Check, Clock)
    - Hover effects
    - Responsive grid layout
+   - Enhanced category quick filters with counts and icons
+   - Improved filter interface for better usability
 
 4. User Interaction Features
    - Feature voting system (upvote/downvote)
@@ -61,9 +63,11 @@
 - None currently tracked
 
 ## Last Updated
+- Enhanced category quick filters with counts and icons
+- Added responsive filters with clear button
+- Improved filter interface design
 - Added sort options and category quick-filters to the roadmap
 - Added search functionality for features
 - Added interactive visualization for development timeline
 - Added detailed technical specifications section
 - Improved milestone tracking with expandable details
-
