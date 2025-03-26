@@ -10,7 +10,13 @@ import {
   Settings, 
   LogOut,
   Menu,
-  X
+  X,
+  BarChart3,
+  Calendar,
+  Mailbox,
+  Tags,
+  Building,
+  Lightbulb
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -37,6 +43,36 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       icon: <Users className="h-5 w-5" />,
       label: "Contacts",
       href: "/contacts",
+    },
+    {
+      icon: <Building className="h-5 w-5" />,
+      label: "Organizations",
+      href: "/organizations",
+    },
+    {
+      icon: <Tags className="h-5 w-5" />,
+      label: "Deals",
+      href: "/deals",
+    },
+    {
+      icon: <Calendar className="h-5 w-5" />,
+      label: "Calendar",
+      href: "/calendar",
+    },
+    {
+      icon: <Mailbox className="h-5 w-5" />,
+      label: "Email",
+      href: "/email",
+    },
+    {
+      icon: <BarChart3 className="h-5 w-5" />,
+      label: "Reports",
+      href: "/reports",
+    },
+    {
+      icon: <Lightbulb className="h-5 w-5" />,
+      label: "Roadmap",
+      href: "/roadmap",
     },
     {
       icon: <Settings className="h-5 w-5" />,
@@ -87,7 +123,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             OpenSRM
           </Link>
         </div>
-        <nav className="space-y-4">
+        <nav className="space-y-1">
           {sidebarItems.map((item) => (
             <Link
               key={item.label}

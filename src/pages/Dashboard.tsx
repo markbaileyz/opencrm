@@ -3,10 +3,12 @@ import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import StatsGrid from "@/components/dashboard/StatsGrid";
+import KeyMetrics from "@/components/dashboard/KeyMetrics";
 import ActivityChart from "@/components/dashboard/ActivityChart";
 import AppointmentList from "@/components/dashboard/AppointmentList";
 import MessageList from "@/components/dashboard/MessageList";
+import SalesPipeline from "@/components/dashboard/SalesPipeline";
+import RecentContacts from "@/components/dashboard/RecentContacts";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -34,8 +36,13 @@ const Dashboard = () => {
       <div className="space-y-6">
         <DashboardHeader isAdmin={isAdmin} />
         
-        {/* Stats Grid */}
-        <StatsGrid isAdmin={isAdmin} />
+        {/* Key Metrics */}
+        <KeyMetrics />
+
+        {/* Sales Pipeline */}
+        <div className="grid grid-cols-1 gap-6 animate-fade-up delay-100">
+          <SalesPipeline />
+        </div>
 
         {/* Activity Chart */}
         <div className="space-y-6 animate-fade-up delay-200">
@@ -44,8 +51,11 @@ const Dashboard = () => {
 
         {/* Recent items grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-up delay-300">
-          <AppointmentList />
-          <MessageList />
+          <RecentContacts />
+          <div className="space-y-6">
+            <AppointmentList />
+            <MessageList />
+          </div>
         </div>
       </div>
     </DashboardLayout>

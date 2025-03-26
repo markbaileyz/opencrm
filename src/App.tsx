@@ -13,6 +13,11 @@ import Roadmap from "@/pages/Roadmap";
 import MindMap from "@/pages/MindMap";
 import HealthcareCRM from "@/pages/HealthcareCRM";
 import OpenCRMRoadmap from "@/pages/OpenCRMRoadmap";
+import Organizations from "@/pages/Organizations";
+import Deals from "@/pages/Deals";
+import Calendar from "@/pages/Calendar";
+import Email from "@/pages/Email";
+import Reports from "@/pages/Reports";
 
 function App() {
   return (
@@ -33,6 +38,11 @@ function App() {
         <Route path="/mind-map" element={<MindMap />} />
         <Route path="/healthcare-crm" element={<HealthcareCRM />} />
         <Route path="/open-crm-roadmap" element={<OpenCRMRoadmap />} />
+        <Route path="/organizations" element={<Organizations />} />
+        <Route path="/deals" element={<Deals />} />
+        <Route path="/calendar" element={<Calendar />} />
+        <Route path="/email" element={<Email />} />
+        <Route path="/reports" element={<Reports />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </ThemeProvider>
