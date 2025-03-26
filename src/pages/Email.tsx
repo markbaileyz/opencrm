@@ -115,25 +115,6 @@ const Email = () => {
     selectedId: selectedEmail?.id
   });
 
-  // Filter emails based on the active tab, search query, and active filters
-  let filteredEmails = emails.filter(email => {
-    // First filter by folder (tab)
-    if (email.folder !== activeTab) return false;
-    
-    // Then apply search query if present
-    if (searchQuery && !emailMatchesSearch(email, searchQuery)) return false;
-    
-    // Then apply active filters
-    if (activeFilters.includes("starred") && !email.starred) return false;
-    if (activeFilters.includes("unread") && email.read) return false;
-    if (activeFilters.includes("attachments") && !email.hasAttachments) return false;
-    
-    return true;
-  });
-
-  // Apply sorting to the filtered emails
-  filteredEmails = sortEmails(filteredEmails, sortOption);
-
   // Helper function to check if an email matches the search query
   const emailMatchesSearch = (email: Email, query: string): boolean => {
     const lowerCaseQuery = query.toLowerCase();
@@ -166,6 +147,25 @@ const Email = () => {
         return emails;
     }
   };
+
+  // Filter emails based on the active tab, search query, and active filters
+  let filteredEmails = emails.filter(email => {
+    // First filter by folder (tab)
+    if (email.folder !== activeTab) return false;
+    
+    // Then apply search query if present
+    if (searchQuery && !emailMatchesSearch(email, searchQuery)) return false;
+    
+    // Then apply active filters
+    if (activeFilters.includes("starred") && !email.starred) return false;
+    if (activeFilters.includes("unread") && email.read) return false;
+    if (activeFilters.includes("attachments") && !email.hasAttachments) return false;
+    
+    return true;
+  });
+
+  // Apply sorting to the filtered emails
+  filteredEmails = sortEmails(filteredEmails, sortOption);
   
   return (
     <DashboardLayout>
