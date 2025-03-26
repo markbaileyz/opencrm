@@ -40,7 +40,7 @@ const EmailList = ({
 }: EmailListProps) => {
   const [hoveredEmail, setHoveredEmail] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const emailsPerPage = 10;
+  const emailsPerPage = 15; // Increased from 10 to display more emails
 
   const {
     selectedEmails,
@@ -73,6 +73,8 @@ const EmailList = ({
     setCurrentPage(page);
     // Reset selection when changing pages
     handleClearSelection();
+    // Scroll to top of list when changing pages
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Calculate paginated emails

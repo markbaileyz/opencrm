@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 export function useEmailActions() {
   const { toast } = useToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastSavedDraft, setLastSavedDraft] = useState<string | null>(null);
 
   const handleReplyEmail = (email: Email, setIsComposeOpen: (value: boolean) => void) => {
     // Pre-fill reply data
@@ -72,6 +73,7 @@ export function useEmailActions() {
     }
     
     localStorage.setItem('emailDrafts', JSON.stringify(drafts));
+    setLastSavedDraft(draftId);
     
     toast({
       title: "Draft saved",
@@ -95,6 +97,10 @@ export function useEmailActions() {
     const drafts = getDrafts();
     const updatedDrafts = drafts.filter((draft: any) => draft.id !== id);
     localStorage.setItem('emailDrafts', JSON.stringify(updatedDrafts));
+    
+    if (lastSavedDraft === id) {
+      setLastSavedDraft(null);
+    }
     
     toast({
       title: "Draft deleted",
@@ -126,6 +132,18 @@ export function useEmailActions() {
       }, 1500);
     });
   };
+
+  const autoSaveDraft = (draftData: any, intervalMs = 30000) => {
+    // Setup auto-save at specified interval
+    const intervalId = setInterval(() => {
+      if (draftData && Object.keys(draftData).length > 0) {
+        saveDraft(draftData);
+      }
+    }, intervalMs);
+    
+    // Return function to clear the interval
+    return () => clearInterval(intervalId);
+  };
   
   return {
     handleReplyEmail,
@@ -135,6 +153,8 @@ export function useEmailActions() {
     getDraft,
     deleteDraft,
     refreshEmails,
-    isRefreshing
+    autoSaveDraft,
+    isRefreshing,
+    lastSavedDraft
   };
 }
