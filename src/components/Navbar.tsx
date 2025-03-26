@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ButtonCustom } from "./ui/button-custom";
 import { Menu, X } from "lucide-react";
 
@@ -7,6 +8,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Handle scroll effect
   useEffect(() => {
@@ -26,8 +28,9 @@ const Navbar = () => {
   const scrollToSection = (sectionId: string) => {
     setIsMobileMenuOpen(false);
     
-    // If we're not on the home page, go to home first
+    // If we're not on the home page, navigate to home with the hash
     if (location.pathname !== '/') {
+      navigate(`/#${sectionId}`);
       return;
     }
 
@@ -165,17 +168,42 @@ interface NavLinkProps {
 }
 
 const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  const handleClick = (e: React.MouseEvent) => {
+    if (onClick) {
+      onClick();
+      return;
+    }
+    
+    if (href.startsWith("/#")) {
+      e.preventDefault();
+      const sectionId = href.substring(2);
+      
+      if (location.pathname !== '/') {
+        navigate(`/#${sectionId}`);
+      } else {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+  };
+  
   if (href.startsWith("/#")) {
     // For hash links
     return (
-      <button
+      <a
+        href={href}
         className={`font-medium text-sm hover-underline text-left ${
           active ? "text-primary" : "text-foreground"
         }`}
-        onClick={onClick}
+        onClick={handleClick}
       >
         {children}
-      </button>
+      </a>
     );
   }
   

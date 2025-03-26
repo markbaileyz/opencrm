@@ -1,12 +1,14 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const scrollToSection = (sectionId: string) => {
     if (location.pathname !== '/') {
+      navigate(`/#${sectionId}`);
       return;
     }
 
@@ -99,47 +101,35 @@ interface FooterLinkProps {
 
 const FooterLink = ({ href, children, sectionId }: FooterLinkProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   
   const handleClick = (e: React.MouseEvent) => {
     if (href.startsWith("/#") && sectionId) {
       e.preventDefault();
       
       if (location.pathname !== '/') {
-        return;
-      }
-      
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+        navigate(`/#${sectionId}`);
+      } else {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
       }
     }
   };
   
   if (href.startsWith("/#") && sectionId) {
-    if (location.pathname === "/") {
-      return (
-        <li>
-          <a
-            href={`#${sectionId}`}
-            className="text-muted-foreground hover:text-foreground text-sm transition"
-            onClick={handleClick}
-          >
-            {children}
-          </a>
-        </li>
-      );
-    } else {
-      return (
-        <li>
-          <Link
-            to={`/${href.substring(2)}`}
-            className="text-muted-foreground hover:text-foreground text-sm transition"
-          >
-            {children}
-          </Link>
-        </li>
-      );
-    }
+    return (
+      <li>
+        <a
+          href={href}
+          className="text-muted-foreground hover:text-foreground text-sm transition"
+          onClick={handleClick}
+        >
+          {children}
+        </a>
+      </li>
+    );
   }
   
   return (

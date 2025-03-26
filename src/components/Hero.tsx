@@ -23,7 +23,8 @@ const Hero = () => {
           href={to}
           onClick={(e) => {
             e.preventDefault();
-            scrollToSection(to.substring(1));
+            const sectionId = to.substring(1);
+            scrollToSection(sectionId);
           }}
           {...props}
         >
