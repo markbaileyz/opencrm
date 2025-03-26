@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export function useEmailActions() {
   const { toast } = useToast();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleReplyEmail = (email: Email, setIsComposeOpen: (value: boolean) => void) => {
     // Pre-fill reply data
@@ -19,6 +20,12 @@ export function useEmailActions() {
     // Store in sessionStorage to persist during compose modal opening
     sessionStorage.setItem('emailCompose', JSON.stringify(replyData));
     setIsComposeOpen(true);
+    
+    toast({
+      title: "Reply started",
+      description: `Replying to: ${email.senderName}`,
+      variant: "default",
+    });
   };
 
   const handleForwardEmail = (email: Email, setIsComposeOpen: (value: boolean) => void) => {
@@ -34,6 +41,12 @@ export function useEmailActions() {
     // Store in sessionStorage to persist during compose modal opening
     sessionStorage.setItem('emailCompose', JSON.stringify(forwardData));
     setIsComposeOpen(true);
+    
+    toast({
+      title: "Forward started",
+      description: `Forwarding email from: ${email.senderName}`,
+      variant: "default",
+    });
   };
 
   const saveDraft = (draftData: any) => {
@@ -91,20 +104,27 @@ export function useEmailActions() {
   };
 
   const refreshEmails = () => {
+    setIsRefreshing(true);
+    
     toast({
       title: "Refreshing emails",
       description: "Checking for new emails...",
       variant: "default",
     });
+    
     // In a real application, this would fetch new emails from the server
-    // For now, we'll just show a toast message
-    setTimeout(() => {
-      toast({
-        title: "Emails refreshed",
-        description: "Your inbox is up to date",
-        variant: "success",
-      });
-    }, 1000);
+    // For now, we'll simulate a network request with a timeout
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        toast({
+          title: "Emails refreshed",
+          description: "Your inbox is up to date",
+          variant: "success",
+        });
+        setIsRefreshing(false);
+        resolve();
+      }, 1500);
+    });
   };
   
   return {
@@ -114,6 +134,7 @@ export function useEmailActions() {
     getDrafts,
     getDraft,
     deleteDraft,
-    refreshEmails
+    refreshEmails,
+    isRefreshing
   };
 }
