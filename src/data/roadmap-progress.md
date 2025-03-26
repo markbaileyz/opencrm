@@ -31,6 +31,7 @@
    - Sort options
    - Category quick-filters
    - Collapsible technical details sections
+   - Feature comments system
 
 5. Strategic Planning
    - OpenCRM roadmap document added
@@ -63,6 +64,7 @@
 - None currently tracked
 
 ## Last Updated
+- Added feature comments system to allow users to discuss features
 - Added implementation progress bars to feature cards
 - Enhanced feature card technical details section with icons
 - Added AI-Driven Content Suggestions feature to marketing category
