@@ -16,6 +16,12 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
   
   if (!isOpen) return null;
   
+  const handleHomeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    closeMobileMenu();
+  };
+  
   return (
     <div className="md:hidden glass animate-fade-down py-4">
       <nav className="container mx-auto px-4 flex flex-col space-y-4">

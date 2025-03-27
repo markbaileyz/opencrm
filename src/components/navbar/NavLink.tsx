@@ -19,6 +19,17 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
       return;
     }
     
+    // Special handling for home link
+    if (href === "/") {
+      e.preventDefault();
+      if (location.pathname !== '/') {
+        navigate('/');
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
+    
     if (href.startsWith("/#")) {
       e.preventDefault();
       const sectionId = href.substring(2);
@@ -34,7 +45,7 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
     }
   };
   
-  if (href.startsWith("/#")) {
+  if (href === "/" || href.startsWith("/#")) {
     return (
       <a
         href={href}
