@@ -27,29 +27,27 @@ import { AuthProvider } from "@/context/AuthContext";
 const App: React.FC = () => {
   return (
     <ThemeProvider defaultTheme="dark">
-      <AuthProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/contacts" element={<Contacts />} />
-            <Route path="/patients" element={<Patients />} />
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/email" element={<Email />} />
-            <Route path="/office" element={<Office />} />
-            <Route path="/front-desk" element={<FrontDesk />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/healthcare-crm" element={<HealthcareCRM />} />
-            <Route path="/patient-portal" element={<PatientPortal />} />
-            <Route path="/pre-check-in" element={<PatientPortal />} />
-            <Route path="/roadmap" element={<Roadmap />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Router>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/contacts" element={<Contacts />} />
+          <Route path="/patients" element={<Patients />} />
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/email" element={<Email />} />
+          <Route path="/office" element={<Office />} />
+          <Route path="/front-desk" element={<FrontDesk />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/healthcare-crm" element={<HealthcareCRM />} />
+          <Route path="/patient-portal" element={<PatientPortal />} />
+          <Route path="/pre-check-in" element={<PatientPortal />} />
+          <Route path="/roadmap" element={<Roadmap />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
         <Toaster />
-      </AuthProvider>
+      </Router>
     </ThemeProvider>
   );
 };
