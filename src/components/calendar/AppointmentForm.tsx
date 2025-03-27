@@ -107,13 +107,13 @@ const AppointmentForm = ({
           </Label>
           <Select 
             name="emailThread" 
-            defaultValue={appointmentToEdit?.emailThreadId || ""}
+            defaultValue={appointmentToEdit?.emailThreadId || "none"}
           >
             <SelectTrigger className="col-span-3">
               <SelectValue placeholder="Related email (optional)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">None</SelectItem>
+              <SelectItem value="none">None</SelectItem>
               {emails.slice(0, 5).map(email => (
                 <SelectItem key={email.id} value={email.id}>
                   {email.subject.substring(0, 30)}...

@@ -133,7 +133,9 @@ const Calendar = () => {
         (appointments.find(a => a.id === editAppointmentId)?.status || "upcoming") : 
         "upcoming",
       notes: formData.get('notes') as string,
-      emailThreadId: formData.get('emailThread') as string || undefined,
+      emailThreadId: (formData.get('emailThread') as string) !== "none" ? 
+                    (formData.get('emailThread') as string) : 
+                    undefined,
       reminderSent: editAppointmentId ? 
         appointments.find(a => a.id === editAppointmentId)?.reminderSent || false : 
         false
