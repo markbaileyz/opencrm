@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Index from "@/pages/Index";
@@ -33,6 +34,8 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
 
 import AdminSettings from "@/pages/AdminSettings";
+import Compliance from "@/pages/Compliance";
+import UserManagement from "@/pages/UserManagement";
 
 function App() {
   const { toast } = useToast();
@@ -133,6 +136,18 @@ function App() {
           <Route path="/admin-settings" element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminSettings />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/compliance" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Compliance />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/user-management" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <UserManagement />
             </ProtectedRoute>
           } />
           

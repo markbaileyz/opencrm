@@ -117,13 +117,13 @@ export const adminSettingsItems: SidebarItem[] = [
   {
     icon: React.createElement(FileLock, { className: "h-5 w-5" }),
     label: "Compliance",
-    href: "/admin-settings",
+    href: "/compliance",
     roles: ["admin"],
   },
   {
     icon: React.createElement(UserCog, { className: "h-5 w-5" }),
     label: "User Management",
-    href: "/admin-settings",
+    href: "/user-management",
     roles: ["admin"],
   },
 ];
