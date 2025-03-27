@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -119,7 +120,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       >
         <div className="mb-8 px-4">
           <Link to="/" className="flex items-center text-lg font-semibold">
-            OpenSRM
+            OpenCRM
           </Link>
         </div>
         <nav className="space-y-1">

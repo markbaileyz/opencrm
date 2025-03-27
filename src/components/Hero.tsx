@@ -96,7 +96,7 @@ const Hero = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-24 animate-fade-up delay-400">
           <StatBox value="98%" label="Customer satisfaction" />
           <StatBox value="24/7" label="Support available" />
-          <StatBox value="10k+" label="Businesses using NextCRM" />
+          <StatBox value="10k+" label="Businesses using OpenCRM" />
           <StatBox value="1M+" label="Customers managed" />
         </div>
       </div>
