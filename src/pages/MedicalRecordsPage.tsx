@@ -42,7 +42,7 @@ const MedicalRecordsPage = () => {
           <Input 
             placeholder="Search medical records..." 
             className="max-w-md"
-            prefixIcon={<Search className="h-4 w-4 text-muted-foreground" />}
+            icon={<Search className="h-4 w-4 text-muted-foreground" />}
           />
         </div>
 
