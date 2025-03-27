@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import SettingsCard from "../SettingsCard";
 import { Database, Upload, Download } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ExportDataSection from "../data-management/ExportDataSection";
-import ImportDataSection from "../data-management/ImportDataSection";
-import ImportSuccessDialog from "../data-management/ImportSuccessDialog";
+import ExportDataSection from "./ExportDataSection";
+import ImportDataSection from "./ImportDataSection";
+import ImportSuccessDialog from "./ImportSuccessDialog";
 
 const DataManagementSettings = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -39,7 +39,14 @@ const DataManagementSettings = () => {
         </TabsList>
         
         <TabsContent value="import">
-          <ImportDataSection onImportSuccess={handleImportSuccess} />
+          <ImportDataSection 
+            onFileSelect={(file) => {}}
+            onImportStart={() => {}}
+            importFile={null}
+            isImporting={false}
+            importProgress={0}
+            onImportSuccess={handleImportSuccess} 
+          />
         </TabsContent>
         
         <TabsContent value="export">
@@ -51,6 +58,7 @@ const DataManagementSettings = () => {
         <ImportSuccessDialog
           open={showSuccessDialog}
           onOpenChange={setShowSuccessDialog}
+          onConfirm={() => setShowSuccessDialog(false)}
           stats={importStats}
         />
       )}

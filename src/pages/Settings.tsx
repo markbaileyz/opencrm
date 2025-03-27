@@ -11,9 +11,61 @@ import IntegrationSettings from "@/components/settings/IntegrationSettings";
 import DataManagementSettings from "@/components/settings/data-management/DataManagementSettings";
 import SettingsHeader from "@/components/settings/SettingsHeader";
 import { User, Bell, Shield, CreditCard, Database, Wrench, AlertTriangle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("profile");
+  const { toast } = useToast();
+  
+  // Profile settings state
+  const [profileValues, setProfileValues] = useState({
+    name: "John Doe",
+    email: "john.doe@example.com",
+    role: "Administrator",
+    company: "Acme Inc.",
+    timezone: "America/New_York"
+  });
+  
+  // Notification settings state
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [smsNotifications, setSmsNotifications] = useState(false);
+  const [dataAnalytics, setDataAnalytics] = useState(true);
+  
+  // Security settings state
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  
+  const handleProfileSubmit = (values: any) => {
+    console.log("Profile updated:", values);
+    toast({
+      title: "Profile updated",
+      description: "Your profile settings have been saved."
+    });
+  };
+  
+  const handlePasswordChange = (values: any) => {
+    console.log("Password change requested:", values);
+    toast({
+      title: "Password updated",
+      description: "Your password has been changed successfully."
+    });
+  };
+  
+  const handleNotificationSave = () => {
+    console.log("Notification settings saved");
+    toast({
+      title: "Preferences saved",
+      description: "Your notification preferences have been updated."
+    });
+  };
+  
+  const handleDeleteAccount = () => {
+    console.log("Account deletion requested");
+    toast({
+      title: "Account deleted",
+      description: "Your account has been scheduled for deletion.",
+      variant: "destructive"
+    });
+  };
 
   return (
     <DashboardLayout>
@@ -56,15 +108,31 @@ const Settings = () => {
           </TabsList>
           
           <TabsContent value="profile">
-            <ProfileSettingsForm />
+            <ProfileSettingsForm 
+              defaultValues={profileValues}
+              timezones={["America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles", "Europe/London"]}
+              onSubmit={handleProfileSubmit}
+            />
           </TabsContent>
           
           <TabsContent value="notifications">
-            <NotificationSettingsForm />
+            <NotificationSettingsForm 
+              emailNotifications={emailNotifications}
+              setEmailNotifications={setEmailNotifications}
+              smsNotifications={smsNotifications}
+              setSmsNotifications={setSmsNotifications}
+              dataAnalytics={dataAnalytics}
+              setDataAnalytics={setDataAnalytics}
+              onSave={handleNotificationSave}
+            />
           </TabsContent>
           
           <TabsContent value="security">
-            <SecuritySettingsForm />
+            <SecuritySettingsForm 
+              onPasswordChange={handlePasswordChange}
+              twoFactorEnabled={twoFactorEnabled}
+              onTwoFactorChange={setTwoFactorEnabled}
+            />
           </TabsContent>
           
           <TabsContent value="subscription">
@@ -80,7 +148,7 @@ const Settings = () => {
           </TabsContent>
           
           <TabsContent value="danger">
-            <DangerZoneSection />
+            <DangerZoneSection onDeleteAccount={handleDeleteAccount} />
           </TabsContent>
         </Tabs>
       </div>
