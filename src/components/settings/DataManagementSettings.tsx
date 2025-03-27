@@ -3,9 +3,9 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useDataManagement } from "@/hooks/useDataManagement";
-import ExportDataSection from "./data-management/ExportDataSection";
-import ImportDataSection from "./data-management/ImportDataSection";
-import ImportSuccessDialog from "./data-management/ImportSuccessDialog";
+import ExportDataSection from "@/components/settings/data-management/ExportDataSection";
+import ImportDataSection from "@/components/settings/data-management/ImportDataSection";
+import ImportSuccessDialog from "@/components/settings/data-management/ImportSuccessDialog";
 
 const DataManagementSettings: React.FC = () => {
   const {
