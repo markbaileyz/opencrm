@@ -76,10 +76,10 @@ const DealFilters: React.FC<DealFiltersProps> = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All Values</SelectItem>
-              <SelectItem value="small">< $10k</SelectItem>
+              <SelectItem value="small">&lt; $10k</SelectItem>
               <SelectItem value="medium">$10k - $50k</SelectItem>
               <SelectItem value="large">$50k - $100k</SelectItem>
-              <SelectItem value="xlarge">> $100k</SelectItem>
+              <SelectItem value="xlarge">&gt; $100k</SelectItem>
             </SelectContent>
           </Select>
           
