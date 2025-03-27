@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar as CalendarIcon, Mail, Clock, FileText, Edit, Trash, X, Check, Ban, MapPin } from "lucide-react";
+import { Calendar as CalendarIcon, Mail, Clock, FileText, Edit, Trash, X, Check, Ban, MapPin, Timer } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { 
   DropdownMenu,
@@ -46,6 +46,29 @@ const AppointmentDetails = ({
     canceled: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
   };
 
+  const formatDuration = (minutes?: number) => {
+    if (!minutes) return "1 hour";
+    
+    if (minutes < 60) {
+      return `${minutes} minutes`;
+    } else if (minutes === 60) {
+      return "1 hour";
+    } else if (minutes === 90) {
+      return "1.5 hours";
+    } else if (minutes === 120) {
+      return "2 hours";
+    } else {
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      
+      if (remainingMinutes === 0) {
+        return `${hours} hour${hours > 1 ? 's' : ''}`;
+      } else {
+        return `${hours} hour${hours > 1 ? 's' : ''} ${remainingMinutes} min`;
+      }
+    }
+  };
+
   const handleStatusChange = (status: "upcoming" | "completed" | "canceled") => {
     if (onStatusChange) {
       onStatusChange(appointment.id, status);
@@ -63,11 +86,19 @@ const AppointmentDetails = ({
         <div className="flex justify-between items-start">
           <div>
             <CardTitle className="text-xl font-bold">{appointment.title}</CardTitle>
-            <CardDescription className="flex items-center mt-1">
-              <CalendarIcon className="h-4 w-4 mr-1" />
-              {format(appointment.date, "PPP")}
-              <Clock className="h-4 w-4 ml-4 mr-1" />
-              {appointment.time}
+            <CardDescription className="flex items-center mt-1 flex-wrap gap-x-4">
+              <span className="flex items-center">
+                <CalendarIcon className="h-4 w-4 mr-1" />
+                {format(appointment.date, "PPP")}
+              </span>
+              <span className="flex items-center">
+                <Clock className="h-4 w-4 mr-1" />
+                {appointment.time}
+              </span>
+              <span className="flex items-center">
+                <Timer className="h-4 w-4 mr-1" />
+                {formatDuration(appointment.duration)}
+              </span>
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">

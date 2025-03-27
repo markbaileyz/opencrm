@@ -12,7 +12,8 @@ export interface Appointment {
   notes?: string;
   emailThreadId?: string; // Reference to related email thread
   reminderSent?: boolean;
-  location?: string; // Added location field
+  location?: string; // Location field
+  duration?: number; // Duration in minutes
 }
 
 export interface AppointmentWithEmail extends Appointment {

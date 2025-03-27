@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin } from "lucide-react";
+import { MapPin, Clock } from "lucide-react";
 import type { Appointment } from "@/types/appointment";
 import type { Email } from "@/types/email";
 
@@ -69,6 +69,28 @@ const AppointmentForm = ({
             required 
             defaultValue={appointmentToEdit?.time || ""}
           />
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="duration" className="text-right flex items-center">
+            <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
+            Duration
+          </Label>
+          <Select 
+            name="duration" 
+            defaultValue={appointmentToEdit?.duration?.toString() || "60"}
+          >
+            <SelectTrigger className="col-span-3">
+              <SelectValue placeholder="Select duration" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="15">15 minutes</SelectItem>
+              <SelectItem value="30">30 minutes</SelectItem>
+              <SelectItem value="45">45 minutes</SelectItem>
+              <SelectItem value="60">1 hour</SelectItem>
+              <SelectItem value="90">1.5 hours</SelectItem>
+              <SelectItem value="120">2 hours</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="location" className="text-right flex items-center">

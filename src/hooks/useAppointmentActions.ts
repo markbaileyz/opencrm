@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import type { Appointment } from "@/types/appointment";
 import type { Email } from "@/types/email";
+import { checkAppointmentConflicts } from "@/utils/calendarEmailUtils";
 
 interface UseAppointmentActionsProps {
   appointments: Appointment[];
@@ -41,6 +42,7 @@ export function useAppointmentActions({
         "upcoming",
       notes: formData.get('notes') as string,
       location: formData.get('location') as string,
+      duration: parseInt(formData.get('duration') as string, 10) || 60,
       emailThreadId: (formData.get('emailThread') as string) !== "none" ? 
                     (formData.get('emailThread') as string) : 
                     undefined,
@@ -48,6 +50,23 @@ export function useAppointmentActions({
         appointments.find(a => a.id === editAppointmentId)?.reminderSent || false : 
         false
     };
+    
+    // Check for appointment conflicts
+    const isEditingCurrentAppointment = editAppointmentId !== null;
+    const filteredAppointments = isEditingCurrentAppointment 
+      ? appointments.filter(app => app.id !== editAppointmentId)
+      : appointments;
+      
+    const hasConflict = checkAppointmentConflicts(newAppointment, filteredAppointments);
+    
+    if (hasConflict) {
+      toast({
+        title: "Appointment conflict detected",
+        description: "This appointment overlaps with an existing appointment. Please choose a different time.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     if (editAppointmentId) {
       setAppointments(prevAppointments => 
@@ -87,8 +106,21 @@ export function useAppointmentActions({
       status: "upcoming",
       notes: appointmentData.notes || "",
       location: appointmentData.location || "",
+      duration: appointmentData.duration || 60,
       reminderSent: false
     };
+    
+    // Check for conflicts
+    const hasConflict = checkAppointmentConflicts(newAppointment, appointments);
+    
+    if (hasConflict) {
+      toast({
+        title: "Appointment conflict detected",
+        description: "This appointment overlaps with an existing appointment. Please choose a different time.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     setAppointments(prev => [...prev, newAppointment]);
     

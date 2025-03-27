@@ -1,6 +1,6 @@
 
 import React from "react";
-import { CheckCircle, Clock, AlertCircle, CalendarX, CalendarClock, MapPin } from "lucide-react";
+import { CheckCircle, Clock, AlertCircle, CalendarX, CalendarClock, MapPin, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
@@ -13,6 +13,7 @@ interface AppointmentItemProps {
   className?: string;
   showStatusBadge?: boolean;
   location?: string;
+  duration?: number;
 }
 
 const AppointmentItem = ({ 
@@ -22,7 +23,8 @@ const AppointmentItem = ({
   status, 
   className,
   showStatusBadge = false,
-  location
+  location,
+  duration
 }: AppointmentItemProps) => {
   // Dynamic styling based on appointment status
   const statusClasses = {
@@ -69,6 +71,23 @@ const AppointmentItem = ({
     }
   };
 
+  // Format duration display
+  const formatDuration = (minutes?: number) => {
+    if (!minutes) return null;
+    
+    if (minutes < 60) {
+      return `${minutes}m`;
+    } else if (minutes === 60) {
+      return "1h";
+    } else if (minutes % 60 === 0) {
+      return `${minutes / 60}h`;
+    } else {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return `${hours}h ${mins}m`;
+    }
+  };
+
   // Get type color
   const getTypeColor = () => {
     const key = type.toLowerCase() as keyof typeof typeColorClasses;
@@ -92,12 +111,18 @@ const AppointmentItem = ({
           )}>
             {name}
           </p>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-wrap">
             <p className={cn("text-xs", getTypeColor())}>{type}</p>
             {location && (
               <div className="flex items-center text-xs text-muted-foreground">
                 <MapPin className="h-3 w-3 ml-1 mr-0.5" />
                 <span className="truncate max-w-[100px]">{location}</span>
+              </div>
+            )}
+            {duration && (
+              <div className="flex items-center text-xs text-muted-foreground">
+                <Timer className="h-3 w-3 ml-1 mr-0.5" />
+                <span>{formatDuration(duration)}</span>
               </div>
             )}
           </div>

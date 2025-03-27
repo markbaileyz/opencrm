@@ -29,6 +29,7 @@ interface QuickAddAppointmentProps {
 const QuickAddAppointment = ({ selectedDate, onQuickAdd }: QuickAddAppointmentProps) => {
   const [name, setName] = useState("");
   const [time, setTime] = useState("09:00");
+  const [duration, setDuration] = useState("60");
   const [type, setType] = useState("consultation");
   const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
@@ -45,6 +46,7 @@ const QuickAddAppointment = ({ selectedDate, onQuickAdd }: QuickAddAppointmentPr
       type,
       name,
       location,
+      duration: parseInt(duration, 10),
       status: "upcoming",
       notes: notes,
       reminderSent: reminder
@@ -53,6 +55,7 @@ const QuickAddAppointment = ({ selectedDate, onQuickAdd }: QuickAddAppointmentPr
     onQuickAdd(newAppointment);
     setName("");
     setTime("09:00");
+    setDuration("60");
     setType("consultation");
     setLocation("");
     setNotes("");
@@ -126,6 +129,23 @@ const QuickAddAppointment = ({ selectedDate, onQuickAdd }: QuickAddAppointmentPr
                 </SelectContent>
               </Select>
             </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="duration">Duration</Label>
+            <Select value={duration} onValueChange={setDuration}>
+              <SelectTrigger id="duration" className="w-full">
+                <SelectValue placeholder="Select duration" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="15">15 minutes</SelectItem>
+                <SelectItem value="30">30 minutes</SelectItem>
+                <SelectItem value="45">45 minutes</SelectItem>
+                <SelectItem value="60">1 hour</SelectItem>
+                <SelectItem value="90">1.5 hours</SelectItem>
+                <SelectItem value="120">2 hours</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           
           <div className="space-y-2">

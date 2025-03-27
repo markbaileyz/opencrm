@@ -1,5 +1,5 @@
 
-import { format, addDays, getDay, parse } from "date-fns";
+import { format, addDays, getDay, parse, isSameDay } from "date-fns";
 import type { Email } from "@/types/email";
 import type { Appointment } from "@/types/appointment";
 
@@ -76,16 +76,44 @@ export const formatAppointmentForEmail = (appointment: Appointment): string => {
     'EEEE, MMMM d, yyyy'
   );
   
+  const durationStr = appointment.duration 
+    ? formatDuration(appointment.duration)
+    : "1 hour";
+  
   return `
 Appointment Details:
 -------------------
 Title: ${appointment.title}
 Date: ${dateStr}
 Time: ${appointment.time}
+Duration: ${durationStr}
 With: ${appointment.name}
 Type: ${appointment.type}
+${appointment.location ? `Location: ${appointment.location}\n` : ''}
 ${appointment.notes ? `\nNotes: ${appointment.notes}` : ''}
 `;
+};
+
+// Format duration for display
+export const formatDuration = (minutes: number): string => {
+  if (minutes < 60) {
+    return `${minutes} minutes`;
+  } else if (minutes === 60) {
+    return "1 hour";
+  } else if (minutes === 90) {
+    return "1.5 hours";
+  } else if (minutes === 120) {
+    return "2 hours";
+  } else {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    
+    if (remainingMinutes === 0) {
+      return `${hours} hour${hours > 1 ? 's' : ''}`;
+    } else {
+      return `${hours} hour${hours > 1 ? 's' : ''} ${remainingMinutes} min`;
+    }
+  }
 };
 
 // Check if an appointment conflicts with existing ones
@@ -117,24 +145,24 @@ export const checkAppointmentConflicts = (
   };
   
   const newStartTime = getTimeInMinutes(newAppointment.time);
-  // Assume 1 hour appointments for conflict detection
-  const newEndTime = newStartTime + 60;
+  // Use specified duration or default to 60 minutes
+  const newEndTime = newStartTime + (newAppointment.duration || 60);
   
   // Check for conflicts with existing appointments
   return existingAppointments.some(appointment => {
     // Skip if not on the same day or it's the same appointment being edited
     if (
       appointment.id === newAppointment.id ||
-      format(
-        typeof appointment.date === 'string' ? new Date(appointment.date) : appointment.date, 
-        'yyyy-MM-dd'
-      ) !== newDate
+      !isSameDay(
+        typeof appointment.date === 'string' ? new Date(appointment.date) : appointment.date,
+        typeof newAppointment.date === 'string' ? new Date(newAppointment.date) : newAppointment.date
+      )
     ) {
       return false;
     }
     
     const existingStartTime = getTimeInMinutes(appointment.time);
-    const existingEndTime = existingStartTime + 60;
+    const existingEndTime = existingStartTime + (appointment.duration || 60);
     
     // Check for overlap
     return (
