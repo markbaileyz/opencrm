@@ -99,6 +99,32 @@ const Reports = () => {
                     <span className="hidden sm:inline">Pipeline Analysis</span>
                   </TabsTrigger>
                 </TabsList>
+
+                <div className="bg-card rounded-lg border shadow mt-4">
+                  <TabsContent value="sales-performance" className="m-0">
+                    <SalesPerformanceReport />
+                  </TabsContent>
+
+                  <TabsContent value="lead-source" className="m-0">
+                    <LeadSourceReport />
+                  </TabsContent>
+
+                  <TabsContent value="deal-conversion" className="m-0">
+                    <DealConversionReport />
+                  </TabsContent>
+
+                  <TabsContent value="sales-forecast" className="m-0">
+                    <SalesForecastReport />
+                  </TabsContent>
+
+                  <TabsContent value="contact-activity" className="m-0">
+                    <ContactActivityReport />
+                  </TabsContent>
+
+                  <TabsContent value="pipeline-analysis" className="m-0">
+                    <PipelineAnalysisReport />
+                  </TabsContent>
+                </div>
               </Tabs>
 
               <div className="flex items-center gap-2">
@@ -131,32 +157,6 @@ const Reports = () => {
             {showExportOptions && (
               <ReportExportOptions onExport={handleExport} onCancel={() => setShowExportOptions(false)} />
             )}
-
-            <div className="bg-card rounded-lg border shadow">
-              <TabsContent value="sales-performance" className="m-0">
-                <SalesPerformanceReport />
-              </TabsContent>
-
-              <TabsContent value="lead-source" className="m-0">
-                <LeadSourceReport />
-              </TabsContent>
-
-              <TabsContent value="deal-conversion" className="m-0">
-                <DealConversionReport />
-              </TabsContent>
-
-              <TabsContent value="sales-forecast" className="m-0">
-                <SalesForecastReport />
-              </TabsContent>
-
-              <TabsContent value="contact-activity" className="m-0">
-                <ContactActivityReport />
-              </TabsContent>
-
-              <TabsContent value="pipeline-analysis" className="m-0">
-                <PipelineAnalysisReport />
-              </TabsContent>
-            </div>
           </>
         ) : (
           <SavedReports />
