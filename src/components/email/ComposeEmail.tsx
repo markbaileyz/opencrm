@@ -7,21 +7,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Send, X, Paperclip, Save, FileText, MessageSquare } from "lucide-react";
 import { useEmailActions } from "@/hooks/useEmailActions";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import EmailTemplateSelector from "./EmailTemplateSelector";
-import type { EmailTemplate } from "@/utils/emailTemplates";
-import { useEmailSignature, type EmailSignature } from "@/hooks/useEmailSignature";
-import EmailSignatureManager from "./EmailSignatureManager";
+import { useEmailSignature } from "@/hooks/useEmailSignature";
+import EmailRecipientFields from "./EmailRecipientFields";
+import EmailContentFields from "./EmailContentFields";
+import EmailAttachments from "./EmailAttachments";
+import EmailComposeActions from "./EmailComposeActions";
 
 interface ComposeEmailProps {
   isOpen: boolean;
@@ -41,8 +32,6 @@ const ComposeEmail = ({ isOpen, onClose, onSend, draftId }: ComposeEmailProps) =
   const [currentDraftId, setCurrentDraftId] = useState<string | undefined>(draftId);
   const [isReply, setIsReply] = useState(false);
   const [isForward, setIsForward] = useState(false);
-  const [isTemplateOpen, setIsTemplateOpen] = useState(false);
-  const [isSignatureOpen, setIsSignatureOpen] = useState(false);
   
   const { saveDraft, getDraft, deleteDraft, autoSaveDraft, stopAutoSave, appendSignature } = useEmailActions();
   const { getDefaultSignature } = useEmailSignature();
@@ -196,25 +185,8 @@ const ComposeEmail = ({ isOpen, onClose, onSend, draftId }: ComposeEmailProps) =
     setAttachments(attachments.filter((_, i) => i !== index));
   };
   
-  const handleApplyTemplate = (template: EmailTemplate) => {
-    // Only overwrite subject and message if they are empty or user confirms
-    const shouldApply = 
-      (!subject && !message) || 
-      window.confirm("Applying this template will replace your current subject and message. Continue?");
-    
-    if (shouldApply) {
-      setSubject(template.subject);
-      setMessage(template.body);
-      setIsTemplateOpen(false);
-    }
-  };
-  
-  const handleSelectSignature = (signature: EmailSignature) => {
-    // Add the signature to the message
-    setMessage(appendSignature(message, signature));
-    setIsSignatureOpen(false);
-  };
-  
+  const isFormValid = !!to && !!subject && !!message;
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] flex flex-col">
@@ -225,171 +197,38 @@ const ComposeEmail = ({ isOpen, onClose, onSend, draftId }: ComposeEmailProps) =
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 flex-1 overflow-y-auto">
           <div className="space-y-4 pr-1">
-            <div className="grid gap-2">
-              <Label htmlFor="to">To</Label>
-              <Input
-                id="to"
-                placeholder="recipient@example.com"
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="cc">Cc</Label>
-              <Input
-                id="cc"
-                placeholder="cc@example.com"
-                value={cc}
-                onChange={(e) => setCc(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="bcc">Bcc</Label>
-              <Input
-                id="bcc"
-                placeholder="bcc@example.com"
-                value={bcc}
-                onChange={(e) => setBcc(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="subject">Subject</Label>
-              <Input
-                id="subject"
-                placeholder="Email subject"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex justify-between items-center">
-                <Label htmlFor="message">Message</Label>
-                <div className="flex items-center gap-2">
-                  <Popover open={isSignatureOpen} onOpenChange={setIsSignatureOpen}>
-                    <PopoverTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="gap-1"
-                      >
-                        <MessageSquare className="h-4 w-4" />
-                        <span>Signature</span>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[450px] p-4" align="end">
-                      <div className="space-y-2">
-                        <h4 className="font-medium">Email Signatures</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Choose a signature to append to your email
-                        </p>
-                        <EmailSignatureManager 
-                          onSelectSignature={handleSelectSignature} 
-                        />
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                  
-                  <Popover open={isTemplateOpen} onOpenChange={setIsTemplateOpen}>
-                    <PopoverTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="gap-1"
-                      >
-                        <FileText className="h-4 w-4" />
-                        <span>Templates</span>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[450px] p-4" align="end">
-                      <div className="space-y-2">
-                        <h4 className="font-medium">Email Templates</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Choose a template to quickly compose your email
-                        </p>
-                        <EmailTemplateSelector 
-                          onSelectTemplate={handleApplyTemplate} 
-                        />
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-              <Textarea
-                id="message"
-                placeholder="Write your message here..."
-                className="min-h-[200px] resize-none"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                required
-              />
-            </div>
+            <EmailRecipientFields 
+              to={to}
+              cc={cc}
+              bcc={bcc}
+              setTo={setTo}
+              setCc={setCc}
+              setBcc={setBcc}
+            />
             
-            {attachments.length > 0 && (
-              <div className="border rounded-md p-2">
-                <Label>Attachments</Label>
-                <div className="mt-2 space-y-2">
-                  {attachments.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between bg-muted/50 rounded p-2">
-                      <span className="text-sm truncate max-w-[300px]">{file.name}</span>
-                      <Button 
-                        type="button" 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => removeAttachment(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            <EmailContentFields 
+              subject={subject}
+              message={message}
+              setSubject={setSubject}
+              setMessage={setMessage}
+              appendSignature={appendSignature}
+            />
+            
+            <EmailAttachments 
+              attachments={attachments}
+              onAttachmentAdd={handleAttachment}
+              onAttachmentRemove={removeAttachment}
+            />
           </div>
           
           <DialogFooter className="flex-shrink-0">
-            <div className="flex items-center gap-2">
-              <label htmlFor="file-upload" className="cursor-pointer">
-                <Button type="button" variant="outline" size="icon" className="cursor-pointer">
-                  <Paperclip className="h-4 w-4" />
-                </Button>
-              </label>
-              <input
-                id="file-upload"
-                type="file"
-                multiple
-                className="hidden"
-                onChange={handleAttachment}
-              />
-              
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={handleSaveDraft}
-                className="gap-1"
-              >
-                <Save className="h-4 w-4" />
-                Save Draft
-              </Button>
-              
-              <Button type="button" variant="outline" onClick={handleClose}>
-                Cancel
-              </Button>
-              
-              <Button 
-                type="submit" 
-                disabled={isSending || !to || !subject || !message}
-                className="gap-1"
-              >
-                {isSending ? "Sending..." : (
-                  <>
-                    <Send className="h-4 w-4" />
-                    Send
-                  </>
-                )}
-              </Button>
-            </div>
+            <EmailComposeActions 
+              onSaveDraft={handleSaveDraft}
+              onCancel={handleClose}
+              onSubmit={handleSubmit}
+              isSending={isSending}
+              isValid={isFormValid}
+            />
           </DialogFooter>
         </form>
       </DialogContent>
