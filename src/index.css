@@ -88,6 +88,18 @@
     @apply bg-black/20 backdrop-blur-lg border border-white/10 shadow-md;
   }
 
+  .dark-card {
+    @apply bg-[#0a1527]/95 backdrop-blur-sm rounded-xl border border-white/10 shadow-lg;
+  }
+
+  .dark-container {
+    @apply bg-[#0a1527]/95 backdrop-blur-md rounded-2xl border border-white/10 shadow-xl;
+  }
+
+  .dark-gradient {
+    @apply bg-gradient-to-b from-[#0a1527] to-[#0f2547];
+  }
+
   /* Animation delay utilities */
   .delay-100 {
     animation-delay: 100ms;
