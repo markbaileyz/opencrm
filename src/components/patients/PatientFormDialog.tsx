@@ -117,7 +117,12 @@ const PatientFormDialog: React.FC<PatientFormDialogProps> = ({
       groupNumber: data.groupNumber,
       coverageType: data.coverageType,
       primaryCarePhysician: data.primaryCarePhysician,
-      emergencyContact: data.emergencyContact,
+      // Ensure emergencyContact meets the required type definition
+      emergencyContact: data.emergencyContact ? {
+        name: data.emergencyContact.name,
+        relationship: data.emergencyContact.relationship,
+        phone: data.emergencyContact.phone
+      } : undefined,
       medicalConditions: data.medicalConditions,
       allergies: data.allergies,
       medications: data.medications,
