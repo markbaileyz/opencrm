@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { format, addDays, addWeeks, addMonths } from "date-fns";
-import { CalendarRange, CalendarRepeat, CalendarX2 } from "lucide-react";
+import { CalendarRange, CalendarClock, Calendar as CalendarIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { Appointment } from "@/types/appointment";
@@ -222,7 +222,7 @@ const RecurringAppointmentSetup = ({
       <CardFooter className="flex justify-between">
         <Button variant="outline" onClick={onClose}>Cancel</Button>
         <Button onClick={handleCreateAppointments}>
-          <CalendarRepeat className="h-4 w-4 mr-2" />
+          <CalendarClock className="h-4 w-4 mr-2" />
           Create Recurring Appointments
         </Button>
       </CardFooter>
