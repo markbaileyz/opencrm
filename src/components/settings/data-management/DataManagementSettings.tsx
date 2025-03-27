@@ -1,54 +1,60 @@
 
-import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { useDataManagement } from "@/hooks/useDataManagement";
-import ExportDataSection from "./ExportDataSection";
-import ImportDataSection from "./ImportDataSection";
-import ImportSuccessDialog from "./ImportSuccessDialog";
+import React, { useState } from "react";
+import SettingsCard from "../SettingsCard";
+import { Database, Upload, Download } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ExportDataSection from "../data-management/ExportDataSection";
+import ImportDataSection from "../data-management/ImportDataSection";
+import ImportSuccessDialog from "../data-management/ImportSuccessDialog";
 
-const DataManagementSettings: React.FC = () => {
-  const {
-    isImporting,
-    importProgress,
-    showImportDialog,
-    importFile,
-    setImportFile,
-    handleImport,
-    handleImportConfirm,
-    setShowImportDialog
-  } = useDataManagement();
+const DataManagementSettings = () => {
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [importStats, setImportStats] = useState({
+    contacts: 0,
+    organizations: 0,
+    deals: 0,
+  });
+
+  const handleImportSuccess = (stats: { contacts: number; organizations: number; deals: number }) => {
+    setImportStats(stats);
+    setShowSuccessDialog(true);
+  };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Data Management</CardTitle>
-        <CardDescription>
-          Export your CRM data or import data from external sources
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
+    <SettingsCard
+      title="Data Management"
+      description="Import, export, and manage your CRM data"
+      icon={<Database className="h-5 w-5" />}
+    >
+      <Tabs defaultValue="import" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="import" className="flex items-center gap-2">
+            <Upload className="h-4 w-4" />
+            <span>Import Data</span>
+          </TabsTrigger>
+          <TabsTrigger value="export" className="flex items-center gap-2">
+            <Download className="h-4 w-4" />
+            <span>Export Data</span>
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="import">
+          <ImportDataSection onImportSuccess={handleImportSuccess} />
+        </TabsContent>
+        
+        <TabsContent value="export">
           <ExportDataSection />
-          
-          <Separator />
-          
-          <ImportDataSection 
-            onFileSelect={setImportFile}
-            onImportStart={handleImport}
-            importFile={importFile}
-            isImporting={isImporting}
-            importProgress={importProgress}
-          />
-        </div>
+        </TabsContent>
+      </Tabs>
 
-        <ImportSuccessDialog 
-          open={showImportDialog} 
-          onOpenChange={setShowImportDialog}
-          onConfirm={handleImportConfirm}
+      {showSuccessDialog && (
+        <ImportSuccessDialog
+          open={showSuccessDialog}
+          onOpenChange={setShowSuccessDialog}
+          stats={importStats}
         />
-      </CardContent>
-    </Card>
+      )}
+    </SettingsCard>
   );
 };
 
