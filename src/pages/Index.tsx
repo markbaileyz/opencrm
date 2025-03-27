@@ -8,6 +8,7 @@ import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import PreCheckInSection from "@/components/hero/PreCheckInSection";
 
 const Index = () => {
   const featuresRef = useRef<HTMLDivElement>(null);
@@ -48,6 +49,10 @@ const Index = () => {
       
       <main className="flex-grow">
         <Hero scrollToSection={scrollToSection} />
+        
+        <div className="container mx-auto px-4">
+          <PreCheckInSection />
+        </div>
         
         <div className="container mx-auto px-4 py-20">
           <div className="text-center mb-10 animate-fade-up">
