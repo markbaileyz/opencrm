@@ -89,8 +89,12 @@ const EmailDetail = ({
       </ScrollArea>
 
       <EmailDetailActions 
+        email={email}
         onReply={() => onReply(email)}
         onForward={() => onForward(email)}
+        onDelete={onDelete}
+        onArchive={onArchive}
+        onStar={onStar}
       />
     </div>
   );
