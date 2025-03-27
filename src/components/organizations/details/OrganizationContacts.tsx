@@ -101,7 +101,7 @@ const OrganizationContacts: React.FC<OrganizationContactsProps> = ({ organizatio
           <Input 
             placeholder="Search contacts..." 
             className="max-w-sm"
-            startIcon={<Search className="h-4 w-4 text-muted-foreground" />}
+            icon={<Search className="h-4 w-4" />}
           />
         </div>
         <div className="flex gap-2">

@@ -113,7 +113,7 @@ const OrganizationInteractionHistory: React.FC<OrganizationInteractionHistoryPro
           <Input 
             placeholder="Search interactions..." 
             className="max-w-sm"
-            startIcon={<Search className="h-4 w-4 text-muted-foreground" />}
+            icon={<Search className="h-4 w-4" />}
           />
           <Select defaultValue="all">
             <SelectTrigger className="w-[180px]">
