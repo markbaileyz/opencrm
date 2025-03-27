@@ -2,8 +2,8 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
-export interface ResponsiveContainerProps extends React.HTMLAttributes<HTMLDivElement> {
-  children?: React.ReactNode;
+interface ResponsiveContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
   breakpoint?: "sm" | "md" | "lg" | "xl";
   mobileView?: React.ReactNode;
   desktopView?: React.ReactNode;
@@ -47,7 +47,7 @@ const ResponsiveContainer = ({
           </div>
         )}
         
-        {/* Both views hidden, show children as fallback */}
+        {/* Both views hidden, show children */}
         {!mobileView && !desktopView && children}
       </div>
     );
