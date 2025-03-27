@@ -1,7 +1,7 @@
 
 import React from "react";
 import DealPipeline from "@/components/deals/DealPipeline";
-import DealDetailsView from "@/components/deals/DealDetailsView";
+import DealDetailsView from "@/components/deals/details/DealDetailsView";
 import DealsSummary from "@/components/deals/DealsSummary";
 import DealFilters from "@/components/deals/DealFilters";
 import DealAnalytics from "@/components/deals/DealAnalytics";
