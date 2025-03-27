@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import type { Appointment } from "@/types/appointment";
+import AppointmentTypeBadge from "./AppointmentTypeBadge";
 
 interface AppointmentConflictAlertProps {
   appointment: Appointment;
@@ -19,14 +20,24 @@ const AppointmentConflictAlert = ({
       <AlertCircle className="h-4 w-4" />
       <AlertTitle>Scheduling Conflict Detected</AlertTitle>
       <AlertDescription>
-        <p className="mt-1">
-          Your appointment <strong>{appointment.title}</strong> with {appointment.name} at {appointment.time} on {format(appointment.date, 'PPP')} 
-          conflicts with an existing appointment: <strong>{conflictingAppointment.title}</strong> with {conflictingAppointment.name} 
-          at {conflictingAppointment.time}.
-        </p>
-        <p className="mt-2">
-          Please choose a different time or date.
-        </p>
+        <div className="mt-1 space-y-2">
+          <p>
+            Your appointment <strong>{appointment.title}</strong> with {appointment.name} 
+            at {appointment.time} on {format(appointment.date, 'PPP')} conflicts with:
+          </p>
+          <div className="bg-destructive/10 p-2 rounded border border-destructive/30">
+            <div className="flex items-center gap-2 mb-1">
+              <strong>{conflictingAppointment.title}</strong>
+              <AppointmentTypeBadge type={conflictingAppointment.type} size="sm" />
+            </div>
+            <p className="text-sm">
+              With: {conflictingAppointment.name} at {conflictingAppointment.time}
+            </p>
+          </div>
+          <p className="font-medium">
+            Please choose a different time or date.
+          </p>
+        </div>
       </AlertDescription>
     </Alert>
   );

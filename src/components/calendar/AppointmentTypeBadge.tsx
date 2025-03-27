@@ -17,7 +17,7 @@ const AppointmentTypeBadge = ({
   className,
   size = 'default',
   showLabel = true,
-  withIcon = false
+  withIcon = true
 }: AppointmentTypeBadgeProps) => {
   const typeInfo = getAppointmentTypeInfo(type);
   
@@ -33,13 +33,14 @@ const AppointmentTypeBadge = ({
       className={cn(
         sizeClasses[size],
         typeInfo.color,
+        "flex items-center gap-1",
         className
       )}
     >
       {withIcon && typeInfo.icon && (
-        <span className="mr-1">{typeInfo.icon}</span>
+        <span>{typeInfo.icon}</span>
       )}
-      {showLabel ? typeInfo.label : type}
+      <span>{showLabel ? typeInfo.label : type}</span>
     </Badge>
   );
 };

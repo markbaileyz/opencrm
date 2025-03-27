@@ -41,9 +41,10 @@ export function useAppointmentActions({
       time: formData.get('time') as string,
       type: formData.get('type') as string,
       name: formData.get('name') as string,
-      status: editAppointmentId ? 
-        (appointments.find(a => a.id === editAppointmentId)?.status || "upcoming") : 
-        "upcoming",
+      status: (formData.get('status') as "upcoming" | "completed" | "canceled") || 
+        (editAppointmentId ? 
+          (appointments.find(a => a.id === editAppointmentId)?.status || "upcoming") : 
+          "upcoming"),
       notes: formData.get('notes') as string,
       location: formData.get('location') as string,
       duration: parseInt(formData.get('duration') as string, 10) || 60,
@@ -55,21 +56,23 @@ export function useAppointmentActions({
         false
     };
     
-    // Check for appointment conflicts
-    const isEditingCurrentAppointment = editAppointmentId !== null;
-    const filteredAppointments = isEditingCurrentAppointment 
-      ? appointments.filter(app => app.id !== editAppointmentId)
-      : appointments;
+    // Check for appointment conflicts - but skip for canceled appointments
+    if (newAppointment.status !== "canceled") {
+      const isEditingCurrentAppointment = editAppointmentId !== null;
+      const filteredAppointments = isEditingCurrentAppointment 
+        ? appointments.filter(app => app.id !== editAppointmentId)
+        : appointments;
+        
+      const hasConflict = checkAppointmentConflicts(newAppointment, filteredAppointments);
       
-    const hasConflict = checkAppointmentConflicts(newAppointment, filteredAppointments);
-    
-    if (hasConflict) {
-      toast({
-        title: "Appointment conflict detected",
-        description: "This appointment overlaps with an existing appointment. Please choose a different time.",
-        variant: "destructive"
-      });
-      return;
+      if (hasConflict) {
+        toast({
+          title: "Appointment conflict detected",
+          description: "This appointment overlaps with an existing appointment. Please choose a different time.",
+          variant: "destructive"
+        });
+        return;
+      }
     }
     
     if (editAppointmentId) {
@@ -107,7 +110,7 @@ export function useAppointmentActions({
       time: appointmentData.time || "9:00 AM",
       type: appointmentData.type || "consultation",
       name: appointmentData.name || "Client",
-      status: "upcoming",
+      status: appointmentData.status || "upcoming",
       notes: appointmentData.notes || "",
       location: appointmentData.location || "",
       duration: appointmentData.duration || 60,
@@ -166,6 +169,26 @@ export function useAppointmentActions({
     );
   };
 
+  const handleStatusChange = (id: string, status: "upcoming" | "completed" | "canceled") => {
+    setAppointments(prevAppointments => 
+      prevAppointments.map(app => 
+        app.id === id ? { ...app, status } : app
+      )
+    );
+    
+    const statusMessages = {
+      upcoming: "Appointment marked as upcoming",
+      completed: "Appointment marked as completed",
+      canceled: "Appointment canceled"
+    };
+    
+    toast({
+      title: statusMessages[status],
+      description: `Appointment status has been updated to ${status}`,
+      variant: status === "canceled" ? "destructive" : "default"
+    });
+  };
+
   const handleGoToEmail = () => {
     navigate('/email');
   };
@@ -181,6 +204,7 @@ export function useAppointmentActions({
     handleEditAppointment,
     handleDeleteAppointment,
     handleSendReminder,
+    handleStatusChange,
     handleGoToEmail,
     navigateToEmail
   };

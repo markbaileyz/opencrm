@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import type { Appointment } from "@/types/appointment";
 import type { Email } from "@/types/email";
 import { APPOINTMENT_TYPES } from "@/types/appointment";
+import AppointmentStatusSelector from "./AppointmentStatusSelector";
 
 interface AppointmentFormProps {
   selectedDate: Date;
@@ -37,10 +38,14 @@ const AppointmentForm = ({
     : null;
 
   const [date, setDate] = useState<Date>(appointmentToEdit?.date || selectedDate);
+  const [status, setStatus] = useState<"upcoming" | "completed" | "canceled">(
+    appointmentToEdit?.status || "upcoming"
+  );
 
   return (
     <form onSubmit={onSubmit}>
       <input type="hidden" name="date" value={format(date, 'yyyy-MM-dd')} />
+      <input type="hidden" name="status" value={status} />
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="title" className="text-right">
@@ -182,6 +187,19 @@ const AppointmentForm = ({
             </Select>
           </div>
         </div>
+        {editAppointmentId && (
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label className="text-right">
+              Status
+            </Label>
+            <div className="col-span-3">
+              <AppointmentStatusSelector 
+                status={status} 
+                onStatusChange={setStatus} 
+              />
+            </div>
+          </div>
+        )}
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="notes" className="text-right">
             Notes
