@@ -4,6 +4,7 @@ import { Link as RouterLink, useLocation } from "react-router-dom";
 import { ButtonCustom } from "./ui/button-custom";
 import { ArrowRight, CheckCircle, Users, Shield, BarChart, Clipboard, Stethoscope, ClipboardCheck, Star, Headset } from "lucide-react";
 import ResponsiveImage from "./ui/responsive-image";
+import { Card, CardContent } from "./ui/card";
 
 const Hero = () => {
   const location = useLocation();
@@ -74,8 +75,8 @@ const Hero = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-violet-500/20 rounded-3xl transform rotate-1 blur-xl"></div>
             <div className="glass rounded-3xl p-1 relative z-10 border border-white/20 shadow-xl overflow-hidden">
               <ResponsiveImage 
-                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2000"
-                alt="Admin using healthcare CRM at reception desk" 
+                src="https://images.unsplash.com/photo-1504439468489-c8920d796a29?q=80&w=2000"
+                alt="Healthcare professionals discussing patient data on a tablet" 
                 className="w-full h-full rounded-2xl"
                 aspectRatio="16/9"
               />
@@ -164,8 +165,8 @@ const Hero = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-violet-500/20 rounded-3xl transform rotate-1 blur-xl"></div>
               <div className="glass rounded-3xl p-1 relative z-10 border border-white/20 shadow-xl overflow-hidden">
                 <ResponsiveImage 
-                  src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=2000"
-                  alt="Admin staff using the reception dashboard" 
+                  src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2000"
+                  alt="Admin using healthcare CRM at reception desk" 
                   className="w-full h-full rounded-2xl"
                   aspectRatio="16/9"
                 />
@@ -280,7 +281,7 @@ const Hero = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-violet-500/20 rounded-3xl transform rotate-1 blur-xl"></div>
               <div className="glass rounded-3xl p-1 relative z-10 border border-white/20 shadow-xl overflow-hidden">
                 <ResponsiveImage 
-                  src="https://images.unsplash.com/photo-1631815588090-d4bfec5b9622?q=80&w=2000"
+                  src="https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?q=80&w=2000"
                   alt="Nurse using tablet for patient care" 
                   className="w-full h-full rounded-2xl"
                   aspectRatio="16/9"
@@ -303,6 +304,75 @@ const Hero = () => {
             </div>
           </div>
         </div>
+        
+        {/* Trusted By Section */}
+        <div className="mt-32 animate-fade-up">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight tracking-tight mb-4">
+              Trusted by Leading Healthcare Providers
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Join thousands of healthcare facilities that trust OpenCRM to optimize their patient experience and streamline operations.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
+            <div className="p-4 glass rounded-xl hover:shadow-lg transition-all duration-300">
+              <img src="/logos/acme.svg" alt="Acme Healthcare" className="h-10 w-auto" />
+            </div>
+            <div className="p-4 glass rounded-xl hover:shadow-lg transition-all duration-300">
+              <img src="/logos/globex.svg" alt="Globex Hospitals" className="h-10 w-auto" />
+            </div>
+            <div className="p-4 glass rounded-xl hover:shadow-lg transition-all duration-300">
+              <img src="/logos/hooli.svg" alt="Hooli Medical" className="h-10 w-auto" />
+            </div>
+            <div className="p-4 glass rounded-xl hover:shadow-lg transition-all duration-300">
+              <img src="/logos/stark.svg" alt="Stark Health" className="h-10 w-auto" />
+            </div>
+          </div>
+        </div>
+
+        {/* Testimonials Preview */}
+        <div className="mt-32 animate-fade-up">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight tracking-tight mb-4">
+              What Healthcare Professionals Say
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Hear from healthcare professionals who have transformed their practice with OpenCRM.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <TestimonialCard
+              quote="OpenCRM cut our patient check-in time by 70% and dramatically improved our scheduling efficiency."
+              name="Dr. Sarah Johnson"
+              role="Medical Director"
+              facility="Westside Medical Center"
+            />
+            <TestimonialCard
+              quote="The intuitive interface means our staff needed minimal training. We were up and running in days, not weeks."
+              name="Michael Chen"
+              role="Practice Manager"
+              facility="Family Care Associates"
+            />
+            <TestimonialCard
+              quote="Patient satisfaction scores have increased by 35% since implementing OpenCRM across our five locations."
+              name="Dr. James Wilson"
+              role="Chief Medical Officer"
+              facility="Regional Health Partners"
+            />
+          </div>
+          
+          <div className="mt-12 text-center">
+            <Link to="#testimonials">
+              <ButtonCustom variant="outline" size="lg" className="font-medium group">
+                Read More Success Stories
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </ButtonCustom>
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -319,6 +389,33 @@ const StatBox = ({ value, label }: StatBoxProps) => (
     <p className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">{value}</p>
     <p className="text-sm text-muted-foreground mt-1 font-medium">{label}</p>
   </div>
+);
+
+// Testimonial card component
+interface TestimonialCardProps {
+  quote: string;
+  name: string;
+  role: string;
+  facility: string;
+}
+
+const TestimonialCard = ({ quote, name, role, facility }: TestimonialCardProps) => (
+  <Card className="glass border-white/10 hover:shadow-lg transition-all duration-300">
+    <CardContent className="p-6">
+      <div className="mb-4">
+        <div className="flex space-x-1">
+          {[...Array(5)].map((_, i) => (
+            <Star key={i} className="h-5 w-5 text-primary fill-primary" />
+          ))}
+        </div>
+      </div>
+      <p className="mb-6 text-foreground">{quote}</p>
+      <div>
+        <p className="font-medium">{name}</p>
+        <p className="text-sm text-muted-foreground">{role}, {facility}</p>
+      </div>
+    </CardContent>
+  </Card>
 );
 
 export default Hero;
