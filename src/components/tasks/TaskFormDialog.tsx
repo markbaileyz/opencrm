@@ -75,9 +75,14 @@ const TaskFormDialog: React.FC<TaskFormDialogProps> = ({
   const onSubmit = (data: z.infer<typeof taskSchema>) => {
     // Convert the form data to a Task object
     const taskData: PatientTask = {
-      ...data,
       id: data.id || new Date().getTime().toString(),
       patientId: data.patientId,
+      title: data.title,
+      description: data.description,
+      dueDate: data.dueDate,
+      assignedTo: data.assignedTo,
+      status: data.status,
+      priority: data.priority
     };
     
     onSave(taskData, isNew);

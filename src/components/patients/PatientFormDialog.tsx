@@ -104,8 +104,25 @@ const PatientFormDialog: React.FC<PatientFormDialogProps> = ({
   const onSubmit = (data: z.infer<typeof patientSchema>) => {
     // Convert the form data to a Patient object
     const patientData: Patient = {
-      ...data,
       id: data.id || new Date().getTime().toString(),
+      firstName: data.firstName,
+      lastName: data.lastName,
+      dateOfBirth: data.dateOfBirth,
+      gender: data.gender,
+      email: data.email,
+      phone: data.phone,
+      address: data.address,
+      insuranceProvider: data.insuranceProvider,
+      policyNumber: data.policyNumber,
+      groupNumber: data.groupNumber,
+      coverageType: data.coverageType,
+      primaryCarePhysician: data.primaryCarePhysician,
+      emergencyContact: data.emergencyContact,
+      medicalConditions: data.medicalConditions,
+      allergies: data.allergies,
+      medications: data.medications,
+      notes: data.notes,
+      status: data.status
     };
     
     onSave(patientData, isNew);
