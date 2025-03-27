@@ -42,13 +42,11 @@ const DealForm: React.FC<DealFormProps> = ({
 
   const handleSubmit = (data: DealFormValues) => {
     // Convert string values to numbers where appropriate
-    const formattedData = {
+    onSubmit({
       ...data,
       value: parseFloat(data.value),
       probability: parseInt(data.probability),
-    };
-    
-    onSubmit(formattedData);
+    });
   };
 
   return (

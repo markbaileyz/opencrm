@@ -18,8 +18,8 @@ const Deals = () => {
   const [viewMode, setViewMode] = useState<"pipeline" | "details">("pipeline");
   const [filters, setFilters] = useState({
     search: "",
-    stage: "",
-    value: "",
+    stage: "all",
+    value: "all",
     sortBy: "newest"
   });
 

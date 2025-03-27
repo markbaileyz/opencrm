@@ -16,6 +16,16 @@ export interface DealFiltersProps {
   onFilterChange: (filters: any) => void;
 }
 
+// Define this type to fix the TypeScript error in dealFilters.ts
+export type DealFiltersState = {
+  search: string;
+  stage: string;
+  value: string;
+  sortBy: string;
+  organization?: string;
+  closeDate?: string;
+};
+
 const DealFilters: React.FC<DealFiltersProps> = ({ 
   filters = { search: "", stage: "", value: "", sortBy: "newest" },
   onFilterChange = () => {}
@@ -57,7 +67,7 @@ const DealFilters: React.FC<DealFiltersProps> = ({
               <SelectValue placeholder="All Stages" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Stages</SelectItem>
+              <SelectItem value="all">All Stages</SelectItem>
               <SelectItem value="lead">Lead</SelectItem>
               <SelectItem value="qualification">Qualification</SelectItem>
               <SelectItem value="proposal">Proposal</SelectItem>
@@ -75,7 +85,7 @@ const DealFilters: React.FC<DealFiltersProps> = ({
               <SelectValue placeholder="All Values" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Values</SelectItem>
+              <SelectItem value="all">All Values</SelectItem>
               <SelectItem value="small">&lt; $10k</SelectItem>
               <SelectItem value="medium">$10k - $50k</SelectItem>
               <SelectItem value="large">$50k - $100k</SelectItem>

@@ -55,13 +55,13 @@ export const filterDeals = (deals: Deal[], filters: DealFiltersState): Deal[] =>
 
     // Value filter
     if (filters.value && filters.value !== 'all') {
-      if (filters.value === 'low' && deal.value >= 10000) {
+      if (filters.value === 'small' && deal.value >= 10000) {
         return false;
       } else if (filters.value === 'medium' && (deal.value < 10000 || deal.value > 50000)) {
         return false;
-      } else if (filters.value === 'high' && (deal.value < 50000 || deal.value > 100000)) {
+      } else if (filters.value === 'large' && (deal.value < 50000 || deal.value > 100000)) {
         return false;
-      } else if (filters.value === 'very-high' && deal.value <= 100000) {
+      } else if (filters.value === 'xlarge' && deal.value <= 100000) {
         return false;
       }
     }
