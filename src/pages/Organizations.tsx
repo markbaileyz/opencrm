@@ -48,7 +48,7 @@ const Organizations = () => {
             </div>
             <div className="flex space-x-2">
               <Tabs 
-                value={viewMode} 
+                defaultValue={viewMode} 
                 onValueChange={(value) => setViewMode(value as "table" | "analytics")} 
                 className="mr-4"
               >
@@ -72,19 +72,22 @@ const Organizations = () => {
 
           <OrganizationsFilters />
           
-          <TabsContent value="table" className={viewMode === "table" ? "block" : "hidden"}>
-            <OrganizationsTable onEdit={handleEditOrganization} />
-          </TabsContent>
-          
-          <TabsContent value="analytics" className={viewMode === "analytics" ? "block" : "hidden"}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <OrganizationTypeChart />
-              <OrganizationSizeDistribution />
-            </div>
-            <div className="mt-6">
-              <OrganizationStatusCard />
-            </div>
-          </TabsContent>
+          {/* Wrap the content in a new Tabs component */}
+          <Tabs defaultValue={viewMode} value={viewMode} className="w-full">
+            <TabsContent value="table">
+              <OrganizationsTable onEdit={handleEditOrganization} />
+            </TabsContent>
+            
+            <TabsContent value="analytics">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <OrganizationTypeChart />
+                <OrganizationSizeDistribution />
+              </div>
+              <div className="mt-6">
+                <OrganizationStatusCard />
+              </div>
+            </TabsContent>
+          </Tabs>
           
           <OrganizationFormDialog 
             open={formOpen} 

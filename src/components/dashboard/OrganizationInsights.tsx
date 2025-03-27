@@ -25,7 +25,7 @@ const OrganizationInsights = () => {
         <CardDescription>Overview of your partner organizations</CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs defaultValue="overview" onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-3 mb-4">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <Building2 className="h-4 w-4" />
