@@ -1,113 +1,131 @@
 
-import React, { useState } from "react";
-import { Patient } from "@/types/patient";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Patient } from "@/types/patient";
+import { Search, UserPlus, Phone, Mail, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter } from "lucide-react";
+import ResponsiveContainer from "@/components/ui/responsive-container";
+import MobilePatientList from './MobilePatientList';
 
 interface PatientListProps {
   patients: Patient[];
-  selectedPatientId?: string;
-  onSelectPatient: (patient: Patient) => void;
+  onViewDetails: (patientId: string) => void;
+  onAddPatient: () => void;
 }
 
-const PatientList: React.FC<PatientListProps> = ({
-  patients,
-  selectedPatientId,
-  onSelectPatient,
+const PatientList: React.FC<PatientListProps> = ({ 
+  patients, 
+  onViewDetails, 
+  onAddPatient 
 }) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const filteredPatients = patients.filter(patient => 
+    patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    patient.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    patient.phone.includes(searchQuery)
+  );
 
-  const filteredPatients = patients.filter((patient) => {
-    const matchesSearch = 
-      patient.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patient.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patient.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patient.phone.includes(searchQuery);
-      
-    const matchesStatus = statusFilter === "all" || patient.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
+  // Desktop view component
+  const DesktopPatientList = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <div className="relative w-64">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search patients..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+        <Button onClick={onAddPatient}>
+          <UserPlus className="mr-2 h-4 w-4" />
+          Add Patient
+        </Button>
+      </div>
+
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>DOB</TableHead>
+              <TableHead>Contact</TableHead>
+              <TableHead>Last Visit</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredPatients.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center text-muted-foreground h-24">
+                  No patients found
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredPatients.map((patient) => (
+                <TableRow key={patient.id}>
+                  <TableCell className="font-medium">{patient.name}</TableCell>
+                  <TableCell>{new Date(patient.dateOfBirth).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-col space-y-1">
+                      <span className="flex items-center text-sm">
+                        <Phone className="mr-2 h-3 w-3 text-muted-foreground" />
+                        {patient.phone}
+                      </span>
+                      <span className="flex items-center text-sm">
+                        <Mail className="mr-2 h-3 w-3 text-muted-foreground" />
+                        {patient.email}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="flex items-center">
+                      <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+                      {patient.lastVisit ? new Date(patient.lastVisit).toLocaleDateString() : 'No visits'}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge 
+                      variant={patient.status === 'active' ? 'default' : 
+                        patient.status === 'pending' ? 'outline' : 'secondary'}
+                    >
+                      {patient.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onViewDetails(patient.id)}
+                    >
+                      View Details
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
 
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-medium">Patients ({patients.length})</CardTitle>
-        <div className="flex flex-col space-y-2 mt-2">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search patients..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div className="flex space-x-2">
-            <Button 
-              variant={statusFilter === "all" ? "default" : "outline"} 
-              size="sm"
-              onClick={() => setStatusFilter("all")}
-              className="flex-1"
-            >
-              All
-            </Button>
-            <Button 
-              variant={statusFilter === "active" ? "default" : "outline"} 
-              size="sm"
-              onClick={() => setStatusFilter("active")}
-              className="flex-1"
-            >
-              Active
-            </Button>
-            <Button 
-              variant={statusFilter === "inactive" ? "default" : "outline"} 
-              size="sm"
-              onClick={() => setStatusFilter("inactive")}
-              className="flex-1"
-            >
-              Inactive
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="overflow-y-auto max-h-[calc(100vh-18rem)]">
-        {filteredPatients.length > 0 ? (
-          <div className="space-y-2">
-            {filteredPatients.map((patient) => (
-              <div
-                key={patient.id}
-                className={`p-3 cursor-pointer rounded-md transition-colors ${
-                  selectedPatientId === patient.id
-                    ? "bg-primary/10 hover:bg-primary/15"
-                    : "hover:bg-muted"
-                }`}
-                onClick={() => onSelectPatient(patient)}
-              >
-                <div className="flex justify-between items-start mb-1">
-                  <div className="font-medium">
-                    {patient.firstName} {patient.lastName}
-                  </div>
-                  <Badge variant={patient.status === "active" ? "default" : "secondary"}>
-                    {patient.status === "active" ? "Active" : "Inactive"}
-                  </Badge>
-                </div>
-                <div className="text-sm text-muted-foreground">{patient.email}</div>
-                <div className="text-sm text-muted-foreground">{patient.phone}</div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            No patients found matching your criteria
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <ResponsiveContainer
+      mobileView={<MobilePatientList 
+        patients={filteredPatients} 
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        onViewDetails={onViewDetails}
+        onAddPatient={onAddPatient}
+      />}
+      desktopView={<DesktopPatientList />}
+    />
   );
 };
 
