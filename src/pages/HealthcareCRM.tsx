@@ -2,7 +2,9 @@
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import HealthcareCRMStrategies from "@/components/HealthcareCRMStrategies";
+import ResponsiveContainer from "@/components/ui/responsive-container";
+import MobileHealthcareCRM from "@/components/healthcare-crm/MobileHealthcareCRM";
+import DesktopHealthcareCRM from "@/components/healthcare-crm/DesktopHealthcareCRM";
 
 const HealthcareCRMPage = () => {
   return (
@@ -10,11 +12,10 @@ const HealthcareCRMPage = () => {
       <Navbar />
       
       <main className="flex-1 animate-fade-in">
-        <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="max-w-4xl mx-auto">
-            <HealthcareCRMStrategies />
-          </div>
-        </div>
+        <ResponsiveContainer
+          mobileView={<MobileHealthcareCRM />}
+          desktopView={<DesktopHealthcareCRM />}
+        />
       </main>
       
       <Footer />
