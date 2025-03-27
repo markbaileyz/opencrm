@@ -11,6 +11,7 @@ import SalesPipeline from "@/components/dashboard/SalesPipeline";
 import RecentContacts from "@/components/dashboard/RecentContacts";
 import RealtimeMetricsChart from "@/components/dashboard/RealtimeMetricsChart";
 import { OrganizationsProvider } from "@/context/OrganizationsContext";
+import OrganizationInsights from "@/components/dashboard/OrganizationInsights";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -44,6 +45,11 @@ const Dashboard = () => {
 
           {/* Real-time Metrics */}
           <RealtimeMetricsChart />
+
+          {/* Organization Insights */}
+          <div className="grid grid-cols-1 gap-6 animate-fade-up delay-50">
+            <OrganizationInsights />
+          </div>
 
           {/* Sales Pipeline */}
           <div className="grid grid-cols-1 gap-6 animate-fade-up delay-100">
