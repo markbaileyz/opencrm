@@ -1,10 +1,11 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { UserPlus, Calendar } from "lucide-react";
+import { UserPlus, Calendar, UserCheck, ExternalLink } from "lucide-react";
 import CheckInDialog from "./CheckInDialog";
 import ScheduleDialog from "./ScheduleDialog";
 import { PatientListItem } from "@/types/patientList";
+import { Link } from "react-router-dom";
 
 // Sample patients data for demonstration
 const samplePatients: PatientListItem[] = [
@@ -78,6 +79,22 @@ const MobileHeader = () => {
             <Calendar className="h-4 w-4 mr-2" />
             Schedule
           </Button>
+        </div>
+        
+        <div className="mt-4 p-4 border rounded-md bg-muted">
+          <h3 className="text-sm font-medium mb-2 flex items-center">
+            <UserCheck className="h-4 w-4 mr-2" />
+            Online Pre-Check-In
+          </h3>
+          <p className="text-xs text-muted-foreground mb-3">
+            Allow patients to complete check-in forms before their appointment
+          </p>
+          <Link to="/pre-check-in" target="_blank" rel="noopener noreferrer">
+            <Button size="sm" variant="outline" className="w-full">
+              <ExternalLink className="h-3.5 w-3.5 mr-2" />
+              Open Pre-Check-In Form
+            </Button>
+          </Link>
         </div>
       </div>
 

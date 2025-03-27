@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Index from "@/pages/Index";
@@ -18,6 +19,8 @@ import ChallengesSolutionsPage from "@/pages/ChallengesSolutions";
 import Settings from "@/pages/Settings";
 import Patients from "@/pages/Patients";
 import FrontDesk from "@/pages/FrontDesk";
+import PreCheckIn from "@/pages/PreCheckIn";
+import CheckInConfirmation from "@/pages/CheckInConfirmation";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/NotFound";
@@ -108,6 +111,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
+          
+          {/* Public patient-facing routes */}
+          <Route path="/pre-check-in" element={<PreCheckIn />} />
+          <Route path="/check-in-confirmation" element={<CheckInConfirmation />} />
           
           <Route path="/dashboard" element={
             <ProtectedRoute>
