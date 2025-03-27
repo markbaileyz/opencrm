@@ -140,7 +140,7 @@ const DealAnalytics: React.FC<DealAnalyticsProps> = ({ deals }) => {
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
-                <YAxis tickFormatter={(value) => formatCurrency(value, false)} />
+                <YAxis tickFormatter={(value) => formatCurrency(value)} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="value" fill="#8884d8" radius={[4, 4, 0, 0]}>
                   {valueByStageData.map((entry, index) => (

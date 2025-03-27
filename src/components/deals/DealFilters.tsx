@@ -63,6 +63,13 @@ export type DealFiltersState = {
   tags?: string[];
 };
 
+// Define a type for saved filters
+type SavedFilter = {
+  id: string;
+  name: string;
+  filters: Partial<DealFiltersState>;
+};
+
 const DealFilters: React.FC<DealFiltersProps> = ({ 
   filters = { search: "", stage: "", value: "", sortBy: "newest" },
   onFilterChange = () => {}
@@ -72,7 +79,7 @@ const DealFilters: React.FC<DealFiltersProps> = ({
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [savedFilterName, setSavedFilterName] = useState("");
   const [showSaveDialog, setShowSaveDialog] = useState(false);
-  const [savedFilters, setSavedFilters] = useState([
+  const [savedFilters, setSavedFilters] = useState<SavedFilter[]>([
     { id: "1", name: "High Value Leads", filters: { stage: "lead", value: "large" } },
     { id: "2", name: "Closing This Month", filters: { closeDate: "this-month", probability: "high" } }
   ]);
@@ -85,7 +92,7 @@ const DealFilters: React.FC<DealFiltersProps> = ({
 
   const handleResetFilters = () => {
     const resetFilters = { search: "", stage: "all", value: "all", sortBy: "newest" };
-    setLocalFilters(resetFilters);
+    setLocalFilters(resetFilters as DealFiltersState);
     onFilterChange(resetFilters);
   };
 
@@ -100,7 +107,7 @@ const DealFilters: React.FC<DealFiltersProps> = ({
     }
 
     // Add the new saved filter
-    const newFilter = {
+    const newFilter: SavedFilter = {
       id: `saved-${Date.now()}`,
       name: savedFilterName,
       filters: { ...localFilters }
@@ -119,7 +126,18 @@ const DealFilters: React.FC<DealFiltersProps> = ({
   const loadSavedFilter = (id: string) => {
     const filter = savedFilters.find(f => f.id === id);
     if (filter) {
-      const loadedFilters = { ...filter.filters };
+      // Create a complete filters object with all required properties
+      const loadedFilters: DealFiltersState = {
+        search: filter.filters.search || "",
+        stage: filter.filters.stage || "all",
+        value: filter.filters.value || "all",
+        sortBy: filter.filters.sortBy || "newest",
+        organization: filter.filters.organization,
+        closeDate: filter.filters.closeDate,
+        probability: filter.filters.probability,
+        tags: filter.filters.tags
+      };
+      
       setLocalFilters(loadedFilters);
       onFilterChange(loadedFilters);
 
