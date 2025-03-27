@@ -6,6 +6,7 @@ import { Clock, Download, Play, Star, Trash2, Calendar, Mail } from "lucide-reac
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import ScheduleForm from "./ScheduleForm";
 import { SavedReport } from "./types";
+import { Badge } from "@/components/ui/badge";
 
 interface ReportItemProps {
   report: SavedReport;
@@ -28,6 +29,22 @@ const ReportItem: React.FC<ReportItemProps> = ({
   showScheduleForm,
   setShowScheduleForm,
 }) => {
+  // Get report type color
+  const getTypeColor = (type: string) => {
+    switch (type.toLowerCase()) {
+      case "sales":
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
+      case "conversion":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
+      case "activity":
+        return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300";
+      case "performance":
+        return "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
+    }
+  };
+
   return (
     <div className="flex flex-col p-3 bg-muted/40 rounded-md hover:bg-muted/60 transition-colors">
       <div className="flex items-center justify-between">
@@ -47,9 +64,9 @@ const ReportItem: React.FC<ReportItemProps> = ({
               />
             </Button>
             <h4 className="font-medium">{report.name}</h4>
-            <span className="text-xs px-2 py-0.5 bg-muted rounded-full text-muted-foreground">
+            <Badge className={`font-normal ${getTypeColor(report.type)}`}>
               {report.type}
-            </span>
+            </Badge>
           </div>
           <div className="text-xs text-muted-foreground flex items-center mt-1">
             <Clock className="h-3 w-3 mr-1" />
