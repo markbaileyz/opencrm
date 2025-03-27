@@ -2,9 +2,12 @@
 import React, { useState } from "react";
 import DealDetailPanel from "./DealDetailPanel";
 import DealConversionStats from "./DealConversionStats";
+import DealActivity from "./DealActivity";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, Trash2 } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, BarChart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface DealDetailsViewProps {
@@ -20,6 +23,7 @@ const DealDetailsView: React.FC<DealDetailsViewProps> = ({
 }) => {
   const { toast } = useToast();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Sample data - in a real app this would come from an API
   const dealData = {
@@ -169,22 +173,59 @@ const DealDetailsView: React.FC<DealDetailsViewProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <DealDetailPanel 
-            deal={dealData} 
-            timeline={timeline}
-            onAddActivity={handleAddActivity}
-          />
-        </div>
-        <div>
-          <DealConversionStats
-            stageConversions={stageConversions}
-            overallConversionRate={32}
-            timeFrame="Last 30 days"
-          />
+      <div>
+        <h1 className="text-2xl font-bold">{dealData.name}</h1>
+        <div className="flex items-center gap-3 mt-1 text-muted-foreground">
+          <span>{dealData.organization.name}</span>
+          <span>•</span>
+          <span>{dealData.stage}</span>
+          <span>•</span>
+          <span>${dealData.value.toLocaleString()}</span>
         </div>
       </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="activity">Activity</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview" className="mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <DealDetailPanel 
+                deal={dealData} 
+                timeline={timeline}
+                onAddActivity={handleAddActivity}
+              />
+            </div>
+            <div>
+              <DealConversionStats
+                stageConversions={stageConversions}
+                overallConversionRate={32}
+                timeFrame="Last 30 days"
+              />
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="activity" className="mt-6">
+          <DealActivity dealId={dealId} />
+        </TabsContent>
+        
+        <TabsContent value="analytics" className="mt-6">
+          <div className="grid grid-cols-1 gap-6">
+            <div className="space-y-6">
+              <DealConversionStats
+                stageConversions={stageConversions}
+                overallConversionRate={32}
+                timeFrame="Last 30 days"
+              />
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <AlertDialogContent>
