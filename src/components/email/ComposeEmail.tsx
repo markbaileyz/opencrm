@@ -15,6 +15,7 @@ import EmailComposeActions from "./EmailComposeActions";
 import EmailAttachments from "./EmailAttachments";
 import EmailTemplateSelector from "./EmailTemplateSelector";
 import EmailSignatureManager from "./EmailSignatureManager";
+import { EmailTemplate } from "@/utils/emailTemplates";
 
 export interface ComposeEmailProps {
   isOpen: boolean;
@@ -64,6 +65,11 @@ const ComposeEmail: React.FC<ComposeEmailProps> = ({
     setAttachments(prev => prev.filter((_, i) => i !== index));
   };
   
+  const handleSelectTemplate = (template: EmailTemplate) => {
+    setSubject(template.subject);
+    setMessage(template.body);
+  };
+  
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col">
@@ -92,7 +98,7 @@ const ComposeEmail: React.FC<ComposeEmailProps> = ({
               />
             </div>
             
-            <EmailTemplateSelector onSelect={(template) => setMessage(template)} />
+            <EmailTemplateSelector onSelectTemplate={handleSelectTemplate} />
             
             <div className="flex-1">
               <Textarea
