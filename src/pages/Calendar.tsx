@@ -32,6 +32,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { emailData } from "@/data/emailData";
 import type { Appointment } from "@/types/appointment";
+import { useCalendarEmailIntegration } from "@/hooks/useCalendarEmailIntegration";
 
 const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -86,8 +87,8 @@ const Calendar = () => {
   ]);
   const [emails] = useState(emailData);
   const navigate = useNavigate();
-  
   const { toast } = useToast();
+  const { findRelatedEmails } = useCalendarEmailIntegration();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -161,6 +162,10 @@ const Calendar = () => {
 
   const handleGoToEmail = () => {
     navigate('/email');
+  };
+
+  const navigateToEmail = (emailId: string) => {
+    navigate(`/email?emailId=${emailId}`);
   };
 
   const selectedDateAppointments = appointments.filter(
@@ -369,8 +374,8 @@ const Calendar = () => {
                               />
                             )}
                             <AppointmentRelatedEmails
-                              appointment={appointment}
-                              emails={emails}
+                              emails={findRelatedEmails(emails, appointment)}
+                              onViewEmail={navigateToEmail}
                             />
                           </div>
                           <div className="flex justify-end space-x-2 pt-2">
