@@ -1,17 +1,22 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Toggle } from "@/components/ui/toggle";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   
-  // Set theme to dark by default when component mounts
+  // Only render UI after component has mounted to avoid hydration mismatch
   useEffect(() => {
-    setTheme("dark");
+    setMounted(true);
   }, []);
 
+  if (!mounted) {
+    return null;
+  }
+  
   return (
     <div className="flex items-center space-x-2">
       <Toggle
@@ -21,9 +26,9 @@ export function ThemeToggle() {
         onPressedChange={() => setTheme(theme === "dark" ? "light" : "dark")}
       >
         {theme === "dark" ? (
-          <Sun className="h-5 w-5 text-yellow-300" />
+          <Moon className="h-5 w-5" />
         ) : (
-          <Moon className="h-5 w-5 text-blue-700" />
+          <Sun className="h-5 w-5 text-yellow-300" />
         )}
       </Toggle>
     </div>
