@@ -4,82 +4,76 @@ import { Button } from "@/components/ui/button";
 import { Send, Save } from "lucide-react";
 import ResponsiveContainer from "@/components/ui/responsive-container";
 
-interface EmailComposeActionsProps {
+const EmailComposeActions = ({ 
+  onSaveDraft, 
+  onCancel, 
+  onSubmit, 
+  isSending, 
+  isValid 
+}: {
   onSaveDraft: () => void;
   onCancel: () => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: () => void;
   isSending: boolean;
   isValid: boolean;
-}
-
-const EmailComposeActions: React.FC<EmailComposeActionsProps> = ({
-  onSaveDraft,
-  onCancel,
-  onSubmit,
-  isSending,
-  isValid
 }) => {
   // Mobile optimized actions
-  const MobileActions = () => (
-    <div className="flex w-full items-center justify-between gap-2">
+  const mobileActions = (
+    <div className="fixed bottom-0 left-0 right-0 border-t bg-background p-3 grid grid-cols-3 gap-2 z-10">
       <Button 
-        type="button" 
         variant="outline" 
         onClick={onCancel}
-        className="flex-1"
+        className="w-full"
       >
         Cancel
       </Button>
-      
-      <div className="flex gap-2">
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={onSaveDraft}
-          className="w-10 h-10 p-0"
-        >
-          <Save className="h-4 w-4" />
-        </Button>
-        
-        <Button 
-          type="submit" 
-          disabled={isSending || !isValid}
-          onClick={onSubmit}
-          className="w-10 h-10 p-0"
-        >
-          {isSending ? "..." : <Send className="h-4 w-4" />}
-        </Button>
-      </div>
-    </div>
-  );
-  
-  // Desktop actions
-  const DesktopActions = () => (
-    <div className="flex items-center gap-2">
       <Button 
-        type="button" 
         variant="outline" 
         onClick={onSaveDraft}
-        className="gap-1"
+        className="w-full"
       >
-        <Save className="h-4 w-4" />
-        Save Draft
+        <Save className="h-4 w-4 mr-2" />
+        Save
       </Button>
-      
-      <Button type="button" variant="outline" onClick={onCancel}>
-        Cancel
-      </Button>
-      
       <Button 
-        type="submit" 
-        disabled={isSending || !isValid}
-        className="gap-1"
         onClick={onSubmit}
+        disabled={isSending || !isValid}
+        className="w-full"
       >
-        {isSending ? "Sending..." : (
+        {isSending ? (
+          "Sending..."
+        ) : (
           <>
-            <Send className="h-4 w-4" />
+            <Send className="h-4 w-4 mr-2" />
             Send
+          </>
+        )}
+      </Button>
+    </div>
+  );
+
+  // Desktop optimized actions
+  const desktopActions = (
+    <div className="flex items-center justify-between pt-4 border-t mt-4">
+      <div>
+        <Button variant="outline" onClick={onCancel} className="mr-2">
+          Cancel
+        </Button>
+        <Button variant="outline" onClick={onSaveDraft}>
+          <Save className="h-4 w-4 mr-2" />
+          Save Draft
+        </Button>
+      </div>
+      <Button 
+        onClick={onSubmit}
+        disabled={isSending || !isValid}
+      >
+        {isSending ? (
+          "Sending..."
+        ) : (
+          <>
+            <Send className="h-4 w-4 mr-2" />
+            Send Email
           </>
         )}
       </Button>
@@ -88,8 +82,9 @@ const EmailComposeActions: React.FC<EmailComposeActionsProps> = ({
 
   return (
     <ResponsiveContainer
-      mobileView={<MobileActions />}
-      desktopView={<DesktopActions />}
+      mobileView={mobileActions}
+      desktopView={desktopActions}
+      children={<></>} // Empty child as placeholder
     />
   );
 };

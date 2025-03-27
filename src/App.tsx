@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
@@ -20,8 +20,26 @@ import Settings from "@/pages/Settings";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/NotFound";
+import { registerServiceWorker, checkForServiceWorkerUpdate } from "./registerServiceWorker";
+import { useToast } from "@/hooks/use-toast";
 
 function App() {
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Register service worker for offline support
+    registerServiceWorker();
+    
+    // Check for updates to service worker
+    checkForServiceWorkerUpdate(() => {
+      toast({
+        title: "Update available",
+        description: "A new version of the app is available. Refresh to update.",
+        duration: 10000,
+      });
+    });
+  }, [toast]);
+  
   return (
     <ThemeProvider
       attribute="class"

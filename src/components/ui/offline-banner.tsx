@@ -41,7 +41,7 @@ const OfflineBanner = ({
 
   if (pendingActions > 0) {
     return (
-      <Alert variant="warning" className={className}>
+      <Alert className={className}>
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Synchronizing</AlertTitle>
         <AlertDescription>

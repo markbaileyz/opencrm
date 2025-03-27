@@ -12,11 +12,17 @@ import RecentContacts from "@/components/dashboard/RecentContacts";
 import RealtimeMetricsChart from "@/components/dashboard/RealtimeMetricsChart";
 import { OrganizationsProvider } from "@/context/OrganizationsContext";
 import OrganizationInsights from "@/components/dashboard/OrganizationInsights";
+import MobileDashboard from "@/components/dashboard/MobileDashboard";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useOfflineState } from "@/hooks/use-offline-state";
+import OfflineBanner from "@/components/ui/offline-banner";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const isAdmin = user?.email.includes("admin");
   const isDoctor = user?.email.includes("doctor");
+  const isMobile = useIsMobile();
+  const { isOnline, pendingActions } = useOfflineState();
   
   // Simulated data
   const customerActivityData = [
@@ -38,37 +44,45 @@ const Dashboard = () => {
     <OrganizationsProvider>
       <DashboardLayout>
         <div className="space-y-6">
-          <DashboardHeader isAdmin={isAdmin} />
+          {!isOnline && <OfflineBanner isOnline={isOnline} pendingActions={pendingActions} />}
           
-          {/* Key Metrics */}
-          <KeyMetrics />
+          {isMobile ? (
+            <MobileDashboard />
+          ) : (
+            <>
+              <DashboardHeader isAdmin={isAdmin} />
+              
+              {/* Key Metrics */}
+              <KeyMetrics />
 
-          {/* Real-time Metrics */}
-          <RealtimeMetricsChart />
+              {/* Real-time Metrics */}
+              <RealtimeMetricsChart />
 
-          {/* Organization Insights */}
-          <div className="grid grid-cols-1 gap-6 animate-fade-up delay-50">
-            <OrganizationInsights />
-          </div>
+              {/* Organization Insights */}
+              <div className="grid grid-cols-1 gap-6 animate-fade-up delay-50">
+                <OrganizationInsights />
+              </div>
 
-          {/* Sales Pipeline */}
-          <div className="grid grid-cols-1 gap-6 animate-fade-up delay-100">
-            <SalesPipeline />
-          </div>
+              {/* Sales Pipeline */}
+              <div className="grid grid-cols-1 gap-6 animate-fade-up delay-100">
+                <SalesPipeline />
+              </div>
 
-          {/* Activity Chart */}
-          <div className="space-y-6 animate-fade-up delay-200">
-            <ActivityChart data={customerActivityData} />
-          </div>
+              {/* Activity Chart */}
+              <div className="space-y-6 animate-fade-up delay-200">
+                <ActivityChart data={customerActivityData} />
+              </div>
 
-          {/* Recent items grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-up delay-300">
-            <RecentContacts />
-            <div className="space-y-6">
-              <AppointmentList />
-              <MessageList />
-            </div>
-          </div>
+              {/* Recent items grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-up delay-300">
+                <RecentContacts />
+                <div className="space-y-6">
+                  <AppointmentList />
+                  <MessageList />
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </DashboardLayout>
     </OrganizationsProvider>
