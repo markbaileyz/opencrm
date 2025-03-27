@@ -13,9 +13,11 @@ import { Email } from "@/types/email";
 
 const MobileEmailView: React.FC = () => {
   const { selectedEmail, setSelectedEmail, showMobileComposer, setShowMobileComposer, activeFolder, setActiveFolder } = useEmailContext();
-  const { emails, loading, error, handleStarEmail } = useEmailManager(activeFolder);
+  const { emails, handleStarEmail } = useEmailManager(activeFolder);
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const filteredEmails = emails.filter(email => 
     email.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -45,7 +47,7 @@ const MobileEmailView: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 <Inbox className="h-5 w-5" />
-                <h1 className="text-xl font-semibold">Inbox</h1>
+                <h1 className="text-xl font-semibold">{activeFolder.charAt(0).toUpperCase() + activeFolder.slice(1)}</h1>
               </div>
               <div className="flex items-center space-x-2">
                 <Button size="icon" variant="ghost" onClick={() => setShowFilters(true)}>

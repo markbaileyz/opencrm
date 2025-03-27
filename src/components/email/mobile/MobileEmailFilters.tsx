@@ -9,17 +9,54 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Inbox, Archive, Star, Send, Trash } from "lucide-react";
 import { format } from "date-fns";
 
-const MobileEmailFilters: React.FC = () => {
+interface MobileEmailFiltersProps {
+  activeFolder: string;
+  onSelectFolder: (folder: string) => void;
+}
+
+const MobileEmailFilters: React.FC<MobileEmailFiltersProps> = ({ 
+  activeFolder, 
+  onSelectFolder 
+}) => {
   const [dateRange, setDateRange] = useState<Date | undefined>(undefined);
   const [hasAttachments, setHasAttachments] = useState(false);
   const [readStatus, setReadStatus] = useState("all");
   
+  const folders = [
+    { id: 'inbox', name: 'Inbox', icon: Inbox },
+    { id: 'starred', name: 'Starred', icon: Star },
+    { id: 'sent', name: 'Sent', icon: Send },
+    { id: 'archive', name: 'Archive', icon: Archive },
+    { id: 'trash', name: 'Trash', icon: Trash },
+  ];
+  
   return (
     <div className="space-y-6 py-4">
-      <h3 className="font-medium text-lg">Email Filters</h3>
+      <h3 className="font-medium text-lg">Email Folders</h3>
+      
+      <div className="space-y-2">
+        {folders.map((folder) => {
+          const Icon = folder.icon;
+          return (
+            <Button
+              key={folder.id}
+              variant={activeFolder === folder.id ? "secondary" : "ghost"}
+              className="w-full justify-start"
+              onClick={() => onSelectFolder(folder.id)}
+            >
+              <Icon className="mr-2 h-4 w-4" />
+              {folder.name}
+            </Button>
+          );
+        })}
+      </div>
+      
+      <Separator />
+      
+      <h3 className="font-medium text-lg">Filters</h3>
       
       <div className="space-y-4">
         <div className="space-y-2">

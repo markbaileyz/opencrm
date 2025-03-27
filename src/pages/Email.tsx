@@ -16,7 +16,11 @@ const EmailPage: React.FC = () => {
         <EmailProvider>
           <ResponsiveContainer
             mobileView={<MobileEmailView />}
-            desktopView={<EmailContent />}
+            desktopView={
+              <div className="h-full">
+                <MobileEmailView />
+              </div>
+            }
             className="h-full"
           />
         </EmailProvider>
