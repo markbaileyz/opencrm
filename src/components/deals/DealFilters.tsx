@@ -66,10 +66,10 @@ const DealFilters = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Values</SelectItem>
-              <SelectItem value="low">< $10,000</SelectItem>
+              <SelectItem value="low">&lt; $10,000</SelectItem>
               <SelectItem value="medium">$10,000 - $50,000</SelectItem>
               <SelectItem value="high">$50,000 - $100,000</SelectItem>
-              <SelectItem value="very-high">> $100,000</SelectItem>
+              <SelectItem value="very-high">&gt; $100,000</SelectItem>
             </SelectContent>
           </Select>
         </div>
