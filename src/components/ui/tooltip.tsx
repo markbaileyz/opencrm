@@ -84,3 +84,17 @@ export const Tooltip: React.FC<TooltipProps> = ({
     </div>
   );
 };
+
+// Add these components for backward compatibility
+// These components are used in read-only files that we can't modify
+export const TooltipProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return <>{children}</>;
+};
+
+export const TooltipTrigger: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return <>{children}</>;
+};
+
+export const TooltipContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return <>{children}</>;
+};
