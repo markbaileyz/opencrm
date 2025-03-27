@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { CalendarPlus, Mail } from "lucide-react";
+import { CalendarPlus, Mail, CalendarRange, CalendarClock } from "lucide-react";
 import { format, addMonths, subMonths } from "date-fns";
 import AppointmentList from "@/components/dashboard/AppointmentList";
 import { useToast } from "@/hooks/use-toast";
@@ -24,11 +24,15 @@ import CalendarView from "@/components/calendar/CalendarView";
 import DailyAppointments from "@/components/calendar/DailyAppointments";
 import EmailIntegrationSection from "@/components/calendar/EmailIntegrationSection";
 import AppointmentForm from "@/components/calendar/AppointmentForm";
+import BatchAppointmentCreator from "@/components/calendar/BatchAppointmentCreator";
+import RecurringAppointmentSetup from "@/components/calendar/RecurringAppointmentSetup";
 
 const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isAddAppointmentOpen, setIsAddAppointmentOpen] = useState(false);
+  const [isBatchModeOpen, setIsBatchModeOpen] = useState(false);
+  const [isRecurringModeOpen, setIsRecurringModeOpen] = useState(false);
   const [editAppointmentId, setEditAppointmentId] = useState<string | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([
     {
@@ -163,6 +167,10 @@ const Calendar = () => {
     setIsAddAppointmentOpen(false);
   };
 
+  const handleBatchAppointmentsCreated = (newAppointments: Appointment[]) => {
+    setAppointments(prev => [...prev, ...newAppointments]);
+  };
+
   const handleEditAppointment = (id: string) => {
     const appointmentToEdit = appointments.find(app => app.id === id);
     if (appointmentToEdit) {
@@ -214,6 +222,52 @@ const Calendar = () => {
               <Mail className="h-4 w-4 mr-2" />
               Go to Email
             </Button>
+            
+            {/* Batch Appointment Dialog */}
+            <Dialog open={isBatchModeOpen} onOpenChange={setIsBatchModeOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <CalendarRange className="h-4 w-4 mr-2" />
+                  Batch Create
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Create Multiple Appointments</DialogTitle>
+                  <DialogDescription>
+                    Schedule multiple appointments for the same day
+                  </DialogDescription>
+                </DialogHeader>
+                <BatchAppointmentCreator 
+                  onAppointmentsCreated={handleBatchAppointmentsCreated}
+                  onClose={() => setIsBatchModeOpen(false)}
+                />
+              </DialogContent>
+            </Dialog>
+            
+            {/* Recurring Appointment Dialog */}
+            <Dialog open={isRecurringModeOpen} onOpenChange={setIsRecurringModeOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <CalendarClock className="h-4 w-4 mr-2" />
+                  Recurring
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Create Recurring Appointments</DialogTitle>
+                  <DialogDescription>
+                    Schedule a series of appointments with regular intervals
+                  </DialogDescription>
+                </DialogHeader>
+                <RecurringAppointmentSetup 
+                  onAppointmentsCreated={handleBatchAppointmentsCreated}
+                  onClose={() => setIsRecurringModeOpen(false)}
+                />
+              </DialogContent>
+            </Dialog>
+            
+            {/* Regular Appointment Dialog */}
             <Dialog open={isAddAppointmentOpen} onOpenChange={setIsAddAppointmentOpen}>
               <DialogTrigger asChild>
                 <Button>
