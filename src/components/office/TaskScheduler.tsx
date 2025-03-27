@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -201,7 +202,7 @@ const TaskScheduler: React.FC = () => {
   
   const updatedTasks = tasks.map(task => {
     if (task.status !== "completed" && isTaskOverdue(task.nextDue)) {
-      return { ...task, status: "overdue" };
+      return { ...task, status: "overdue" as const };
     }
     return task;
   });
