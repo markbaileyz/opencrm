@@ -12,10 +12,10 @@ interface TrustedBySectionProps {
 
 const TrustedBySection = ({ title, description, logos }: TrustedBySectionProps) => {
   return (
-    <div className="animate-fade-up py-16 relative bg-[#0a1527]/95 backdrop-blur-md rounded-2xl border border-white/10 shadow-xl">
+    <div className="animate-fade-up py-16 relative dark-container overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute -top-10 -left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
       
       <div className="relative z-10">
         <div className="text-center mb-12">
@@ -36,11 +36,11 @@ const TrustedBySection = ({ title, description, logos }: TrustedBySectionProps) 
           </p>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center px-4">
           {logos.map((logo, index) => (
             <div 
               key={index} 
-              className={`p-6 bg-[#132543] rounded-xl border border-white/10 shadow-md hover:shadow-lg transition-all duration-300 hover:border-blue-500/20 animate-fade-up delay-${(index + 1) * 100}`}
+              className={`p-6 bg-[#0f1c36] rounded-xl border border-blue-500/10 shadow-xl hover:shadow-blue-500/5 transition-all duration-300 hover:border-blue-500/20 hover:translate-y-[-3px] animate-fade-up delay-${(index + 1) * 100}`}
             >
               <img src={logo} alt={`Partner logo ${index + 1}`} className="h-12 w-auto" />
             </div>
