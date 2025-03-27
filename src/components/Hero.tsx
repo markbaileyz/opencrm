@@ -6,7 +6,6 @@ import { Headset, Stethoscope, Clipboard, BarChart, Users, ClipboardCheck, Star,
 import MainHero from "./hero/MainHero";
 import StatsGrid from "./hero/StatsGrid";
 import PerspectiveSection from "./hero/PerspectiveSection";
-import TrustedBySection from "./hero/TrustedBySection";
 import TestimonialsPreview from "./hero/TestimonialsPreview";
 
 interface HeroProps {
@@ -56,14 +55,6 @@ const Hero = ({ scrollToSection }: HeroProps) => {
       role: "Chief Medical Officer",
       facility: "Regional Health Partners"
     }
-  ];
-
-  // Trusted by logos
-  const logos = [
-    "/logos/acme.svg",
-    "/logos/globex.svg",
-    "/logos/hooli.svg",
-    "/logos/stark.svg"
   ];
 
   return (
@@ -130,15 +121,6 @@ const Hero = ({ scrollToSection }: HeroProps) => {
             statIcon={<BarChart className="h-5 w-5 text-primary" />}
             statLabel="Documentation Time"
             statValue="-45%"
-          />
-        </div>
-        
-        {/* Trusted By Section */}
-        <div className="mt-32">
-          <TrustedBySection
-            title="Trusted by Leading Healthcare Providers"
-            description="Join thousands of healthcare facilities that trust OpenCRM to optimize their patient experience and streamline operations."
-            logos={logos}
           />
         </div>
 
