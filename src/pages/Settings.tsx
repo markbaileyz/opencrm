@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { 
@@ -289,74 +288,44 @@ const Settings = () => {
                   Manage your password and two-factor authentication.
                 </CardDescription>
               </div>
-              <CollapsibleTrigger onClick={() => setIsSecuritySettingsOpen(!isSecuritySettingsOpen)} className="rounded-full p-2 hover:bg-muted">
-                {isSecuritySettingsOpen ? (
-                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4">
-                    <path d="M3.13523 6.15803C3.3241 5.95657 3.64052 5.94637 3.84197 6.13523L7.5 9.56464L11.158 6.13523C11.3595 5.94637 11.6759 5.95657 11.8648 6.15803C12.0536 6.35949 12.0434 6.67591 11.842 6.86477L7.84197 10.6148C7.64964 10.7951 7.35036 10.7951 7.15803 10.6148L3.15803 6.86477C2.95657 6.67591 2.94637 6.35949 3.13523 6.15803Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
-                  </svg>
-                ) : (
-                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4">
-                    <path d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
-                  </svg>
-                )}
-              </CollapsibleTrigger>
-            </CardHeader>
-            <Collapsible open={isSecuritySettingsOpen} onOpenChange={setIsSecuritySettingsOpen}>
-              <CollapsibleContent>
-                <CardContent className="space-y-4">
-                  <Form {...securityForm}>
-                    <form onSubmit={securityForm.handleSubmit(handlePasswordChange)} className="space-y-4">
-                      <h3 className="text-lg font-medium">Change Password</h3>
-                      <FormField
-                        control={securityForm.control}
-                        name="currentPassword"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Current Password</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <Input 
-                                  {...field} 
-                                  type={showPassword ? "text" : "password"} 
-                                  placeholder="Enter your current password" 
-                                />
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  className="absolute right-0 top-0 h-full px-3"
-                                  onClick={() => setShowPassword(!showPassword)}
-                                >
-                                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                </Button>
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Collapsible open={isSecuritySettingsOpen} onOpenChange={setIsSecuritySettingsOpen}>
+                <CollapsibleTrigger className="rounded-full p-2 hover:bg-muted">
+                  {isSecuritySettingsOpen ? (
+                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4">
+                      <path d="M3.13523 6.15803C3.3241 5.95657 3.64052 5.94637 3.84197 6.13523L7.5 9.56464L11.158 6.13523C11.3595 5.94637 11.6759 5.95657 11.8648 6.15803C12.0536 6.35949 12.0434 6.67591 11.842 6.86477L7.84197 10.6148C7.64964 10.7951 7.35036 10.7951 7.15803 10.6148L3.15803 6.86477C2.95657 6.67591 2.94637 6.35949 3.13523 6.15803Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
+                    </svg>
+                  ) : (
+                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4">
+                      <path d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
+                    </svg>
+                  )}
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent className="space-y-4">
+                    <Form {...securityForm}>
+                      <form onSubmit={securityForm.handleSubmit(handlePasswordChange)} className="space-y-4">
+                        <h3 className="text-lg font-medium">Change Password</h3>
                         <FormField
                           control={securityForm.control}
-                          name="newPassword"
+                          name="currentPassword"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>New Password</FormLabel>
+                              <FormLabel>Current Password</FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Input 
                                     {...field} 
-                                    type={showNewPassword ? "text" : "password"} 
-                                    placeholder="Enter your new password" 
+                                    type={showPassword ? "text" : "password"} 
+                                    placeholder="Enter your current password" 
                                   />
                                   <Button
                                     type="button"
                                     variant="ghost"
                                     size="sm"
                                     className="absolute right-0 top-0 h-full px-3"
-                                    onClick={() => setShowNewPassword(!showNewPassword)}
+                                    onClick={() => setShowPassword(!showPassword)}
                                   >
-                                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                   </Button>
                                 </div>
                               </FormControl>
@@ -364,69 +333,99 @@ const Settings = () => {
                             </FormItem>
                           )}
                         />
-                        <FormField
-                          control={securityForm.control}
-                          name="confirmPassword"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Confirm New Password</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Input 
-                                    {...field} 
-                                    type={showConfirmPassword ? "text" : "password"} 
-                                    placeholder="Confirm your new password" 
-                                  />
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="absolute right-0 top-0 h-full px-3"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                  >
-                                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                  </Button>
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={securityForm.control}
+                            name="newPassword"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>New Password</FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Input 
+                                      {...field} 
+                                      type={showNewPassword ? "text" : "password"} 
+                                      placeholder="Enter your new password" 
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      className="absolute right-0 top-0 h-full px-3"
+                                      onClick={() => setShowNewPassword(!showNewPassword)}
+                                    >
+                                      {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </Button>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={securityForm.control}
+                            name="confirmPassword"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Confirm New Password</FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Input 
+                                      {...field} 
+                                      type={showConfirmPassword ? "text" : "password"} 
+                                      placeholder="Confirm your new password" 
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      className="absolute right-0 top-0 h-full px-3"
+                                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    >
+                                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </Button>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div>
+                          <Button type="submit">Update Password</Button>
+                        </div>
+                      </form>
+                    </Form>
+                    
+                    <Separator className="my-4" />
+                    
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium">Two-factor Authentication</h3>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">Enable Two-factor Authentication</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Add an extra layer of security to your account with 2FA.
+                          </p>
+                        </div>
+                        <div className="flex items-center">
+                          <Switch
+                            checked={twoFactorEnabled}
+                            onCheckedChange={setTwoFactorEnabled}
+                            id="twoFactorEnabled"
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <Button type="submit">Update Password</Button>
-                      </div>
-                    </form>
-                  </Form>
-                  
-                  <Separator className="my-4" />
-                  
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Two-factor Authentication</h3>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium">Enable Two-factor Authentication</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Add an extra layer of security to your account with 2FA.
-                        </p>
-                      </div>
-                      <div className="flex items-center">
-                        <Switch
-                          checked={twoFactorEnabled}
-                          onCheckedChange={setTwoFactorEnabled}
-                          id="twoFactorEnabled"
-                        />
-                      </div>
+                      {twoFactorEnabled && (
+                        <div className="bg-muted p-3 rounded-md text-sm">
+                          <p>Two-factor authentication is enabled. You'll receive verification codes via SMS when signing in from a new device.</p>
+                        </div>
+                      )}
                     </div>
-                    {twoFactorEnabled && (
-                      <div className="bg-muted p-3 rounded-md text-sm">
-                        <p>Two-factor authentication is enabled. You'll receive verification codes via SMS when signing in from a new device.</p>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </CollapsibleContent>
-            </Collapsible>
+                  </CardContent>
+                </CollapsibleContent>
+              </Collapsible>
+            </CardHeader>
           </Card>
 
           <Card>
