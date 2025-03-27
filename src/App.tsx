@@ -1,11 +1,11 @@
 
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "@/components/ui/theme-provider";
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 
 // Import pages
-import Home from "@/pages/Home";
+import Home from "./pages/Index";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import Contacts from "@/pages/Contacts";
@@ -13,8 +13,7 @@ import Patients from "@/pages/Patients";
 import Calendar from "@/pages/Calendar";
 import Email from "@/pages/Email";
 import HealthcareCRM from "@/pages/HealthcareCRM";
-import PatientPortal from "@/pages/PatientPortal";
-import PreCheckIn from "@/pages/PreCheckIn";
+import PatientPortal from "./pages/PreCheckIn";
 import Roadmap from "@/pages/Roadmap";
 import Office from "@/pages/Office";
 import FrontDesk from "@/pages/FrontDesk";
@@ -44,7 +43,7 @@ const App: React.FC = () => {
             <Route path="/settings" element={<Settings />} />
             <Route path="/healthcare-crm" element={<HealthcareCRM />} />
             <Route path="/patient-portal" element={<PatientPortal />} />
-            <Route path="/pre-check-in" element={<PreCheckIn />} />
+            <Route path="/pre-check-in" element={<PatientPortal />} />
             <Route path="/roadmap" element={<Roadmap />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
