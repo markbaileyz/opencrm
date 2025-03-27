@@ -5,7 +5,11 @@ import { Menu, X } from "lucide-react";
 import DesktopNav from "./navbar/DesktopNav";
 import MobileNav from "./navbar/MobileNav";
 
-const Navbar = () => {
+interface NavbarProps {
+  scrollToSection?: (sectionId: string) => void;
+}
+
+const Navbar = ({ scrollToSection }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -35,24 +39,28 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
-  const scrollToSection = (sectionId: string) => {
+  const handleScrollToSection = (sectionId: string) => {
     setIsMobileMenuOpen(false);
     
-    if (location.pathname !== '/') {
-      // Navigate to home page and then scroll
-      navigate('/', { replace: true });
-      // Increase timeout to ensure the page has fully loaded
-      setTimeout(() => {
+    if (scrollToSection) {
+      scrollToSection(sectionId);
+    } else {
+      if (location.pathname !== '/') {
+        // Navigate to home page and then scroll
+        navigate('/', { replace: true });
+        // Increase timeout to ensure the page has fully loaded
+        setTimeout(() => {
+          const element = document.getElementById(sectionId);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 200);
+      } else {
+        // Already on home page, just scroll
         const element = document.getElementById(sectionId);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
         }
-      }, 200);
-    } else {
-      // Already on home page, just scroll
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
       }
     }
   };
@@ -74,7 +82,7 @@ const Navbar = () => {
           </span>
         </Link>
 
-        <DesktopNav isActive={isActive} scrollToSection={scrollToSection} />
+        <DesktopNav isActive={isActive} scrollToSection={handleScrollToSection} />
 
         <button
           className="md:hidden"
@@ -91,7 +99,7 @@ const Navbar = () => {
       <MobileNav 
         isOpen={isMobileMenuOpen}
         isActive={isActive}
-        scrollToSection={scrollToSection}
+        scrollToSection={handleScrollToSection}
         closeMobileMenu={closeMobileMenu}
       />
     </header>

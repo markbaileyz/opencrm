@@ -9,14 +9,22 @@ import PerspectiveSection from "./hero/PerspectiveSection";
 import TrustedBySection from "./hero/TrustedBySection";
 import TestimonialsPreview from "./hero/TestimonialsPreview";
 
-const Hero = () => {
+interface HeroProps {
+  scrollToSection?: (sectionId: string) => void;
+}
+
+const Hero = ({ scrollToSection }: HeroProps) => {
   const location = useLocation();
   
   // Function to smoothly scroll to a section
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+  const handleScrollToSection = (sectionId: string) => {
+    if (scrollToSection) {
+      scrollToSection(sectionId);
+    } else {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
@@ -62,7 +70,7 @@ const Hero = () => {
     <section className="pt-24 pb-16 md:pt-36 md:pb-24 overflow-hidden" id="home">
       <div className="container mx-auto px-4 md:px-6">
         {/* Main Hero */}
-        <MainHero scrollToSection={scrollToSection} />
+        <MainHero scrollToSection={handleScrollToSection} />
         
         {/* Statistics */}
         <StatsGrid stats={statsData} />
@@ -140,7 +148,7 @@ const Hero = () => {
             title="What Healthcare Professionals Say"
             description="Hear from healthcare professionals who have transformed their practice with OpenCRM."
             testimonials={testimonials}
-            scrollToSection={scrollToSection}
+            scrollToSection={handleScrollToSection}
           />
         </div>
       </div>
