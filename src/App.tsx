@@ -39,6 +39,9 @@ import Compliance from "@/pages/Compliance";
 import UserManagement from "@/pages/UserManagement";
 import DashboardRoadmap from "@/pages/DashboardRoadmap";
 import Office from "@/pages/Office";
+import MedicalRecordsPage from "@/pages/MedicalRecordsPage";
+import HealthTrackerPage from "@/pages/HealthTrackerPage";
+import PatientVitalsPage from "@/pages/PatientVitalsPage";
 
 function App() {
   const { toast } = useToast();
@@ -119,7 +122,7 @@ function App() {
         {/* Patient Routes */}
         <Route path="/medical-records" element={
           <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse", "patient"]}>
-            <PlaceholderPage title="Medical Records" description="Your medical records will be available here soon. We're working on making this feature available to you." />
+            <MedicalRecordsPage />
           </ProtectedRoute>
         } />
         
@@ -131,7 +134,7 @@ function App() {
         
         <Route path="/health-tracker" element={
           <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "patient"]}>
-            <PlaceholderPage title="Health Tracker" description="Track your health metrics and progress here. This feature is coming soon." />
+            <HealthTrackerPage />
           </ProtectedRoute>
         } />
         
@@ -151,7 +154,7 @@ function App() {
         {/* Nurse Routes */}
         <Route path="/patient-vitals" element={
           <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse"]}>
-            <PlaceholderPage title="Patient Vitals" description="Record and monitor patient vital signs. This feature is under development." />
+            <PatientVitalsPage />
           </ProtectedRoute>
         } />
         

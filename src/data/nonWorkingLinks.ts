@@ -37,8 +37,8 @@ export const nonWorkingLinks = [
   },
   {
     path: "/patient-vitals",
-    status: "Placeholder",
-    description: "Patient vitals tracking needs implementation",
+    status: "Basic Implementation",
+    description: "Patient vitals tracking has basic implementation, needs real-time monitoring features",
     priority: "Medium"
   },
   {
