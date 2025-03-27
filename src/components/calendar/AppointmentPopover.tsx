@@ -3,7 +3,21 @@ import React from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, FileText, Edit, Trash } from "lucide-react";
+import { 
+  Clock, 
+  FileText, 
+  Edit, 
+  Trash,
+  Check,
+  Ban,
+  Calendar
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import AppointmentReminder from "./AppointmentReminder";
 import AppointmentRelatedEmails from "./AppointmentRelatedEmails";
 import type { Appointment } from "@/types/appointment";
@@ -16,6 +30,7 @@ interface AppointmentPopoverProps {
   onDeleteAppointment: (id: string) => void;
   onReminderSent: (appointmentId: string) => void;
   onViewEmail: (emailId: string) => void;
+  onStatusChange?: (id: string, status: "upcoming" | "completed" | "canceled") => void;
 }
 
 const AppointmentPopover = ({
@@ -25,6 +40,7 @@ const AppointmentPopover = ({
   onDeleteAppointment,
   onReminderSent,
   onViewEmail,
+  onStatusChange,
 }: AppointmentPopoverProps) => {
   const statusColors = {
     upcoming: "bg-blue-100 text-blue-800",
@@ -76,23 +92,59 @@ const AppointmentPopover = ({
         />
       </div>
       
-      <div className="flex justify-end space-x-2 pt-2">
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={() => onEditAppointment(appointment.id)}
-        >
-          <Edit className="h-4 w-4 mr-1" />
-          Edit
-        </Button>
-        <Button 
-          variant="destructive" 
-          size="sm"
-          onClick={() => onDeleteAppointment(appointment.id)}
-        >
-          <Trash className="h-4 w-4 mr-1" />
-          Delete
-        </Button>
+      <div className="flex justify-between space-x-2 pt-2">
+        {onStatusChange && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Calendar className="h-4 w-4 mr-1" />
+                Status
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem 
+                onClick={() => onStatusChange(appointment.id, "upcoming")}
+                disabled={appointment.status === "upcoming"}
+              >
+                <Clock className="h-4 w-4 mr-2" />
+                Mark as Upcoming
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => onStatusChange(appointment.id, "completed")}
+                disabled={appointment.status === "completed"}
+              >
+                <Check className="h-4 w-4 mr-2" />
+                Mark as Completed
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => onStatusChange(appointment.id, "canceled")}
+                disabled={appointment.status === "canceled"}
+              >
+                <Ban className="h-4 w-4 mr-2" />
+                Mark as Canceled
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+        
+        <div className="flex space-x-2">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => onEditAppointment(appointment.id)}
+          >
+            <Edit className="h-4 w-4 mr-1" />
+            Edit
+          </Button>
+          <Button 
+            variant="destructive" 
+            size="sm"
+            onClick={() => onDeleteAppointment(appointment.id)}
+          >
+            <Trash className="h-4 w-4 mr-1" />
+            Delete
+          </Button>
+        </div>
       </div>
     </div>
   );

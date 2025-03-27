@@ -3,6 +3,7 @@ import React from "react";
 import { format } from "date-fns";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { CalendarClock, CalendarPlus } from "lucide-react";
 import {
   Popover,
@@ -24,6 +25,7 @@ interface DailyAppointmentsProps {
   onReminderSent: (appointmentId: string) => void;
   onViewEmail: (emailId: string) => void;
   onAppointmentSelect: (id: string) => void;
+  onStatusChange?: (id: string, status: "upcoming" | "completed" | "canceled") => void;
   findRelatedEmails: (emails: Email[], appointment: Appointment) => Email[];
 }
 
@@ -37,6 +39,7 @@ const DailyAppointments = ({
   onReminderSent,
   onViewEmail,
   onAppointmentSelect,
+  onStatusChange,
   findRelatedEmails
 }: DailyAppointmentsProps) => {
   
@@ -77,6 +80,7 @@ const DailyAppointments = ({
                       onDeleteAppointment={onDeleteAppointment}
                       onReminderSent={onReminderSent}
                       onViewEmail={onViewEmail}
+                      onStatusChange={onStatusChange}
                     />
                   </PopoverContent>
                 </Popover>

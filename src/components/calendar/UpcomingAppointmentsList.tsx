@@ -3,9 +3,15 @@ import React from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, CalendarClock, Edit, Trash2, Bell } from "lucide-react";
+import { Clock, CalendarClock, Edit, Trash2, Bell, MoreHorizontal, Check, Ban, CalendarRange } from "lucide-react";
 import { format, isToday, isTomorrow, isFuture, isPast } from "date-fns";
 import { Separator } from "@/components/ui/separator";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import type { Appointment } from "@/types/appointment";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +21,7 @@ interface UpcomingAppointmentsListProps {
   onDeleteAppointment: (id: string) => void;
   onReminderSent: (appointmentId: string) => void;
   onAppointmentSelect: (id: string) => void;
+  onStatusChange?: (id: string, status: "upcoming" | "completed" | "canceled") => void;
   showOnlyUpcoming?: boolean;
 }
 
@@ -24,6 +31,7 @@ const UpcomingAppointmentsList: React.FC<UpcomingAppointmentsListProps> = ({
   onDeleteAppointment,
   onReminderSent,
   onAppointmentSelect,
+  onStatusChange,
   showOnlyUpcoming = false
 }) => {
   // Sort appointments by date and time
@@ -91,8 +99,9 @@ const UpcomingAppointmentsList: React.FC<UpcomingAppointmentsListProps> = ({
                       <div 
                         key={appointment.id} 
                         className={cn(
-                          "border rounded-md p-4 hover:bg-accent cursor-pointer",
-                          appointment.status === "completed" && "opacity-75"
+                          "border rounded-md p-4 hover:bg-accent cursor-pointer transition-colors",
+                          appointment.status === "completed" ? "opacity-75" : "",
+                          appointment.status === "canceled" ? "opacity-60" : ""
                         )}
                         onClick={() => onAppointmentSelect(appointment.id)}
                       >
@@ -105,18 +114,70 @@ const UpcomingAppointmentsList: React.FC<UpcomingAppointmentsListProps> = ({
                               <span className="mx-2">•</span>
                               <span>{appointment.name}</span>
                             </div>
-                            <Badge 
-                              variant={
-                                appointment.status === "completed" 
-                                  ? "outline" 
-                                  : "secondary"
-                              }
-                              className="mt-2"
-                            >
-                              {appointment.type}
-                            </Badge>
+                            <div className="flex items-center gap-2 mt-2">
+                              <Badge 
+                                variant={
+                                  appointment.status === "completed" 
+                                    ? "outline" 
+                                    : "secondary"
+                                }
+                              >
+                                {appointment.type}
+                              </Badge>
+                              <Badge 
+                                variant="outline"
+                                className={
+                                  appointment.status === "upcoming" ? "bg-blue-100 text-blue-800" :
+                                  appointment.status === "completed" ? "bg-green-100 text-green-800" :
+                                  "bg-red-100 text-red-800"
+                                }
+                              >
+                                {appointment.status}
+                              </Badge>
+                            </div>
                           </div>
                           <div className="flex space-x-1">
+                            {onStatusChange && (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onStatusChange(appointment.id, "upcoming");
+                                    }}
+                                    disabled={appointment.status === "upcoming"}
+                                  >
+                                    <CalendarRange className="h-4 w-4 mr-2" />
+                                    Mark as Upcoming
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onStatusChange(appointment.id, "completed");
+                                    }}
+                                    disabled={appointment.status === "completed"}
+                                  >
+                                    <Check className="h-4 w-4 mr-2" />
+                                    Mark as Completed
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onStatusChange(appointment.id, "canceled");
+                                    }}
+                                    disabled={appointment.status === "canceled"}
+                                  >
+                                    <Ban className="h-4 w-4 mr-2" />
+                                    Mark as Canceled
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            )}
                             <Button 
                               variant="ghost" 
                               size="icon"

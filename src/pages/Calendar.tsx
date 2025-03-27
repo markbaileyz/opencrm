@@ -62,6 +62,15 @@ const Calendar = () => {
     setEditAppointmentId
   });
 
+  // Add a new function to handle status changes
+  const handleStatusChange = (id: string, status: "upcoming" | "completed" | "canceled") => {
+    setAppointments(prevAppointments => 
+      prevAppointments.map(app => 
+        app.id === id ? { ...app, status } : app
+      )
+    );
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -103,6 +112,7 @@ const Calendar = () => {
           onDeleteAppointment={handleDeleteAppointment}
           onReminderSent={handleSendReminder}
           onViewEmail={navigateToEmail}
+          onStatusChange={handleStatusChange}
           findRelatedEmails={findRelatedEmails}
         />
         

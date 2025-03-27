@@ -4,8 +4,15 @@ import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar as CalendarIcon, Mail, Clock, FileText, Edit, Trash, X } from "lucide-react";
+import { Calendar as CalendarIcon, Mail, Clock, FileText, Edit, Trash, X, Check, Ban } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
 import AppointmentReminder from "./AppointmentReminder";
 import AppointmentRelatedEmails from "./AppointmentRelatedEmails";
 import type { AppointmentWithEmail } from "@/types/appointment";
@@ -18,7 +25,8 @@ interface AppointmentDetailsProps {
   onDeleteAppointment: (id: string) => void;
   onReminderSent: (appointmentId: string) => void;
   onViewEmail: (emailId: string) => void;
-  onClose?: () => void; // Added onClose prop as optional
+  onClose?: () => void;
+  onStatusChange?: (id: string, status: "upcoming" | "completed" | "canceled") => void;
 }
 
 const AppointmentDetails = ({
@@ -29,11 +37,24 @@ const AppointmentDetails = ({
   onReminderSent,
   onViewEmail,
   onClose,
+  onStatusChange,
 }: AppointmentDetailsProps) => {
+  const { toast } = useToast();
   const statusColors = {
     upcoming: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
     completed: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
     canceled: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+  };
+
+  const handleStatusChange = (status: "upcoming" | "completed" | "canceled") => {
+    if (onStatusChange) {
+      onStatusChange(appointment.id, status);
+      
+      toast({
+        title: `Appointment marked as ${status}`,
+        description: `${appointment.title} with ${appointment.name} has been updated.`,
+      });
+    }
   };
 
   return (
@@ -110,16 +131,47 @@ const AppointmentDetails = ({
       </CardContent>
       
       <CardFooter className="flex justify-between">
-        <div>
+        <div className="flex items-center gap-2">
           <Button 
             variant="outline" 
             size="sm"
-            className="mr-2"
             onClick={() => onEditAppointment(appointment)}
           >
             <Edit className="h-4 w-4 mr-1" />
             Edit
           </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                Change Status
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem 
+                onClick={() => handleStatusChange("upcoming")}
+                disabled={appointment.status === "upcoming"}
+              >
+                <Clock className="h-4 w-4 mr-2" />
+                Mark as Upcoming
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleStatusChange("completed")}
+                disabled={appointment.status === "completed"}
+              >
+                <Check className="h-4 w-4 mr-2" />
+                Mark as Completed
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleStatusChange("canceled")}
+                disabled={appointment.status === "canceled"}
+              >
+                <Ban className="h-4 w-4 mr-2" />
+                Mark as Canceled
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
           <Button 
             variant="destructive" 
             size="sm"

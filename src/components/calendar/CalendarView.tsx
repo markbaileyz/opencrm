@@ -2,6 +2,7 @@
 import React from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format, isToday, startOfDay, endOfDay, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay } from "date-fns";
@@ -16,6 +17,7 @@ interface CalendarViewProps {
   onPrevMonth: () => void;
   onNextMonth: () => void;
   currentView: 'day' | 'week' | 'month';
+  onAppointmentSelect?: (id: string) => void;
 }
 
 const CalendarView = ({
@@ -26,7 +28,8 @@ const CalendarView = ({
   onMonthChange,
   onPrevMonth,
   onNextMonth,
-  currentView
+  currentView,
+  onAppointmentSelect
 }: CalendarViewProps) => {
   
   const dateHasAppointment = (date: Date) => {
@@ -36,6 +39,13 @@ const CalendarView = ({
         return isSameDay(appointmentDate, date);
       }
     );
+  };
+
+  const handleAppointmentClick = (e: React.MouseEvent, appointmentId: string) => {
+    e.stopPropagation();
+    if (onAppointmentSelect) {
+      onAppointmentSelect(appointmentId);
+    }
   };
 
   const renderDayView = () => {
@@ -52,15 +62,28 @@ const CalendarView = ({
         
         <div className="space-y-2">
           {dayAppointments.length > 0 ? (
-            dayAppointments.map((appointment, index) => (
+            dayAppointments.map((appointment) => (
               <div 
                 key={appointment.id}
-                className="p-2 rounded bg-accent border flex justify-between items-center"
+                className="p-2 rounded bg-accent border flex justify-between items-center hover:bg-accent/80 cursor-pointer transition-colors"
+                onClick={(e) => handleAppointmentClick(e, appointment.id)}
               >
                 <div>
                   <span className="font-medium">{appointment.time}</span> - {appointment.title}
                 </div>
-                <span className="text-sm">{appointment.name}</span>
+                <div className="flex items-center">
+                  <span className="text-sm mr-2">{appointment.name}</span>
+                  <Badge 
+                    variant="outline" 
+                    className={
+                      appointment.status === "upcoming" ? "bg-blue-100 text-blue-800" :
+                      appointment.status === "completed" ? "bg-green-100 text-green-800" :
+                      "bg-red-100 text-red-800"
+                    }
+                  >
+                    {appointment.status}
+                  </Badge>
+                </div>
               </div>
             ))
           ) : (
@@ -89,7 +112,6 @@ const CalendarView = ({
             <div 
               key={day.toString()} 
               className="text-center font-medium text-sm"
-              onClick={() => onDateSelect(day)}
             >
               {format(day, 'EEEEEE')}
             </div>
@@ -110,8 +132,16 @@ const CalendarView = ({
                 onClick={() => onDateSelect(day)}
               >
                 <div className="text-right p-1">{format(day, 'd')}</div>
-                {dayAppointments.slice(0, 3).map((app, i) => (
-                  <div key={app.id} className="bg-accent rounded-sm p-1 mb-1 truncate">
+                {dayAppointments.slice(0, 3).map((app) => (
+                  <div 
+                    key={app.id} 
+                    className={`rounded-sm p-1 mb-1 truncate cursor-pointer hover:bg-accent/80 transition-colors ${
+                      app.status === "upcoming" ? "bg-blue-100 text-blue-800" :
+                      app.status === "completed" ? "bg-green-100 text-green-800" :
+                      "bg-red-100 text-red-800"
+                    }`}
+                    onClick={(e) => handleAppointmentClick(e, app.id)}
+                  >
                     {app.time} - {app.title}
                   </div>
                 ))}

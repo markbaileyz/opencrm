@@ -23,6 +23,7 @@ interface CalendarMainContentProps {
   onDeleteAppointment: (id: string) => void;
   onReminderSent: (appointmentId: string) => void;
   onViewEmail: (emailId: string) => void;
+  onStatusChange?: (id: string, status: "upcoming" | "completed" | "canceled") => void;
   findRelatedEmails: (emails: Email[], appointment: Appointment) => Email[];
 }
 
@@ -40,10 +41,12 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
   onDeleteAppointment,
   onReminderSent,
   onViewEmail,
+  onStatusChange,
   findRelatedEmails
 }) => {
   const [calendarView, setCalendarView] = useState<'day' | 'week' | 'month'>('month');
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("calendar");
   
   // Find the selected appointment if any
   const selectedAppointment = selectedAppointmentId 
@@ -62,7 +65,12 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
   
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="calendar" className="w-full">
+      <Tabs 
+        defaultValue="calendar" 
+        className="w-full"
+        value={activeTab}
+        onValueChange={setActiveTab}
+      >
         <TabsList className="mb-4">
           <TabsTrigger value="calendar">Calendar View</TabsTrigger>
           <TabsTrigger value="list">List View</TabsTrigger>
@@ -86,6 +94,7 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
                 onPrevMonth={onPrevMonth}
                 onNextMonth={onNextMonth}
                 currentView={calendarView}
+                onAppointmentSelect={handleAppointmentSelect}
               />
             </div>
             
@@ -100,6 +109,7 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
                 onReminderSent={onReminderSent}
                 onViewEmail={onViewEmail}
                 onAppointmentSelect={handleAppointmentSelect}
+                onStatusChange={onStatusChange}
                 findRelatedEmails={findRelatedEmails}
               />
             </div>
@@ -113,6 +123,7 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
             onDeleteAppointment={onDeleteAppointment}
             onReminderSent={onReminderSent}
             onAppointmentSelect={handleAppointmentSelect}
+            onStatusChange={onStatusChange}
           />
         </TabsContent>
         
@@ -123,6 +134,7 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
             onDeleteAppointment={onDeleteAppointment}
             onReminderSent={onReminderSent}
             onAppointmentSelect={handleAppointmentSelect}
+            onStatusChange={onStatusChange}
             showOnlyUpcoming
           />
         </TabsContent>
@@ -137,6 +149,7 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
           onReminderSent={onReminderSent}
           onViewEmail={onViewEmail}
           onClose={handleCloseAppointmentDetails}
+          onStatusChange={onStatusChange}
         />
       )}
     </div>
