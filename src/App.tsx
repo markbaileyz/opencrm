@@ -27,7 +27,6 @@ function App() {
       enableSystem
       disableTransitionOnChange
     >
-      <Toaster />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
@@ -45,6 +44,7 @@ function App() {
         <Route path="/reports" element={<Reports />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Toaster />
     </ThemeProvider>
   );
 }
