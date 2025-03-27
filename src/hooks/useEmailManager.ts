@@ -38,7 +38,9 @@ export function useEmailManager(initialEmails: Email[]) {
   
   const { 
     handleStarEmail: starEmail, 
-    markEmailAsRead 
+    markEmailAsRead,
+    markEmailAsUnread,
+    markAllAsRead
   } = useEmailStatus();
   
   const { 
@@ -57,7 +59,7 @@ export function useEmailManager(initialEmails: Email[]) {
       const updatedEmails = markEmailAsRead(emails, email.id);
       setEmails(updatedEmails);
     }
-    setSelectedEmail(updatedEmail as Email);
+    setSelectedEmail(email);
   };
 
   const handleStarEmail = (id: string) => {
@@ -91,6 +93,16 @@ export function useEmailManager(initialEmails: Email[]) {
     setEmails(updatedEmails);
   };
 
+  const handleMarkAsUnread = (id: string) => {
+    const updatedEmails = markEmailAsUnread(emails, id);
+    setEmails(updatedEmails);
+  };
+
+  const handleMarkAllAsRead = () => {
+    const updatedEmails = markAllAsRead(emails);
+    setEmails(updatedEmails);
+  };
+
   const handleSendEmail = (data: any) => {
     const updatedEmails = sendEmail(emails, data);
     setEmails(updatedEmails);
@@ -110,6 +122,8 @@ export function useEmailManager(initialEmails: Email[]) {
     handleSendEmail,
     handleAddLabel,
     handleRemoveLabel,
+    handleMarkAsUnread,
+    handleMarkAllAsRead,
     handleEditDraft,
     refreshDrafts,
     handleSelectAll,

@@ -19,11 +19,11 @@ export function useEmailSelection(emails: Email[] = []) {
     } else {
       // Single email selection
       const email = emailOrId;
+      setSelectedEmail(email);
       // Mark email as read if it wasn't
       if (!email.read) {
         return { ...email, read: true };
       }
-      setSelectedEmail(email);
       return email;
     }
   };
