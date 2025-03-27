@@ -1,39 +1,29 @@
+
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { 
-  Popover,
-  PopoverContent,
-  PopoverTrigger 
-} from "@/components/ui/popover";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
-  DialogClose
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarPlus, CalendarClock, ChevronLeft, ChevronRight, Mail, MoveRight } from "lucide-react";
-import { format, addMonths, subMonths, isToday, isFuture } from "date-fns";
+import { CalendarPlus, Mail } from "lucide-react";
+import { format, addMonths, subMonths } from "date-fns";
 import AppointmentList from "@/components/dashboard/AppointmentList";
-import AppointmentItem from "@/components/dashboard/AppointmentItem";
-import AppointmentPopover from "@/components/calendar/AppointmentPopover";
-import AppointmentReminder from "@/components/calendar/AppointmentReminder";
-import AppointmentRelatedEmails from "@/components/calendar/AppointmentRelatedEmails";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { emailData } from "@/data/emailData";
-import type { Appointment } from "@/types/appointment";
 import { useCalendarEmailIntegration } from "@/hooks/useCalendarEmailIntegration";
+import type { Appointment } from "@/types/appointment";
+
+// Import refactored components
+import CalendarView from "@/components/calendar/CalendarView";
+import DailyAppointments from "@/components/calendar/DailyAppointments";
+import EmailIntegrationSection from "@/components/calendar/EmailIntegrationSection";
+import AppointmentForm from "@/components/calendar/AppointmentForm";
 
 const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -209,16 +199,6 @@ const Calendar = () => {
     navigate(`/email?emailId=${emailId}`);
   };
 
-  const selectedDateAppointments = appointments.filter(
-    (appointment) => format(appointment.date, 'PP') === format(selectedDate, 'PP')
-  );
-
-  const dateHasAppointment = (date: Date) => {
-    return appointments.some(
-      (appointment) => format(appointment.date, 'PP') === format(date, 'PP')
-    );
-  };
-
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -252,257 +232,43 @@ const Calendar = () => {
                       : `Create a new appointment for ${format(selectedDate, 'PPP')}`}
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleAddAppointment}>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="title" className="text-right">
-                        Title
-                      </Label>
-                      <Input 
-                        id="title" 
-                        name="title" 
-                        className="col-span-3" 
-                        required 
-                        defaultValue={editAppointmentId 
-                          ? appointments.find(a => a.id === editAppointmentId)?.title 
-                          : ""}
-                      />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="name" className="text-right">
-                        Client Name
-                      </Label>
-                      <Input 
-                        id="name" 
-                        name="name" 
-                        className="col-span-3" 
-                        required 
-                        defaultValue={editAppointmentId 
-                          ? appointments.find(a => a.id === editAppointmentId)?.name 
-                          : ""}
-                      />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="time" className="text-right">
-                        Time
-                      </Label>
-                      <Input 
-                        id="time" 
-                        name="time" 
-                        type="time" 
-                        className="col-span-3" 
-                        required 
-                        defaultValue={editAppointmentId 
-                          ? appointments.find(a => a.id === editAppointmentId)?.time 
-                          : ""}
-                      />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="type" className="text-right">
-                        Type
-                      </Label>
-                      <Select 
-                        name="type" 
-                        defaultValue={editAppointmentId 
-                          ? appointments.find(a => a.id === editAppointmentId)?.type 
-                          : "consultation"}
-                      >
-                        <SelectTrigger className="col-span-3">
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="consultation">Consultation</SelectItem>
-                          <SelectItem value="follow-up">Follow-up</SelectItem>
-                          <SelectItem value="check-in">Check-in</SelectItem>
-                          <SelectItem value="review">Review</SelectItem>
-                          <SelectItem value="new-client">New Client</SelectItem>
-                          <SelectItem value="email-followup">Email Follow-up</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="notes" className="text-right">
-                        Notes
-                      </Label>
-                      <Textarea 
-                        id="notes" 
-                        name="notes" 
-                        className="col-span-3" 
-                        defaultValue={editAppointmentId 
-                          ? appointments.find(a => a.id === editAppointmentId)?.notes || "" 
-                          : ""}
-                      />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="emailThread" className="text-right">
-                        Email Thread
-                      </Label>
-                      <Select 
-                        name="emailThread" 
-                        defaultValue={editAppointmentId 
-                          ? appointments.find(a => a.id === editAppointmentId)?.emailThreadId || "" 
-                          : ""}
-                      >
-                        <SelectTrigger className="col-span-3">
-                          <SelectValue placeholder="Related email (optional)" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="">None</SelectItem>
-                          {emails.slice(0, 5).map(email => (
-                            <SelectItem key={email.id} value={email.id}>
-                              {email.subject.substring(0, 30)}...
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button type="button" variant="outline">Cancel</Button>
-                    </DialogClose>
-                    <Button type="submit">
-                      {editAppointmentId ? "Update Appointment" : "Save Appointment"}
-                    </Button>
-                  </DialogFooter>
-                </form>
+                <AppointmentForm
+                  selectedDate={selectedDate}
+                  editAppointmentId={editAppointmentId}
+                  appointments={appointments}
+                  emails={emails}
+                  onSubmit={handleAddAppointment}
+                />
               </DialogContent>
             </Dialog>
           </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="md:col-span-2">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle>Calendar</CardTitle>
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="icon" onClick={prevMonth}>
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <span className="font-semibold">
-                    {format(currentMonth, 'MMMM yyyy')}
-                  </span>
-                  <Button variant="outline" size="icon" onClick={nextMonth}>
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-center">
-                <CalendarComponent
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={handleDateSelect}
-                  month={currentMonth}
-                  onMonthChange={setCurrentMonth}
-                  className="rounded-md p-3 w-full"
-                  modifiers={{
-                    hasAppointment: (date) => dateHasAppointment(date),
-                    today: (date) => isToday(date),
-                  }}
-                  modifiersClassNames={{
-                    hasAppointment: "bg-primary/20 font-bold text-primary",
-                    today: "border border-primary ring-2 ring-primary/20"
-                  }}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <CalendarView
+            currentMonth={currentMonth}
+            selectedDate={selectedDate}
+            appointments={appointments}
+            onDateSelect={handleDateSelect}
+            onMonthChange={setCurrentMonth}
+            onPrevMonth={prevMonth}
+            onNextMonth={nextMonth}
+          />
           
-          <Card>
-            <CardHeader>
-              <CardTitle>Appointments for {format(selectedDate, 'PPP')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {selectedDateAppointments.length > 0 ? (
-                <div className="space-y-4">
-                  {selectedDateAppointments.map((appointment) => (
-                    <Popover key={appointment.id}>
-                      <PopoverTrigger asChild>
-                        <div className="cursor-pointer">
-                          <AppointmentItem
-                            name={appointment.name}
-                            time={appointment.time}
-                            type={appointment.type}
-                            status={appointment.status}
-                          />
-                        </div>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-80">
-                        <AppointmentPopover
-                          appointment={appointment}
-                          relatedEmails={findRelatedEmails(emails, appointment)}
-                          onEditAppointment={handleEditAppointment}
-                          onDeleteAppointment={handleDeleteAppointment}
-                          onReminderSent={handleSendReminder}
-                          onViewEmail={navigateToEmail}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <CalendarClock className="h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">No appointments for this date</p>
-                  <Button 
-                    variant="outline" 
-                    className="mt-4"
-                    onClick={() => setIsAddAppointmentOpen(true)}
-                  >
-                    <CalendarPlus className="h-4 w-4 mr-2" />
-                    Add Appointment
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <DailyAppointments
+            selectedDate={selectedDate}
+            appointments={appointments}
+            emails={emails}
+            onAddAppointment={() => setIsAddAppointmentOpen(true)}
+            onEditAppointment={handleEditAppointment}
+            onDeleteAppointment={handleDeleteAppointment}
+            onReminderSent={handleSendReminder}
+            onViewEmail={navigateToEmail}
+            findRelatedEmails={findRelatedEmails}
+          />
         </div>
         
-        <Card>
-          <CardHeader>
-            <CardTitle>Email & Calendar Integration</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h3 className="font-medium">Create appointments from emails</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Schedule follow-up meetings directly from your email inbox
-                  </p>
-                </div>
-                <Button onClick={handleGoToEmail}>
-                  Go to Email
-                  <MoveRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-              
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h3 className="font-medium">Send email reminders</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Automatically send email reminders for upcoming appointments
-                  </p>
-                </div>
-                <Button 
-                  variant="outline"
-                  onClick={() => {
-                    toast({
-                      title: "Reminder emails sent",
-                      description: "Reminder emails have been sent for tomorrow's appointments",
-                      variant: "success"
-                    });
-                  }}
-                >
-                  Send All Reminders
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <EmailIntegrationSection onGoToEmail={handleGoToEmail} />
         
         <div className="mt-6">
           <AppointmentList />
