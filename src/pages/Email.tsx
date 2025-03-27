@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -52,7 +51,6 @@ const Email = () => {
     getDrafts
   } = useEmailActions();
 
-  // Periodically refresh drafts
   useEffect(() => {
     const refreshInterval = setInterval(() => {
       if (activeTab === 'drafts') {
@@ -63,7 +61,6 @@ const Email = () => {
     return () => clearInterval(refreshInterval);
   }, [activeTab]);
 
-  // Refresh drafts when switching to drafts tab
   useEffect(() => {
     if (activeTab === 'drafts') {
       refreshDrafts();
@@ -86,7 +83,6 @@ const Email = () => {
       setIsComposeOpen(false);
       setEditingDraftId(undefined);
       
-      // Refresh drafts after sending in case we sent a draft
       refreshDrafts();
     }
   };
@@ -131,7 +127,6 @@ const Email = () => {
     selectedId: selectedEmail?.id
   });
 
-  // Special handling for drafts folder
   const handleSelectEmailWrapper = (email: Email) => {
     if (email.folder === 'drafts') {
       handleOpenDraft(email);
