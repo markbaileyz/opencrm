@@ -3,7 +3,17 @@ import { useState } from "react";
 import { EmailTemplate, getAllTemplates, getTemplateById, applyTemplatePlaceholders } from "@/utils/emailTemplates";
 import { Contact } from "@/types/contact";
 
-export function useTemplateSelection(contact: Contact, onSelectTemplate: (subject: string, body: string) => void) {
+// Define a type that has the minimal properties we need for template replacement
+interface TemplatePlaceholderContext {
+  id: string;
+  name: string;
+  company?: string;
+}
+
+export function useTemplateSelection(
+  context: TemplatePlaceholderContext, 
+  onSelectTemplate: (subject: string, body: string) => void
+) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
   const [open, setOpen] = useState(false);
   
@@ -15,14 +25,14 @@ export function useTemplateSelection(contact: Contact, onSelectTemplate: (subjec
     const template = getTemplateById(selectedTemplateId);
     if (!template) return;
     
-    // Apply contact information to the template
+    // Apply contact or appointment information to the template
     const placeholderValues = {
-      'Recipient': contact.name,
+      'Recipient': context.name,
       'Your Name': 'Your Name', // This would come from user settings in a real app
       'Date and Time': new Date().toLocaleString(),
       'Location or Platform': 'Zoom/Google Meet',
-      'Topic': `Discussion about ${contact.company}`,
-      'Meeting Topic': `Our collaboration with ${contact.company}`
+      'Topic': `Discussion about ${context.company || 'our upcoming meeting'}`,
+      'Meeting Topic': `Our collaboration with ${context.company || 'you'}`
     };
     
     const subject = applyTemplatePlaceholders(template.subject, placeholderValues);

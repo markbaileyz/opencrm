@@ -1,118 +1,79 @@
 
-import { useState } from "react";
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { format, isSameDay } from "date-fns";
-import type { Appointment, AppointmentWithEmail } from "@/types/appointment";
+import { v4 as uuidv4 } from "uuid";
 import type { Email } from "@/types/email";
-import { formatAppointmentForEmail } from "@/utils/calendarEmailUtils";
+import type { Appointment } from "@/types/appointment";
+
+interface EmailTemplate {
+  subject: string;
+  body: string;
+}
 
 export function useCalendarEmailIntegration() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isProcessing, setIsProcessing] = useState(false);
-  
-  // Create a calendar appointment from an email
-  const createAppointmentFromEmail = (email: Email, date: Date, time: string): Appointment => {
-    const newAppointment: Appointment = {
-      id: `app-${Date.now()}`,
-      title: `Meeting re: ${email.subject}`,
-      date: date,
-      time: time,
-      type: "Email Follow-up",
+
+  const createAppointmentFromEmail = useCallback((email: Email, date: Date, time: string): Appointment => {
+    return {
+      id: uuidv4(),
+      title: `Re: ${email.subject}`,
+      date,
+      time,
       name: email.senderName,
+      type: "follow-up",
       status: "upcoming",
-      notes: `Follow-up from email: ${email.subject}`,
-      emailThreadId: email.id,
-      reminderSent: false
+      emailThreadId: email.id
     };
-    
-    toast({
-      title: "Appointment created from email",
-      description: `Appointment with ${email.senderName} scheduled for ${format(date, 'PPP')} at ${time}`,
-      variant: "success"
-    });
-    
-    return newAppointment;
-  };
-  
-  // Navigate to email page to view an email
-  const navigateToEmail = (emailId: string) => {
-    navigate(`/email?emailId=${emailId}`);
-    toast({
-      title: "Navigating to email",
-      description: "Opening the related email thread",
-    });
-  };
-  
-  // Send an email reminder for an appointment
-  const sendAppointmentReminder = async (appointment: Appointment): Promise<boolean> => {
-    setIsProcessing(true);
-    
+  }, []);
+
+  const findRelatedEmails = useCallback((emails: Email[], appointment: Appointment): Email[] => {
+    // Simple implementation to find emails based on subject or sender matching appointment details
+    return emails.filter(email => 
+      email.subject.includes(appointment.title) || 
+      email.senderName === appointment.name ||
+      appointment.emailThreadId === email.id
+    );
+  }, []);
+
+  const sendAppointmentReminder = useCallback(async (
+    appointment: Appointment, 
+    template?: EmailTemplate
+  ): Promise<boolean> => {
     try {
-      // Create email content based on appointment details
-      const emailContent = formatAppointmentForEmail(appointment);
+      // This would be replaced with actual email sending logic
+      console.log("Sending reminder for appointment:", appointment.id);
       
-      // Simulate sending email reminder
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (template) {
+        console.log("Using custom template:", template);
+      } else {
+        console.log("Using default reminder template");
+      }
       
-      setIsProcessing(false);
       toast({
-        title: "Reminder email sent",
-        description: `Reminder sent for appointment with ${appointment.name}`,
-        variant: "success"
+        title: "Reminder sent",
+        description: `Reminder has been sent to ${appointment.name}`,
+        variant: "success",
       });
       
       return true;
     } catch (error) {
-      setIsProcessing(false);
+      console.error("Failed to send reminder:", error);
+      
       toast({
         title: "Failed to send reminder",
-        description: "Could not send the appointment reminder email",
-        variant: "destructive"
+        description: "There was an error sending the reminder. Please try again.",
+        variant: "destructive",
       });
       
       return false;
     }
-  };
-  
-  // Find emails related to an appointment
-  const findRelatedEmails = (emails: Email[], appointment: Appointment): Email[] => {
-    if (!appointment.emailThreadId) {
-      // If no direct thread ID, try to match by name/subject
-      return emails.filter(email => 
-        email.senderName.toLowerCase().includes(appointment.name.toLowerCase()) ||
-        email.subject.toLowerCase().includes(appointment.title.toLowerCase())
-      );
-    }
-    
-    // Return emails from the same thread
-    return emails.filter(email => email.id === appointment.emailThreadId);
-  };
-
-  // Find appointments for a specific date
-  const findAppointmentsForDate = (appointments: Appointment[], date: Date): Appointment[] => {
-    return appointments.filter(appointment => {
-      const appointmentDate = typeof appointment.date === 'string' 
-        ? new Date(appointment.date) 
-        : appointment.date;
-      
-      return isSameDay(appointmentDate, date);
-    });
-  };
-
-  // Check if email has any related appointments
-  const hasRelatedAppointments = (email: Email, appointments: Appointment[]): boolean => {
-    return appointments.some(appointment => appointment.emailThreadId === email.id);
-  };
+  }, [toast]);
 
   return {
     createAppointmentFromEmail,
-    navigateToEmail,
-    sendAppointmentReminder,
     findRelatedEmails,
-    findAppointmentsForDate,
-    hasRelatedAppointments,
-    isProcessing
+    sendAppointmentReminder
   };
 }
