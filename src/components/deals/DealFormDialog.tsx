@@ -7,11 +7,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import DealForm from "./DealForm";
+import { ProcessedDealData } from "./form/DealFormTypes";
 
 export interface DealFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: ProcessedDealData) => void;
   initialData?: any;
 }
 

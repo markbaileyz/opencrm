@@ -2,7 +2,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { dealFormSchema, DealFormValues } from "./form/DealFormTypes";
+import { dealFormSchema, DealFormValues, ProcessedDealData } from "./form/DealFormTypes";
 import { Form } from "@/components/ui/form";
 import DealBasicInfoFields from "./form/DealBasicInfoFields";
 import DealRelationshipFields from "./form/DealRelationshipFields";
@@ -11,7 +11,7 @@ import DealDescriptionField from "./form/DealDescriptionField";
 import DealFormActions from "./form/DealFormActions";
 
 interface DealFormProps {
-  onSubmit: (data: DealFormValues) => void;
+  onSubmit: (data: ProcessedDealData) => void;
   initialData?: any;
   onCancel: () => void;
 }
@@ -42,11 +42,13 @@ const DealForm: React.FC<DealFormProps> = ({
 
   const handleSubmit = (data: DealFormValues) => {
     // Convert string values to numbers where appropriate
-    onSubmit({
+    const processedData: ProcessedDealData = {
       ...data,
       value: parseFloat(data.value),
       probability: parseInt(data.probability),
-    });
+    };
+    
+    onSubmit(processedData);
   };
 
   return (

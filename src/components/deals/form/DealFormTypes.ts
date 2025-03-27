@@ -13,4 +13,11 @@ export const dealFormSchema = z.object({
   description: z.string().optional(),
 });
 
+// The form values type derived from the schema
 export type DealFormValues = z.infer<typeof dealFormSchema>;
+
+// The type for processed deal data after form submission
+export interface ProcessedDealData extends Omit<DealFormValues, 'value' | 'probability'> {
+  value: number;
+  probability: number;
+}
