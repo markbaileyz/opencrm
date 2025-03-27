@@ -13,6 +13,14 @@ const DesktopNav = ({ isActive, scrollToSection }: DesktopNavProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   
+  const handleHomeClick = () => {
+    if (location.pathname !== '/') {
+      navigate('/', { replace: true });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+  
   const handleNavigate = (path: string) => {
     navigate(path, { replace: true });
   };
@@ -20,7 +28,7 @@ const DesktopNav = ({ isActive, scrollToSection }: DesktopNavProps) => {
   return (
     <>
       <nav className="hidden md:flex items-center space-x-8">
-        <NavLink href="/" active={isActive("/")} onClick={() => null}>
+        <NavLink href="/" active={isActive("/")} onClick={handleHomeClick}>
           Home
         </NavLink>
         <NavLink 

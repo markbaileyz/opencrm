@@ -14,16 +14,16 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
   const navigate = useNavigate();
   
   const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
     // If custom onClick handler is provided, use that
     if (onClick) {
-      e.preventDefault();
       onClick();
       return;
     }
     
     // Special handling for home link
     if (href === "/") {
-      e.preventDefault();
       if (location.pathname !== '/') {
         navigate('/', { replace: true });
       } else {
@@ -34,11 +34,10 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
     
     // Handle hash links (section links within the homepage)
     if (href.startsWith("/#")) {
-      e.preventDefault();
       const sectionId = href.substring(2);
       
       if (location.pathname !== '/') {
-        // Force navigation to home page first if we're not there
+        // Navigate to home page first if we're not there
         navigate('/', { replace: true });
         // Set a timeout to ensure the home page renders completely
         setTimeout(() => {
@@ -46,7 +45,7 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
           if (element) {
             element.scrollIntoView({ behavior: 'smooth' });
           }
-        }, 300); // Increased timeout for better reliability
+        }, 300);
       } else {
         // We're already on the home page, just scroll to section
         const element = document.getElementById(sectionId);
@@ -57,8 +56,7 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
       return;
     }
     
-    // For all other links (like /healthcare-crm, /roadmap, etc.)
-    e.preventDefault();
+    // For all other regular page links
     navigate(href, { replace: true });
   };
   
