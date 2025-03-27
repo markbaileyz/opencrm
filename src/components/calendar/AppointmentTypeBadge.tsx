@@ -9,13 +9,15 @@ interface AppointmentTypeBadgeProps {
   className?: string;
   size?: 'sm' | 'default' | 'lg';
   showLabel?: boolean;
+  withIcon?: boolean;
 }
 
 const AppointmentTypeBadge = ({ 
   type, 
   className,
   size = 'default',
-  showLabel = true
+  showLabel = true,
+  withIcon = false
 }: AppointmentTypeBadgeProps) => {
   const typeInfo = getAppointmentTypeInfo(type);
   
@@ -34,6 +36,9 @@ const AppointmentTypeBadge = ({
         className
       )}
     >
+      {withIcon && typeInfo.icon && (
+        <span className="mr-1">{typeInfo.icon}</span>
+      )}
       {showLabel ? typeInfo.label : type}
     </Badge>
   );

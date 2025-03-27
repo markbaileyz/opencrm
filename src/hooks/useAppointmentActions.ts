@@ -30,10 +30,14 @@ export function useAppointmentActions({
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
+    // Parse date from form data (comes as string in format yyyy-MM-dd)
+    const dateStr = formData.get('date') as string;
+    const appointmentDate = dateStr ? new Date(dateStr) : selectedDate;
+    
     const newAppointment: Appointment = {
       id: editAppointmentId || `app-${Date.now()}`,
       title: formData.get('title') as string,
-      date: selectedDate,
+      date: appointmentDate,
       time: formData.get('time') as string,
       type: formData.get('type') as string,
       name: formData.get('name') as string,
@@ -77,7 +81,7 @@ export function useAppointmentActions({
       
       toast({
         title: "Appointment updated",
-        description: `Appointment with ${newAppointment.name} updated for ${format(selectedDate, 'PPP')} at ${newAppointment.time}`,
+        description: `Appointment with ${newAppointment.name} updated for ${format(newAppointment.date, 'PPP')} at ${newAppointment.time}`,
         variant: "success"
       });
       
@@ -87,7 +91,7 @@ export function useAppointmentActions({
       
       toast({
         title: "Appointment created",
-        description: `Appointment with ${newAppointment.name} scheduled for ${format(selectedDate, 'PPP')} at ${newAppointment.time}`,
+        description: `Appointment with ${newAppointment.name} scheduled for ${format(newAppointment.date, 'PPP')} at ${newAppointment.time}`,
         variant: "success"
       });
     }

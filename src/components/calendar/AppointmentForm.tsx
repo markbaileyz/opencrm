@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,9 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Clock, Info } from "lucide-react";
+import { MapPin, Clock, Info, CalendarIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import type { Appointment } from "@/types/appointment";
 import type { Email } from "@/types/email";
 import { APPOINTMENT_TYPES } from "@/types/appointment";
@@ -33,8 +36,11 @@ const AppointmentForm = ({
     ? appointments.find(a => a.id === editAppointmentId)
     : null;
 
+  const [date, setDate] = useState<Date>(appointmentToEdit?.date || selectedDate);
+
   return (
     <form onSubmit={onSubmit}>
+      <input type="hidden" name="date" value={format(date, 'yyyy-MM-dd')} />
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="title" className="text-right">
@@ -59,6 +65,36 @@ const AppointmentForm = ({
             required 
             defaultValue={appointmentToEdit?.name || ""}
           />
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="date" className="text-right">
+            Date
+          </Label>
+          <div className="col-span-3">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(newDate) => newDate && setDate(newDate)}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="time" className="text-right">
@@ -189,11 +225,6 @@ const AppointmentForm = ({
       </DialogFooter>
     </form>
   );
-};
-
-// Helper function to combine tailwind classes
-const cn = (...classes: any[]) => {
-  return classes.filter(Boolean).join(' ');
 };
 
 export default AppointmentForm;
