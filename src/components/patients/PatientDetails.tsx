@@ -1,11 +1,11 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Patient, PatientDocument, PatientTask } from "@/types/patient";
-import { AlertTriangle } from "lucide-react";
+import { Patient } from "@/types/patient";
+import { usePatientDetails } from "@/hooks/usePatientDetails";
 
-// Import new component sections
+// Import component sections
 import PatientHeader from "./detail-sections/PatientHeader";
 import BasicInfoTab from "./detail-sections/BasicInfoTab";
 import MedicalTab from "./detail-sections/MedicalTab";
@@ -24,32 +24,15 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const [documents, setDocuments] = useState<PatientDocument[]>(patient.documents || []);
-  const [tasks, setTasks] = useState<PatientTask[]>(patient.tasks || []);
-
-  // Document management functions
-  const handleAddDocument = (document: PatientDocument) => {
-    setDocuments([...documents, document]);
-  };
-
-  const handleDeleteDocument = (documentId: string) => {
-    setDocuments(documents.filter(doc => doc.id !== documentId));
-  };
-
-  // Task management functions
-  const handleAddTask = (task: PatientTask) => {
-    setTasks([...tasks, task]);
-  };
-
-  const handleUpdateTask = (taskId: string, updates: Partial<PatientTask>) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId ? { ...task, ...updates } : task
-    ));
-  };
-
-  const handleDeleteTask = (taskId: string) => {
-    setTasks(tasks.filter(task => task.id !== taskId));
-  };
+  const {
+    documents,
+    tasks,
+    handleAddDocument,
+    handleDeleteDocument,
+    handleAddTask,
+    handleUpdateTask,
+    handleDeleteTask
+  } = usePatientDetails({ patient });
 
   return (
     <div className="space-y-6">
