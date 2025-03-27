@@ -14,8 +14,20 @@ export function useEmailStatus() {
     );
   };
 
+  const markEmailAsUnread = (emails: Email[], id: string) => {
+    return emails.map(email => 
+      email.id === id ? { ...email, read: false } : email
+    );
+  };
+
+  const markAllAsRead = (emails: Email[]) => {
+    return emails.map(email => ({ ...email, read: true }));
+  };
+
   return {
     handleStarEmail,
-    markEmailAsRead
+    markEmailAsRead,
+    markEmailAsUnread,
+    markAllAsRead
   };
 }

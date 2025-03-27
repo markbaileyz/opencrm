@@ -83,7 +83,7 @@ const EmailList = ({
   const {
     selectedEmails,
     isBulkMode,
-    handleSelectEmail,
+    handleSelectEmail: handleSelect,
     handleSelectAll,
     handleClearSelection,
     toggleBulkMode,
@@ -94,7 +94,7 @@ const EmailList = ({
   
   const handleRowClick = (email: Email) => {
     if (isBulkMode) {
-      handleSelectEmail(email.id);
+      handleSelect(email.id);
     } else {
       onSelectEmail(email);
     }
@@ -171,7 +171,7 @@ const EmailList = ({
                 isSelected={selectedEmails.includes(email.id)}
                 isBulkMode={isBulkMode}
                 isHovered={hoveredEmail === email.id}
-                onSelect={handleSelectEmail}
+                onSelect={handleSelect}
                 onStarClick={handleStarClick}
                 onClick={handleRowClick}
                 onMouseEnter={() => setHoveredEmail(email.id)}
