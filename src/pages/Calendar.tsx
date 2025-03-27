@@ -52,7 +52,8 @@ const Calendar = () => {
     handleDeleteAppointment,
     handleSendReminder,
     handleGoToEmail,
-    navigateToEmail
+    navigateToEmail,
+    handleQuickAddAppointment
   } = useAppointmentActions({
     appointments,
     setAppointments,
@@ -62,7 +63,7 @@ const Calendar = () => {
     setEditAppointmentId
   });
 
-  // Add a new function to handle status changes
+  // Add a function to handle status changes
   const handleStatusChange = (id: string, status: "upcoming" | "completed" | "canceled") => {
     setAppointments(prevAppointments => 
       prevAppointments.map(app => 
@@ -114,6 +115,8 @@ const Calendar = () => {
           onViewEmail={navigateToEmail}
           onStatusChange={handleStatusChange}
           findRelatedEmails={findRelatedEmails}
+          onDateChange={setSelectedDate}
+          onQuickAdd={handleQuickAddAppointment}
         />
         
         <EmailIntegrationSection onGoToEmail={handleGoToEmail} />

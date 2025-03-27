@@ -75,6 +75,28 @@ export function useAppointmentActions({
     setIsAddAppointmentOpen(false);
   };
 
+  const handleQuickAddAppointment = (appointmentData: Partial<Appointment>) => {
+    const newAppointment: Appointment = {
+      id: `app-${Date.now()}`,
+      title: appointmentData.title || "New Appointment",
+      date: appointmentData.date || selectedDate,
+      time: appointmentData.time || "9:00 AM",
+      type: appointmentData.type || "consultation",
+      name: appointmentData.name || "Client",
+      status: "upcoming",
+      notes: appointmentData.notes || "",
+      reminderSent: false
+    };
+    
+    setAppointments(prev => [...prev, newAppointment]);
+    
+    toast({
+      title: "Quick appointment created",
+      description: `Appointment with ${newAppointment.name} scheduled for ${format(newAppointment.date, 'PPP')} at ${newAppointment.time}`,
+      variant: "success"
+    });
+  };
+
   const handleBatchAppointmentsCreated = (newAppointments: Appointment[]) => {
     setAppointments(prev => [...prev, ...newAppointments]);
   };
@@ -116,6 +138,7 @@ export function useAppointmentActions({
 
   return {
     handleAddAppointment,
+    handleQuickAddAppointment,
     handleBatchAppointmentsCreated,
     handleEditAppointment,
     handleDeleteAppointment,

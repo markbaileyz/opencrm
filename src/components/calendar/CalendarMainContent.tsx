@@ -25,6 +25,8 @@ interface CalendarMainContentProps {
   onViewEmail: (emailId: string) => void;
   onStatusChange?: (id: string, status: "upcoming" | "completed" | "canceled") => void;
   findRelatedEmails: (emails: Email[], appointment: Appointment) => Email[];
+  onDateChange?: (date: Date) => void;
+  onQuickAdd?: (appointment: Partial<Appointment>) => void;
 }
 
 const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
@@ -42,7 +44,9 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
   onReminderSent,
   onViewEmail,
   onStatusChange,
-  findRelatedEmails
+  findRelatedEmails,
+  onDateChange,
+  onQuickAdd
 }) => {
   const [calendarView, setCalendarView] = useState<'day' | 'week' | 'month'>('month');
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
@@ -111,6 +115,8 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
                 onAppointmentSelect={handleAppointmentSelect}
                 onStatusChange={onStatusChange}
                 findRelatedEmails={findRelatedEmails}
+                onDateChange={onDateChange}
+                onQuickAdd={onQuickAdd}
               />
             </div>
           </div>
