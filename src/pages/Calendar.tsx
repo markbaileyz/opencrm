@@ -93,6 +93,7 @@ const Calendar = () => {
     }
   ]);
   
+  // Moved the useToast hook inside the component function
   const { toast } = useToast();
 
   const nextMonth = () => {
