@@ -39,7 +39,15 @@ const Navbar = () => {
     setIsMobileMenuOpen(false);
     
     if (location.pathname !== '/') {
-      navigate(`/#${sectionId}`, { replace: true });
+      // Use replace: true to avoid adding to browser history
+      navigate('/', { replace: true });
+      // Add a small delay to ensure the page has loaded before scrolling
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 50);
       return;
     }
 

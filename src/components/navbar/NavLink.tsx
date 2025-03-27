@@ -37,9 +37,16 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
       e.preventDefault();
       const sectionId = href.substring(2);
       
+      // Force navigation to home page first if we're not there
       if (location.pathname !== '/') {
-        // Navigate to home page with the hash
-        navigate(`/#${sectionId}`);
+        navigate('/', { replace: true });
+        // Set a small timeout to allow the home page to render before scrolling
+        setTimeout(() => {
+          const element = document.getElementById(sectionId);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 50);
       } else {
         // We're already on the home page, just scroll to section
         const element = document.getElementById(sectionId);
