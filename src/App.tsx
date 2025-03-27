@@ -17,6 +17,7 @@ import KnowledgeBasePage from "@/pages/KnowledgeBase";
 import ChallengesSolutionsPage from "@/pages/ChallengesSolutions";
 import Settings from "@/pages/Settings";
 import Patients from "@/pages/Patients";
+import FrontDesk from "@/pages/FrontDesk";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/NotFound";
@@ -112,13 +113,19 @@ function App() {
           } />
           
           <Route path="/patients" element={
-            <ProtectedRoute allowedRoles={["admin", "doctor", "nurse"]}>
+            <ProtectedRoute allowedRoles={["admin", "doctor", "nurse", "front-desk"]}>
               <Patients />
             </ProtectedRoute>
           } />
           
+          <Route path="/front-desk" element={
+            <ProtectedRoute allowedRoles={["admin", "front-desk"]}>
+              <FrontDesk />
+            </ProtectedRoute>
+          } />
+          
           <Route path="/calendar" element={
-            <ProtectedRoute allowedRoles={["admin", "doctor", "nurse"]}>
+            <ProtectedRoute allowedRoles={["admin", "doctor", "nurse", "front-desk"]}>
               <Calendar />
             </ProtectedRoute>
           } />

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 // Enhanced User interface with role
@@ -6,7 +5,7 @@ interface User {
   email: string;
   displayName?: string;
   photoURL?: string;
-  role: "admin" | "doctor" | "nurse" | "patient" | "guest";
+  role: "admin" | "doctor" | "nurse" | "patient" | "front-desk" | "guest";
 }
 
 interface AuthContextType {

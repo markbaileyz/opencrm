@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard, 
   Users, 
@@ -13,7 +12,8 @@ import {
   BookOpen,
   Shield,
   FileLock,
-  UserCog
+  UserCog,
+  Reception
 } from "lucide-react";
 import React from "react";
 
@@ -37,21 +37,27 @@ export const baseSidebarItems: SidebarItem[] = [
 export const medicalSidebarItems: SidebarItem[] = [
   {
     icon: React.createElement(Users, { className: "h-5 w-5" }),
-    label: "Patients",
+    label: "Patients & Contacts",
     href: "/patients",
-    roles: ["admin", "doctor", "nurse"],
+    roles: ["admin", "doctor", "nurse", "front-desk"],
+  },
+  {
+    icon: React.createElement(Reception, { className: "h-5 w-5" }),
+    label: "Front Desk",
+    href: "/front-desk",
+    roles: ["admin", "front-desk"],
   },
   {
     icon: React.createElement(Calendar, { className: "h-5 w-5" }),
     label: "Calendar",
     href: "/calendar",
-    roles: ["admin", "doctor", "nurse"],
+    roles: ["admin", "doctor", "nurse", "front-desk"],
   },
   {
     icon: React.createElement(Mailbox, { className: "h-5 w-5" }),
     label: "Email",
     href: "/email",
-    roles: ["admin", "doctor", "nurse"],
+    roles: ["admin", "doctor", "nurse", "front-desk"],
   },
 ];
 
@@ -110,13 +116,13 @@ export const adminSettingsItems: SidebarItem[] = [
   {
     icon: React.createElement(FileLock, { className: "h-5 w-5" }),
     label: "Compliance",
-    href: "/compliance",
+    href: "/admin-settings",
     roles: ["admin"],
   },
   {
     icon: React.createElement(UserCog, { className: "h-5 w-5" }),
     label: "User Management",
-    href: "/users",
+    href: "/admin-settings",
     roles: ["admin"],
   },
 ];
