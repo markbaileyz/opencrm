@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Settings as SettingsIcon, Lock, Info } from "lucide-react";
@@ -140,7 +139,9 @@ const Settings = () => {
                 </CollapsibleContent>
               </Collapsible>
             }
-          />
+          >
+            <div></div>
+          </SettingsCard>
 
           <SettingsCard
             title="Notification Preferences"
