@@ -150,12 +150,29 @@ Best regards,
     return true;
   };
 
+  // Set default signature
+  const setDefaultSignature = (id: string) => {
+    const updatedSignatures = signatures.map(sig => ({
+      ...sig,
+      isDefault: sig.id === id
+    }));
+    
+    setSignatures(updatedSignatures);
+    
+    toast({
+      title: "Default signature set",
+      description: "This signature will be used for all new emails",
+      variant: "default",
+    });
+  };
+
   return {
     signatures,
     isLoading,
     getDefaultSignature,
     addSignature,
     updateSignature,
-    deleteSignature
+    deleteSignature,
+    setDefaultSignature
   };
 }

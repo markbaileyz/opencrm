@@ -55,7 +55,7 @@ const EmailSignatureManager: React.FC<EmailSignatureManagerProps> = ({
       return;
     }
     
-    addSignature({ name, content });
+    addSignature({ name, content, isDefault: false });
     toast({
       title: "Signature created",
       description: "Your email signature has been saved",

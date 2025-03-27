@@ -149,7 +149,7 @@ const EmailAttachments: React.FC<EmailAttachmentsProps> = ({
         <div className="space-y-2">
           <div className="flex justify-between items-center text-xs">
             <span>Used {totalSizeMB.toFixed(1)}MB of {maxSize}MB</span>
-            <span>{Math.min(100, sizePercentage.toFixed(0))}%</span>
+            <span>{Math.min(100, Math.round(sizePercentage))}%</span>
           </div>
           <Progress value={Math.min(100, sizePercentage)} className="h-1" />
           

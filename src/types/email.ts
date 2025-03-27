@@ -4,7 +4,7 @@ export interface Email {
   subject: string;
   sender: string;
   senderName: string;
-  senderEmail?: string;
+  senderEmail: string;
   recipient: string;
   recipientName?: string;
   cc?: string[];
