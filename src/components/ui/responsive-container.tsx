@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ResponsiveContainerProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   breakpoint?: "sm" | "md" | "lg" | "xl";
   mobileView?: React.ReactNode;
   desktopView?: React.ReactNode;
