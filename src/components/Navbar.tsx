@@ -25,7 +25,7 @@ const Navbar = () => {
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
         }
-      }, 100);
+      }, 200);
     }
     
     return () => window.removeEventListener("scroll", handleScroll);
@@ -39,21 +39,21 @@ const Navbar = () => {
     setIsMobileMenuOpen(false);
     
     if (location.pathname !== '/') {
-      // Use replace: true to avoid adding to browser history
+      // Navigate to home page and then scroll
       navigate('/', { replace: true });
-      // Add a small delay to ensure the page has loaded before scrolling
+      // Increase timeout to ensure the page has fully loaded
       setTimeout(() => {
         const element = document.getElementById(sectionId);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
         }
-      }, 50);
-      return;
-    }
-
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      }, 200);
+    } else {
+      // Already on home page, just scroll
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 

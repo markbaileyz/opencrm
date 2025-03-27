@@ -48,9 +48,6 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
         <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={closeMobileMenu}>
           Roadmap
         </NavLink>
-        <NavLink href="/mind-map" active={isActive("/mind-map")} onClick={closeMobileMenu}>
-          Mind Map
-        </NavLink>
         <div className="flex space-x-4 pt-2">
           <Link to="/login" onClick={closeMobileMenu}>
             <ButtonCustom variant="ghost" size="sm">

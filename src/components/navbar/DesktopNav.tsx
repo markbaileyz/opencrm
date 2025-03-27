@@ -38,9 +38,6 @@ const DesktopNav = ({ isActive, scrollToSection }: DesktopNavProps) => {
         <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={() => null}>
           Roadmap
         </NavLink>
-        <NavLink href="/mind-map" active={isActive("/mind-map")} onClick={() => null}>
-          Mind Map
-        </NavLink>
       </nav>
 
       <div className="hidden md:flex items-center space-x-4">

@@ -1,11 +1,13 @@
 
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CRMFeaturesList from "@/components/CRMFeaturesList";
 import { Toaster } from "@/components/ui/toaster";
 import { FilterType } from "@/components/roadmap/FeatureFilters";
 import { SortType } from "@/components/CRMFeaturesList";
+import { ButtonCustom } from "@/components/ui/button-custom";
 
 // Import refactored components
 import RoadmapHeader from "@/components/roadmap/RoadmapHeader";
@@ -47,6 +49,16 @@ const Roadmap = () => {
           setActiveSort={setActiveSort}
           scrollToFeatures={scrollToFeatures}
         />
+        
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex justify-end mb-8">
+            <Link to="/mind-map">
+              <ButtonCustom variant="outline">
+                View Mind Map
+              </ButtonCustom>
+            </Link>
+          </div>
+        </div>
         
         <StrategicPlan />
         

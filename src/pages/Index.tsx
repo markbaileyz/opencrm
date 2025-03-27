@@ -16,13 +16,13 @@ const Index = () => {
     // Handle hash navigation after the page has fully loaded
     if (location.hash) {
       const id = location.hash.substring(1);
-      // Use a slightly longer timeout to ensure the page is fully rendered
+      // Use a longer timeout to ensure the page is fully rendered
       setTimeout(() => {
         const element = document.getElementById(id);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
         }
-      }, 100);
+      }, 300);
     } else {
       // If no hash, scroll to top
       window.scrollTo(0, 0);

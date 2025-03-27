@@ -25,7 +25,7 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
     if (href === "/") {
       e.preventDefault();
       if (location.pathname !== '/') {
-        navigate('/');
+        navigate('/', { replace: true });
       } else {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -37,16 +37,16 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
       e.preventDefault();
       const sectionId = href.substring(2);
       
-      // Force navigation to home page first if we're not there
       if (location.pathname !== '/') {
+        // Force navigation to home page first if we're not there
         navigate('/', { replace: true });
-        // Set a small timeout to allow the home page to render before scrolling
+        // Set a larger timeout to ensure the home page renders completely
         setTimeout(() => {
           const element = document.getElementById(sectionId);
           if (element) {
             element.scrollIntoView({ behavior: 'smooth' });
           }
-        }, 50);
+        }, 200);
       } else {
         // We're already on the home page, just scroll to section
         const element = document.getElementById(sectionId);
@@ -57,29 +57,13 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
       return;
     }
     
-    // If we're already on the target route, prevent default navigation
+    // For standard page links, let Link handle it
+    // But prevent navigation if we're already on the target route
     if (location.pathname === href) {
       e.preventDefault();
-      return;
     }
   };
   
-  // For home or hash links, use anchor tag with our custom handler
-  if (href === "/" || href.startsWith("/#")) {
-    return (
-      <a
-        href={href}
-        className={`font-medium text-sm hover-underline text-left ${
-          active ? "text-primary" : "text-foreground"
-        }`}
-        onClick={handleClick}
-      >
-        {children}
-      </a>
-    );
-  }
-  
-  // For other links, use React Router's Link
   return (
     <Link
       to={href}
