@@ -38,6 +38,9 @@ const DesktopNav = ({ isActive, scrollToSection }: DesktopNavProps) => {
         <NavLink href="/mind-map" active={isActive("/mind-map")} onClick={() => null}>
           Mind Map
         </NavLink>
+        <NavLink href="/healthcare-crm" active={isActive("/healthcare-crm")} onClick={() => null}>
+          Healthcare CRM
+        </NavLink>
       </nav>
 
       <div className="hidden md:flex items-center space-x-4">
