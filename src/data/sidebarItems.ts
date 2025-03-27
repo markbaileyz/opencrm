@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard, 
   Users, 
@@ -17,7 +16,7 @@ import {
   ClipboardList,
   FileText,
   Stethoscope,
-  Pills,
+  Pill,
   MessageSquare,
   Star,
   Award,
@@ -33,7 +32,6 @@ export interface SidebarItem {
   roles?: string[];
 }
 
-// Base sidebar items available to most users
 export const baseSidebarItems: SidebarItem[] = [
   {
     icon: React.createElement(LayoutDashboard, { className: "h-5 w-5" }),
@@ -42,7 +40,6 @@ export const baseSidebarItems: SidebarItem[] = [
   },
 ];
 
-// Items specifically for medical staff and front desk
 export const medicalSidebarItems: SidebarItem[] = [
   {
     icon: React.createElement(Users, { className: "h-5 w-5" }),
@@ -70,7 +67,6 @@ export const medicalSidebarItems: SidebarItem[] = [
   },
 ];
 
-// Patient-specific items
 export const patientSidebarItems: SidebarItem[] = [
   {
     icon: React.createElement(FileText, { className: "h-5 w-5" }),
@@ -79,7 +75,7 @@ export const patientSidebarItems: SidebarItem[] = [
     roles: ["admin", "power-user", "doctor", "nurse", "patient"],
   },
   {
-    icon: React.createElement(Pills, { className: "h-5 w-5" }),
+    icon: React.createElement(Pill, { className: "h-5 w-5" }),
     label: "Medications",
     href: "/medications",
     roles: ["admin", "power-user", "doctor", "nurse", "patient"],
@@ -92,7 +88,6 @@ export const patientSidebarItems: SidebarItem[] = [
   },
 ];
 
-// Doctor-specific items
 export const doctorSidebarItems: SidebarItem[] = [
   {
     icon: React.createElement(Stethoscope, { className: "h-5 w-5" }),
@@ -108,7 +103,6 @@ export const doctorSidebarItems: SidebarItem[] = [
   },
 ];
 
-// Nurse-specific items
 export const nurseSidebarItems: SidebarItem[] = [
   {
     icon: React.createElement(Clipboard, { className: "h-5 w-5" }),
@@ -118,7 +112,6 @@ export const nurseSidebarItems: SidebarItem[] = [
   },
 ];
 
-// Communication tools
 export const communicationItems: SidebarItem[] = [
   {
     icon: React.createElement(MessageSquare, { className: "h-5 w-5" }),
@@ -128,7 +121,6 @@ export const communicationItems: SidebarItem[] = [
   },
 ];
 
-// Front desk specific items
 export const frontDeskItems: SidebarItem[] = [
   {
     icon: React.createElement(Star, { className: "h-5 w-5" }),
@@ -144,7 +136,6 @@ export const frontDeskItems: SidebarItem[] = [
   },
 ];
 
-// Admin/management items
 export const adminSidebarItems: SidebarItem[] = [
   {
     icon: React.createElement(Building, { className: "h-5 w-5" }),
@@ -172,7 +163,6 @@ export const adminSidebarItems: SidebarItem[] = [
   },
 ];
 
-// General settings and support items
 export const settingsSidebarItems: SidebarItem[] = [
   {
     icon: React.createElement(HelpCircle, { className: "h-5 w-5" }),
@@ -191,7 +181,6 @@ export const settingsSidebarItems: SidebarItem[] = [
   },
 ];
 
-// Admin-only setting items
 export const adminSettingsItems: SidebarItem[] = [
   {
     icon: React.createElement(Shield, { className: "h-5 w-5" }),
