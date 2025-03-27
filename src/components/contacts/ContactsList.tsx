@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
 import { Tooltip } from "../ui/tooltip";
 import ContactsFilter from "./ContactsFilter";
-import ContactListItem from "./ContactListItem";
 import ContactSortableHeader from "./ContactSortableHeader";
 import ContactFollowUpIndicator from "./ContactFollowUpIndicator";
+import ContactListContainer from "./ContactListContainer";
 
 interface ContactsListProps {
   contacts: Contact[];
@@ -58,7 +58,7 @@ const ContactsList = ({
     }
   };
   
-  // Filter and sort contacts
+  // Apply filters and sort contacts
   const filteredAndSortedContacts = contacts
     .filter(contact => {
       // Apply text filter
@@ -100,7 +100,7 @@ const ContactsList = ({
       return 0;
     });
 
-  // Simple helper function to check if a date is today
+  // Calculate follow-up indicators
   function isToday(date: Date): boolean {
     const today = new Date();
     return date.getDate() === today.getDate() &&
@@ -108,7 +108,6 @@ const ContactsList = ({
       date.getFullYear() === today.getFullYear();
   }
 
-  // Calculate counts for follow-ups
   const overdueCount = contacts.filter(c => 
     c.followUp && 
     c.followUp.status === 'pending' && 
@@ -158,30 +157,14 @@ const ContactsList = ({
             showFilters={showFilters}
           />
           
-          <div className="border rounded-md mt-2">
-            <ContactSortableHeader 
-              sortField={sortField}
-              sortDirection={sortDirection}
-              handleSort={handleSort}
-            />
-            
-            <div className="max-h-[500px] overflow-y-auto">
-              {filteredAndSortedContacts.length > 0 ? (
-                filteredAndSortedContacts.map((contact) => (
-                  <ContactListItem 
-                    key={contact.id}
-                    contact={contact}
-                    isSelected={selectedContactId === contact.id}
-                    onSelect={onSelectContact}
-                  />
-                ))
-              ) : (
-                <div className="p-4 text-center text-muted-foreground">
-                  No contacts found matching your criteria.
-                </div>
-              )}
-            </div>
-          </div>
+          <ContactListContainer
+            contacts={filteredAndSortedContacts}
+            selectedContactId={selectedContactId}
+            onSelectContact={onSelectContact}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            handleSort={handleSort}
+          />
         </div>
       </CardContent>
     </Card>
