@@ -169,18 +169,20 @@ export function applyTemplatePlaceholders(
   let result = content;
   
   // Find all placeholders like [Placeholder]
-  const placeholders = content.match(/\[([^\]]+)\]/g) || [];
+  const placeholderMatches = content.match(/\[([^\]]+)\]/g);
   
-  // Replace each placeholder with its value
-  placeholders.forEach(placeholder => {
-    // Remove the brackets to get the key
-    const key = placeholder.slice(1, -1);
-    
-    // Replace if value exists, otherwise keep the placeholder
-    if (values[key]) {
-      result = result.replace(placeholder, values[key]);
-    }
-  });
+  // Replace each placeholder with its value if there are matches
+  if (placeholderMatches) {
+    placeholderMatches.forEach(placeholder => {
+      // Remove the brackets to get the key (for example, convert "[Name]" to "Name")
+      const key = placeholder.substring(1, placeholder.length - 1);
+      
+      // Replace if value exists, otherwise keep the placeholder
+      if (values[key]) {
+        result = result.replace(placeholder, values[key]);
+      }
+    });
+  }
   
   return result;
 }
