@@ -66,8 +66,8 @@ const MainHero = ({ scrollToSection }: MainHeroProps) => {
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-violet-500/20 rounded-3xl transform rotate-1 blur-xl"></div>
         <div className="glass rounded-3xl p-1 relative z-10 border border-white/20 shadow-xl overflow-hidden">
           <ResponsiveImage 
-            src="/lovable-uploads/8f809609-fda6-4c5f-b64d-3eea05d2eec9.png"
-            alt="Healthcare professionals discussing patient data on a tablet" 
+            src="/lovable-uploads/9acc4b31-f7b0-4021-aba4-3773ea9cc967.png"
+            alt="Medical professionals in operating room during surgery" 
             className="w-full h-full rounded-2xl"
             aspectRatio="16/9"
           />
