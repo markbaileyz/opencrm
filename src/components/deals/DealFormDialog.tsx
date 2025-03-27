@@ -3,48 +3,38 @@ import React from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import DealForm from "./DealForm";
-import { Deal } from "@/types/deal";
 
-interface DealFormDialogProps {
+export interface DealFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  deal?: Deal;
-  onSubmit: (formData: Partial<Deal>) => void;
+  onSubmit: (data: any) => void;
+  initialData?: any;
 }
 
 const DealFormDialog: React.FC<DealFormDialogProps> = ({
   open,
   onOpenChange,
-  deal,
-  onSubmit,
+  onSubmit = () => {},
+  initialData
 }) => {
-  const isEditMode = !!deal;
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>
-            {isEditMode ? "Edit Deal" : "Create New Deal"}
-          </DialogTitle>
-          <DialogDescription>
-            {isEditMode 
-              ? "Update the details of your existing deal." 
-              : "Add a new deal to your pipeline. Fill in the details below."}
-          </DialogDescription>
+          <DialogTitle>{initialData ? "Edit Deal" : "Create New Deal"}</DialogTitle>
         </DialogHeader>
-        
         <DealForm 
-          deal={deal} 
-          onSubmit={onSubmit} 
-          onCancel={() => onOpenChange(false)} 
+          onSubmit={(data) => {
+            onSubmit(data);
+            onOpenChange(false);
+          }}
+          initialData={initialData}
+          onCancel={() => onOpenChange(false)}
         />
-        
       </DialogContent>
     </Dialog>
   );

@@ -1,10 +1,9 @@
 
 import React from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Form } from "@/components/ui/form";
-import { Deal } from "@/types/deal";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { dealFormSchema, DealFormValues } from "./form/DealFormTypes";
+import { Form } from "@/components/ui/form";
 import DealBasicInfoFields from "./form/DealBasicInfoFields";
 import DealRelationshipFields from "./form/DealRelationshipFields";
 import DealValueFields from "./form/DealValueFields";
@@ -12,23 +11,28 @@ import DealDescriptionField from "./form/DealDescriptionField";
 import DealFormActions from "./form/DealFormActions";
 
 interface DealFormProps {
-  deal?: Deal;
-  onSubmit: (data: Partial<Deal>) => void;
+  onSubmit: (data: DealFormValues) => void;
+  initialData?: any;
   onCancel: () => void;
 }
 
-const DealForm: React.FC<DealFormProps> = ({ deal, onSubmit, onCancel }) => {
-  const isEditMode = !!deal;
+const DealForm: React.FC<DealFormProps> = ({
+  onSubmit,
+  initialData,
+  onCancel
+}) => {
+  const isEditMode = !!initialData;
 
+  // Set default values based on initial data or defaults
   const defaultValues: Partial<DealFormValues> = {
-    name: deal?.name || "",
-    stage: deal?.stage || "prospecting",
-    organization: deal?.organization || "",
-    contact: deal?.contact || "",
-    value: deal?.value ? String(deal.value) : "",
-    closeDate: deal?.closeDate ? new Date(deal.closeDate) : new Date(),
-    probability: deal?.probability ? String(deal.probability) : "50",
-    description: deal?.description || "",
+    name: initialData?.name || "",
+    stage: initialData?.stage || "lead",
+    organization: initialData?.organization || "",
+    contact: initialData?.contact || "",
+    value: initialData?.value ? String(initialData.value) : "",
+    closeDate: initialData?.closeDate ? new Date(initialData.closeDate) : new Date(),
+    probability: initialData?.probability ? String(initialData.probability) : "50",
+    description: initialData?.description || "",
   };
 
   const form = useForm<DealFormValues>({
@@ -36,11 +40,12 @@ const DealForm: React.FC<DealFormProps> = ({ deal, onSubmit, onCancel }) => {
     defaultValues,
   });
 
-  const handleSubmit = (values: DealFormValues) => {
+  const handleSubmit = (data: DealFormValues) => {
+    // Convert string values to numbers where appropriate
     const formattedData = {
-      ...values,
-      value: parseFloat(values.value),
-      probability: parseInt(values.probability, 10),
+      ...data,
+      value: parseFloat(data.value),
+      probability: parseInt(data.probability),
     };
     
     onSubmit(formattedData);
@@ -49,10 +54,13 @@ const DealForm: React.FC<DealFormProps> = ({ deal, onSubmit, onCancel }) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <DealBasicInfoFields form={form} />
-        <DealRelationshipFields form={form} />
-        <DealValueFields form={form} />
-        <DealDescriptionField form={form} />
+        <div className="space-y-4">
+          <DealBasicInfoFields form={form} />
+          <DealRelationshipFields form={form} />
+          <DealValueFields form={form} />
+          <DealDescriptionField form={form} />
+        </div>
+        
         <DealFormActions isEditMode={isEditMode} onCancel={onCancel} />
       </form>
     </Form>

@@ -1,47 +1,63 @@
 
-import React from "react";
+import React, { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, FilterX } from "lucide-react";
 
-export interface DealFiltersState {
-  search: string;
-  stage: string;
-  organization: string;
-  closeDate: string;
-  value: string;
+export interface DealFiltersProps {
+  filters: {
+    search: string;
+    stage: string;
+    value: string;
+    sortBy: string;
+  };
+  onFilterChange: (filters: any) => void;
 }
 
-interface DealFiltersProps {
-  filters: DealFiltersState;
-  onFilterChange: (filters: Partial<DealFiltersState>) => void;
-}
+const DealFilters: React.FC<DealFiltersProps> = ({ 
+  filters = { search: "", stage: "", value: "", sortBy: "newest" },
+  onFilterChange = () => {}
+}) => {
+  const [localFilters, setLocalFilters] = useState(filters);
 
-const DealFilters: React.FC<DealFiltersProps> = ({ filters, onFilterChange }) => {
+  const handleFilterChange = (key: string, value: string) => {
+    const updatedFilters = { ...localFilters, [key]: value };
+    setLocalFilters(updatedFilters);
+    onFilterChange(updatedFilters);
+  };
+
+  const handleResetFilters = () => {
+    const resetFilters = { search: "", stage: "", value: "", sortBy: "newest" };
+    setLocalFilters(resetFilters);
+    onFilterChange(resetFilters);
+  };
+
   return (
-    <div className="bg-muted/30 rounded-lg p-4 mb-6">
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input 
-            placeholder="Search deals..." 
-            className="pl-9"
-            value={filters.search}
-            onChange={(e) => onFilterChange({ search: e.target.value })}
-          />
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 flex-1">
+    <Card>
+      <CardContent className="p-4">
+        <div className="grid gap-4 md:grid-cols-4">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search deals..."
+              className="pl-8"
+              value={localFilters.search}
+              onChange={(e) => handleFilterChange("search", e.target.value)}
+            />
+          </div>
+          
           <Select 
-            value={filters.stage} 
-            onValueChange={(value) => onFilterChange({ stage: value })}
+            value={localFilters.stage} 
+            onValueChange={(value) => handleFilterChange("stage", value)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Deal Stage" />
+              <SelectValue placeholder="All Stages" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Stages</SelectItem>
+              <SelectItem value="">All Stages</SelectItem>
               <SelectItem value="lead">Lead</SelectItem>
               <SelectItem value="qualification">Qualification</SelectItem>
               <SelectItem value="proposal">Proposal</SelectItem>
@@ -52,61 +68,46 @@ const DealFilters: React.FC<DealFiltersProps> = ({ filters, onFilterChange }) =>
           </Select>
           
           <Select 
-            value={filters.organization} 
-            onValueChange={(value) => onFilterChange({ organization: value })}
+            value={localFilters.value} 
+            onValueChange={(value) => handleFilterChange("value", value)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Organization" />
+              <SelectValue placeholder="All Values" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Organizations</SelectItem>
-              <SelectItem value="1">Acme Corp</SelectItem>
-              <SelectItem value="2">Globex</SelectItem>
-              <SelectItem value="3">Initech</SelectItem>
-              <SelectItem value="4">Massive Dynamic</SelectItem>
-              <SelectItem value="5">Umbrella Corp</SelectItem>
+              <SelectItem value="">All Values</SelectItem>
+              <SelectItem value="small">< $10k</SelectItem>
+              <SelectItem value="medium">$10k - $50k</SelectItem>
+              <SelectItem value="large">$50k - $100k</SelectItem>
+              <SelectItem value="xlarge">> $100k</SelectItem>
             </SelectContent>
           </Select>
           
           <Select 
-            value={filters.closeDate} 
-            onValueChange={(value) => onFilterChange({ closeDate: value })}
+            value={localFilters.sortBy} 
+            onValueChange={(value) => handleFilterChange("sortBy", value)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Close Date" />
+              <SelectValue placeholder="Sort By" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Dates</SelectItem>
-              <SelectItem value="this-month">This Month</SelectItem>
-              <SelectItem value="next-month">Next Month</SelectItem>
-              <SelectItem value="this-quarter">This Quarter</SelectItem>
-              <SelectItem value="next-quarter">Next Quarter</SelectItem>
+              <SelectItem value="newest">Newest First</SelectItem>
+              <SelectItem value="oldest">Oldest First</SelectItem>
+              <SelectItem value="highest">Highest Value</SelectItem>
+              <SelectItem value="lowest">Lowest Value</SelectItem>
+              <SelectItem value="probability">Highest Probability</SelectItem>
             </SelectContent>
           </Select>
           
-          <Select 
-            value={filters.value} 
-            onValueChange={(value) => onFilterChange({ value: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Value" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Values</SelectItem>
-              <SelectItem value="low">&lt; $10,000</SelectItem>
-              <SelectItem value="medium">$10,000 - $50,000</SelectItem>
-              <SelectItem value="high">$50,000 - $100,000</SelectItem>
-              <SelectItem value="very-high">&gt; $100,000</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="md:col-span-4 flex justify-end">
+            <Button variant="outline" size="sm" onClick={handleResetFilters} className="gap-1">
+              <FilterX className="h-4 w-4" />
+              Reset Filters
+            </Button>
+          </div>
         </div>
-        
-        <Button variant="outline" className="flex-shrink-0">
-          <SlidersHorizontal className="h-4 w-4 mr-2" />
-          More Filters
-        </Button>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
