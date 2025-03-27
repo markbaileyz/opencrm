@@ -1,29 +1,86 @@
 
-import * as React from "react"
-import * as TooltipPrimitive from "@radix-ui/react-tooltip"
+import React from 'react';
+import { cn } from '@/lib/utils';
 
-import { cn } from "@/lib/utils"
+interface TooltipProps {
+  children: React.ReactNode;
+  content: string;
+  position?: 'top' | 'bottom' | 'left' | 'right';
+  className?: string;
+  contentClassName?: string;
+}
 
-const TooltipProvider = TooltipPrimitive.Provider
+export const Tooltip: React.FC<TooltipProps> = ({
+  children,
+  content,
+  position = 'top',
+  className,
+  contentClassName,
+}) => {
+  const [show, setShow] = React.useState(false);
+  const [coords, setCoords] = React.useState({ top: 0, left: 0 });
+  const tooltipRef = React.useRef<HTMLDivElement>(null);
 
-const Tooltip = TooltipPrimitive.Root
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    const childRect = e.currentTarget.getBoundingClientRect();
+    
+    let top = 0;
+    let left = 0;
+    
+    if (position === 'top') {
+      top = -10;
+      left = childRect.width / 2;
+    } else if (position === 'bottom') {
+      top = childRect.height + 10;
+      left = childRect.width / 2;
+    } else if (position === 'left') {
+      top = childRect.height / 2;
+      left = -10;
+    } else if (position === 'right') {
+      top = childRect.height / 2;
+      left = childRect.width + 10;
+    }
+    
+    setCoords({ top, left });
+    setShow(true);
+  };
 
-const TooltipTrigger = TooltipPrimitive.Trigger
+  const positionClass = {
+    top: 'bottom-full left-1/2 -translate-x-1/2 -translate-y-2 mb-2',
+    bottom: 'top-full left-1/2 -translate-x-1/2 translate-y-2 mt-2',
+    left: 'right-full top-1/2 -translate-y-1/2 -translate-x-2 mr-2',
+    right: 'left-full top-1/2 -translate-y-1/2 translate-x-2 ml-2',
+  };
 
-const TooltipContent = React.forwardRef<
-  React.ElementRef<typeof TooltipPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
-  <TooltipPrimitive.Content
-    ref={ref}
-    sideOffset={sideOffset}
-    className={cn(
-      "z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-      className
-    )}
-    {...props}
-  />
-))
-TooltipContent.displayName = TooltipPrimitive.Content.displayName
-
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
+  return (
+    <div 
+      className={cn("relative inline-block", className)} 
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={() => setShow(false)}
+      ref={tooltipRef}
+    >
+      {children}
+      
+      {show && (
+        <div 
+          className={cn(
+            "absolute z-50 px-2 py-1 text-xs font-medium bg-popover text-popover-foreground rounded shadow-md whitespace-nowrap",
+            positionClass[position],
+            contentClassName
+          )}
+          style={{ 
+            transformOrigin: position === 'top' 
+              ? 'bottom center' 
+              : position === 'bottom' 
+                ? 'top center' 
+                : position === 'left' 
+                  ? 'right center' 
+                  : 'left center'
+          }}
+        >
+          {content}
+        </div>
+      )}
+    </div>
+  );
+};
