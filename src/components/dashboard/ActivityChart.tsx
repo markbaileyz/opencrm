@@ -11,7 +11,7 @@ import {
   ResponsiveContainer
 } from "recharts";
 
-interface ActivityChartProps {
+export interface ActivityChartProps {
   data: Array<{ name: string; value: number }>;
 }
 

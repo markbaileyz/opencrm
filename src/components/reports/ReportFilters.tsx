@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +20,7 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon, Filter, Search, X } from "lucide-react";
 import ResponsiveContainer from "@/components/ui/responsive-container";
 
-interface ReportFiltersProps {
+export interface ReportFiltersProps {
   onFilterChange: (filters: any) => void;
 }
 
@@ -61,7 +60,6 @@ const ReportFilters: React.FC<ReportFiltersProps> = ({ onFilterChange }) => {
     });
   };
 
-  // Mobile filters panel
   const mobileFilters = (
     <div className="space-y-4 pb-14">
       <div className="flex items-center justify-between">

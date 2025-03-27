@@ -18,7 +18,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
-interface DashboardHeaderProps {
+export interface DashboardHeaderProps {
   isAdmin: boolean;
 }
 

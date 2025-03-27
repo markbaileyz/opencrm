@@ -48,26 +48,21 @@ const Reports = () => {
   };
 
   const renderActiveReport = () => {
-    const props = {
-      filters,
-      isOnline
-    };
-
     switch (activeTab) {
       case "leadSource":
-        return <LeadSourceReport {...props} />;
+        return <LeadSourceReport />;
       case "salesPerformance":
-        return <SalesPerformanceReport {...props} />;
+        return <SalesPerformanceReport />;
       case "pipelineAnalysis":
-        return <PipelineAnalysisReport {...props} />;
+        return <PipelineAnalysisReport />;
       case "contactActivity":
-        return <ContactActivityReport {...props} />;
+        return <ContactActivityReport />;
       case "dealConversion":
-        return <DealConversionReport {...props} />;
+        return <DealConversionReport />;
       case "salesForecast":
-        return <SalesForecastReport {...props} />;
+        return <SalesForecastReport />;
       default:
-        return <LeadSourceReport {...props} />;
+        return <LeadSourceReport />;
     }
   };
 
@@ -75,10 +70,8 @@ const Reports = () => {
     <DashboardLayout>
       <div className="container mx-auto py-6">
         <ReportHeader 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab}
-          viewSaved={viewSaved}
-          setViewSaved={setViewSaved}
+          title={activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace(/([A-Z])/g, ' $1') + " Report"}
+          description="Analyze your business performance and track key metrics"
         />
         
         {(!isOnline || pendingActions > 0) && (
@@ -92,7 +85,6 @@ const Reports = () => {
         ) : (
           <div className="space-y-6">
             <ReportFilters 
-              filters={filters} 
               onFilterChange={handleFilterChange}
             />
             

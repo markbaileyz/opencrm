@@ -19,12 +19,24 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 const Dashboard = () => {
   const { isOnline, pendingActions, isSyncing, processPendingActions } = useOfflineState();
   const isMobile = useMediaQuery("(max-width: 768px)");
+  // Mock sample data for activity chart
+  const activityData = [
+    { name: "Jan", value: 30 },
+    { name: "Feb", value: 40 },
+    { name: "Mar", value: 45 },
+    { name: "Apr", value: 60 },
+    { name: "May", value: 65 },
+    { name: "Jun", value: 58 },
+    { name: "Jul", value: 80 }
+  ];
+  // Assuming user is admin for now - this should be from authentication context
+  const isAdmin = true;
   
   if (isMobile) {
     return (
       <DashboardLayout>
         <div className="container mx-auto py-4 space-y-6">
-          <DashboardHeader />
+          <DashboardHeader isAdmin={isAdmin} />
           
           {/* Show offline banner if needed */}
           {(!isOnline || pendingActions > 0) && (
@@ -45,7 +57,7 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       <div className="container mx-auto py-6">
-        <DashboardHeader />
+        <DashboardHeader isAdmin={isAdmin} />
         
         {/* Show offline banner if needed - only shown here if not already in App.tsx */}
         {(!isOnline || pendingActions > 0) && (
@@ -59,9 +71,9 @@ const Dashboard = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3 space-y-6">
-            <StatsGrid />
+            <StatsGrid isAdmin={isAdmin} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ActivityChart />
+              <ActivityChart data={activityData} />
               <KeyMetrics />
             </div>
             <SalesPipeline />

@@ -7,6 +7,11 @@
 
 declare const self: ServiceWorkerGlobalScope;
 
+// Define custom SyncEvent interface that's missing in TS lib
+interface SyncEvent extends ExtendableEvent {
+  tag: string;
+}
+
 const CACHE_NAME = 'opencrm-cache-v1';
 const urlsToCache = [
   '/',
@@ -78,7 +83,7 @@ self.addEventListener('fetch', (event: FetchEvent) => {
 });
 
 // Cache-first strategy: Try cache first, fallback to network
-async function cacheFirstStrategy(request: Request) {
+async function cacheFirstStrategy(request: Request): Promise<Response> {
   const cachedResponse = await caches.match(request);
   if (cachedResponse) {
     return cachedResponse;
@@ -94,7 +99,10 @@ async function cacheFirstStrategy(request: Request) {
   } catch (error) {
     // If both cache and network fail, return a custom offline page for navigation requests
     if (request.mode === 'navigate') {
-      return caches.match('/');
+      const offlineResponse = await caches.match('/');
+      if (offlineResponse) {
+        return offlineResponse;
+      }
     }
     
     // For other requests, return a simple error response
@@ -106,7 +114,7 @@ async function cacheFirstStrategy(request: Request) {
 }
 
 // Network-first strategy: Try network first, fallback to cache
-async function networkFirstStrategy(request: Request) {
+async function networkFirstStrategy(request: Request): Promise<Response> {
   try {
     const networkResponse = await fetch(request);
     
@@ -132,7 +140,7 @@ async function networkFirstStrategy(request: Request) {
 }
 
 // Stale-while-revalidate strategy: Return cached version immediately, then update cache
-async function staleWhileRevalidateStrategy(request: Request) {
+async function staleWhileRevalidateStrategy(request: Request): Promise<Response> {
   const cache = await caches.open(CACHE_NAME);
   
   // First, try to get the resource from the cache
@@ -145,12 +153,24 @@ async function staleWhileRevalidateStrategy(request: Request) {
       cache.put(request, response.clone());
     }
     return response;
-  }).catch(() => {
-    // Do nothing on network failure - we already have the cached version or will handle the failure below
+  }).catch(error => {
+    console.error('Network fetch failed in stale-while-revalidate strategy:', error);
+    return null;
   });
   
-  // Return the cached response immediately, or wait for the network response if there's no cached version
-  return cachedResponse || networkResponsePromise || new Response('Network error and no cache available', {
+  // Return the cached response immediately if we have one
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+  
+  // If there's no cached response, wait for the network response
+  const networkResponse = await networkResponsePromise;
+  if (networkResponse) {
+    return networkResponse;
+  }
+  
+  // If both cache and network fail, return an error response
+  return new Response('Network error and no cache available', {
     status: 503,
     headers: { 'Content-Type': 'text/plain' }
   });
@@ -166,7 +186,7 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
             return caches.delete(cacheName);
           }
-          return null;
+          return Promise.resolve();
         })
       );
     }).then(() => {
@@ -191,7 +211,7 @@ self.addEventListener('sync', (event: SyncEvent) => {
 });
 
 // Function to sync pending actions when back online
-async function syncPendingActions() {
+async function syncPendingActions(): Promise<void> {
   try {
     // This would normally get the pending actions from IndexedDB
     // For now we'll just log that sync is happening

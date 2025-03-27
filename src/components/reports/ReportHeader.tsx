@@ -2,7 +2,7 @@
 import React from "react";
 import { BarChart3 } from "lucide-react";
 
-interface ReportHeaderProps {
+export interface ReportHeaderProps {
   title: string;
   description: string;
 }
