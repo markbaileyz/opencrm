@@ -1,7 +1,7 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { Email } from '@/types/email';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from "@/components/ui/toast";
 import { useEmailManager } from '@/hooks/useEmailManager';
 
 interface EmailContextType {

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { X, Paperclip, Send } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/toast";
 
 interface MobileEmailComposerProps {
   onClose: () => void;
@@ -13,7 +13,7 @@ interface MobileEmailComposerProps {
   replyToEmail?: {
     id: string;
     subject: string;
-    sender: {
+    from: {
       email: string;
       name: string;
     };
@@ -26,7 +26,7 @@ const MobileEmailComposer: React.FC<MobileEmailComposerProps> = ({
   replyToEmail
 }) => {
   const { toast } = useToast();
-  const [to, setTo] = useState(replyToEmail?.sender.email || "");
+  const [to, setTo] = useState(replyToEmail?.from.email || "");
   const [subject, setSubject] = useState(replyToEmail ? `Re: ${replyToEmail.subject}` : "");
   const [content, setContent] = useState("");
   

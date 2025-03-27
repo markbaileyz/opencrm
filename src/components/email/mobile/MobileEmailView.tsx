@@ -13,16 +13,18 @@ import { Email } from "@/types/email";
 import { useEmailManager } from "@/hooks/useEmailManager";
 
 const MobileEmailView: React.FC = () => {
-  const { emails, loading, activeFolder } = useEmailManager();
+  const { emails } = useEmailManager();
   const [searchQuery, setSearchQuery] = useState("");
   const [showComposer, setShowComposer] = useState(false);
   const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeFolder, setActiveFolder] = useState("inbox");
   
   // Filter emails based on search query
   const filteredEmails = emails.filter(email => 
     email.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    email.sender.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    email.content.toLowerCase().includes(searchQuery.toLowerCase())
+    email.from.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    email.body.toLowerCase().includes(searchQuery.toLowerCase())
   );
   
   return (
@@ -78,7 +80,7 @@ const MobileEmailView: React.FC = () => {
         </div>
 
         <TabsContent value="inbox" className="flex-1 overflow-auto p-0">
-          {loading ? (
+          {isLoading ? (
             <div className="p-4 text-center text-muted-foreground">Loading emails...</div>
           ) : filteredEmails.length === 0 ? (
             <div className="p-4 text-center text-muted-foreground">

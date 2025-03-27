@@ -29,7 +29,7 @@ const EmailListItemCompact: React.FC<EmailListItemCompactProps> = ({
     >
       <div className="flex justify-between items-start mb-1">
         <span className="text-sm font-medium truncate max-w-[70%]">
-          {email.sender.name}
+          {email.from.name}
         </span>
         <span className="text-xs text-muted-foreground whitespace-nowrap">
           {formattedDate}
@@ -41,13 +41,13 @@ const EmailListItemCompact: React.FC<EmailListItemCompactProps> = ({
       </div>
       
       <div className="text-xs text-muted-foreground truncate mb-1">
-        {email.content.substring(0, 100)}
-        {email.content.length > 100 ? "..." : ""}
+        {email.body.substring(0, 100)}
+        {email.body.length > 100 ? "..." : ""}
       </div>
       
       <div className="flex items-center justify-between mt-1">
         <div className="flex items-center gap-2">
-          {email.attachments && email.attachments.length > 0 && (
+          {email.hasAttachments && (
             <Paperclip className="h-3 w-3 text-muted-foreground" />
           )}
           {email.labels && email.labels.length > 0 && (
