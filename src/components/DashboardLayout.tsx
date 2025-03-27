@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,11 @@ import {
   Building,
   Lightbulb,
   HelpCircle,
-  BookOpen
+  BookOpen,
+  Shield,
+  Key,
+  FileLock,
+  UserCog
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -29,53 +32,69 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-  const { logout } = useAuth();
+  const { logout, user, hasRole } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { toast } = useToast();
   
-  const sidebarItems = [
+  const baseSidebarItems = [
     {
       icon: <LayoutDashboard className="h-5 w-5" />,
       label: "Dashboard",
       href: "/dashboard",
     },
+  ];
+
+  const medicalSidebarItems = [
     {
       icon: <Users className="h-5 w-5" />,
-      label: "Contacts",
-      href: "/contacts",
-    },
-    {
-      icon: <Building className="h-5 w-5" />,
-      label: "Organizations",
-      href: "/organizations",
-    },
-    {
-      icon: <Tags className="h-5 w-5" />,
-      label: "Deals",
-      href: "/deals",
+      label: "Patients",
+      href: "/patients",
+      roles: ["admin", "doctor", "nurse"],
     },
     {
       icon: <Calendar className="h-5 w-5" />,
       label: "Calendar",
       href: "/calendar",
+      roles: ["admin", "doctor", "nurse"],
     },
     {
       icon: <Mailbox className="h-5 w-5" />,
       label: "Email",
       href: "/email",
+      roles: ["admin", "doctor", "nurse"],
+    },
+  ];
+
+  const adminSidebarItems = [
+    {
+      icon: <Building className="h-5 w-5" />,
+      label: "Organizations",
+      href: "/organizations",
+      roles: ["admin"],
+    },
+    {
+      icon: <Tags className="h-5 w-5" />,
+      label: "Deals",
+      href: "/deals",
+      roles: ["admin"],
     },
     {
       icon: <BarChart3 className="h-5 w-5" />,
       label: "Reports",
       href: "/reports",
+      roles: ["admin"],
     },
     {
       icon: <Lightbulb className="h-5 w-5" />,
       label: "Roadmap",
       href: "/roadmap",
+      roles: ["admin"],
     },
+  ];
+
+  const settingsSidebarItems = [
     {
       icon: <HelpCircle className="h-5 w-5" />,
       label: "Knowledge Base",
@@ -92,6 +111,40 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       href: "/settings",
     },
   ];
+
+  const adminSettingsItems = [
+    {
+      icon: <Shield className="h-5 w-5" />,
+      label: "Admin Settings",
+      href: "/admin-settings",
+      roles: ["admin"],
+    },
+    {
+      icon: <FileLock className="h-5 w-5" />,
+      label: "Compliance",
+      href: "/compliance",
+      roles: ["admin"],
+    },
+    {
+      icon: <UserCog className="h-5 w-5" />,
+      label: "User Management",
+      href: "/users",
+      roles: ["admin"],
+    },
+  ];
+  
+  const allSidebarItems = [
+    ...baseSidebarItems,
+    ...medicalSidebarItems,
+    ...adminSidebarItems,
+    ...settingsSidebarItems,
+    ...adminSettingsItems
+  ];
+
+  const sidebarItems = allSidebarItems.filter(item => {
+    if (!item.roles) return true;
+    return hasRole(item.roles);
+  });
   
   const isActive = (path: string) => location.pathname === path;
   
@@ -110,7 +163,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   
   return (
     <div className="flex h-screen">
-      {/* Mobile Sidebar Button */}
       <button
         onClick={toggleSidebar}
         className="md:hidden absolute top-4 left-4 z-50"
@@ -122,7 +174,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         )}
       </button>
 
-      {/* Sidebar */}
       <aside
         className={cn(
           "w-64 flex-shrink-0 bg-secondary border-r border-r-muted py-4 px-2 fixed h-full z-40 md:relative",
@@ -130,11 +181,18 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           "transition-transform duration-300 ease-in-out md:translate-x-0"
         )}
       >
-        <div className="mb-8 px-4">
+        <div className="mb-4 px-4">
           <Link to="/" className="flex items-center text-lg font-semibold">
             OpenCRM
           </Link>
+          {user && (
+            <div className="mt-2 text-sm text-muted-foreground flex items-center">
+              <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+              {user.displayName || user.email} ({user.role})
+            </div>
+          )}
         </div>
+        
         <nav className="space-y-1">
           {sidebarItems.map((item) => (
             <Link
@@ -165,7 +223,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         </div>
       </aside>
 
-      {/* Main Content */}
       <div className="flex-1 p-6 overflow-auto">
         {children}
       </div>

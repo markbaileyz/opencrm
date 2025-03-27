@@ -1,10 +1,12 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+// Enhanced User interface with role
 interface User {
   email: string;
   displayName?: string;
   photoURL?: string;
+  role: "admin" | "doctor" | "nurse" | "patient" | "guest";
 }
 
 interface AuthContextType {
@@ -14,6 +16,7 @@ interface AuthContextType {
   logout: () => void;
   updateProfile: (profileData: Partial<User>) => void;
   uploadProfileImage: (file: File) => Promise<string>;
+  hasRole: (roles: string | string[]) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -23,6 +26,7 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
   updateProfile: () => {},
   uploadProfileImage: async () => "",
+  hasRole: () => false,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -67,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const uploadProfileImage = async (file: File): Promise<string> => {
-    // In a real application, this would upload to a storage service
+    // In a real application, this would upload to a secure HIPAA-compliant storage
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -81,8 +85,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  // Role-based authorization helper
+  const hasRole = (roles: string | string[]): boolean => {
+    if (!user) return false;
+    
+    const rolesToCheck = Array.isArray(roles) ? roles : [roles];
+    return rolesToCheck.includes(user.role);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, updateProfile, uploadProfileImage }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isAuthenticated, 
+      login, 
+      logout, 
+      updateProfile, 
+      uploadProfileImage,
+      hasRole
+    }}>
       {children}
     </AuthContext.Provider>
   );

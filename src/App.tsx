@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
@@ -29,6 +28,10 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useOfflineState } from "@/hooks/use-offline-state";
 import OfflineBanner from "@/components/ui/offline-banner";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import { useAuth } from "@/context/AuthContext";
+
+import AdminSettings from "@/pages/AdminSettings";
 
 function App() {
   const { toast } = useToast();
@@ -39,12 +42,10 @@ function App() {
     processPendingActions 
   } = useOfflineState();
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    // Register service worker for offline support
     registerServiceWorker();
-    
-    // Check for updates to service worker
     checkForServiceWorkerUpdate(() => {
       setUpdateAvailable(true);
       toast({
@@ -67,7 +68,6 @@ function App() {
   }, [toast]);
 
   const handleTryReconnect = () => {
-    // Force a connection check
     if (navigator.onLine) {
       processPendingActions();
       toast({
@@ -91,7 +91,6 @@ function App() {
       disableTransitionOnChange
     >
       <div className="relative">
-        {/* Offline banner at the top of the app */}
         <div className="sticky top-0 z-50">
           <OfflineBanner 
             isOnline={isOnline} 
@@ -105,21 +104,108 @@ function App() {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/contacts" element={<Contacts />} />
-          <Route path="/organizations" element={<Organizations />} />
-          <Route path="/deals" element={<Deals />} />
-          <Route path="/calendar" element={<Calendar />} />
-          <Route path="/email" element={<Email />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/roadmap" element={<Roadmap />} />
-          <Route path="/knowledge-base" element={<KnowledgeBasePage />} />
-          <Route path="/challenges-solutions" element={<ChallengesSolutionsPage />} />
-          <Route path="/healthcare-crm" element={<HealthcareCRM />} />
-          <Route path="/open-crm-roadmap" element={<OpenCRMRoadmap />} />
-          <Route path="/mind-map" element={<MindMap />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/patients" element={<Patients />} />
+          
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/patients" element={
+            <ProtectedRoute allowedRoles={["admin", "doctor", "nurse"]}>
+              <Patients />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/calendar" element={
+            <ProtectedRoute allowedRoles={["admin", "doctor", "nurse"]}>
+              <Calendar />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/admin-settings" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSettings />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/reports" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Reports />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/contacts" element={
+            <ProtectedRoute allowedRoles={["admin", "doctor", "nurse"]}>
+              <Contacts />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/organizations" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Organizations />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/deals" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Deals />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/email" element={
+            <ProtectedRoute>
+              <Email />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/roadmap" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Roadmap />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/knowledge-base" element={
+            <ProtectedRoute>
+              <KnowledgeBasePage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/challenges-solutions" element={
+            <ProtectedRoute>
+              <ChallengesSolutionsPage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/healthcare-crm" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <HealthcareCRM />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/open-crm-roadmap" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <OpenCRMRoadmap />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/mind-map" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <MindMap />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/settings" element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          } />
+          
+          <Route 
+            path="/signup" 
+            element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login isSignUp={true} />} 
+          />
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />

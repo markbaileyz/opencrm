@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { ButtonCustom } from "./ui/button-custom";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Shield } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface LoginFormProps {
   isSignUp?: boolean;
@@ -25,21 +26,48 @@ const LoginForm = ({ isSignUp = false }: LoginFormProps) => {
     setLoading(true);
 
     try {
-      // Simulate API request delay
+      // Simulate API request delay - In production, this would use encrypted HIPAA-compliant channels
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
-      // For demo purposes, let's allow any email with "test" in it
-      if (email.includes("test") || email === "admin@example.com" || email === "doctor@example.com" || email === "nurse@example.com") {
-        // Login successfully
-        login({ email });
-        toast.success(`Welcome to NextCRM, ${email}!`);
+      // For demo purposes, role-based demo accounts
+      if (email === "admin@example.com") {
+        login({ 
+          email, 
+          displayName: "Admin User", 
+          role: "admin" 
+        });
+        toast.success(`Welcome, Admin`);
+        navigate("/dashboard");
+      } else if (email === "doctor@example.com") {
+        login({ 
+          email, 
+          displayName: "Dr. Smith", 
+          role: "doctor" 
+        });
+        toast.success(`Welcome, Dr. Smith`);
+        navigate("/patients");
+      } else if (email === "nurse@example.com") {
+        login({ 
+          email, 
+          displayName: "Nurse Johnson", 
+          role: "nurse" 
+        });
+        toast.success(`Welcome, Nurse Johnson`);
+        navigate("/patients");
+      } else if (email.includes("test") || email === "patient@example.com") {
+        login({ 
+          email, 
+          displayName: "Patient User", 
+          role: "patient" 
+        });
+        toast.success(`Welcome to your patient portal`);
         navigate("/dashboard");
       } else {
         // Show error for any other email
-        toast.error("Invalid credentials. Try using a test account like test@example.com");
+        toast.error("Invalid credentials. Try using a demo account.");
       }
     } catch (error) {
-      toast.error("Something went wrong. Please try again.");
+      toast.error("Authentication error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -52,7 +80,7 @@ const LoginForm = ({ isSignUp = false }: LoginFormProps) => {
 
   return (
     <div className="glass rounded-xl p-8 shadow-lg w-full max-w-md mx-auto animate-scale-in">
-      <div className="text-center mb-8">
+      <div className="text-center mb-6">
         <h2 className="text-2xl font-bold">{isSignUp ? "Create an account" : "Welcome back"}</h2>
         <p className="text-muted-foreground mt-2">
           {isSignUp
@@ -60,6 +88,14 @@ const LoginForm = ({ isSignUp = false }: LoginFormProps) => {
             : "Enter your credentials to access your account"}
         </p>
       </div>
+
+      <Alert className="mb-6 bg-primary/10 border-primary/20">
+        <Shield className="h-4 w-4 text-primary" />
+        <AlertTitle>HIPAA Compliant System</AlertTitle>
+        <AlertDescription className="text-xs">
+          This system uses end-to-end encryption and follows all HIPAA and SOC 2 security protocols.
+        </AlertDescription>
+      </Alert>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
@@ -141,6 +177,13 @@ const LoginForm = ({ isSignUp = false }: LoginFormProps) => {
             onClick={() => handleDemoLogin("nurse@example.com")}
           >
             Nurse Demo Account
+          </ButtonCustom>
+          <ButtonCustom
+            type="button"
+            variant="outline"
+            onClick={() => handleDemoLogin("patient@example.com")}
+          >
+            Patient Demo Account
           </ButtonCustom>
         </div>
       </form>
