@@ -1,5 +1,6 @@
 
 export type ContactStatus = "lead" | "prospect" | "customer" | "inactive";
+export type ContactPriority = "low" | "medium" | "high";
 
 export interface Contact {
   id: string;
@@ -13,4 +14,14 @@ export interface Contact {
   notes: string;
   profileImage?: string;
   tags?: string[];
+  priority?: ContactPriority;
+  activities?: ContactActivity[];
+}
+
+export interface ContactActivity {
+  id: string;
+  contactId: string;
+  type: "email" | "call" | "meeting" | "note";
+  date: string;
+  description: string;
 }

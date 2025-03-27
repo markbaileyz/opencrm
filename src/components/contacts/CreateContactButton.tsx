@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Contact, ContactStatus } from "@/types/contact";
+import { Contact, ContactStatus, ContactPriority } from "@/types/contact";
 import ContactTags from "./ContactTags";
 
 interface CreateContactButtonProps {
@@ -44,6 +44,7 @@ const CreateContactButton = ({
     position: "",
     lastContact: new Date().toISOString().split("T")[0],
     status: "lead",
+    priority: "medium",
     notes: "",
     tags: []
   });
@@ -60,6 +61,13 @@ const CreateContactButton = ({
     setFormData((prev) => ({
       ...prev,
       status: value,
+    }));
+  };
+
+  const handlePriorityChange = (value: ContactPriority) => {
+    setFormData((prev) => ({
+      ...prev,
+      priority: value,
     }));
   };
   
@@ -93,6 +101,7 @@ const CreateContactButton = ({
       position: "",
       lastContact: new Date().toISOString().split("T")[0],
       status: "lead",
+      priority: "medium",
       notes: "",
       tags: []
     });
@@ -198,6 +207,22 @@ const CreateContactButton = ({
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="grid gap-2">
+                <Label htmlFor="priority">Priority</Label>
+                <Select
+                  value={formData.priority || "medium"}
+                  onValueChange={(value) => handlePriorityChange(value as ContactPriority)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low Priority</SelectItem>
+                    <SelectItem value="medium">Medium Priority</SelectItem>
+                    <SelectItem value="high">High Priority</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
                 <Label htmlFor="lastContact">Last Contact Date</Label>
                 <Input
                   id="lastContact"
@@ -207,16 +232,16 @@ const CreateContactButton = ({
                   onChange={handleChange}
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="profileImage">Profile Image URL (Optional)</Label>
-                <Input
-                  id="profileImage"
-                  name="profileImage"
-                  placeholder="https://example.com/image.jpg"
-                  value={formData.profileImage || ""}
-                  onChange={handleChange}
-                />
-              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="profileImage">Profile Image URL (Optional)</Label>
+              <Input
+                id="profileImage"
+                name="profileImage"
+                placeholder="https://example.com/image.jpg"
+                value={formData.profileImage || ""}
+                onChange={handleChange}
+              />
             </div>
             <div className="grid gap-2">
               <Label>Tags</Label>

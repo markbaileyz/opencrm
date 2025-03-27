@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Contact, ContactStatus } from "@/types/contact";
+import { Contact, ContactStatus, ContactPriority, ContactActivity } from "@/types/contact";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,8 @@ import {
   Calendar, 
   Building, 
   Briefcase,
-  User
+  User,
+  FileText
 } from "lucide-react";
 import {
   Select,
@@ -36,24 +37,43 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import ContactStatusBadge from "./ContactStatusBadge";
+import ContactPriorityBadge from "./ContactPriorityBadge";
 import ContactTags from "./ContactTags";
+import ContactActivityLog from "./ContactActivityLog";
 
 interface ContactDetailsProps {
   contact: Contact;
   onUpdateContact: (contact: Contact) => void;
   onDeleteContact: (id: string) => void;
+  onAddActivity?: (type: ContactActivity["type"], description: string) => void;
 }
 
-const ContactDetails = ({ contact, onUpdateContact, onDeleteContact }: ContactDetailsProps) => {
+const ContactDetails = ({ 
+  contact, 
+  onUpdateContact, 
+  onDeleteContact,
+  onAddActivity 
+}: ContactDetailsProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Contact>(contact);
+  const [activityDialogOpen, setActivityDialogOpen] = useState(false);
+  const [activityType, setActivityType] = useState<ContactActivity["type"]>("note");
+  const [activityDescription, setActivityDescription] = useState("");
   
   // Initialize tags if they don't exist
   React.useEffect(() => {
     setFormData({
       ...contact,
-      tags: contact.tags || []
+      tags: contact.tags || [],
+      activities: contact.activities || []
     });
   }, [contact]);
   
@@ -69,6 +89,13 @@ const ContactDetails = ({ contact, onUpdateContact, onDeleteContact }: ContactDe
     setFormData({
       ...formData,
       status,
+    });
+  };
+  
+  const handlePriorityChange = (priority: ContactPriority) => {
+    setFormData({
+      ...formData,
+      priority,
     });
   };
   
@@ -95,6 +122,20 @@ const ContactDetails = ({ contact, onUpdateContact, onDeleteContact }: ContactDe
   const handleCancel = () => {
     setFormData(contact);
     setIsEditing(false);
+  };
+
+  const handleActivityDialogOpen = (type: ContactActivity["type"]) => {
+    setActivityType(type);
+    setActivityDescription("");
+    setActivityDialogOpen(true);
+  };
+
+  const handleAddActivitySubmit = () => {
+    if (onAddActivity && activityDescription.trim()) {
+      onAddActivity(activityType, activityDescription.trim());
+      setActivityDialogOpen(false);
+      setActivityDescription("");
+    }
   };
   
   return (
@@ -229,6 +270,23 @@ const ContactDetails = ({ contact, onUpdateContact, onDeleteContact }: ContactDe
                   </div>
                   
                   <div className="grid gap-2">
+                    <Label htmlFor="priority">Priority</Label>
+                    <Select
+                      value={formData.priority || "medium"}
+                      onValueChange={(value) => handlePriorityChange(value as ContactPriority)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low Priority</SelectItem>
+                        <SelectItem value="medium">Medium Priority</SelectItem>
+                        <SelectItem value="high">High Priority</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="grid gap-2">
                     <Label htmlFor="lastContact">Last Contact Date</Label>
                     <Input
                       id="lastContact"
@@ -291,8 +349,11 @@ const ContactDetails = ({ contact, onUpdateContact, onDeleteContact }: ContactDe
                   </div>
                 )}
                 
-                <div>
-                  <ContactStatusBadge status={contact.status} size="lg" className="mx-auto" />
+                <div className="flex flex-col items-center gap-2">
+                  <ContactStatusBadge status={contact.status} size="lg" />
+                  {contact.priority && (
+                    <ContactPriorityBadge priority={contact.priority} size="lg" />
+                  )}
                 </div>
                 
                 {(contact.tags && contact.tags.length > 0) && (
@@ -354,12 +415,19 @@ const ContactDetails = ({ contact, onUpdateContact, onDeleteContact }: ContactDe
               </div>
             </div>
             
+            <div className="border-t pt-6 mt-6">
+              <ContactActivityLog 
+                activities={contact.activities || []}
+                onAddActivity={onAddActivity ? handleActivityDialogOpen : undefined}
+              />
+            </div>
+            
             <div className="flex justify-end space-x-2 pt-4">
-              <Button variant="outline">
+              <Button variant="outline" onClick={() => handleActivityDialogOpen("meeting")}>
                 <Calendar className="h-4 w-4 mr-2" />
                 Schedule Meeting
               </Button>
-              <Button>
+              <Button onClick={() => handleActivityDialogOpen("email")}>
                 <Mail className="h-4 w-4 mr-2" />
                 Send Email
               </Button>
@@ -367,6 +435,73 @@ const ContactDetails = ({ contact, onUpdateContact, onDeleteContact }: ContactDe
           </div>
         )}
       </CardContent>
+
+      {/* Activity Dialog */}
+      <Dialog open={activityDialogOpen} onOpenChange={setActivityDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {activityType === "email" && "Log Email"}
+              {activityType === "call" && "Log Call"}
+              {activityType === "meeting" && "Log Meeting"}
+              {activityType === "note" && "Add Note"}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-2">
+            <div className="grid gap-2">
+              <Label htmlFor="activityType">Type</Label>
+              <Select
+                value={activityType}
+                onValueChange={(value) => setActivityType(value as ContactActivity["type"])}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="email">Email</SelectItem>
+                  <SelectItem value="call">Phone Call</SelectItem>
+                  <SelectItem value="meeting">Meeting</SelectItem>
+                  <SelectItem value="note">Note</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="description">
+                {activityType === "note" ? "Note" : "Description"}
+              </Label>
+              <Textarea
+                id="description"
+                value={activityDescription}
+                onChange={(e) => setActivityDescription(e.target.value)}
+                placeholder={
+                  activityType === "email" ? "Discussed project timeline and next steps..."
+                  : activityType === "call" ? "Called about the upcoming proposal..."
+                  : activityType === "meeting" ? "Met to review requirements and timeline..."
+                  : "Added information about the contact..."
+                }
+                rows={4}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setActivityDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleAddActivitySubmit}
+              disabled={!activityDescription.trim()}
+            >
+              {activityType === "note" ? "Add Note" : "Log Activity"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
