@@ -1,8 +1,15 @@
 
-import React from "react";
+import React, { useState } from "react";
+import { format } from "date-fns";
 import DashboardLayout from "@/components/DashboardLayout";
 import AppointmentList from "@/components/dashboard/AppointmentList";
 import EmailIntegrationSection from "@/components/calendar/EmailIntegrationSection";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
 
 // Import custom hooks
 import { useCalendar } from "@/hooks/useCalendar";
@@ -12,6 +19,8 @@ import { useCalendarEmailIntegration } from "@/hooks/useCalendarEmailIntegration
 // Import refactored components
 import CalendarHeader from "@/components/calendar/CalendarHeader";
 import CalendarMainContent from "@/components/calendar/CalendarMainContent";
+import { Button } from "@/components/ui/button";
+import { CalendarPlus } from "lucide-react";
 
 const Calendar = () => {
   const {
@@ -54,9 +63,19 @@ const Calendar = () => {
     setEditAppointmentId
   });
 
+  const [activeView, setActiveView] = useState<'calendar' | 'upcoming'>('calendar');
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h1 className="text-2xl font-semibold">Calendar</h1>
+          <Button onClick={() => setIsAddAppointmentOpen(true)}>
+            <CalendarPlus className="mr-2 h-4 w-4" />
+            New Appointment
+          </Button>
+        </div>
+        
         <CalendarHeader
           selectedDate={selectedDate}
           editAppointmentId={editAppointmentId}
@@ -92,9 +111,16 @@ const Calendar = () => {
         
         <EmailIntegrationSection onGoToEmail={handleGoToEmail} />
         
-        <div className="mt-6">
-          <AppointmentList />
-        </div>
+        <Dialog open={isAddAppointmentOpen} onOpenChange={setIsAddAppointmentOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>
+                {editAppointmentId ? "Edit Appointment" : "New Appointment"}
+              </DialogTitle>
+            </DialogHeader>
+            {/* AppointmentForm would be imported and used here */}
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );
