@@ -1,9 +1,10 @@
+
 import React, { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Settings as SettingsIcon, Lock, Info } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Import refactored components
 import SettingsHeader from "@/components/settings/SettingsHeader";
@@ -12,6 +13,9 @@ import ProfileSettingsForm, { ProfileFormValues } from "@/components/settings/Pr
 import SecuritySettingsForm, { SecurityFormValues } from "@/components/settings/SecuritySettingsForm";
 import NotificationSettingsForm from "@/components/settings/NotificationSettingsForm";
 import DangerZoneSection from "@/components/settings/DangerZoneSection";
+import IntegrationSettings from "@/components/settings/IntegrationSettings";
+import DataManagementSettings from "@/components/settings/DataManagementSettings";
+import SubscriptionSettings from "@/components/settings/SubscriptionSettings";
 
 const timezones = [
   { value: "UTC-12", label: "UTC-12:00 (Baker Island, Howland Island)" },
@@ -44,6 +48,7 @@ const timezones = [
 
 const Settings = () => {
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("account");
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [smsNotifications, setSmsNotifications] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
@@ -52,8 +57,6 @@ const Settings = () => {
 
   const handleSaveSettings = (values: ProfileFormValues) => {
     console.log("Form values:", values);
-    console.log("Email notifications:", emailNotifications);
-    console.log("SMS notifications:", smsNotifications);
     
     toast({
       title: "Settings saved",
@@ -95,77 +98,79 @@ const Settings = () => {
           description="Manage your account settings and preferences."
         />
 
-        <div className="grid gap-6">
-          <SettingsCard
-            title="Profile Settings"
-            description="Update your personal information and preferences."
-          >
-            <ProfileSettingsForm
-              defaultValues={{
-                fullName: "John Doe",
-                email: "johndoe@example.com",
-                phone: "",
-                timezone: "UTC-7",
-              }}
-              timezones={timezones}
-              onSubmit={handleSaveSettings}
-            />
-          </SettingsCard>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full">
+            <TabsTrigger value="account">Account</TabsTrigger>
+            <TabsTrigger value="security">Security</TabsTrigger>
+            <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="billing">Billing</TabsTrigger>
+          </TabsList>
+          
+          <div className="mt-6">
+            <TabsContent value="account" className="space-y-6">
+              <SettingsCard
+                title="Profile Settings"
+                description="Update your personal information and preferences."
+              >
+                <ProfileSettingsForm
+                  defaultValues={{
+                    fullName: "John Doe",
+                    email: "johndoe@example.com",
+                    phone: "",
+                    timezone: "UTC-7",
+                  }}
+                  timezones={timezones}
+                  onSubmit={handleSaveSettings}
+                />
+              </SettingsCard>
 
-          <SettingsCard
-            title="Security Settings"
-            description="Manage your password and two-factor authentication."
-            icon={<Lock className="h-5 w-5" />}
-            collapsible
-            headerAction={
-              <Collapsible open={isSecuritySettingsOpen} onOpenChange={setIsSecuritySettingsOpen}>
-                <CollapsibleTrigger className="rounded-full p-2 hover:bg-muted">
-                  {isSecuritySettingsOpen ? (
-                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4">
-                      <path d="M3.13523 6.15803C3.3241 5.95657 3.64052 5.94637 3.84197 6.13523L7.5 9.56464L11.158 6.13523C11.3595 5.94637 11.6759 5.95657 11.8648 6.15803C12.0536 6.35949 12.0434 6.67591 11.842 6.86477L7.84197 10.6148C7.64964 10.7951 7.35036 10.7951 7.15803 10.6148L3.15803 6.86477C2.95657 6.67591 2.94637 6.35949 3.13523 6.15803Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
-                    </svg>
-                  ) : (
-                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4">
-                      <path d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
-                    </svg>
-                  )}
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SecuritySettingsForm
-                    onPasswordChange={handlePasswordChange}
-                    twoFactorEnabled={twoFactorEnabled}
-                    onTwoFactorChange={setTwoFactorEnabled}
-                  />
-                </CollapsibleContent>
-              </Collapsible>
-            }
-          >
-            <div></div>
-          </SettingsCard>
+              <SettingsCard
+                title="Notification Preferences"
+                description="Control how and when you receive notifications."
+              >
+                <NotificationSettingsForm
+                  emailNotifications={emailNotifications}
+                  setEmailNotifications={setEmailNotifications}
+                  smsNotifications={smsNotifications}
+                  setSmsNotifications={setSmsNotifications}
+                  dataAnalytics={dataAnalytics}
+                  setDataAnalytics={setDataAnalytics}
+                  onSave={handleNotificationSave}
+                />
+              </SettingsCard>
 
-          <SettingsCard
-            title="Notification Preferences"
-            description="Control how and when you receive notifications."
-          >
-            <NotificationSettingsForm
-              emailNotifications={emailNotifications}
-              setEmailNotifications={setEmailNotifications}
-              smsNotifications={smsNotifications}
-              setSmsNotifications={setSmsNotifications}
-              dataAnalytics={dataAnalytics}
-              setDataAnalytics={setDataAnalytics}
-              onSave={handleNotificationSave}
-            />
-          </SettingsCard>
+              <DataManagementSettings />
+            </TabsContent>
+            
+            <TabsContent value="security" className="space-y-6">
+              <SettingsCard
+                title="Security Settings"
+                description="Manage your password and two-factor authentication."
+              >
+                <SecuritySettingsForm
+                  onPasswordChange={handlePasswordChange}
+                  twoFactorEnabled={twoFactorEnabled}
+                  onTwoFactorChange={setTwoFactorEnabled}
+                />
+              </SettingsCard>
 
-          <SettingsCard
-            title="Advanced Settings"
-            description="Danger zone - these actions cannot be undone."
-            icon={<Info className="h-5 w-5 text-destructive" />}
-          >
-            <DangerZoneSection onDeleteAccount={handleDeleteAccount} />
-          </SettingsCard>
-        </div>
+              <SettingsCard
+                title="Danger Zone"
+                description="Danger zone - these actions cannot be undone."
+              >
+                <DangerZoneSection onDeleteAccount={handleDeleteAccount} />
+              </SettingsCard>
+            </TabsContent>
+            
+            <TabsContent value="integrations">
+              <IntegrationSettings />
+            </TabsContent>
+            
+            <TabsContent value="billing">
+              <SubscriptionSettings />
+            </TabsContent>
+          </div>
+        </Tabs>
       </div>
     </DashboardLayout>
   );
