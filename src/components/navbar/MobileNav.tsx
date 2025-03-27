@@ -63,6 +63,14 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
         <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={() => handleNavigate("/roadmap")}>
           Roadmap
         </NavLink>
+        <NavLink 
+          href="/pre-check-in" 
+          active={isActive("/pre-check-in")} 
+          onClick={() => handleNavigate("/pre-check-in")}
+          className="bg-primary/10 text-primary font-semibold rounded-full px-4 py-2 flex items-center justify-center"
+        >
+          Pre-Check-In
+        </NavLink>
         <div className="flex space-x-4 pt-2">
           <Link to="/login" onClick={closeMobileMenu}>
             <ButtonCustom variant="ghost" size="sm">

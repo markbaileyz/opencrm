@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const ContactSupport: React.FC = () => {
   return (
@@ -10,6 +11,9 @@ const ContactSupport: React.FC = () => {
       <div className="flex flex-wrap gap-4">
         <Button>Contact Support</Button>
         <Button variant="outline">Submit a Feature Request</Button>
+        <Link to="/pre-check-in">
+          <Button variant="default" className="bg-primary">Pre-Check-In</Button>
+        </Link>
       </div>
     </div>
   );

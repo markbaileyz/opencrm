@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -35,6 +35,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useOfflineState } from "@/hooks/use-offline-state";
 import { Badge } from "@/components/ui/badge";
+import { Camera, Upload, RefreshCw, X } from "lucide-react";
+
+const FILE_SIZE_LIMIT = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 const checkInSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }),
@@ -55,6 +59,11 @@ const checkInSchema = z.object({
   consent: z.boolean().refine(val => val === true, {
     message: "You must agree to the terms and conditions",
   }),
+  // Optional document uploads
+  insuranceCardFront: z.any().optional(),
+  insuranceCardBack: z.any().optional(),
+  driversLicenseFront: z.any().optional(),
+  driversLicenseBack: z.any().optional(),
 });
 
 type CheckInFormValues = z.infer<typeof checkInSchema>;
@@ -65,6 +74,19 @@ const PreCheckIn = () => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { isOnline, queueAction } = useOfflineState();
+  
+  // Document preview states
+  const [documents, setDocuments] = useState({
+    insuranceCardFront: null as string | null,
+    insuranceCardBack: null as string | null,
+    driversLicenseFront: null as string | null,
+    driversLicenseBack: null as string | null
+  });
+  
+  // Camera states
+  const [activeCamera, setActiveCamera] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   
   const form = useForm<CheckInFormValues>({
     resolver: zodResolver(checkInSchema),
@@ -112,6 +134,124 @@ const PreCheckIn = () => {
     window.scrollTo(0, 0);
   };
   
+  // Handle file uploads
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, documentType: keyof typeof documents) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    // Validate file size
+    if (file.size > FILE_SIZE_LIMIT) {
+      toast({
+        title: "File too large",
+        description: "The file must be less than 5MB",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Validate file type
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload a valid image file (JPEG, PNG, WEBP)",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      setDocuments(prev => ({
+        ...prev,
+        [documentType]: dataUrl
+      }));
+      
+      // Store the file in the form data
+      form.setValue(documentType as any, file);
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  // Camera functionality
+  const startCamera = async (documentType: keyof typeof documents) => {
+    setActiveCamera(documentType);
+    
+    if (videoRef.current) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: 'environment' } 
+        });
+        videoRef.current.srcObject = stream;
+      } catch (err) {
+        console.error("Error accessing camera:", err);
+        toast({
+          title: "Camera Error",
+          description: "Unable to access camera. Please check permissions.",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+  
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+      setActiveCamera(null);
+    }
+  };
+  
+  const capturePhoto = () => {
+    if (!activeCamera || !videoRef.current || !canvasRef.current) return;
+    
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Draw video frame to canvas
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      // Convert canvas to data URL
+      const dataUrl = canvas.toDataURL('image/jpeg');
+      
+      // Convert data URL to a Blob
+      fetch(dataUrl)
+        .then(res => res.blob())
+        .then(blob => {
+          // Create a File object from the Blob
+          const file = new File([blob], `${activeCamera}.jpg`, { type: 'image/jpeg' });
+          
+          // Update documents state
+          setDocuments(prev => ({
+            ...prev,
+            [activeCamera]: dataUrl
+          }));
+          
+          // Set form value
+          form.setValue(activeCamera as any, file);
+          
+          // Stop camera
+          stopCamera();
+        });
+    }
+  };
+  
+  const removeDocument = (documentType: keyof typeof documents) => {
+    setDocuments(prev => ({
+      ...prev,
+      [documentType]: null
+    }));
+    form.setValue(documentType as any, undefined);
+  };
+  
   const onSubmit = (data: CheckInFormValues) => {
     setIsSubmitting(true);
     
@@ -122,7 +262,16 @@ const PreCheckIn = () => {
           resolve({
             success: true,
             message: "Check-in submitted successfully",
-            data: { id: Date.now().toString(), ...data }
+            data: { 
+              id: Date.now().toString(), 
+              ...data,
+              documentUploads: {
+                insuranceCardFront: documents.insuranceCardFront,
+                insuranceCardBack: documents.insuranceCardBack,
+                driversLicenseFront: documents.driversLicenseFront,
+                driversLicenseBack: documents.driversLicenseBack
+              }
+            }
           });
         }, 1500);
       });
@@ -130,7 +279,10 @@ const PreCheckIn = () => {
     
     if (!isOnline) {
       // Queue the action for when we're back online
-      queueAction('patient-check-in', data);
+      queueAction('patient-check-in', {
+        ...data,
+        documentUploads: documents
+      });
       
       toast({
         title: "Check-in saved",
@@ -142,7 +294,8 @@ const PreCheckIn = () => {
       navigate("/check-in-confirmation", { 
         state: { 
           isOffline: true,
-          data 
+          data,
+          documents
         } 
       });
       return;
@@ -176,8 +329,107 @@ const PreCheckIn = () => {
     });
   };
   
+  // Render document upload section
+  const renderDocumentUpload = (documentType: keyof typeof documents, label: string) => {
+    const documentPreview = documents[documentType];
+    
+    return (
+      <div className="border rounded-md p-4 mb-4">
+        <h4 className="font-medium mb-2">{label}</h4>
+        
+        {documentPreview ? (
+          <div className="mb-4">
+            <div className="relative">
+              <img 
+                src={documentPreview} 
+                alt={label} 
+                className="max-w-full h-auto rounded-md mb-2 border" 
+              />
+              <Button 
+                type="button" 
+                variant="destructive" 
+                size="sm"
+                className="absolute top-2 right-2"
+                onClick={() => removeDocument(documentType)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col sm:flex-row gap-2 mb-4">
+            <div className="flex-1">
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => startCamera(documentType)}
+              >
+                <Camera className="mr-2 h-4 w-4" />
+                Take Photo
+              </Button>
+            </div>
+            <div className="flex-1">
+              <label className="w-full">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  asChild
+                >
+                  <div>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload Image
+                  </div>
+                </Button>
+                <Input 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={(e) => handleFileUpload(e, documentType)}
+                />
+              </label>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+  
   return (
     <div className="container mx-auto px-4 py-10 min-h-screen bg-gray-50">
+      {/* Camera component */}
+      {activeCamera && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex flex-col justify-center items-center p-4">
+          <div className="bg-background rounded-lg w-full max-w-md overflow-hidden">
+            <div className="p-4 flex justify-between items-center border-b">
+              <h3 className="font-semibold">Take Photo</h3>
+              <Button variant="ghost" size="sm" onClick={stopCamera}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="relative">
+              <video 
+                ref={videoRef} 
+                autoPlay 
+                playsInline 
+                className="w-full h-auto" 
+              />
+              <canvas ref={canvasRef} className="hidden" />
+            </div>
+            
+            <div className="p-4 flex justify-between">
+              <Button variant="outline" onClick={stopCamera}>Cancel</Button>
+              <Button onClick={capturePhoto}>
+                <Camera className="mr-2 h-4 w-4" />
+                Capture
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <Card className="max-w-2xl mx-auto shadow-lg">
         <CardHeader className="pb-4">
           <div className="flex justify-between items-center">
@@ -194,13 +446,14 @@ const PreCheckIn = () => {
           <div className="w-full mt-4 bg-gray-200 rounded-full h-2.5">
             <div 
               className="bg-primary h-2.5 rounded-full transition-all" 
-              style={{ width: `${(step / 3) * 100}%` }}
+              style={{ width: `${(step / 4) * 100}%` }}
             ></div>
           </div>
           <div className="flex justify-between text-xs text-muted-foreground mt-1">
             <span>Patient Info</span>
-            <span>Additional Details</span>
-            <span>Review & Submit</span>
+            <span>Details</span>
+            <span>Documents</span>
+            <span>Review</span>
           </div>
         </CardHeader>
         
@@ -427,6 +680,21 @@ const PreCheckIn = () => {
               
               {step === 3 && (
                 <div className="space-y-4" data-testid="step-3">
+                  <div className="bg-muted p-3 rounded-md mb-4">
+                    <p className="text-sm text-muted-foreground">
+                      Please upload or take photos of your documents. This will speed up your check-in process.
+                    </p>
+                  </div>
+                  
+                  {renderDocumentUpload("insuranceCardFront", "Insurance Card (Front)")}
+                  {renderDocumentUpload("insuranceCardBack", "Insurance Card (Back)")}
+                  {renderDocumentUpload("driversLicenseFront", "Driver's License (Front)")}
+                  {renderDocumentUpload("driversLicenseBack", "Driver's License (Back)")}
+                </div>
+              )}
+              
+              {step === 4 && (
+                <div className="space-y-4" data-testid="step-4">
                   <div className="grid grid-cols-1 gap-4">
                     <FormField
                       control={form.control}
@@ -521,6 +789,21 @@ const PreCheckIn = () => {
                         <dd>{form.getValues("reasonForVisit")}</dd>
                       </div>
                     </dl>
+                    
+                    <div className="mt-4 grid grid-cols-2 gap-4">
+                      <div>
+                        <h5 className="text-sm font-medium mb-1">Documents Uploaded:</h5>
+                        <ul className="text-sm text-muted-foreground">
+                          {documents.insuranceCardFront && <li>Insurance Card (Front)</li>}
+                          {documents.insuranceCardBack && <li>Insurance Card (Back)</li>}
+                          {documents.driversLicenseFront && <li>Driver's License (Front)</li>}
+                          {documents.driversLicenseBack && <li>Driver's License (Back)</li>}
+                          {!documents.insuranceCardFront && !documents.insuranceCardBack && 
+                           !documents.driversLicenseFront && !documents.driversLicenseBack && 
+                           <li>No documents uploaded</li>}
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -539,7 +822,7 @@ const PreCheckIn = () => {
             </Button>
           )}
           
-          {step < 3 ? (
+          {step < 4 ? (
             <Button onClick={nextStep} disabled={isSubmitting}>
               Next
             </Button>

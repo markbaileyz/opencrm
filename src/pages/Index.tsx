@@ -10,7 +10,7 @@ import Navbar from "@/components/Navbar";
 import { Link } from "react-router-dom";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
-import { UserPlus, ChevronDown, Building, User, Calendar, Lightbulb, Heart } from "lucide-react";
+import { UserPlus, ChevronDown, Building, User, Calendar, Lightbulb, Heart, Camera, FileImage } from "lucide-react";
 
 const Index = () => {
   const featuresRef = useRef<HTMLDivElement>(null);
@@ -51,6 +51,33 @@ const Index = () => {
       
       <main className="flex-grow">
         <Hero scrollToSection={scrollToSection} />
+        
+        {/* Pre-Check-In Banner */}
+        <div className="bg-primary/10 py-6">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 rounded-xl bg-white shadow-lg">
+              <div className="flex-1">
+                <h2 className="text-xl md:text-2xl font-bold mb-2">Skip the Wait, Pre-Check-In Online</h2>
+                <p className="text-muted-foreground mb-4">Upload your documents, provide your information, and save time on your next visit.</p>
+                <div className="flex gap-2">
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <FileImage className="h-4 w-4" />
+                    <span>Upload ID</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Camera className="h-4 w-4" />
+                    <span>Take Photos</span>
+                  </div>
+                </div>
+              </div>
+              <Link to="/pre-check-in">
+                <Button size="lg" className="whitespace-nowrap">
+                  Pre-Check-In Now
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
         
         <div className="container mx-auto px-4 py-12 mt-6">
           <div className="text-center mb-10">

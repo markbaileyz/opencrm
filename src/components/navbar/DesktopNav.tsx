@@ -51,6 +51,14 @@ const DesktopNav = ({ isActive, scrollToSection }: DesktopNavProps) => {
         <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={() => handleNavigate("/roadmap")}>
           Roadmap
         </NavLink>
+        <NavLink 
+          href="/pre-check-in" 
+          active={isActive("/pre-check-in")} 
+          onClick={() => handleNavigate("/pre-check-in")}
+          className="bg-primary/10 text-primary font-semibold rounded-full px-4 py-1 transition-colors hover:bg-primary/20"
+        >
+          Pre-Check-In
+        </NavLink>
       </nav>
 
       <div className="hidden md:flex items-center space-x-4">

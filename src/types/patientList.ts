@@ -15,4 +15,10 @@ export interface PatientListItem {
   status: string;
   lastVisit: string;
   medicalHistory?: string[]; // Added to fix the type errors in Patients.tsx
+  documents?: {
+    insuranceCardFront?: string;
+    insuranceCardBack?: string;
+    driversLicenseFront?: string;
+    driversLicenseBack?: string;
+  };
 }

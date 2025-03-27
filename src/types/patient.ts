@@ -40,6 +40,13 @@ export interface Patient {
   appointments?: PatientAppointment[];
   insuranceHistory?: Insurance[];
   tasks?: PatientTask[];
+  // New fields for document uploads
+  documentUploads?: {
+    insuranceCardFront?: string;
+    insuranceCardBack?: string;
+    driversLicenseFront?: string;
+    driversLicenseBack?: string;
+  };
 }
 
 export interface PatientDocument {

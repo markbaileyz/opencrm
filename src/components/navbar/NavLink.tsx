@@ -1,15 +1,17 @@
 
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 interface NavLinkProps {
   href: string;
   active: boolean;
   children: React.ReactNode;
   onClick?: () => void;
+  className?: string;
 }
 
-const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
+const NavLink = ({ href, active, children, onClick, className }: NavLinkProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -63,9 +65,11 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
   return (
     <Link
       to={href}
-      className={`font-medium text-sm hover-underline ${
-        active ? "text-primary" : "text-foreground"
-      }`}
+      className={cn(
+        "font-medium text-sm hover-underline",
+        active ? "text-primary" : "text-foreground",
+        className
+      )}
       onClick={handleClick}
     >
       {children}
