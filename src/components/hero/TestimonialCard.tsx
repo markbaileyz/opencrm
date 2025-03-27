@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Star } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface TestimonialCardProps {
   quote: string;
@@ -10,23 +10,38 @@ interface TestimonialCardProps {
   facility: string;
 }
 
-const TestimonialCard = ({ quote, name, role, facility }: TestimonialCardProps) => (
-  <Card className="glass border-white/10 hover:shadow-lg transition-all duration-300">
-    <CardContent className="p-6">
-      <div className="mb-4">
-        <div className="flex space-x-1">
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} className="h-5 w-5 text-primary fill-primary" />
-          ))}
+const TestimonialCard = ({ quote, name, role, facility }: TestimonialCardProps) => {
+  return (
+    <div className="relative glass rounded-xl p-6 shadow-md transition-all duration-300 hover:shadow-lg">
+      <div className="absolute -top-3 left-6">
+        <Badge variant="primary" className="shadow-sm">
+          Testimonial
+        </Badge>
+      </div>
+      
+      <div className="flex text-primary mb-4">
+        {[...Array(5)].map((_, i) => (
+          <Star key={i} className="h-4 w-4 fill-current" />
+        ))}
+      </div>
+      
+      <blockquote className="mb-4 text-foreground">
+        <p className="relative text-base leading-relaxed">
+          <span className="absolute -left-2 -top-2 text-3xl text-primary/40">"</span>
+          {quote}
+          <span className="absolute -bottom-4 right-0 text-3xl text-primary/40">"</span>
+        </p>
+      </blockquote>
+      
+      <div className="mt-6 pt-4 border-t border-border">
+        <p className="font-semibold">{name}</p>
+        <div className="flex flex-col text-sm text-muted-foreground">
+          <span>{role}</span>
+          <span>{facility}</span>
         </div>
       </div>
-      <p className="mb-6 text-foreground">{quote}</p>
-      <div>
-        <p className="font-medium">{name}</p>
-        <p className="text-sm text-muted-foreground">{role}, {facility}</p>
-      </div>
-    </CardContent>
-  </Card>
-);
+    </div>
+  );
+};
 
 export default TestimonialCard;

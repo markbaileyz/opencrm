@@ -1,15 +1,25 @@
 
 import React from "react";
 import { Check, MessageSquare, Calendar, ClipboardList, Shield, Users } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 const Features = () => {
   return (
-    <section id="features" className="py-16 md:py-24 bg-secondary/50">
+    <section id="features" className="py-20 md:py-28 bg-gradient-to-b from-white to-secondary/10">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16 animate-fade-up">
+          <Badge variant="primary" className="mb-4">
+            Features
+          </Badge>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             All-in-one healthcare platform
           </h2>
+          <div className="flex items-center justify-center mb-6">
+            <Separator className="w-12 bg-primary/30" />
+            <span className="mx-4 text-primary/80 font-medium">Powerful Features</span>
+            <Separator className="w-12 bg-primary/30" />
+          </div>
           <p className="text-lg text-muted-foreground">
             Everything you need to manage your practice and provide the best care for your patients.
           </p>
@@ -110,7 +120,7 @@ interface FeatureCardProps {
 
 const FeatureCard = ({ icon, title, description, children, delay }: FeatureCardProps) => {
   return (
-    <div className={`glass rounded-xl p-6 transition-all duration-300 hover:shadow-lg animate-fade-up ${delay}`}>
+    <div className={`bg-white rounded-xl p-6 border border-primary/10 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-up ${delay}`}>
       <div className="rounded-full bg-primary/10 w-12 h-12 flex items-center justify-center mb-4">
         {icon}
       </div>
@@ -129,7 +139,9 @@ interface FeatureItemProps {
 const FeatureItem = ({ children }: FeatureItemProps) => {
   return (
     <li className="flex items-center text-sm">
-      <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+      <div className="rounded-full bg-green-100 p-0.5 mr-2">
+        <Check className="h-3.5 w-3.5 text-green-600" />
+      </div>
       <span>{children}</span>
     </li>
   );

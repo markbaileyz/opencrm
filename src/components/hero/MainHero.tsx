@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, Users, ClipboardCheck, Shield } from "lucide-react";
 import { ButtonCustom } from "@/components/ui/button-custom";
 import ResponsiveImage from "@/components/ui/responsive-image";
+import { Badge } from "@/components/ui/badge";
 
 interface MainHeroProps {
   scrollToSection: (sectionId: string) => void;
@@ -35,12 +36,12 @@ const MainHero = ({ scrollToSection }: MainHeroProps) => {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
       <div className="space-y-6 animate-fade-up">
         <div className="flex items-center space-x-2">
-          <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+          <Badge variant="primary" className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium">
             <CheckCircle className="mr-1 h-3.5 w-3.5" />
             Healthcare-specific CRM
-          </span>
+          </Badge>
         </div>
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
           Transform Your Patient Relationships
         </h1>
         <p className="text-lg text-muted-foreground max-w-lg">
@@ -65,7 +66,7 @@ const MainHero = ({ scrollToSection }: MainHeroProps) => {
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-violet-500/20 rounded-3xl transform rotate-1 blur-xl"></div>
         <div className="glass rounded-3xl p-1 relative z-10 border border-white/20 shadow-xl overflow-hidden">
           <ResponsiveImage 
-            src="https://images.unsplash.com/photo-1504439468489-c8920d796a29?q=80&w=2000"
+            src="/lovable-uploads/8f809609-fda6-4c5f-b64d-3eea05d2eec9.png"
             alt="Healthcare professionals discussing patient data on a tablet" 
             className="w-full h-full rounded-2xl"
             aspectRatio="16/9"

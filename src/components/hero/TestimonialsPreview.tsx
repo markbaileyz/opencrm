@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ButtonCustom } from "@/components/ui/button-custom";
 import TestimonialCard from "./TestimonialCard";
+import { Separator } from "@/components/ui/separator";
 
 interface TestimonialsPreviewProps {
   title: string;
@@ -45,11 +46,16 @@ const TestimonialsPreview = ({
   };
 
   return (
-    <div className="animate-fade-up">
+    <div className="animate-fade-up py-10">
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-bold leading-tight tracking-tight mb-4">
           {title}
         </h2>
+        <div className="flex items-center justify-center mb-6">
+          <Separator className="w-12 bg-primary/30" />
+          <span className="mx-4 text-primary font-medium">Trusted by Healthcare Professionals</span>
+          <Separator className="w-12 bg-primary/30" />
+        </div>
         <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
           {description}
         </p>
