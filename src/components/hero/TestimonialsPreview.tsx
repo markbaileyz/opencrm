@@ -6,6 +6,7 @@ import { ButtonCustom } from "@/components/ui/button-custom";
 import TestimonialCard from "./TestimonialCard";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface TestimonialsPreviewProps {
   title: string;
@@ -54,6 +55,10 @@ const TestimonialsPreview = ({
         <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
         
         <div className="relative z-10">
+          <div className="flex justify-end px-6 mb-2">
+            <ThemeToggle />
+          </div>
+          
           <div className="text-center mb-12">
             <Badge variant="primary" className="mb-4 bg-blue-500/20 text-blue-300 border border-blue-400/30">
               <Quote className="h-3.5 w-3.5 mr-1" />
@@ -72,7 +77,7 @@ const TestimonialsPreview = ({
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-6">
             {testimonials.map((testimonial, index) => (
               <TestimonialCard
                 key={index}

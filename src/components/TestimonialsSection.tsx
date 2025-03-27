@@ -2,7 +2,8 @@
 import React from "react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Star } from "lucide-react";
+import { Star, Quote } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface TestimonialProps {
   name: string;
@@ -15,28 +16,30 @@ interface TestimonialProps {
 
 const TestimonialCard = ({ name, role, content, rating, image, className = "" }: TestimonialProps) => {
   return (
-    <div className={`relative bg-white rounded-xl p-6 border border-primary/10 shadow-md transition-all duration-300 hover:shadow-lg hover:border-primary/30 ${className}`}>
-      <div className="flex text-primary mb-4">
+    <div className={`relative dark-card p-6 border border-white/10 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-blue-500/20 ${className}`}>
+      <div className="flex text-yellow-400 mb-4">
         {Array(rating).fill(0).map((_, i) => (
-          <Star key={i} className="h-4 w-4 fill-current" />
+          <Star key={i} className="h-4 w-4 fill-yellow-400" />
         ))}
       </div>
       
-      <blockquote className="mb-4 text-foreground">
+      <Quote className="h-8 w-8 text-blue-400/30 mb-2" />
+      
+      <blockquote className="mb-4 text-white">
         <p className="relative text-base leading-relaxed">
-          <span className="absolute -left-2 -top-2 text-3xl text-primary/40">"</span>
+          <span className="absolute -left-2 -top-2 text-3xl text-blue-400/40">"</span>
           {content}
-          <span className="absolute -bottom-4 right-0 text-3xl text-primary/40">"</span>
+          <span className="absolute -bottom-4 right-0 text-3xl text-blue-400/40">"</span>
         </p>
       </blockquote>
       
-      <div className="mt-6 pt-4 border-t border-border flex items-center">
-        <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
+      <div className="mt-8 pt-4 border-t border-white/10 flex items-center">
+        <div className="w-10 h-10 rounded-full overflow-hidden mr-3 border border-blue-500/20">
           <img src={image} alt={name} className="w-full h-full object-cover" />
         </div>
         <div>
-          <p className="font-semibold">{name}</p>
-          <p className="text-sm text-muted-foreground">{role}</p>
+          <p className="font-semibold text-white">{name}</p>
+          <p className="text-sm text-blue-300">{role}</p>
         </div>
       </div>
     </div>
@@ -45,21 +48,29 @@ const TestimonialCard = ({ name, role, content, rating, image, className = "" }:
 
 const TestimonialsSection = () => {
   return (
-    <section id="testimonials" className="py-16 md:py-24 bg-gradient-to-b from-secondary/30 to-secondary/5">
-      <div className="container mx-auto px-4 md:px-6">
+    <section id="testimonials" className="py-16 md:py-24 dark-gradient relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
+      
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
+        <div className="flex justify-end mb-4">
+          <ThemeToggle />
+        </div>
+        
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <Badge variant="primary" className="mb-4">
+          <Badge variant="primary" className="mb-4 shadow-sm bg-blue-500/20 text-blue-300 border border-blue-400/30">
             Customer Success
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-up">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-up text-white">
             Trusted by healthcare professionals
           </h2>
           <div className="flex items-center justify-center mb-6">
-            <Separator className="w-12 bg-primary/30" />
-            <span className="mx-4 text-primary/80 font-medium">What our users say</span>
-            <Separator className="w-12 bg-primary/30" />
+            <Separator className="w-12 bg-blue-400/30" />
+            <span className="mx-4 text-blue-300 font-medium">What our users say</span>
+            <Separator className="w-12 bg-blue-400/30" />
           </div>
-          <p className="text-lg text-muted-foreground animate-fade-up delay-100">
+          <p className="text-lg text-white/70 animate-fade-up delay-100">
             See how OpenCRM is transforming healthcare practices across the country
           </p>
         </div>
