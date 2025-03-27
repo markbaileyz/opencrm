@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Contact, ContactStatus, ContactPriority, ContactActivity, FollowUp } from "@/types/contact";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +28,7 @@ import ContactInfo from "./ContactInfo";
 import ContactActivityLog from "./ContactActivityLog";
 import ContactFollowUpSection from "./ContactFollowUpSection";
 import ContactActivityDialog from "./ContactActivityDialog";
+import ContactEmailTemplates from "./ContactEmailTemplates";
 import { Label } from "@/components/ui/label";
 
 interface ContactDetailsProps {
@@ -50,7 +50,6 @@ const ContactDetails = ({
   const [activityType, setActivityType] = useState<ContactActivity["type"]>("note");
   const [activityDescription, setActivityDescription] = useState("");
   
-  // Initialize form data when contact changes
   useEffect(() => {
     setFormData({
       ...contact,
@@ -128,7 +127,13 @@ const ContactDetails = ({
 
     onUpdateContact(updatedContact);
   };
-  
+
+  const handleEmailTemplateSelect = (subject: string, body: string) => {
+    setActivityType("email");
+    setActivityDescription(`Subject: ${subject}\n\n${body}`);
+    setActivityDialogOpen(true);
+  };
+
   return (
     <Card className="h-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -211,6 +216,10 @@ const ContactDetails = ({
             </div>
             
             <div className="flex justify-end space-x-2 pt-4">
+              <ContactEmailTemplates 
+                contact={contact}
+                onSelectTemplate={handleEmailTemplateSelect}
+              />
               <Button variant="outline" onClick={() => handleActivityDialogOpen("meeting")}>
                 <Calendar className="h-4 w-4 mr-2" />
                 Schedule Meeting
