@@ -16,7 +16,7 @@ interface TestimonialProps {
 
 const TestimonialCard = ({ name, role, content, rating, image, className = "" }: TestimonialProps) => {
   return (
-    <div className={`relative dark-card p-6 border border-white/10 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-blue-500/20 ${className}`}>
+    <div className={`relative p-6 rounded-xl bg-[#0f1c36] border border-blue-500/10 shadow-xl hover:shadow-blue-500/5 transition-all duration-300 hover:border-blue-500/20 hover:translate-y-[-3px] ${className}`}>
       <div className="flex text-yellow-400 mb-4">
         {Array(rating).fill(0).map((_, i) => (
           <Star key={i} className="h-4 w-4 fill-yellow-400" />
@@ -48,7 +48,7 @@ const TestimonialCard = ({ name, role, content, rating, image, className = "" }:
 
 const TestimonialsSection = () => {
   return (
-    <section id="testimonials" className="py-16 md:py-24 dark-gradient relative overflow-hidden">
+    <section id="testimonials" className="py-16 md:py-24 bg-[#0a1527]/95 backdrop-blur-md relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>

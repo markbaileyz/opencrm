@@ -1,11 +1,16 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 import { Toggle } from "@/components/ui/toggle";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  
+  // Set theme to dark by default when component mounts
+  useEffect(() => {
+    setTheme("dark");
+  }, []);
 
   return (
     <div className="flex items-center space-x-2">
