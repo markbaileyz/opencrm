@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
@@ -15,6 +16,8 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  TooltipProviderProps,
+  TooltipContentProps,
 } from "@/components/ui/tooltip"
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state"
@@ -576,14 +579,15 @@ const SidebarMenuButton = React.forwardRef<
     }
 
     return (
-      <Tooltip>
-        <TooltipTrigger asChild>{button}</TooltipTrigger>
+      <Tooltip content={
         <TooltipContent
           side="right"
           align="center"
           hidden={state !== "collapsed" || isMobile}
           {...tooltip}
         />
+      }>
+        <TooltipTrigger asChild>{button}</TooltipTrigger>
       </Tooltip>
     )
   }

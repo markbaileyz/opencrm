@@ -2,7 +2,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-interface TooltipProps {
+export interface TooltipProps {
   children: React.ReactNode;
   content: React.ReactNode;
   position?: 'top' | 'bottom' | 'left' | 'right';
@@ -87,19 +87,31 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
 // These components are simplified compatibility versions for radix-ui/tooltip
 // They're used in read-only files that we can't modify
-export const TooltipProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export interface TooltipProviderProps {
+  children: React.ReactNode;
+  delayDuration?: number;
+}
+
+export const TooltipProvider: React.FC<TooltipProviderProps> = ({ children, delayDuration }) => {
   return <>{children}</>;
 };
 
-export const TooltipTrigger: React.FC<{ children: React.ReactNode; asChild?: boolean }> = ({ children }) => {
+export interface TooltipTriggerProps {
+  children: React.ReactNode;
+  asChild?: boolean;
+}
+
+export const TooltipTrigger: React.FC<TooltipTriggerProps> = ({ children, asChild }) => {
   return <>{children}</>;
 };
 
-export const TooltipContent: React.FC<{ 
+export interface TooltipContentProps { 
   children: React.ReactNode; 
   side?: string;
   align?: string;
   hidden?: boolean;
-}> = ({ children }) => {
+}
+
+export const TooltipContent: React.FC<TooltipContentProps> = ({ children, side, align, hidden }) => {
   return <>{children}</>;
 };

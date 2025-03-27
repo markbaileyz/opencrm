@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,7 +21,7 @@ interface ContactFormFieldsProps {
     position: string;
     lastContact: string;
     status: ContactStatus;
-    priority: ContactPriority;
+    priority?: ContactPriority;
     notes: string;
     profileImage?: string;
     tags?: string[];

@@ -22,13 +22,27 @@ interface CreateContactButtonProps {
   className?: string;
 }
 
+interface FormDataType {
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  position: string;
+  lastContact: string;
+  status: ContactStatus;
+  priority: ContactPriority;
+  notes: string;
+  profileImage?: string;
+  tags?: string[];
+}
+
 const CreateContactButton = ({ 
   onCreateContact, 
   variant = "default",
   className 
 }: CreateContactButtonProps) => {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<Omit<Contact, "id">>({
+  const [formData, setFormData] = useState<FormDataType>({
     name: "",
     email: "",
     phone: "",
