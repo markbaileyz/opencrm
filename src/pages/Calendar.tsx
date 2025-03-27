@@ -26,8 +26,9 @@ import { CalendarPlus, CalendarClock, ChevronLeft, ChevronRight, Mail, MoveRight
 import { format, addMonths, subMonths, isToday, isFuture } from "date-fns";
 import AppointmentList from "@/components/dashboard/AppointmentList";
 import AppointmentItem from "@/components/dashboard/AppointmentItem";
-import AppointmentRelatedEmails from "@/components/calendar/AppointmentRelatedEmails";
+import AppointmentPopover from "@/components/calendar/AppointmentPopover";
 import AppointmentReminder from "@/components/calendar/AppointmentReminder";
+import AppointmentRelatedEmails from "@/components/calendar/AppointmentRelatedEmails";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { emailData } from "@/data/emailData";
@@ -38,6 +39,7 @@ const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isAddAppointmentOpen, setIsAddAppointmentOpen] = useState(false);
+  const [editAppointmentId, setEditAppointmentId] = useState<string | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([
     {
       id: "1",
@@ -128,25 +130,64 @@ const Calendar = () => {
     const formData = new FormData(e.currentTarget);
     
     const newAppointment: Appointment = {
-      id: `app-${Date.now()}`,
+      id: editAppointmentId || `app-${Date.now()}`,
       title: formData.get('title') as string,
       date: selectedDate,
       time: formData.get('time') as string,
       type: formData.get('type') as string,
       name: formData.get('name') as string,
-      status: "upcoming",
+      status: editAppointmentId ? 
+        (appointments.find(a => a.id === editAppointmentId)?.status || "upcoming") : 
+        "upcoming",
       notes: formData.get('notes') as string,
       emailThreadId: formData.get('emailThread') as string || undefined,
-      reminderSent: false
+      reminderSent: editAppointmentId ? 
+        appointments.find(a => a.id === editAppointmentId)?.reminderSent || false : 
+        false
     };
     
-    setAppointments([...appointments, newAppointment]);
-    setIsAddAppointmentOpen(false);
+    if (editAppointmentId) {
+      setAppointments(prevAppointments => 
+        prevAppointments.map(app => 
+          app.id === editAppointmentId ? newAppointment : app
+        )
+      );
+      
+      toast({
+        title: "Appointment updated",
+        description: `Appointment with ${newAppointment.name} updated for ${format(selectedDate, 'PPP')} at ${newAppointment.time}`,
+        variant: "success"
+      });
+      
+      setEditAppointmentId(null);
+    } else {
+      setAppointments([...appointments, newAppointment]);
+      
+      toast({
+        title: "Appointment created",
+        description: `Appointment with ${newAppointment.name} scheduled for ${format(selectedDate, 'PPP')} at ${newAppointment.time}`,
+        variant: "success"
+      });
+    }
     
+    setIsAddAppointmentOpen(false);
+  };
+
+  const handleEditAppointment = (id: string) => {
+    const appointmentToEdit = appointments.find(app => app.id === id);
+    if (appointmentToEdit) {
+      setSelectedDate(appointmentToEdit.date);
+      setEditAppointmentId(id);
+      setIsAddAppointmentOpen(true);
+    }
+  };
+
+  const handleDeleteAppointment = (id: string) => {
+    setAppointments(appointments.filter(a => a.id !== id));
     toast({
-      title: "Appointment created",
-      description: `Appointment with ${newAppointment.name} scheduled for ${format(selectedDate, 'PPP')} at ${newAppointment.time}`,
-      variant: "success"
+      title: "Appointment deleted",
+      description: "The appointment has been deleted",
+      variant: "destructive"
     });
   };
 
@@ -202,9 +243,13 @@ const Calendar = () => {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                  <DialogTitle>Add New Appointment</DialogTitle>
+                  <DialogTitle>
+                    {editAppointmentId ? "Edit Appointment" : "Add New Appointment"}
+                  </DialogTitle>
                   <DialogDescription>
-                    Create a new appointment for {format(selectedDate, 'PPP')}
+                    {editAppointmentId 
+                      ? "Update the appointment details" 
+                      : `Create a new appointment for ${format(selectedDate, 'PPP')}`}
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleAddAppointment}>
@@ -213,25 +258,55 @@ const Calendar = () => {
                       <Label htmlFor="title" className="text-right">
                         Title
                       </Label>
-                      <Input id="title" name="title" className="col-span-3" required />
+                      <Input 
+                        id="title" 
+                        name="title" 
+                        className="col-span-3" 
+                        required 
+                        defaultValue={editAppointmentId 
+                          ? appointments.find(a => a.id === editAppointmentId)?.title 
+                          : ""}
+                      />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="name" className="text-right">
                         Client Name
                       </Label>
-                      <Input id="name" name="name" className="col-span-3" required />
+                      <Input 
+                        id="name" 
+                        name="name" 
+                        className="col-span-3" 
+                        required 
+                        defaultValue={editAppointmentId 
+                          ? appointments.find(a => a.id === editAppointmentId)?.name 
+                          : ""}
+                      />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="time" className="text-right">
                         Time
                       </Label>
-                      <Input id="time" name="time" type="time" className="col-span-3" required />
+                      <Input 
+                        id="time" 
+                        name="time" 
+                        type="time" 
+                        className="col-span-3" 
+                        required 
+                        defaultValue={editAppointmentId 
+                          ? appointments.find(a => a.id === editAppointmentId)?.time 
+                          : ""}
+                      />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="type" className="text-right">
                         Type
                       </Label>
-                      <Select name="type" defaultValue="consultation">
+                      <Select 
+                        name="type" 
+                        defaultValue={editAppointmentId 
+                          ? appointments.find(a => a.id === editAppointmentId)?.type 
+                          : "consultation"}
+                      >
                         <SelectTrigger className="col-span-3">
                           <SelectValue placeholder="Select type" />
                         </SelectTrigger>
@@ -249,13 +324,25 @@ const Calendar = () => {
                       <Label htmlFor="notes" className="text-right">
                         Notes
                       </Label>
-                      <Textarea id="notes" name="notes" className="col-span-3" />
+                      <Textarea 
+                        id="notes" 
+                        name="notes" 
+                        className="col-span-3" 
+                        defaultValue={editAppointmentId 
+                          ? appointments.find(a => a.id === editAppointmentId)?.notes || "" 
+                          : ""}
+                      />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="emailThread" className="text-right">
                         Email Thread
                       </Label>
-                      <Select name="emailThread">
+                      <Select 
+                        name="emailThread" 
+                        defaultValue={editAppointmentId 
+                          ? appointments.find(a => a.id === editAppointmentId)?.emailThreadId || "" 
+                          : ""}
+                      >
                         <SelectTrigger className="col-span-3">
                           <SelectValue placeholder="Related email (optional)" />
                         </SelectTrigger>
@@ -274,7 +361,9 @@ const Calendar = () => {
                     <DialogClose asChild>
                       <Button type="button" variant="outline">Cancel</Button>
                     </DialogClose>
-                    <Button type="submit">Save Appointment</Button>
+                    <Button type="submit">
+                      {editAppointmentId ? "Update Appointment" : "Save Appointment"}
+                    </Button>
                   </DialogFooter>
                 </form>
               </DialogContent>
@@ -342,60 +431,14 @@ const Calendar = () => {
                         </div>
                       </PopoverTrigger>
                       <PopoverContent className="w-80">
-                        <div className="space-y-2">
-                          <h3 className="font-semibold text-lg">{appointment.title}</h3>
-                          <div className="grid grid-cols-3 gap-1">
-                            <p className="text-muted-foreground text-sm">Client:</p>
-                            <p className="col-span-2 text-sm">{appointment.name}</p>
-                            
-                            <p className="text-muted-foreground text-sm">Date:</p>
-                            <p className="col-span-2 text-sm">{format(appointment.date, 'PPP')}</p>
-                            
-                            <p className="text-muted-foreground text-sm">Time:</p>
-                            <p className="col-span-2 text-sm">{appointment.time}</p>
-                            
-                            <p className="text-muted-foreground text-sm">Type:</p>
-                            <p className="col-span-2 text-sm">{appointment.type}</p>
-                            
-                            <p className="text-muted-foreground text-sm">Status:</p>
-                            <p className="col-span-2 text-sm capitalize">{appointment.status}</p>
-                          </div>
-                          {appointment.notes && (
-                            <>
-                              <p className="text-muted-foreground text-sm">Notes:</p>
-                              <p className="text-sm">{appointment.notes}</p>
-                            </>
-                          )}
-                          <div className="flex items-center pt-2 space-x-2">
-                            {isFuture(appointment.date) && (
-                              <AppointmentReminder 
-                                appointment={appointment}
-                                onReminderSent={handleSendReminder}
-                              />
-                            )}
-                            <AppointmentRelatedEmails
-                              emails={findRelatedEmails(emails, appointment)}
-                              onViewEmail={navigateToEmail}
-                            />
-                          </div>
-                          <div className="flex justify-end space-x-2 pt-2">
-                            <Button variant="ghost" size="sm">Edit</Button>
-                            <Button 
-                              variant="destructive" 
-                              size="sm"
-                              onClick={() => {
-                                setAppointments(appointments.filter(a => a.id !== appointment.id));
-                                toast({
-                                  title: "Appointment deleted",
-                                  description: "The appointment has been deleted",
-                                  variant: "destructive"
-                                });
-                              }}
-                            >
-                              Delete
-                            </Button>
-                          </div>
-                        </div>
+                        <AppointmentPopover
+                          appointment={appointment}
+                          relatedEmails={findRelatedEmails(emails, appointment)}
+                          onEditAppointment={handleEditAppointment}
+                          onDeleteAppointment={handleDeleteAppointment}
+                          onReminderSent={handleSendReminder}
+                          onViewEmail={navigateToEmail}
+                        />
                       </PopoverContent>
                     </Popover>
                   ))}
