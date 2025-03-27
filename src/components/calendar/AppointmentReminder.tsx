@@ -4,12 +4,7 @@ import { Button } from "@/components/ui/button";
 import { BellRing, CheckCircle, Loader2, Clock } from "lucide-react";
 import { useCalendarEmailIntegration } from "@/hooks/useCalendarEmailIntegration";
 import { format, addHours } from "date-fns";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip } from "@/components/ui/tooltip";
 import type { Appointment } from "@/types/appointment";
 
 interface AppointmentReminderProps {
@@ -52,23 +47,16 @@ const AppointmentReminder = ({
   
   if (autoSend && !sent) {
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button 
-              variant="outline"
-              size="sm"
-              className="ml-2 pointer-events-none"
-            >
-              <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-              Auto Reminder
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Reminder will be sent automatically on {getReminderTime()}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip content={`Reminder will be sent automatically on ${getReminderTime()}`}>
+        <Button 
+          variant="outline"
+          size="sm"
+          className="ml-2 pointer-events-none"
+        >
+          <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+          Auto Reminder
+        </Button>
+      </Tooltip>
     );
   }
   

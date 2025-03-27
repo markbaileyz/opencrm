@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 
 interface TooltipProps {
   children: React.ReactNode;
-  content: string;
+  content: React.ReactNode;
   position?: 'top' | 'bottom' | 'left' | 'right';
   className?: string;
   contentClassName?: string;
@@ -85,16 +85,21 @@ export const Tooltip: React.FC<TooltipProps> = ({
   );
 };
 
-// Add these components for backward compatibility
-// These components are used in read-only files that we can't modify
+// These components are simplified compatibility versions for radix-ui/tooltip
+// They're used in read-only files that we can't modify
 export const TooltipProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <>{children}</>;
 };
 
-export const TooltipTrigger: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const TooltipTrigger: React.FC<{ children: React.ReactNode; asChild?: boolean }> = ({ children }) => {
   return <>{children}</>;
 };
 
-export const TooltipContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const TooltipContent: React.FC<{ 
+  children: React.ReactNode; 
+  side?: string;
+  align?: string;
+  hidden?: boolean;
+}> = ({ children }) => {
   return <>{children}</>;
 };
