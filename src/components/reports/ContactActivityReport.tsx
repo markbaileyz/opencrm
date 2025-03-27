@@ -43,24 +43,64 @@ const ContactActivityReport = () => {
                 <TabsTrigger value="month">This Month</TabsTrigger>
                 <TabsTrigger value="quarter">This Quarter</TabsTrigger>
               </TabsList>
+              
+              <TabsContent value="week">
+                <div className="h-80 mt-4">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={activityData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="emails" fill="#3b82f6" name="Emails" />
+                      <Bar dataKey="calls" fill="#10b981" name="Calls" />
+                      <Bar dataKey="meetings" fill="#8b5cf6" name="Meetings" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="month">
+                <div className="h-80 mt-4">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={activityData.map(item => ({ ...item, emails: item.emails * 4, calls: item.calls * 4, meetings: item.meetings * 4 }))}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="emails" fill="#3b82f6" name="Emails" />
+                      <Bar dataKey="calls" fill="#10b981" name="Calls" />
+                      <Bar dataKey="meetings" fill="#8b5cf6" name="Meetings" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="quarter">
+                <div className="h-80 mt-4">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={activityData.map(item => ({ ...item, emails: item.emails * 12, calls: item.calls * 12, meetings: item.meetings * 12 }))}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="emails" fill="#3b82f6" name="Emails" />
+                      <Bar dataKey="calls" fill="#10b981" name="Calls" />
+                      <Bar dataKey="meetings" fill="#8b5cf6" name="Meetings" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </TabsContent>
             </Tabs>
-            
-            <div className="h-80 mt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={activityData}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="emails" fill="#3b82f6" name="Emails" />
-                  <Bar dataKey="calls" fill="#10b981" name="Calls" />
-                  <Bar dataKey="meetings" fill="#8b5cf6" name="Meetings" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
 
             <div className="grid grid-cols-3 gap-4 mt-8">
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">

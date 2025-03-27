@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { 
   Card, 
@@ -159,96 +158,114 @@ const AppointmentList = () => {
             <TabsTrigger value="completed">Completed</TabsTrigger>
           </TabsList>
           
-          <TabsContent value={activeTab} className="mt-0">
-            {filteredAppointments.length > 0 ? (
-              <div className="divide-y">
-                {filteredAppointments.map((appointment) => {
-                  const dateDisplay = isToday(appointment.date)
-                    ? "Today"
-                    : isTomorrow(appointment.date)
-                    ? "Tomorrow"
-                    : format(appointment.date, "EEE, MMM d");
-                    
-                  return (
-                    <div 
-                      key={appointment.id}
-                      className="py-3 group cursor-pointer"
-                      onClick={() => handleViewAppointment(appointment)}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start space-x-4">
-                          <Avatar className="h-10 w-10 mt-1">
-                            <div className="bg-muted flex items-center justify-center h-full">
-                              {appointment.name.charAt(0)}
-                            </div>
-                          </Avatar>
-                          
-                          <div>
-                            <div className="flex items-center">
-                              <h3 className="font-medium mr-2 group-hover:text-primary">
-                                {appointment.title}
-                              </h3>
-                              <Badge 
-                                className={cn(
-                                  "text-xs",
-                                  appointment.status === "completed" 
-                                    ? "bg-green-100 text-green-800" 
-                                    : "bg-blue-100 text-blue-800"
-                                )}
-                              >
-                                {appointment.status}
-                              </Badge>
-                            </div>
-                            
-                            <p className="text-sm text-muted-foreground">
-                              {appointment.name}
-                            </p>
-                            
-                            <div className="flex items-center mt-1 space-x-3 text-xs text-muted-foreground">
-                              <div className="flex items-center">
-                                <Calendar className="h-3 w-3 mr-1" />
-                                {dateDisplay}
-                              </div>
-                              <div className="flex items-center">
-                                <Clock className="h-3 w-3 mr-1" />
-                                {appointment.time}
-                              </div>
-                              <div className="flex items-center">
-                                {getAppointmentIcon(appointment.type)}
-                                <span className="ml-1">{appointment.type}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <CalendarClock className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium mb-1">No appointments found</h3>
-                <p className="text-muted-foreground mb-4">
-                  {activeTab === "upcoming" 
-                    ? "You don't have any upcoming appointments" 
-                    : activeTab === "today"
-                    ? "You don't have any appointments today"
-                    : activeTab === "tomorrow"
-                    ? "You don't have any appointments tomorrow"
-                    : "You don't have any completed appointments"}
-                </p>
-                <Button onClick={handleGoToCalendar}>
-                  Go to Calendar
-                </Button>
-              </div>
-            )}
+          <TabsContent value="upcoming" className="mt-0">
+            {renderAppointmentsList(filteredAppointments, handleViewAppointment, getAppointmentIcon)}
+          </TabsContent>
+          
+          <TabsContent value="today" className="mt-0">
+            {renderAppointmentsList(filteredAppointments, handleViewAppointment, getAppointmentIcon)}
+          </TabsContent>
+          
+          <TabsContent value="tomorrow" className="mt-0">
+            {renderAppointmentsList(filteredAppointments, handleViewAppointment, getAppointmentIcon)}
+          </TabsContent>
+          
+          <TabsContent value="completed" className="mt-0">
+            {renderAppointmentsList(filteredAppointments, handleViewAppointment, getAppointmentIcon)}
           </TabsContent>
         </Tabs>
       </CardContent>
     </Card>
+  );
+};
+
+const renderAppointmentsList = (
+  appointments: any[], 
+  handleViewAppointment: (appointment: any) => void,
+  getAppointmentIcon: (type: string) => JSX.Element
+) => {
+  if (appointments.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <CalendarClock className="h-12 w-12 text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-1">No appointments found</h3>
+        <p className="text-muted-foreground mb-4">
+          You don't have any appointments in this category
+        </p>
+        <Button onClick={() => window.location.href = '/calendar'}>
+          Go to Calendar
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="divide-y">
+      {appointments.map((appointment) => {
+        const dateDisplay = isToday(appointment.date)
+          ? "Today"
+          : isTomorrow(appointment.date)
+          ? "Tomorrow"
+          : format(appointment.date, "EEE, MMM d");
+          
+        return (
+          <div 
+            key={appointment.id}
+            className="py-3 group cursor-pointer"
+            onClick={() => handleViewAppointment(appointment)}
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex items-start space-x-4">
+                <Avatar className="h-10 w-10 mt-1">
+                  <div className="bg-muted flex items-center justify-center h-full">
+                    {appointment.name.charAt(0)}
+                  </div>
+                </Avatar>
+                
+                <div>
+                  <div className="flex items-center">
+                    <h3 className="font-medium mr-2 group-hover:text-primary">
+                      {appointment.title}
+                    </h3>
+                    <Badge 
+                      className={cn(
+                        "text-xs",
+                        appointment.status === "completed" 
+                          ? "bg-green-100 text-green-800" 
+                          : "bg-blue-100 text-blue-800"
+                      )}
+                    >
+                      {appointment.status}
+                    </Badge>
+                  </div>
+                  
+                  <p className="text-sm text-muted-foreground">
+                    {appointment.name}
+                  </p>
+                  
+                  <div className="flex items-center mt-1 space-x-3 text-xs text-muted-foreground">
+                    <div className="flex items-center">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {dateDisplay}
+                    </div>
+                    <div className="flex items-center">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {appointment.time}
+                    </div>
+                    <div className="flex items-center">
+                      {getAppointmentIcon(appointment.type)}
+                      <span className="ml-1">{appointment.type}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 };
 

@@ -1,18 +1,11 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 
-interface ExportDataSectionProps {
-  onExportComplete?: () => void;
-}
-
-const ExportDataSection: React.FC<ExportDataSectionProps> = ({ onExportComplete }) => {
-  const { toast } = useToast();
+const ExportDataSection: React.FC = () => {
   const [exportFormat, setExportFormat] = useState("json");
-  const [exportType, setExportType] = useState("all");
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = () => {
@@ -22,47 +15,32 @@ const ExportDataSection: React.FC<ExportDataSectionProps> = ({ onExportComplete 
     setTimeout(() => {
       setIsExporting(false);
       
-      toast({
-        title: "Export complete",
-        description: `Your data has been exported in ${exportFormat.toUpperCase()} format.`,
-      });
+      // In a real app, this would trigger a download
+      console.log(`Exporting data in ${exportFormat} format`);
       
-      // Simulate file download
-      const link = document.createElement("a");
-      link.href = "#";
-      link.download = `crm-export-${Date.now()}.${exportFormat}`;
-      link.click();
-      
-      if (onExportComplete) {
-        onExportComplete();
-      }
+      // Create a fake download to simulate the functionality
+      const element = document.createElement("a");
+      element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent("Exported CRM data"));
+      element.setAttribute("download", `crm-export.${exportFormat}`);
+      element.style.display = "none";
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
     }, 2000);
   };
 
   return (
     <div>
       <h3 className="text-lg font-medium mb-4">Export Data</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Data to Export</label>
-          <Select value={exportType} onValueChange={setExportType}>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <div className="text-sm font-medium">Data Format</div>
+          <Select 
+            value={exportFormat} 
+            onValueChange={setExportFormat}
+          >
             <SelectTrigger>
-              <SelectValue placeholder="Select data to export" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Data</SelectItem>
-              <SelectItem value="contacts">Contacts Only</SelectItem>
-              <SelectItem value="deals">Deals Only</SelectItem>
-              <SelectItem value="organizations">Organizations Only</SelectItem>
-              <SelectItem value="activities">Activities Only</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <label className="text-sm font-medium mb-2 block">Export Format</label>
-          <Select value={exportFormat} onValueChange={setExportFormat}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select export format" />
+              <SelectValue placeholder="Select format" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="json">JSON</SelectItem>
@@ -71,23 +49,35 @@ const ExportDataSection: React.FC<ExportDataSectionProps> = ({ onExportComplete 
             </SelectContent>
           </Select>
         </div>
+        <div className="flex items-end">
+          <Button 
+            onClick={handleExport} 
+            disabled={isExporting}
+            className="w-full"
+          >
+            {isExporting ? (
+              <>Exporting...</>
+            ) : (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                Export Data
+              </>
+            )}
+          </Button>
+        </div>
       </div>
-      <Button onClick={handleExport} disabled={isExporting} className="w-full md:w-auto">
-        {isExporting ? (
-          <>
-            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Exporting...
-          </>
-        ) : (
-          <>
-            <Download className="mr-2 h-4 w-4" />
-            Export Data
-          </>
-        )}
-      </Button>
+      
+      <div className="mt-4 bg-muted/30 p-3 rounded-md text-sm">
+        <div className="flex items-start">
+          <FileText className="h-5 w-5 mr-2 text-muted-foreground mt-0.5" />
+          <div>
+            <p className="text-muted-foreground">
+              This will export all of your data including contacts, organizations, deals, 
+              activities, notes, and custom fields.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

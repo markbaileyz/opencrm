@@ -71,9 +71,9 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
     <div className="space-y-6">
       <Tabs 
         defaultValue="calendar" 
-        className="w-full"
         value={activeTab}
         onValueChange={setActiveTab}
+        className="w-full"
       >
         <TabsList className="mb-4">
           <TabsTrigger value="calendar">Calendar View</TabsTrigger>
