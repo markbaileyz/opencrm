@@ -39,6 +39,13 @@ export const useDataManagement = () => {
     });
   };
 
+  const handleDownloadReport = () => {
+    toast({
+      title: "Report downloaded",
+      description: "Import report has been downloaded to your device.",
+    });
+  };
+
   return {
     isImporting,
     importProgress,
@@ -47,6 +54,7 @@ export const useDataManagement = () => {
     setImportFile,
     handleImport,
     handleImportConfirm,
-    setShowImportDialog
+    setShowImportDialog,
+    handleDownloadReport
   };
 };

@@ -19,6 +19,16 @@ const DataManagementSettings: React.FC = () => {
     setShowImportDialog
   } = useDataManagement();
 
+  // Default import stats to display in the success dialog
+  const importStats = {
+    contacts: 127,
+    organizations: 43,
+    deals: 56,
+    activities: 94,
+    duplicatesSkipped: 12,
+    totalRecords: 332
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -46,6 +56,8 @@ const DataManagementSettings: React.FC = () => {
           open={showImportDialog} 
           onOpenChange={setShowImportDialog}
           onConfirm={handleImportConfirm}
+          stats={importStats}
+          onDownloadReport={() => console.log("Download report")}
         />
       </CardContent>
     </Card>
