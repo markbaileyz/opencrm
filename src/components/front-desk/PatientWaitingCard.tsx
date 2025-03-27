@@ -1,8 +1,9 @@
 
-import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from "react";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock, Users, Check } from "lucide-react";
+import { Clock, User, UserCheck, ChevronRight } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PatientWaitingCardProps {
   name: string;
@@ -12,49 +13,72 @@ interface PatientWaitingCardProps {
   appointmentType: string;
 }
 
-const PatientWaitingCard = ({ 
-  name, 
-  time, 
-  waitTime, 
-  provider, 
-  appointmentType 
-}: PatientWaitingCardProps) => (
-  <Card>
-    <CardHeader className="pb-2">
-      <div className="flex justify-between items-start">
-        <div>
-          <CardTitle className="text-base">{name}</CardTitle>
-          <CardDescription className="text-xs">{appointmentType}</CardDescription>
+const PatientWaitingCard: React.FC<PatientWaitingCardProps> = ({
+  name,
+  time,
+  waitTime,
+  provider,
+  appointmentType
+}) => {
+  const { toast } = useToast();
+  const [isCheckedIn, setIsCheckedIn] = useState(false);
+
+  const handleCheckIn = () => {
+    // In a real app, this would call an API to check in the patient
+    setIsCheckedIn(true);
+    
+    toast({
+      title: "Patient checked in",
+      description: `${name} has been checked in`,
+    });
+  };
+  
+  const handleViewDetails = () => {
+    // In a real app, this would navigate to patient details
+    console.log(`View details for ${name}`);
+  };
+
+  return (
+    <Card className="overflow-hidden">
+      <div className="p-4">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="font-medium">{name}</h3>
+            <div className="text-sm text-muted-foreground flex items-center mt-1">
+              <Clock className="h-3.5 w-3.5 mr-1" /> 
+              {time} ({waitTime} wait)
+            </div>
+          </div>
+          
+          <div className="flex flex-col items-end">
+            <span className="text-sm font-medium">{appointmentType}</span>
+            <span className="text-xs text-muted-foreground">{provider}</span>
+          </div>
         </div>
-        <div className="bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 text-xs font-medium px-2.5 py-0.5 rounded">
-          Waiting
-        </div>
-      </div>
-    </CardHeader>
-    <CardContent>
-      <div className="grid grid-cols-2 gap-2 text-sm">
-        <div className="flex items-center gap-1">
-          <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-          <span>{time}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <Users className="h-3.5 w-3.5 text-muted-foreground" />
-          <span>{provider}</span>
-        </div>
-      </div>
-      <div className="mt-3 flex justify-between items-center">
-        <div className="text-xs text-muted-foreground">
-          Waiting: {waitTime}
-        </div>
-        <div className="flex gap-1">
-          <Button variant="secondary" size="sm">
-            <Check className="h-3.5 w-3.5 mr-1" />
-            Check In
+        
+        <div className="mt-4 flex justify-between items-center">
+          <Button
+            size="sm"
+            className="text-xs h-8"
+            onClick={handleCheckIn}
+            disabled={isCheckedIn}
+          >
+            <UserCheck className="h-3.5 w-3.5 mr-1.5" />
+            {isCheckedIn ? "Checked In" : "Check In"}
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs h-8"
+            onClick={handleViewDetails}
+          >
+            Details <ChevronRight className="h-3.5 w-3.5 ml-1" />
           </Button>
         </div>
       </div>
-    </CardContent>
-  </Card>
-);
+    </Card>
+  );
+};
 
 export default PatientWaitingCard;
