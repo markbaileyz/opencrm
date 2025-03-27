@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -152,7 +151,7 @@ const TaskScheduler: React.FC = () => {
           
           return {
             ...task,
-            status: "completed",
+            status: "completed" as const,
             lastCompleted: today.toISOString(),
             nextDue: nextDue.toISOString()
           };
@@ -200,7 +199,6 @@ const TaskScheduler: React.FC = () => {
     return dueDate < today;
   };
   
-  // Update any overdue tasks
   const updatedTasks = tasks.map(task => {
     if (task.status !== "completed" && isTaskOverdue(task.nextDue)) {
       return { ...task, status: "overdue" };
@@ -208,7 +206,6 @@ const TaskScheduler: React.FC = () => {
     return task;
   });
   
-  // Filter tasks based on active tab
   const filteredTasks = updatedTasks.filter(task => {
     if (activeTab === "upcoming") {
       return task.status === "pending" || task.status === "in-progress" || task.status === "overdue";
