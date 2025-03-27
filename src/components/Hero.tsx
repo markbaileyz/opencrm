@@ -2,7 +2,7 @@
 import React from "react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import { ButtonCustom } from "./ui/button-custom";
-import { ArrowRight, CheckCircle, Users, Shield, BarChart, Clipboard, Stethoscope, ClipboardCheck } from "lucide-react";
+import { ArrowRight, CheckCircle, Users, Shield, BarChart, Clipboard, Stethoscope, ClipboardCheck, Star, Headset } from "lucide-react";
 import ResponsiveImage from "./ui/responsive-image";
 
 const Hero = () => {
@@ -129,6 +129,64 @@ const Hero = () => {
         
         {/* Perspective Sections */}
         <div className="mt-32 space-y-32">
+          {/* Admin's Perspective */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6 animate-fade-up">
+              <div className="flex items-center space-x-2">
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                  <Headset className="mr-1 h-3.5 w-3.5" />
+                  Admin Dashboard
+                </span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold leading-tight tracking-tight">
+                Simplify Front Desk Operations
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Streamline check-ins, appointment scheduling, and patient communications with our intuitive admin interface designed specifically for healthcare practices.
+              </p>
+              <ul className="space-y-3">
+                <li className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-primary mt-1 mr-2" />
+                  <span>One-click patient check-in with digital forms</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-primary mt-1 mr-2" />
+                  <span>Intelligent scheduling with double-booking prevention</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-primary mt-1 mr-2" />
+                  <span>Automated appointment reminders and confirmations</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-violet-500/20 rounded-3xl transform rotate-1 blur-xl"></div>
+              <div className="glass rounded-3xl p-1 relative z-10 border border-white/20 shadow-xl overflow-hidden">
+                <ResponsiveImage 
+                  src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=2000"
+                  alt="Admin staff using the reception dashboard" 
+                  className="w-full h-full rounded-2xl"
+                  aspectRatio="16/9"
+                />
+                
+                <div className="absolute bottom-8 left-8 right-8 glass-dark rounded-xl p-4 shadow-lg backdrop-blur-md">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/20 p-2 rounded-full">
+                        <Star className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-sm">Reception Efficiency</h4>
+                        <p className="text-2xl font-bold">+58%</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
           {/* Doctor's Perspective */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="order-2 md:order-1 relative">
