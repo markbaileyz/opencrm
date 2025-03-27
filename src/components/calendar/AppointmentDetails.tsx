@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar as CalendarIcon, Mail, Clock, FileText, Edit, Trash, X, Check, Ban } from "lucide-react";
+import { Calendar as CalendarIcon, Mail, Clock, FileText, Edit, Trash, X, Check, Ban, MapPin } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { 
   DropdownMenu,
@@ -93,6 +93,16 @@ const AppointmentDetails = ({
             <p>{appointment.type}</p>
           </div>
         </div>
+        
+        {appointment.location && (
+          <div>
+            <h3 className="font-medium mb-1 flex items-center">
+              <MapPin className="h-4 w-4 mr-1" />
+              Location
+            </h3>
+            <p className="text-sm">{appointment.location}</p>
+          </div>
+        )}
         
         {appointment.notes && (
           <div>

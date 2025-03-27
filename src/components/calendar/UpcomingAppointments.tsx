@@ -110,6 +110,7 @@ const UpcomingAppointments = ({
                       time={appointment.time}
                       type={appointment.type}
                       status={appointment.status}
+                      location={appointment.location}
                     />
                   </div>
                 ))}

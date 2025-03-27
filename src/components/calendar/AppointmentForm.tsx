@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MapPin } from "lucide-react";
 import type { Appointment } from "@/types/appointment";
 import type { Email } from "@/types/email";
 
@@ -70,6 +71,19 @@ const AppointmentForm = ({
           />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="location" className="text-right flex items-center">
+            <MapPin className="h-4 w-4 mr-1 text-muted-foreground" /> 
+            Location
+          </Label>
+          <Input 
+            id="location" 
+            name="location" 
+            className="col-span-3" 
+            placeholder="Office, virtual, client site, etc."
+            defaultValue={appointmentToEdit?.location || ""}
+          />
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="type" className="text-right">
             Type
           </Label>
@@ -86,7 +100,7 @@ const AppointmentForm = ({
               <SelectItem value="check-in">Check-in</SelectItem>
               <SelectItem value="review">Review</SelectItem>
               <SelectItem value="new-client">New Client</SelectItem>
-              <SelectItem value="email-followup">Email Follow-up</SelectItem>
+              <SelectItem value="email-follow-up">Email Follow-up</SelectItem>
             </SelectContent>
           </Select>
         </div>

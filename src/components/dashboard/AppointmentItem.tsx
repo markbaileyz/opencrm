@@ -1,6 +1,6 @@
 
 import React from "react";
-import { CheckCircle, Clock, AlertCircle, CalendarX, CalendarClock } from "lucide-react";
+import { CheckCircle, Clock, AlertCircle, CalendarX, CalendarClock, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
@@ -12,6 +12,7 @@ interface AppointmentItemProps {
   status: "completed" | "upcoming" | "canceled";
   className?: string;
   showStatusBadge?: boolean;
+  location?: string;
 }
 
 const AppointmentItem = ({ 
@@ -20,7 +21,8 @@ const AppointmentItem = ({
   type, 
   status, 
   className,
-  showStatusBadge = false
+  showStatusBadge = false,
+  location
 }: AppointmentItemProps) => {
   // Dynamic styling based on appointment status
   const statusClasses = {
@@ -90,7 +92,15 @@ const AppointmentItem = ({
           )}>
             {name}
           </p>
-          <p className={cn("text-xs", getTypeColor())}>{type}</p>
+          <div className="flex items-center gap-1">
+            <p className={cn("text-xs", getTypeColor())}>{type}</p>
+            {location && (
+              <div className="flex items-center text-xs text-muted-foreground">
+                <MapPin className="h-3 w-3 ml-1 mr-0.5" />
+                <span className="truncate max-w-[100px]">{location}</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <div className="flex items-center gap-2">

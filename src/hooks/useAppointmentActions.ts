@@ -40,6 +40,7 @@ export function useAppointmentActions({
         (appointments.find(a => a.id === editAppointmentId)?.status || "upcoming") : 
         "upcoming",
       notes: formData.get('notes') as string,
+      location: formData.get('location') as string,
       emailThreadId: (formData.get('emailThread') as string) !== "none" ? 
                     (formData.get('emailThread') as string) : 
                     undefined,
@@ -85,6 +86,7 @@ export function useAppointmentActions({
       name: appointmentData.name || "Client",
       status: "upcoming",
       notes: appointmentData.notes || "",
+      location: appointmentData.location || "",
       reminderSent: false
     };
     

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { format, addDays, subDays } from "date-fns";
 import { Card, CardHeader, CardContent, CardTitle, CardFooter } from "@/components/ui/card";
@@ -57,10 +56,8 @@ const DailyAppointments = ({
   const [statusFilter, setStatusFilter] = useState<"all" | "upcoming" | "completed" | "canceled">("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   
-  // Get all unique appointment types
   const appointmentTypes = ["all", ...new Set(appointments.map(app => app.type.toLowerCase()))];
   
-  // Filter appointments by selected date and applied filters
   const filteredAppointments = appointments.filter(
     (appointment) => {
       const matchesDate = format(new Date(appointment.date), 'PP') === format(selectedDate, 'PP');
@@ -71,7 +68,6 @@ const DailyAppointments = ({
     }
   );
 
-  // Status badge styling helper
   const getStatusBadge = (status: "upcoming" | "completed" | "canceled") => {
     switch(status) {
       case "upcoming":
@@ -85,7 +81,6 @@ const DailyAppointments = ({
     }
   };
 
-  // Helper for appointment type color
   const getAppointmentTypeColor = (type: string) => {
     switch(type.toLowerCase()) {
       case "check-in":
@@ -105,7 +100,6 @@ const DailyAppointments = ({
     }
   };
   
-  // Handle date navigation
   const handlePrevDay = () => {
     if (onDateChange) {
       onDateChange(subDays(selectedDate, 1));
@@ -205,6 +199,7 @@ const DailyAppointments = ({
                         time={appointment.time}
                         type={appointment.type}
                         status={appointment.status}
+                        location={appointment.location}
                         showStatusBadge={true}
                       />
                     </div>

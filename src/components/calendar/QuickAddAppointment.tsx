@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CalendarPlus, Clock } from "lucide-react";
+import { CalendarPlus, Clock, MapPin } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -30,6 +30,7 @@ const QuickAddAppointment = ({ selectedDate, onQuickAdd }: QuickAddAppointmentPr
   const [name, setName] = useState("");
   const [time, setTime] = useState("09:00");
   const [type, setType] = useState("consultation");
+  const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
   const [reminder, setReminder] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -43,6 +44,7 @@ const QuickAddAppointment = ({ selectedDate, onQuickAdd }: QuickAddAppointmentPr
       time: format(new Date(`2000-01-01T${time}`), 'h:mm a'),
       type,
       name,
+      location,
       status: "upcoming",
       notes: notes,
       reminderSent: reminder
@@ -52,6 +54,7 @@ const QuickAddAppointment = ({ selectedDate, onQuickAdd }: QuickAddAppointmentPr
     setName("");
     setTime("09:00");
     setType("consultation");
+    setLocation("");
     setNotes("");
     setReminder(false);
     setIsOpen(false);
@@ -123,6 +126,19 @@ const QuickAddAppointment = ({ selectedDate, onQuickAdd }: QuickAddAppointmentPr
                 </SelectContent>
               </Select>
             </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="location" className="flex items-center">
+              <MapPin className="h-3.5 w-3.5 mr-1 opacity-70" />
+              Location (Optional)
+            </Label>
+            <Input
+              id="location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Office, virtual, client site, etc."
+            />
           </div>
           
           <div className="space-y-2">
