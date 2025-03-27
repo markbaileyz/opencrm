@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,7 +33,7 @@ const ReportFilters: React.FC<ReportFiltersProps> = ({ onFilterChange }) => {
     from: undefined,
     to: undefined,
   });
-  const [reportType, setReportType] = useState<string>("");
+  const [reportType, setReportType] = useState<string>("all");
   const [showOnlyMine, setShowOnlyMine] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
@@ -49,12 +50,12 @@ const ReportFilters: React.FC<ReportFiltersProps> = ({ onFilterChange }) => {
 
   const handleReset = () => {
     setDateRange({ from: undefined, to: undefined });
-    setReportType("");
+    setReportType("all");
     setShowOnlyMine(false);
     setSearchQuery("");
     onFilterChange({
       dateRange: { from: undefined, to: undefined },
-      reportType: "",
+      reportType: "all",
       showOnlyMine: false,
       searchQuery: "",
     });
@@ -77,7 +78,7 @@ const ReportFilters: React.FC<ReportFiltersProps> = ({ onFilterChange }) => {
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="sales">Sales</SelectItem>
               <SelectItem value="leads">Leads</SelectItem>
               <SelectItem value="activity">Activity</SelectItem>
@@ -178,7 +179,7 @@ const ReportFilters: React.FC<ReportFiltersProps> = ({ onFilterChange }) => {
                       <SelectValue placeholder="All Types" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Types</SelectItem>
+                      <SelectItem value="all">All Types</SelectItem>
                       <SelectItem value="sales">Sales</SelectItem>
                       <SelectItem value="leads">Leads</SelectItem>
                       <SelectItem value="activity">Activity</SelectItem>
