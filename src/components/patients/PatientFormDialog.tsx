@@ -24,6 +24,7 @@ interface PatientFormDialogProps {
   onOpenChange: (open: boolean) => void;
   patient: Patient | null;
   onSave: (patient: Patient, isNew: boolean) => void;
+  onSubmit?: (data: any) => void; // For backward compatibility
 }
 
 const PatientFormDialog: React.FC<PatientFormDialogProps> = ({
@@ -31,6 +32,7 @@ const PatientFormDialog: React.FC<PatientFormDialogProps> = ({
   onOpenChange,
   patient,
   onSave,
+  onSubmit
 }) => {
   const isNew = !patient;
   
@@ -39,10 +41,16 @@ const PatientFormDialog: React.FC<PatientFormDialogProps> = ({
     defaultValues: mapPatientToFormValues(patient)
   });
 
-  const onSubmit = (data: PatientFormValues) => {
+  const handleSubmit = (data: PatientFormValues) => {
     // Convert the form data to a Patient object
     const patientData = mapFormValuesToPatient(data);
-    onSave(patientData, isNew);
+    
+    // Support both the new onSave and legacy onSubmit patterns
+    if (onSave) {
+      onSave(patientData, isNew);
+    } else if (onSubmit) {
+      onSubmit(patientData);
+    }
   };
 
   return (
@@ -53,7 +61,7 @@ const PatientFormDialog: React.FC<PatientFormDialogProps> = ({
         </DialogHeader>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <Tabs defaultValue="basic">
               <TabsList className="mb-4">
                 <TabsTrigger value="basic">Basic Info</TabsTrigger>

@@ -3,14 +3,14 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Patient } from "@/types/patient";
 import { Search, UserPlus, Phone, Mail, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import ResponsiveContainer from "@/components/ui/responsive-container";
 import MobilePatientList from './MobilePatientList';
+import { PatientListItem } from "@/types/patientList";
 
 interface PatientListProps {
-  patients: Patient[];
+  patients: PatientListItem[];
   onViewDetails: (patientId: string) => void;
   onAddPatient: () => void;
 }
@@ -91,8 +91,10 @@ const PatientList: React.FC<PatientListProps> = ({
                   </TableCell>
                   <TableCell>
                     <Badge 
-                      variant={patient.status === 'active' ? 'default' : 
-                        patient.status === 'pending' ? 'outline' : 'secondary'}
+                      variant={
+                        patient.status === 'active' ? 'default' : 
+                        patient.status === 'pending' ? 'outline' : 'secondary'
+                      }
                     >
                       {patient.status}
                     </Badge>

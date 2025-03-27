@@ -5,14 +5,17 @@ import PatientList from "@/components/patients/PatientList";
 import PatientDetails from "@/components/patients/PatientDetails";
 import PatientFormDialog from "@/components/patients/PatientFormDialog";
 import { useToast } from "@/hooks/use-toast";
+import { PatientListItem } from "@/types/patientList";
+import { Patient } from "@/types/patient";
 
 const Patients = () => {
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const { toast } = useToast();
 
   // Mock patient data - in a real app, this would come from an API
-  const patients = [
+  const patients: PatientListItem[] = [
     {
       id: "1",
       name: "John Smith",
@@ -96,21 +99,55 @@ const Patients = () => {
   };
 
   const handleAddPatient = () => {
+    setEditingPatient(null);
     setIsFormOpen(true);
+  };
+
+  const handleEditPatient = () => {
+    if (selectedPatient) {
+      // Convert the PatientListItem to a Patient for editing
+      const patientToEdit: Patient = {
+        id: selectedPatient.id,
+        firstName: selectedPatient.name.split(' ')[0],
+        lastName: selectedPatient.name.split(' ').slice(1).join(' '),
+        dateOfBirth: selectedPatient.dateOfBirth,
+        gender: selectedPatient.gender as any,
+        email: selectedPatient.email,
+        phone: selectedPatient.phone,
+        address: selectedPatient.address,
+        insuranceProvider: selectedPatient.insurance.provider,
+        policyNumber: selectedPatient.insurance.policyNumber,
+        groupNumber: selectedPatient.insurance.group,
+        coverageType: "standard", // default value
+        status: selectedPatient.status as any,
+      };
+      
+      setEditingPatient(patientToEdit);
+      setIsFormOpen(true);
+    }
   };
 
   const handleCloseDetails = () => {
     setSelectedPatientId(null);
   };
 
-  const handleFormSubmit = (data: any) => {
+  const handleDeletePatient = () => {
+    // In a real app, this would delete the patient from an API
+    toast({
+      title: "Patient deleted",
+      description: "The patient has been successfully deleted.",
+    });
+    setSelectedPatientId(null);
+  };
+
+  const handleSavePatient = (patientData: Patient, isNew: boolean) => {
     // In a real app, this would save the patient to an API
-    console.log("Form submitted:", data);
+    console.log("Patient saved:", patientData, "isNew:", isNew);
     setIsFormOpen(false);
     
     toast({
-      title: "Patient added",
-      description: "The patient has been successfully added.",
+      title: isNew ? "Patient added" : "Patient updated",
+      description: `The patient has been successfully ${isNew ? "added" : "updated"}.`,
     });
   };
 
@@ -128,8 +165,9 @@ const Patients = () => {
         
         {selectedPatient ? (
           <PatientDetails 
-            patient={selectedPatient} 
-            onBack={handleCloseDetails}
+            patient={selectedPatient as any} 
+            onEdit={handleEditPatient}
+            onDelete={handleDeletePatient}
           />
         ) : (
           <PatientList 
@@ -142,7 +180,8 @@ const Patients = () => {
         <PatientFormDialog
           open={isFormOpen}
           onOpenChange={setIsFormOpen}
-          onSubmit={handleFormSubmit}
+          patient={editingPatient}
+          onSave={handleSavePatient}
         />
       </div>
     </DashboardLayout>

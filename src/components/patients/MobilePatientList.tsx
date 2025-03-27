@@ -1,14 +1,14 @@
 
 import React from 'react';
-import { Patient } from "@/types/patient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search, UserPlus, Phone, Mail, Calendar, ChevronRight } from "lucide-react";
+import { PatientListItem } from "@/types/patientList";
 
 interface MobilePatientListProps {
-  patients: Patient[];
+  patients: PatientListItem[];
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   onViewDetails: (patientId: string) => void;
@@ -61,8 +61,10 @@ const MobilePatientList: React.FC<MobilePatientListProps> = ({
                       </div>
                     </div>
                     <Badge 
-                      variant={patient.status === 'active' ? 'default' : 
-                        patient.status === 'pending' ? 'outline' : 'secondary'}
+                      variant={
+                        patient.status === 'active' ? 'default' : 
+                        patient.status === 'pending' ? 'outline' : 'secondary'
+                      }
                     >
                       {patient.status}
                     </Badge>
