@@ -12,4 +12,5 @@ export interface Contact {
   status: ContactStatus;
   notes: string;
   profileImage?: string;
+  tags?: string[];
 }

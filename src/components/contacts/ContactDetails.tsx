@@ -2,284 +2,367 @@
 import React, { useState } from "react";
 import { Contact, ContactStatus } from "@/types/contact";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Edit, Trash2, Mail, Phone, Building, Calendar, User } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { format } from "date-fns";
+import { 
+  Edit, 
+  Trash, 
+  Save, 
+  X, 
+  Mail, 
+  Phone, 
+  Calendar, 
+  Building, 
+  Briefcase,
+  User
+} from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import ContactStatusBadge from "./ContactStatusBadge";
+import ContactTags from "./ContactTags";
 
 interface ContactDetailsProps {
   contact: Contact;
-  onUpdateContact: (updatedContact: Contact) => void;
-  onDeleteContact: (contactId: string) => void;
+  onUpdateContact: (contact: Contact) => void;
+  onDeleteContact: (id: string) => void;
 }
 
 const ContactDetails = ({ contact, onUpdateContact, onDeleteContact }: ContactDetailsProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
-  const [editedContact, setEditedContact] = useState<Contact>(contact);
+  const [formData, setFormData] = useState<Contact>(contact);
   
-  // Format the last contact date
-  const formattedDate = (() => {
-    try {
-      return format(new Date(contact.lastContact), 'PPP');
-    } catch (e) {
-      return contact.lastContact;
-    }
-  })();
+  // Initialize tags if they don't exist
+  React.useEffect(() => {
+    setFormData({
+      ...contact,
+      tags: contact.tags || []
+    });
+  }, [contact]);
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setEditedContact({
-      ...editedContact,
+    setFormData({
+      ...formData,
       [name]: value,
     });
   };
   
-  const handleStatusChange = (value: string) => {
-    setEditedContact({
-      ...editedContact,
-      status: value as ContactStatus,
+  const handleStatusChange = (status: ContactStatus) => {
+    setFormData({
+      ...formData,
+      status,
     });
   };
   
-  const handleSave = () => {
-    onUpdateContact(editedContact);
-    setIsEditing(false);
+  const handleAddTag = (tag: string) => {
+    setFormData({
+      ...formData,
+      tags: [...(formData.tags || []), tag]
+    });
   };
   
-  const handleDelete = () => {
-    onDeleteContact(contact.id);
-    setIsConfirmingDelete(false);
+  const handleRemoveTag = (tagToRemove: string) => {
+    setFormData({
+      ...formData,
+      tags: (formData.tags || []).filter(tag => tag !== tagToRemove)
+    });
+  };
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onUpdateContact(formData);
+    setIsEditing(false);
   };
   
   const handleCancel = () => {
-    setEditedContact(contact);
+    setFormData(contact);
     setIsEditing(false);
-  };
-  
-  const getStatusBadgeStyle = (status: ContactStatus) => {
-    switch (status) {
-      case "lead":
-        return "bg-yellow-100 hover:bg-yellow-200 text-yellow-800";
-      case "prospect":
-        return "bg-blue-100 hover:bg-blue-200 text-blue-800";
-      case "customer":
-        return "bg-green-100 hover:bg-green-200 text-green-800";
-      case "inactive":
-        return "bg-gray-100 hover:bg-gray-200 text-gray-800";
-      default:
-        return "";
-    }
   };
   
   return (
     <Card className="h-full">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-start">
-          <div className="space-y-1">
-            <CardTitle className="text-xl">{contact.name}</CardTitle>
-            <div className="flex items-center space-x-2">
-              <Badge variant="outline" className={getStatusBadgeStyle(contact.status)}>
-                {contact.status}
-              </Badge>
-              <span className="text-sm text-muted-foreground">{contact.position} at {contact.company}</span>
-            </div>
-          </div>
-          <div className="flex space-x-2">
-            <Button variant="outline" size="icon" onClick={() => setIsEditing(true)}>
-              <Edit className="h-4 w-4" />
-            </Button>
-            <Dialog open={isConfirmingDelete} onOpenChange={setIsConfirmingDelete}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Delete Contact</DialogTitle>
-                </DialogHeader>
-                <p>Are you sure you want to delete this contact? This action cannot be undone.</p>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsConfirmingDelete(false)}>Cancel</Button>
-                  <Button variant="destructive" onClick={handleDelete}>Delete</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-xl">
+          {isEditing ? "Edit Contact" : contact.name}
+        </CardTitle>
+        <div className="flex space-x-2">
+          {isEditing ? (
+            <>
+              <Button variant="outline" size="sm" onClick={handleCancel}>
+                <X className="h-4 w-4 mr-1" />
+                Cancel
+              </Button>
+              <Button size="sm" onClick={handleSubmit}>
+                <Save className="h-4 w-4 mr-1" />
+                Save
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                <Edit className="h-4 w-4 mr-1" />
+                Edit
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm">
+                    <Trash className="h-4 w-4 mr-1" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Contact</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete {contact.name}? This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => onDeleteContact(contact.id)}>
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
+          )}
         </div>
       </CardHeader>
-      
-      <Separator />
-      
-      <CardContent className="pt-6">
+      <CardContent className="pt-4">
         {isEditing ? (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input 
-                  id="name" 
-                  name="name" 
-                  value={editedContact.name} 
-                  onChange={handleInputChange}
-                />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+              <div className="flex-1">
+                <div className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="company">Company</Label>
+                    <Input
+                      id="company"
+                      name="company"
+                      value={formData.company}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="position">Position</Label>
+                    <Input
+                      id="position"
+                      name="position"
+                      value={formData.position}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  name="email" 
-                  type="email" 
-                  value={editedContact.email} 
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
-                <Input 
-                  id="phone" 
-                  name="phone" 
-                  value={editedContact.phone} 
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="company">Company</Label>
-                <Input 
-                  id="company" 
-                  name="company" 
-                  value={editedContact.company} 
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="position">Position</Label>
-                <Input 
-                  id="position" 
-                  name="position" 
-                  value={editedContact.position} 
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select 
-                  value={editedContact.status} 
-                  onValueChange={handleStatusChange}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="lead">Lead</SelectItem>
-                    <SelectItem value="prospect">Prospect</SelectItem>
-                    <SelectItem value="customer">Customer</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastContact">Last Contact Date</Label>
-                <Input 
-                  id="lastContact" 
-                  name="lastContact" 
-                  type="date" 
-                  value={editedContact.lastContact} 
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="profileImage">Profile Image URL</Label>
-                <Input 
-                  id="profileImage" 
-                  name="profileImage" 
-                  value={editedContact.profileImage || ""} 
-                  onChange={handleInputChange}
-                />
+              
+              <div className="flex-1">
+                <div className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="status">Status</Label>
+                    <Select
+                      value={formData.status}
+                      onValueChange={(value) => handleStatusChange(value as ContactStatus)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="lead">Lead</SelectItem>
+                        <SelectItem value="prospect">Prospect</SelectItem>
+                        <SelectItem value="customer">Customer</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="lastContact">Last Contact Date</Label>
+                    <Input
+                      id="lastContact"
+                      name="lastContact"
+                      type="date"
+                      value={formData.lastContact}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="profileImage">Profile Image URL</Label>
+                    <Input
+                      id="profileImage"
+                      name="profileImage"
+                      value={formData.profileImage || ""}
+                      onChange={handleChange}
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label>Tags</Label>
+                    <ContactTags
+                      tags={formData.tags || []}
+                      onAddTag={handleAddTag}
+                      onRemoveTag={handleRemoveTag}
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="notes">Notes</Label>
+                    <Textarea
+                      id="notes"
+                      name="notes"
+                      value={formData.notes}
+                      onChange={handleChange}
+                      rows={3}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
-              <Textarea 
-                id="notes" 
-                name="notes" 
-                value={editedContact.notes} 
-                onChange={handleInputChange}
-                rows={4}
-              />
-            </div>
-            
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button variant="outline" onClick={handleCancel}>Cancel</Button>
-              <Button onClick={handleSave}>Save Changes</Button>
-            </div>
-          </div>
+          </form>
         ) : (
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
-              {contact.profileImage ? (
-                <div className="h-24 w-24 rounded-lg overflow-hidden mb-4 sm:mb-0">
-                  <img 
-                    src={contact.profileImage} 
-                    alt={contact.name} 
-                    className="h-full w-full object-cover"
-                  />
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="w-full md:w-1/3 space-y-4">
+                {contact.profileImage ? (
+                  <div className="rounded-lg overflow-hidden h-40 w-40 mx-auto">
+                    <img
+                      src={contact.profileImage}
+                      alt={contact.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="rounded-lg bg-muted h-40 w-40 mx-auto flex items-center justify-center">
+                    <User className="h-20 w-20 text-muted-foreground/50" />
+                  </div>
+                )}
+                
+                <div>
+                  <ContactStatusBadge status={contact.status} size="lg" className="mx-auto" />
                 </div>
-              ) : (
-                <div className="h-24 w-24 rounded-lg bg-muted flex items-center justify-center mb-4 sm:mb-0">
-                  <User className="h-12 w-12 text-muted-foreground" />
-                </div>
-              )}
+                
+                {(contact.tags && contact.tags.length > 0) && (
+                  <div className="pt-2">
+                    <Label className="text-sm text-muted-foreground mb-2 block">Tags</Label>
+                    <ContactTags
+                      tags={contact.tags}
+                      onAddTag={() => {}}
+                      onRemoveTag={() => {}}
+                      readOnly
+                    />
+                  </div>
+                )}
+              </div>
               
-              <div className="space-y-3 flex-1">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="flex items-center space-x-2">
+              <div className="flex-1 space-y-4">
+                <div className="grid gap-4">
+                  <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-muted-foreground" />
-                    <a href={`mailto:${contact.email}`} className="text-sm hover:underline">
+                    <span className="font-medium">Email:</span>
+                    <a href={`mailto:${contact.email}`} className="text-primary hover:underline">
                       {contact.email}
                     </a>
                   </div>
                   
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-muted-foreground" />
-                    <a href={`tel:${contact.phone}`} className="text-sm hover:underline">
+                    <span className="font-medium">Phone:</span>
+                    <a href={`tel:${contact.phone}`} className="hover:underline">
                       {contact.phone}
                     </a>
                   </div>
                   
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <Building className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{contact.company}</span>
+                    <span className="font-medium">Company:</span>
+                    <span>{contact.company}</span>
                   </div>
                   
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">Position:</span>
+                    <span>{contact.position}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">Last contacted: {formattedDate}</span>
+                    <span className="font-medium">Last Contact:</span>
+                    <span>{new Date(contact.lastContact).toLocaleDateString()}</span>
+                  </div>
+                </div>
+                
+                <div className="pt-4">
+                  <h3 className="text-sm font-medium mb-2">Notes</h3>
+                  <div className="bg-muted/30 p-3 rounded-md whitespace-pre-line">
+                    {contact.notes || "No notes added yet."}
                   </div>
                 </div>
               </div>
             </div>
             
-            <div>
-              <h3 className="text-sm font-medium mb-2">Notes</h3>
-              <div className="bg-muted/30 p-3 rounded-md text-sm">
-                {contact.notes || "No notes available"}
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-sm font-medium mb-2">Recent Activity</h3>
-              <div className="bg-muted/30 p-3 rounded-md text-sm text-center text-muted-foreground">
-                Activity tracking coming soon
-              </div>
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button variant="outline">
+                <Calendar className="h-4 w-4 mr-2" />
+                Schedule Meeting
+              </Button>
+              <Button>
+                <Mail className="h-4 w-4 mr-2" />
+                Send Email
+              </Button>
             </div>
           </div>
         )}

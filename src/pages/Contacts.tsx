@@ -20,6 +20,7 @@ const initialContacts: Contact[] = [
     status: "customer",
     notes: "Met at the industry conference last month",
     profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
+    tags: ["VIP", "Tech"]
   },
   {
     id: "2",
@@ -32,6 +33,7 @@ const initialContacts: Contact[] = [
     status: "lead",
     notes: "Interested in our enterprise solution",
     profileImage: "https://randomuser.me/api/portraits/women/2.jpg",
+    tags: ["Healthcare", "Potential"]
   },
   {
     id: "3",
@@ -44,6 +46,7 @@ const initialContacts: Contact[] = [
     status: "prospect",
     notes: "Follow up on marketing campaign proposal",
     profileImage: "https://randomuser.me/api/portraits/men/3.jpg",
+    tags: ["Marketing", "Follow-up"]
   },
 ];
 
@@ -60,6 +63,7 @@ const Contacts = () => {
     const contact = {
       ...newContact,
       id: `${contacts.length + 1}`,
+      tags: newContact.tags || []
     };
     
     setContacts([...contacts, contact]);

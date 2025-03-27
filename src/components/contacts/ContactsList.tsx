@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ContactStatusBadge from "./ContactStatusBadge";
 
 interface ContactsListProps {
   contacts: Contact[];
@@ -18,7 +19,8 @@ const ContactsList = ({ contacts, selectedContactId, onSelectContact }: Contacts
   const filteredContacts = contacts.filter((contact) =>
     contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.company.toLowerCase().includes(searchQuery.toLowerCase())
+    contact.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (contact.tags && contact.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())))
   );
   
   return (
@@ -66,18 +68,22 @@ const ContactsList = ({ contacts, selectedContactId, onSelectContact }: Contacts
                     <p className="text-sm text-muted-foreground truncate">
                       {contact.company}
                     </p>
-                  </div>
-                  <div 
-                    className={cn(
-                      "text-xs px-2 py-0.5 rounded font-medium",
-                      contact.status === "lead" && "bg-yellow-100 text-yellow-800",
-                      contact.status === "prospect" && "bg-blue-100 text-blue-800",
-                      contact.status === "customer" && "bg-green-100 text-green-800",
-                      contact.status === "inactive" && "bg-gray-100 text-gray-800"
+                    {contact.tags && contact.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {contact.tags.slice(0, 2).map(tag => (
+                          <div key={tag} className="text-xs px-1.5 py-0 bg-secondary text-secondary-foreground rounded-sm">
+                            {tag}
+                          </div>
+                        ))}
+                        {contact.tags.length > 2 && (
+                          <div className="text-xs text-muted-foreground">
+                            +{contact.tags.length - 2} more
+                          </div>
+                        )}
+                      </div>
                     )}
-                  >
-                    {contact.status}
                   </div>
+                  <ContactStatusBadge status={contact.status} size="sm" />
                 </div>
               </div>
             ))

@@ -1,201 +1,249 @@
 
 import React, { useState } from "react";
-import { Button, ButtonProps } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Contact, ContactStatus } from "@/types/contact";
+import ContactTags from "./ContactTags";
 
-interface CreateContactButtonProps extends Omit<ButtonProps, "onClick"> {
+interface CreateContactButtonProps {
   onCreateContact: (contact: Omit<Contact, "id">) => void;
+  variant?: "default" | "outline" | "secondary";
+  className?: string;
 }
 
-const CreateContactButton = ({ onCreateContact, variant = "default", ...props }: CreateContactButtonProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [newContact, setNewContact] = useState<Omit<Contact, "id">>({
+const CreateContactButton = ({ 
+  onCreateContact, 
+  variant = "default",
+  className 
+}: CreateContactButtonProps) => {
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState<Omit<Contact, "id">>({
     name: "",
     email: "",
     phone: "",
     company: "",
     position: "",
-    lastContact: new Date().toISOString().split('T')[0],
+    lastContact: new Date().toISOString().split("T")[0],
     status: "lead",
     notes: "",
+    tags: []
   });
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setNewContact({
-      ...newContact,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
   
-  const handleStatusChange = (value: string) => {
-    setNewContact({
-      ...newContact,
-      status: value as ContactStatus,
-    });
+  const handleStatusChange = (value: ContactStatus) => {
+    setFormData((prev) => ({
+      ...prev,
+      status: value,
+    }));
+  };
+  
+  const handleAddTag = (tag: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      tags: [...(prev.tags || []), tag]
+    }));
+  };
+  
+  const handleRemoveTag = (tagToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      tags: (prev.tags || []).filter(tag => tag !== tagToRemove)
+    }));
   };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onCreateContact(newContact);
-    
-    // Reset form and close dialog
-    setNewContact({
+    onCreateContact(formData);
+    setOpen(false);
+    resetForm();
+  };
+  
+  const resetForm = () => {
+    setFormData({
       name: "",
       email: "",
       phone: "",
       company: "",
       position: "",
-      lastContact: new Date().toISOString().split('T')[0],
+      lastContact: new Date().toISOString().split("T")[0],
       status: "lead",
       notes: "",
+      tags: []
     });
-    setIsOpen(false);
   };
   
   return (
-    <>
-      <Button 
-        variant={variant} 
-        onClick={() => setIsOpen(true)}
-        {...props}
-      >
-        <PlusCircle className="h-4 w-4 mr-2" />
-        Add Contact
-      </Button>
-      
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Add New Contact</DialogTitle>
-          </DialogHeader>
-          
-          <form onSubmit={handleSubmit}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="new-name">Name*</Label>
-                  <Input 
-                    id="new-name" 
-                    name="name" 
-                    value={newContact.name} 
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="new-email">Email*</Label>
-                  <Input 
-                    id="new-email" 
-                    name="email" 
-                    type="email" 
-                    value={newContact.email} 
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      setOpen(isOpen);
+      if (!isOpen) {
+        resetForm();
+      }
+    }}>
+      <DialogTrigger asChild>
+        <Button variant={variant} className={className}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Contact
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle>Create New Contact</DialogTitle>
+          <DialogDescription>
+            Add a new contact to your network.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  placeholder="John Doe"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
               </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="new-phone">Phone</Label>
-                  <Input 
-                    id="new-phone" 
-                    name="phone" 
-                    value={newContact.phone} 
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="new-company">Company</Label>
-                  <Input 
-                    id="new-company" 
-                    name="company" 
-                    value={newContact.company} 
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="new-position">Position</Label>
-                  <Input 
-                    id="new-position" 
-                    name="position" 
-                    value={newContact.position} 
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="new-status">Status</Label>
-                  <Select 
-                    value={newContact.status} 
-                    onValueChange={handleStatusChange}
-                  >
-                    <SelectTrigger id="new-status">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="lead">Lead</SelectItem>
-                      <SelectItem value="prospect">Prospect</SelectItem>
-                      <SelectItem value="customer">Customer</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="new-lastContact">Last Contact Date</Label>
-                  <Input 
-                    id="new-lastContact" 
-                    name="lastContact" 
-                    type="date" 
-                    value={newContact.lastContact} 
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="new-profileImage">Profile Image URL</Label>
-                  <Input 
-                    id="new-profileImage" 
-                    name="profileImage" 
-                    value={newContact.profileImage || ""} 
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="new-notes">Notes</Label>
-                <Textarea 
-                  id="new-notes" 
-                  name="notes" 
-                  value={newContact.notes} 
-                  onChange={handleInputChange}
-                  rows={3}
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="johndoe@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
                 />
               </div>
             </div>
-            
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit">Create Contact</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  placeholder="+1 (555) 123-4567"
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="company">Company</Label>
+                <Input
+                  id="company"
+                  name="company"
+                  placeholder="Acme Inc."
+                  value={formData.company}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="position">Position</Label>
+                <Input
+                  id="position"
+                  name="position"
+                  placeholder="CEO"
+                  value={formData.position}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="status">Status</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) => handleStatusChange(value as ContactStatus)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="lead">Lead</SelectItem>
+                    <SelectItem value="prospect">Prospect</SelectItem>
+                    <SelectItem value="customer">Customer</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="lastContact">Last Contact Date</Label>
+                <Input
+                  id="lastContact"
+                  name="lastContact"
+                  type="date"
+                  value={formData.lastContact}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="profileImage">Profile Image URL (Optional)</Label>
+                <Input
+                  id="profileImage"
+                  name="profileImage"
+                  placeholder="https://example.com/image.jpg"
+                  value={formData.profileImage || ""}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label>Tags</Label>
+              <ContactTags
+                tags={formData.tags || []}
+                onAddTag={handleAddTag}
+                onRemoveTag={handleRemoveTag}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                name="notes"
+                placeholder="Additional information about this contact..."
+                value={formData.notes}
+                onChange={handleChange}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="submit">Create Contact</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
