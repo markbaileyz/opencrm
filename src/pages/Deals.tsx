@@ -1,9 +1,9 @@
 
 import React, { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { DealFilters } from "@/components/deals/DealFilters";
-import { DealPipeline } from "@/components/deals/DealPipeline";
-import { DealsSummary } from "@/components/deals/DealsSummary";
+import DealFilters from "@/components/deals/DealFilters";
+import DealPipeline from "@/components/deals/DealPipeline";
+import DealsSummary from "@/components/deals/DealsSummary";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlusCircle, ListFilter, BarChart3, SlidersHorizontal } from "lucide-react";
