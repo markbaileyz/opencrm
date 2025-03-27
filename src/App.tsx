@@ -17,6 +17,7 @@ import OpenCRMRoadmap from "@/pages/OpenCRMRoadmap";
 import KnowledgeBasePage from "@/pages/KnowledgeBase";
 import ChallengesSolutionsPage from "@/pages/ChallengesSolutions";
 import Settings from "@/pages/Settings";
+import Patients from "@/pages/Patients";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/NotFound";
@@ -118,6 +119,7 @@ function App() {
           <Route path="/open-crm-roadmap" element={<OpenCRMRoadmap />} />
           <Route path="/mind-map" element={<MindMap />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/patients" element={<Patients />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
