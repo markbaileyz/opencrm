@@ -1,547 +1,271 @@
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Calendar, CheckCircle2, AlertCircle, Clock, Filter } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import type { ScheduledTask } from "@/types/office";
-import { addDays, format, isPast, isThisWeek, isToday, isWithinInterval, subDays } from "date-fns";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { CalendarIcon, Check, Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { type ScheduledTask } from "@/types/office";
 
 const TaskScheduler: React.FC = () => {
-  const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [activeTab, setActiveTab] = useState<string>("upcoming");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentTask, setCurrentTask] = useState<ScheduledTask | null>(null);
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  
+  const nextWeek = new Date(today);
+  nextWeek.setDate(today.getDate() + 7);
+  
+  const nextMonth = new Date(today);
+  nextMonth.setMonth(today.getMonth() + 1);
+  
   const [tasks, setTasks] = useState<ScheduledTask[]>([
     {
-      id: "1",
+      id: "task-1",
       title: "Clean Waiting Room",
-      description: "Vacuum the floor, sanitize all surfaces, and organize magazines",
+      description: "Vacuum, sanitize surfaces, and empty trash",
       frequency: "daily",
       assignedTo: "Cleaning Staff",
-      lastCompleted: subDays(new Date(), 1).toISOString(),
-      nextDue: new Date().toISOString(),
+      lastCompleted: today.toISOString(),
+      nextDue: tomorrow.toISOString(),
       priority: "medium",
       status: "pending",
       category: "cleaning"
     },
     {
-      id: "2",
-      title: "Order Medical Supplies",
-      description: "Check inventory and order gloves, masks, and sanitizer",
-      frequency: "weekly",
+      id: "task-2",
+      title: "Order Office Supplies",
+      description: "Check inventory and reorder paper, pens, and other supplies",
+      frequency: "monthly",
       assignedTo: "Office Manager",
-      lastCompleted: subDays(new Date(), 8).toISOString(),
-      nextDue: addDays(new Date(), 1).toISOString(),
-      priority: "high",
+      lastCompleted: new Date(today.getFullYear(), today.getMonth() - 1, today.getDate()).toISOString(),
+      nextDue: nextMonth.toISOString(),
+      priority: "low",
       status: "pending",
       category: "ordering"
     },
     {
-      id: "3",
-      title: "Calibrate Medical Equipment",
-      description: "Calibrate blood pressure monitors and scales",
-      frequency: "monthly",
-      assignedTo: "Maintenance Tech",
-      lastCompleted: subDays(new Date(), 31).toISOString(),
-      nextDue: addDays(new Date(), 3).toISOString(),
-      priority: "low",
+      id: "task-3",
+      title: "Maintenance Check",
+      description: "Check all equipment and facilities for any issues",
+      frequency: "weekly",
+      assignedTo: "Maintenance",
+      lastCompleted: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7).toISOString(),
+      nextDue: nextWeek.toISOString(),
+      priority: "high",
       status: "pending",
       category: "maintenance"
     },
     {
-      id: "4",
-      title: "Patient Records Audit",
-      description: "Audit recent patient files for completeness",
-      frequency: "monthly",
-      assignedTo: "Records Admin",
-      lastCompleted: subDays(new Date(), 25).toISOString(),
-      nextDue: addDays(new Date(), 5).toISOString(),
-      priority: "medium",
-      status: "in-progress",
-      category: "administrative"
-    },
-    {
-      id: "5",
-      title: "Deep Clean Treatment Rooms",
-      description: "Perform deep cleaning and sanitization of all treatment rooms",
+      id: "task-4",
+      title: "Deep Clean Examination Rooms",
+      description: "Thorough cleaning and sanitizing of all exam rooms",
       frequency: "weekly",
       assignedTo: "Cleaning Staff",
-      lastCompleted: subDays(new Date(), 10).toISOString(),
-      nextDue: subDays(new Date(), 2).toISOString(),
+      lastCompleted: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6).toISOString(),
+      nextDue: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString(),
       priority: "high",
-      status: "overdue",
+      status: "pending",
       category: "cleaning"
-    }
+    },
   ]);
-
+  
+  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("upcoming");
+  const [newTask, setNewTask] = useState<Partial<ScheduledTask>>({
+    title: "",
+    description: "",
+    frequency: "weekly",
+    assignedTo: "",
+    priority: "medium",
+    status: "pending",
+    category: "cleaning"
+  });
+  const [dueDate, setDueDate] = useState<Date | undefined>(tomorrow);
+  
   const handleAddTask = () => {
-    setCurrentTask({
-      id: String(Date.now()),
+    if (!dueDate) return;
+    
+    const taskToAdd: ScheduledTask = {
+      id: `task-${Date.now()}`,
+      title: newTask.title || "New Task",
+      description: newTask.description || "",
+      frequency: newTask.frequency || "weekly",
+      assignedTo: newTask.assignedTo,
+      nextDue: dueDate.toISOString(),
+      priority: newTask.priority || "medium",
+      status: "pending",
+      category: newTask.category || "cleaning"
+    };
+    
+    setTasks([...tasks, taskToAdd]);
+    setIsAddTaskOpen(false);
+    setNewTask({
       title: "",
       description: "",
       frequency: "weekly",
       assignedTo: "",
-      nextDue: new Date().toISOString(),
       priority: "medium",
       status: "pending",
-      category: "maintenance"
+      category: "cleaning"
     });
-    setIsDialogOpen(true);
+    setDueDate(tomorrow);
   };
-
-  const handleEditTask = (task: ScheduledTask) => {
-    setCurrentTask(task);
-    setIsDialogOpen(true);
-  };
-
-  const handleCompleteTask = (taskId: string) => {
-    setTasks(tasks.map(task => {
-      if (task.id === taskId) {
-        const now = new Date();
-        let nextDueDate: Date;
-        
-        // Calculate next due date based on frequency
-        switch (task.frequency) {
-          case "daily":
-            nextDueDate = addDays(now, 1);
-            break;
-          case "weekly":
-            nextDueDate = addDays(now, 7);
-            break;
-          case "monthly":
-            nextDueDate = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
-            break;
-          case "quarterly":
-            nextDueDate = new Date(now.getFullYear(), now.getMonth() + 3, now.getDate());
-            break;
-          case "yearly":
-            nextDueDate = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
-            break;
-          default:
-            nextDueDate = addDays(now, 7); // Default to weekly
+  
+  const handleMarkAsCompleted = (taskId: string) => {
+    const today = new Date();
+    
+    setTasks(prevTasks => 
+      prevTasks.map(task => {
+        if (task.id === taskId) {
+          // Calculate next due date based on frequency
+          let nextDue = new Date(today);
+          
+          switch (task.frequency) {
+            case "daily":
+              nextDue.setDate(today.getDate() + 1);
+              break;
+            case "weekly":
+              nextDue.setDate(today.getDate() + 7);
+              break;
+            case "monthly":
+              nextDue.setMonth(today.getMonth() + 1);
+              break;
+            case "quarterly":
+              nextDue.setMonth(today.getMonth() + 3);
+              break;
+            case "yearly":
+              nextDue.setFullYear(today.getFullYear() + 1);
+              break;
+            default:
+              nextDue.setDate(today.getDate() + 7);
+          }
+          
+          return {
+            ...task,
+            status: "completed" as const,
+            lastCompleted: today.toISOString(),
+            nextDue: nextDue.toISOString()
+          };
         }
-        
-        return {
-          ...task,
-          status: "completed",
-          lastCompleted: now.toISOString(),
-          nextDue: nextDueDate.toISOString()
-        };
-      }
-      return task;
-    }));
-    
-    toast({
-      title: "Task completed",
-      description: "The task has been marked as completed and rescheduled",
-      variant: "default"
-    });
+        return task;
+      })
+    );
   };
-
-  const handleSaveTask = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!currentTask) return;
-
-    const formData = new FormData(e.currentTarget);
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const frequency = formData.get("frequency") as ScheduledTask["frequency"];
-    const assignedTo = formData.get("assignedTo") as string;
-    const nextDue = formData.get("nextDue") as string;
-    const priority = formData.get("priority") as ScheduledTask["priority"];
-    const category = formData.get("category") as ScheduledTask["category"];
-    
-    // Determine status based on next due date
-    let status: ScheduledTask["status"] = "pending";
-    const nextDueDate = new Date(nextDue);
-    if (isPast(nextDueDate) && !isToday(nextDueDate)) {
-      status = "overdue";
-    }
-    
-    const updatedTask: ScheduledTask = {
-      ...currentTask,
-      title,
-      description,
-      frequency,
-      assignedTo,
-      nextDue: nextDueDate.toISOString(),
-      priority,
-      status,
-      category
-    };
-
-    const isNewTask = !tasks.some(task => task.id === currentTask.id);
-    
-    if (isNewTask) {
-      setTasks([...tasks, updatedTask]);
-      toast({
-        title: "Task created",
-        description: `Task "${title}" has been created`,
-        variant: "default"
-      });
-    } else {
-      setTasks(tasks.map(task => 
-        task.id === currentTask.id ? updatedTask : task
-      ));
-      toast({
-        title: "Task updated",
-        description: `Task "${title}" has been updated`,
-        variant: "default"
-      });
-    }
-
-    setIsDialogOpen(false);
-    setCurrentTask(null);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-      case "in-progress":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
-      case "overdue":
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
-      default:
-        return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
+  
+  const getPriorityBadge = (priority: ScheduledTask["priority"]) => {
     switch (priority) {
       case "high":
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
+        return <Badge className="bg-red-100 text-red-800">High</Badge>;
       case "medium":
-        return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
+        return <Badge className="bg-yellow-100 text-yellow-800">Medium</Badge>;
       case "low":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+        return <Badge className="bg-green-100 text-green-800">Low</Badge>;
       default:
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
+        return <Badge className="bg-gray-100 text-gray-800">Unknown</Badge>;
     }
   };
-
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case "cleaning":
-        return "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300";
-      case "maintenance":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
-      case "ordering":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
-      case "administrative":
-        return "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300";
-      default:
-        return "bg-slate-100 text-slate-800 dark:bg-slate-800/50 dark:text-slate-300";
-    }
-  };
-
-  const filteredTasks = tasks.filter(task => {
-    const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         task.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         task.assignedTo?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === "all" || task.status === statusFilter;
-    const matchesCategory = categoryFilter === "all" || task.category === categoryFilter;
-    
-    return matchesSearch && matchesStatus && matchesCategory;
-  });
-
-  // Filter tasks based on the active tab
-  const filteredTasksByTab = filteredTasks.filter(task => {
-    const nextDueDate = new Date(task.nextDue);
-    
-    switch(activeTab) {
-      case "upcoming":
-        return !isPast(nextDueDate) || isToday(nextDueDate);
-      case "overdue":
-        return task.status === "overdue" || (isPast(nextDueDate) && !isToday(nextDueDate));
-      case "today":
-        return isToday(nextDueDate);
-      case "thisWeek":
-        return isWithinInterval(nextDueDate, { 
-          start: new Date(), 
-          end: addDays(new Date(), 7) 
-        });
+  
+  const getStatusBadge = (status: ScheduledTask["status"]) => {
+    switch (status) {
       case "completed":
-        return task.status === "completed";
+        return <Badge className="bg-green-100 text-green-800">Completed</Badge>;
+      case "in-progress":
+        return <Badge className="bg-blue-100 text-blue-800">In Progress</Badge>;
+      case "overdue":
+        return <Badge className="bg-red-100 text-red-800">Overdue</Badge>;
+      case "pending":
+        return <Badge className="bg-gray-100 text-gray-800">Pending</Badge>;
       default:
-        return true;
+        return <Badge className="bg-gray-100 text-gray-800">Unknown</Badge>;
     }
+  };
+  
+  const formatDate = (dateString: string) => {
+    return format(new Date(dateString), "MMM d, yyyy");
+  };
+  
+  const isTaskOverdue = (nextDue: string) => {
+    const dueDate = new Date(nextDue);
+    const today = new Date();
+    return dueDate < today;
+  };
+  
+  const updatedTasks = tasks.map(task => {
+    if (task.status !== "completed" && isTaskOverdue(task.nextDue)) {
+      return { ...task, status: "overdue" as const };
+    }
+    return task;
   });
-
+  
+  const filteredTasks = updatedTasks.filter(task => {
+    if (activeTab === "upcoming") {
+      return task.status === "pending" || task.status === "in-progress" || task.status === "overdue";
+    } else if (activeTab === "completed") {
+      return task.status === "completed";
+    } else if (activeTab === "daily") {
+      return task.frequency === "daily";
+    } else if (activeTab === "cleaning") {
+      return task.category === "cleaning";
+    }
+    return true;
+  });
+  
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center">
-        <div>
-          <h2 className="text-xl font-semibold">Task Scheduler</h2>
-          <p className="text-muted-foreground">
-            Manage recurring tasks and maintenance schedules
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button onClick={handleAddTask}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Task
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 sm:grid-cols-5 w-full">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-            <TabsTrigger value="today">Today</TabsTrigger>
-            <TabsTrigger value="thisWeek">This Week</TabsTrigger>
-            <TabsTrigger value="overdue">Overdue</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search tasks..."
-            className="pl-8 w-full"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Filter className="h-4 w-4 mr-2" />
-              {statusFilter === "all" ? "All Statuses" : 
-                statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-xl font-semibold">Scheduled Tasks</h2>
+        
+        <Dialog open={isAddTaskOpen} onOpenChange={setIsAddTaskOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Task
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuRadioGroup value={statusFilter} onValueChange={setStatusFilter}>
-              <DropdownMenuRadioItem value="all">All Statuses</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="pending">Pending</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="in-progress">In Progress</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="completed">Completed</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="overdue">Overdue</DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Filter className="h-4 w-4 mr-2" />
-              {categoryFilter === "all" ? "All Categories" : 
-                categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1)}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuRadioGroup value={categoryFilter} onValueChange={setCategoryFilter}>
-              <DropdownMenuRadioItem value="all">All Categories</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="cleaning">Cleaning</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="maintenance">Maintenance</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="ordering">Ordering</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="administrative">Administrative</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="other">Other</DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Scheduled Tasks</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Priority</TableHead>
-                <TableHead>Frequency</TableHead>
-                <TableHead>Next Due</TableHead>
-                <TableHead>Assigned To</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredTasksByTab.length > 0 ? (
-                filteredTasksByTab.map((task) => (
-                  <TableRow key={task.id}>
-                    <TableCell className="font-medium">{task.title}</TableCell>
-                    <TableCell>
-                      <Badge className={getCategoryColor(task.category)}>
-                        {task.category.charAt(0).toUpperCase() + task.category.slice(1)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(task.status)}>
-                        {task.status.replace('-', ' ')}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getPriorityColor(task.priority)}>
-                        {task.priority}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{task.frequency}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <Calendar className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
-                        {format(new Date(task.nextDue), 'MMM d, yyyy')}
-                      </div>
-                    </TableCell>
-                    <TableCell>{task.assignedTo || "Unassigned"}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        {task.status !== "completed" && (
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8"
-                            onClick={() => handleCompleteTask(task.id)}
-                          >
-                            <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
-                            Complete
-                          </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8"
-                          onClick={() => handleEditTask(task)}
-                        >
-                          Edit
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center h-32">
-                    <div className="flex flex-col items-center justify-center">
-                      <AlertCircle className="h-8 w-8 text-muted-foreground mb-2" />
-                      <p className="text-muted-foreground">No tasks found</p>
-                      <Button 
-                        variant="outline" 
-                        className="mt-4"
-                        onClick={handleAddTask}
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Task
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[550px]">
-          <DialogHeader>
-            <DialogTitle>{currentTask?.title ? 'Edit Task' : 'Add New Task'}</DialogTitle>
-            <DialogDescription>
-              {currentTask?.title 
-                ? 'Update the task details below.'
-                : 'Fill in the details for the new scheduled task.'}
-            </DialogDescription>
-          </DialogHeader>
-
-          <form onSubmit={handleSaveTask}>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Task</DialogTitle>
+            </DialogHeader>
+            
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="title">Task Title</Label>
-                <Input
-                  id="title"
-                  name="title"
-                  placeholder="Enter task title"
-                  defaultValue={currentTask?.title}
-                  required
+                <Label htmlFor="task-title">Title</Label>
+                <Input 
+                  id="task-title" 
+                  value={newTask.title || ""}
+                  onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+                  placeholder="Enter task title" 
                 />
               </div>
-
+              
               <div className="grid gap-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Enter task description"
-                  defaultValue={currentTask?.description}
-                  rows={3}
+                <Label htmlFor="task-description">Description</Label>
+                <Textarea 
+                  id="task-description" 
+                  value={newTask.description || ""}
+                  onChange={(e) => setNewTask({...newTask, description: e.target.value})}
+                  placeholder="Enter task description" 
                 />
               </div>
-
+              
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Select name="category" defaultValue={currentTask?.category}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cleaning">Cleaning</SelectItem>
-                      <SelectItem value="maintenance">Maintenance</SelectItem>
-                      <SelectItem value="ordering">Ordering</SelectItem>
-                      <SelectItem value="administrative">Administrative</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="frequency">Frequency</Label>
-                  <Select name="frequency" defaultValue={currentTask?.frequency}>
-                    <SelectTrigger>
+                  <Label htmlFor="task-frequency">Frequency</Label>
+                  <Select 
+                    value={newTask.frequency || "weekly"}
+                    onValueChange={(value) => setNewTask({...newTask, frequency: value as ScheduledTask["frequency"]})}
+                  >
+                    <SelectTrigger id="task-frequency">
                       <SelectValue placeholder="Select frequency" />
                     </SelectTrigger>
                     <SelectContent>
@@ -554,58 +278,163 @@ const TaskScheduler: React.FC = () => {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+                
                 <div className="grid gap-2">
-                  <Label htmlFor="nextDue">Next Due Date</Label>
-                  <Input
-                    id="nextDue"
-                    name="nextDue"
-                    type="date"
-                    defaultValue={currentTask?.nextDue 
-                      ? new Date(currentTask.nextDue).toISOString().split('T')[0]
-                      : new Date().toISOString().split('T')[0]
-                    }
-                    required
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="priority">Priority</Label>
-                  <Select name="priority" defaultValue={currentTask?.priority}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select priority" />
+                  <Label htmlFor="task-category">Category</Label>
+                  <Select 
+                    value={newTask.category || "cleaning"}
+                    onValueChange={(value) => setNewTask({...newTask, category: value as ScheduledTask["category"]})}
+                  >
+                    <SelectTrigger id="task-category">
+                      <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="cleaning">Cleaning</SelectItem>
+                      <SelectItem value="maintenance">Maintenance</SelectItem>
+                      <SelectItem value="ordering">Ordering</SelectItem>
+                      <SelectItem value="administrative">Administrative</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
-
+              
               <div className="grid gap-2">
-                <Label htmlFor="assignedTo">Assigned To</Label>
-                <Input
-                  id="assignedTo"
-                  name="assignedTo"
-                  placeholder="Who is responsible for this task?"
-                  defaultValue={currentTask?.assignedTo}
+                <Label htmlFor="task-assigned">Assigned To (Optional)</Label>
+                <Input 
+                  id="task-assigned" 
+                  value={newTask.assignedTo || ""}
+                  onChange={(e) => setNewTask({...newTask, assignedTo: e.target.value})}
+                  placeholder="Enter person or role" 
                 />
               </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="task-priority">Priority</Label>
+                  <Select 
+                    value={newTask.priority || "medium"}
+                    onValueChange={(value) => setNewTask({...newTask, priority: value as ScheduledTask["priority"]})}
+                  >
+                    <SelectTrigger id="task-priority">
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="grid gap-2">
+                  <Label>Due Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full pl-3 text-left font-normal",
+                          !dueDate && "text-muted-foreground"
+                        )}
+                      >
+                        {dueDate ? (
+                          format(dueDate, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={dueDate}
+                        onSelect={setDueDate}
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
             </div>
-
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit">Save</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+            
+            <Button onClick={handleAddTask}>Add Task</Button>
+          </DialogContent>
+        </Dialog>
+      </div>
+      
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-4 sm:w-1/2 w-full mb-4">
+          <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+          <TabsTrigger value="completed">Completed</TabsTrigger>
+          <TabsTrigger value="daily">Daily</TabsTrigger>
+          <TabsTrigger value="cleaning">Cleaning</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value={activeTab}>
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {activeTab === "upcoming" && "Upcoming Tasks"}
+                {activeTab === "completed" && "Completed Tasks"}
+                {activeTab === "daily" && "Daily Tasks"}
+                {activeTab === "cleaning" && "Cleaning Tasks"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Task</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Priority</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Due Date</TableHead>
+                    <TableHead>Assigned To</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredTasks.map((task) => (
+                    <TableRow key={task.id}>
+                      <TableCell className="font-medium">
+                        <div className="font-medium">{task.title}</div>
+                        <div className="text-xs text-muted-foreground mt-1">{task.description}</div>
+                      </TableCell>
+                      <TableCell>{task.category.charAt(0).toUpperCase() + task.category.slice(1)}</TableCell>
+                      <TableCell>{getPriorityBadge(task.priority)}</TableCell>
+                      <TableCell>{getStatusBadge(task.status)}</TableCell>
+                      <TableCell>{formatDate(task.nextDue)}</TableCell>
+                      <TableCell>{task.assignedTo || "—"}</TableCell>
+                      <TableCell className="text-right">
+                        {task.status !== "completed" && (
+                          <Button 
+                            size="sm" 
+                            onClick={() => handleMarkAsCompleted(task.id)}
+                          >
+                            <Check className="h-4 w-4 mr-1" />
+                            Complete
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  
+                  {filteredTasks.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
+                        No tasks found
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
