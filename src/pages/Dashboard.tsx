@@ -15,6 +15,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import OfflineBanner from "@/components/ui/offline-banner";
 import { useOfflineState } from "@/hooks/use-offline-state";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { OrganizationsProvider } from "@/context/OrganizationsContext";
 
 const Dashboard = () => {
   const { isOnline, pendingActions, isSyncing, processPendingActions } = useOfflineState();
@@ -88,7 +89,9 @@ const Dashboard = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <RecentContacts />
-          <OrganizationInsights />
+          <OrganizationsProvider>
+            <OrganizationInsights />
+          </OrganizationsProvider>
         </div>
       </div>
     </DashboardLayout>
