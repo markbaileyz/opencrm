@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus } from "lucide-react";
+import { Plus, Bell } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -21,8 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Contact, ContactStatus, ContactPriority } from "@/types/contact";
+import { Contact, ContactStatus, ContactPriority, FollowUp } from "@/types/contact";
 import ContactTags from "./ContactTags";
+import { Checkbox } from "@/components/ui/checkbox";
+import { v4 as uuidv4 } from "uuid";
 
 interface CreateContactButtonProps {
   onCreateContact: (contact: Omit<Contact, "id">) => void;
@@ -47,6 +49,13 @@ const CreateContactButton = ({
     priority: "medium",
     notes: "",
     tags: []
+  });
+  
+  const [includeFollowUp, setIncludeFollowUp] = useState(false);
+  const [followUpData, setFollowUpData] = useState({
+    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 7 days from now
+    description: "",
+    priority: "medium" as ContactPriority
   });
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -84,10 +93,44 @@ const CreateContactButton = ({
       tags: (prev.tags || []).filter(tag => tag !== tagToRemove)
     }));
   };
+
+  const handleFollowUpChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFollowUpData({
+      ...followUpData,
+      [name]: value,
+    });
+  };
+
+  const handleFollowUpPriorityChange = (value: ContactPriority) => {
+    setFollowUpData({
+      ...followUpData,
+      priority: value,
+    });
+  };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onCreateContact(formData);
+    
+    // Create final contact object, including follow-up if selected
+    const contactToCreate: Omit<Contact, "id"> = {
+      ...formData
+    };
+    
+    if (includeFollowUp && followUpData.description) {
+      const followUp: FollowUp = {
+        id: uuidv4(),
+        contactId: "", // Will be set after contact is created
+        dueDate: followUpData.dueDate,
+        description: followUpData.description,
+        status: "pending",
+        priority: followUpData.priority
+      };
+      
+      contactToCreate.followUp = followUp;
+    }
+    
+    onCreateContact(contactToCreate);
     setOpen(false);
     resetForm();
   };
@@ -104,6 +147,12 @@ const CreateContactButton = ({
       priority: "medium",
       notes: "",
       tags: []
+    });
+    setIncludeFollowUp(false);
+    setFollowUpData({
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      description: "",
+      priority: "medium"
     });
   };
   
@@ -261,6 +310,65 @@ const CreateContactButton = ({
                 onChange={handleChange}
                 rows={3}
               />
+            </div>
+
+            {/* Follow-up section */}
+            <div className="border-t pt-4 mt-2">
+              <div className="flex items-center space-x-2 mb-4">
+                <Checkbox 
+                  id="includeFollowUp"
+                  checked={includeFollowUp}
+                  onCheckedChange={(checked) => setIncludeFollowUp(checked === true)}
+                />
+                <Label htmlFor="includeFollowUp" className="flex items-center">
+                  <Bell className="h-4 w-4 mr-2" />
+                  Set follow-up reminder
+                </Label>
+              </div>
+              
+              {includeFollowUp && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="followUpDueDate">Follow-up Date</Label>
+                    <Input
+                      id="followUpDueDate"
+                      name="dueDate"
+                      type="date"
+                      value={followUpData.dueDate}
+                      onChange={handleFollowUpChange}
+                      required={includeFollowUp}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="followUpPriority">Priority</Label>
+                    <Select
+                      value={followUpData.priority}
+                      onValueChange={(value) => handleFollowUpPriorityChange(value as ContactPriority)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low Priority</SelectItem>
+                        <SelectItem value="medium">Medium Priority</SelectItem>
+                        <SelectItem value="high">High Priority</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2 sm:col-span-2">
+                    <Label htmlFor="followUpDescription">Description</Label>
+                    <Textarea
+                      id="followUpDescription"
+                      name="description"
+                      placeholder="What needs to be followed up on..."
+                      value={followUpData.description}
+                      onChange={handleFollowUpChange}
+                      rows={2}
+                      required={includeFollowUp}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <DialogFooter>

@@ -6,7 +6,7 @@ import ContactDetails from "@/components/contacts/ContactDetails";
 import CreateContactButton from "@/components/contacts/CreateContactButton";
 import ContactImportExport from "@/components/contacts/ContactImportExport";
 import { useToast } from "@/hooks/use-toast";
-import { Contact, ContactActivity } from "@/types/contact";
+import { Contact, ContactActivity, FollowUp } from "@/types/contact";
 import { v4 as uuidv4 } from "uuid";
 
 // Sample data for demonstration
@@ -39,7 +39,15 @@ const initialContacts: Contact[] = [
         date: "2023-10-18T09:15:00",
         description: "Sent follow-up email with product information."
       }
-    ]
+    ],
+    followUp: {
+      id: "f1",
+      contactId: "1",
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 7 days from now
+      description: "Follow up on proposal and pricing discussion",
+      status: "pending",
+      priority: "high"
+    }
   },
   {
     id: "2",
@@ -77,7 +85,15 @@ const initialContacts: Contact[] = [
     profileImage: "https://randomuser.me/api/portraits/men/3.jpg",
     tags: ["Marketing", "Follow-up"],
     priority: "low",
-    activities: []
+    activities: [],
+    followUp: {
+      id: "f2",
+      contactId: "3",
+      dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 days ago (overdue)
+      description: "Schedule demo of new marketing features",
+      status: "pending",
+      priority: "medium"
+    }
   },
 ];
 

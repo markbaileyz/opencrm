@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Contact } from "@/types/contact";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search, User, Filter } from "lucide-react";
+import { Search, User, Filter, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ContactStatusBadge from "./ContactStatusBadge";
 import ContactPriorityBadge from "./ContactPriorityBadge";
@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { isPast, isToday } from "date-fns";
 
 interface ContactsListProps {
   contacts: Contact[];
@@ -34,7 +35,8 @@ const ContactsList = ({ contacts, selectedContactId, onSelectContact }: Contacts
   const [showFilters, setShowFilters] = useState(false);
   const [statusFilters, setStatusFilters] = useState<Contact["status"][]>([]);
   const [priorityFilters, setPriorityFilters] = useState<Contact["priority"][]>([]);
-  const [sortBy, setSortBy] = useState<"name" | "lastContact" | "company">("name");
+  const [followUpFilters, setFollowUpFilters] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<"name" | "lastContact" | "company" | "followUp">("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   
   const toggleStatusFilter = (status: Contact["status"]) => {
@@ -53,6 +55,14 @@ const ContactsList = ({ contacts, selectedContactId, onSelectContact }: Contacts
         : [...prev, priority]
     );
   };
+
+  const toggleFollowUpFilter = (filter: string) => {
+    setFollowUpFilters(prev => 
+      prev.includes(filter) 
+        ? prev.filter(f => f !== filter)
+        : [...prev, filter]
+    );
+  };
   
   const filteredContacts = contacts.filter((contact) => {
     // Text search filter
@@ -69,7 +79,15 @@ const ContactsList = ({ contacts, selectedContactId, onSelectContact }: Contacts
     const matchesPriority = priorityFilters.length === 0 || 
       (contact.priority && priorityFilters.includes(contact.priority));
     
-    return matchesSearch && matchesStatus && matchesPriority;
+    // Follow-up filter
+    const matchesFollowUp = followUpFilters.length === 0 || 
+      (followUpFilters.includes("none") && !contact.followUp) ||
+      (followUpFilters.includes("pending") && contact.followUp && contact.followUp.status === "pending") ||
+      (followUpFilters.includes("completed") && contact.followUp && contact.followUp.status === "completed") ||
+      (followUpFilters.includes("overdue") && contact.followUp && contact.followUp.status === "pending" && 
+        isPast(new Date(contact.followUp.dueDate)) && !isToday(new Date(contact.followUp.dueDate)));
+    
+    return matchesSearch && matchesStatus && matchesPriority && matchesFollowUp;
   });
   
   // Sort contacts
@@ -82,6 +100,19 @@ const ContactsList = ({ contacts, selectedContactId, onSelectContact }: Contacts
       comparison = new Date(a.lastContact).getTime() - new Date(b.lastContact).getTime();
     } else if (sortBy === "company") {
       comparison = a.company.localeCompare(b.company);
+    } else if (sortBy === "followUp") {
+      // Sort by follow-up due date (contacts with follow-ups first, then by due date)
+      const aHasFollowUp = !!a.followUp && a.followUp.status === "pending";
+      const bHasFollowUp = !!b.followUp && b.followUp.status === "pending";
+      
+      if (aHasFollowUp && !bHasFollowUp) return -1;
+      if (!aHasFollowUp && bHasFollowUp) return 1;
+      
+      if (aHasFollowUp && bHasFollowUp) {
+        return new Date(a.followUp!.dueDate).getTime() - new Date(b.followUp!.dueDate).getTime();
+      }
+      
+      return 0;
     }
     
     return sortDirection === "asc" ? comparison : -comparison;
@@ -90,12 +121,33 @@ const ContactsList = ({ contacts, selectedContactId, onSelectContact }: Contacts
   const handleResetFilters = () => {
     setStatusFilters([]);
     setPriorityFilters([]);
+    setFollowUpFilters([]);
     setSortBy("name");
     setSortDirection("asc");
   };
 
-  const activeFilterCount = statusFilters.length + priorityFilters.length + 
+  const activeFilterCount = statusFilters.length + priorityFilters.length + followUpFilters.length + 
     (sortBy !== "name" || sortDirection !== "asc" ? 1 : 0);
+
+  // Helper function to determine follow-up status indicator
+  const getFollowUpIndicator = (contact: Contact) => {
+    if (!contact.followUp) return null;
+    
+    const dueDate = new Date(contact.followUp.dueDate);
+    const isOverdue = isPast(dueDate) && !isToday(dueDate) && contact.followUp.status === "pending";
+    const isDueToday = isToday(dueDate) && contact.followUp.status === "pending";
+    const isCompleted = contact.followUp.status === "completed";
+    
+    if (isOverdue) {
+      return <Bell className="h-4 w-4 text-red-500" title="Overdue follow-up" />;
+    } else if (isDueToday) {
+      return <Bell className="h-4 w-4 text-yellow-500" title="Follow-up due today" />;
+    } else if (isCompleted) {
+      return <Bell className="h-4 w-4 text-green-500" title="Completed follow-up" />;
+    } else {
+      return <Bell className="h-4 w-4 text-blue-500" title="Pending follow-up" />;
+    }
+  };
   
   return (
     <Card className="h-full">
@@ -171,6 +223,32 @@ const ContactsList = ({ contacts, selectedContactId, onSelectContact }: Contacts
                     ))}
                   </div>
                 </div>
+
+                <div className="space-y-2">
+                  <h5 className="text-xs text-muted-foreground">Follow-up</h5>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { id: "none", label: "No follow-up" },
+                      { id: "pending", label: "Pending" },
+                      { id: "overdue", label: "Overdue" },
+                      { id: "completed", label: "Completed" }
+                    ].map((followUp) => (
+                      <div key={followUp.id} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`follow-up-${followUp.id}`} 
+                          checked={followUpFilters.includes(followUp.id)}
+                          onCheckedChange={() => toggleFollowUpFilter(followUp.id)}
+                        />
+                        <Label 
+                          htmlFor={`follow-up-${followUp.id}`}
+                          className="text-sm"
+                        >
+                          {followUp.label}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
                 
                 <div className="space-y-2">
                   <h5 className="text-xs text-muted-foreground">Sort By</h5>
@@ -186,6 +264,7 @@ const ContactsList = ({ contacts, selectedContactId, onSelectContact }: Contacts
                         <SelectItem value="name">Name</SelectItem>
                         <SelectItem value="company">Company</SelectItem>
                         <SelectItem value="lastContact">Last Contact</SelectItem>
+                        <SelectItem value="followUp">Follow-up Date</SelectItem>
                       </SelectContent>
                     </Select>
                     
@@ -245,7 +324,10 @@ const ContactsList = ({ contacts, selectedContactId, onSelectContact }: Contacts
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{contact.name}</p>
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium truncate">{contact.name}</p>
+                      {getFollowUpIndicator(contact)}
+                    </div>
                     <p className="text-sm text-muted-foreground truncate">
                       {contact.company}
                     </p>
