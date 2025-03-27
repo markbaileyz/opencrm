@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ButtonCustom } from "../ui/button-custom";
 import NavLink from "./NavLink";
 
@@ -13,13 +13,13 @@ interface MobileNavProps {
 
 const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: MobileNavProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   
   if (!isOpen) return null;
   
-  const handleHomeClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleNavigate = (path: string) => {
     closeMobileMenu();
+    navigate(path, { replace: true });
   };
   
   return (
@@ -42,10 +42,10 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
         >
           Pricing
         </NavLink>
-        <NavLink href="/healthcare-crm" active={isActive("/healthcare-crm")} onClick={closeMobileMenu}>
+        <NavLink href="/healthcare-crm" active={isActive("/healthcare-crm")} onClick={() => handleNavigate("/healthcare-crm")}>
           Healthcare CRM
         </NavLink>
-        <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={closeMobileMenu}>
+        <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={() => handleNavigate("/roadmap")}>
           Roadmap
         </NavLink>
         <div className="flex space-x-4 pt-2">

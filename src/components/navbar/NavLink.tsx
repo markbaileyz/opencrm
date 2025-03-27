@@ -40,13 +40,13 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
       if (location.pathname !== '/') {
         // Force navigation to home page first if we're not there
         navigate('/', { replace: true });
-        // Set a larger timeout to ensure the home page renders completely
+        // Set a timeout to ensure the home page renders completely
         setTimeout(() => {
           const element = document.getElementById(sectionId);
           if (element) {
             element.scrollIntoView({ behavior: 'smooth' });
           }
-        }, 200);
+        }, 300); // Increased timeout for better reliability
       } else {
         // We're already on the home page, just scroll to section
         const element = document.getElementById(sectionId);
@@ -57,10 +57,11 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
       return;
     }
     
-    // For standard page links, let Link handle it
-    // But prevent navigation if we're already on the target route
-    if (location.pathname === href) {
+    // For standard page links, prevent default and use navigate
+    // to avoid full page reloads
+    if (!href.includes('#')) {
       e.preventDefault();
+      navigate(href, { replace: true });
     }
   };
   
