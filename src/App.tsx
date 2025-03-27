@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Index from "@/pages/Index";
@@ -13,8 +14,9 @@ import Roadmap from "@/pages/Roadmap";
 import MindMap from "@/pages/MindMap";
 import HealthcareCRM from "@/pages/HealthcareCRM";
 import OpenCRMRoadmap from "@/pages/OpenCRMRoadmap";
-import KnowledgeBasePage from "@/pages/KnowledgeBasePage";
-import ChallengesSolutionsPage from "@/pages/ChallengesSolutionsPage";
+import KnowledgeBasePage from "@/pages/KnowledgeBase";
+import ChallengesSolutionsPage from "@/pages/ChallengesSolutions";
+import Settings from "@/pages/Settings";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/NotFound";
