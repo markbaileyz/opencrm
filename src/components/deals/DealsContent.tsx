@@ -7,15 +7,16 @@ import DealFilters from "@/components/deals/DealFilters";
 import DealAnalytics from "@/components/deals/DealAnalytics";
 import { Deal } from "@/types/deal";
 import { filterDeals } from "@/utils/dealFilters";
+import { DealFiltersState } from "./types/dealFilterTypes";
 
 interface DealsContentProps {
   viewMode: "pipeline" | "details" | "analytics";
   selectedDealId: string | null;
-  filters: any;
+  filters: DealFiltersState;
   deals: Deal[];
   onDealClick: (dealId: string) => void;
   onDealMoved: (dealId: string, newStage: string) => void;
-  onFilterChange: (filters: any) => void;
+  onFilterChange: (filters: DealFiltersState) => void;
   onEditDeal: (dealId: string) => void;
   onBackToPipeline: () => void;
 }

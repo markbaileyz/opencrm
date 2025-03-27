@@ -1,6 +1,6 @@
 
 import { Deal } from "@/types/deal";
-import { DealFiltersState } from "@/components/deals/DealFilters";
+import { DealFiltersState } from "@/components/deals/types/dealFilterTypes";
 
 export const filterDeals = (deals: Deal[], filters: DealFiltersState): Deal[] => {
   return deals.filter(deal => {
