@@ -1,7 +1,8 @@
 
 import React from "react";
-import { CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { CheckCircle, Clock, AlertCircle, CalendarX, CalendarClock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 // Appointment Item Component
 interface AppointmentItemProps {
@@ -10,14 +11,32 @@ interface AppointmentItemProps {
   type: string;
   status: "completed" | "upcoming" | "canceled";
   className?: string;
+  showStatusBadge?: boolean;
 }
 
-const AppointmentItem = ({ name, time, type, status, className }: AppointmentItemProps) => {
+const AppointmentItem = ({ 
+  name, 
+  time, 
+  type, 
+  status, 
+  className,
+  showStatusBadge = false
+}: AppointmentItemProps) => {
   // Dynamic styling based on appointment status
   const statusClasses = {
     completed: "text-green-500",
     upcoming: "text-primary",
     canceled: "text-red-500",
+  };
+
+  // Appointment type color mapping
+  const typeColorClasses = {
+    "check-in": "text-blue-500",
+    "follow-up": "text-purple-500",
+    "consultation": "text-green-500",
+    "new-client": "text-orange-500",
+    "review": "text-yellow-500",
+    "email-follow-up": "text-sky-500",
   };
 
   // Get the appropriate status icon
@@ -26,12 +45,32 @@ const AppointmentItem = ({ name, time, type, status, className }: AppointmentIte
       case "completed":
         return <CheckCircle className={`h-5 w-5 ${statusClasses.completed}`} />;
       case "upcoming":
-        return <Clock className={`h-5 w-5 ${statusClasses.upcoming}`} />;
+        return <CalendarClock className={`h-5 w-5 ${statusClasses.upcoming}`} />;
       case "canceled":
-        return <AlertCircle className={`h-5 w-5 ${statusClasses.canceled}`} />;
+        return <CalendarX className={`h-5 w-5 ${statusClasses.canceled}`} />;
       default:
         return <Clock className="h-5 w-5 text-primary" />;
     }
+  };
+
+  // Get status badge
+  const getStatusBadge = () => {
+    switch(status) {
+      case "upcoming":
+        return <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">Upcoming</Badge>;
+      case "completed":
+        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">Completed</Badge>;
+      case "canceled":
+        return <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">Canceled</Badge>;
+      default:
+        return null;
+    }
+  };
+
+  // Get type color
+  const getTypeColor = () => {
+    const key = type.toLowerCase() as keyof typeof typeColorClasses;
+    return typeColorClasses[key] || "text-gray-500";
   };
 
   return (
@@ -51,14 +90,17 @@ const AppointmentItem = ({ name, time, type, status, className }: AppointmentIte
           )}>
             {name}
           </p>
-          <p className="text-xs text-muted-foreground">{type}</p>
+          <p className={cn("text-xs", getTypeColor())}>{type}</p>
         </div>
       </div>
-      <div className={cn(
-        "text-sm",
-        statusClasses[status]
-      )}>
-        {time}
+      <div className="flex items-center gap-2">
+        {showStatusBadge && getStatusBadge()}
+        <div className={cn(
+          "text-sm",
+          statusClasses[status]
+        )}>
+          {time}
+        </div>
       </div>
     </div>
   );

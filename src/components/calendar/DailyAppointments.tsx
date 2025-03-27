@@ -1,15 +1,22 @@
 
-import React from "react";
-import { format } from "date-fns";
+import React, { useState } from "react";
+import { format, addDays, subDays } from "date-fns";
 import { Card, CardHeader, CardContent, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarClock, CalendarPlus, ArrowLeft, ArrowRight } from "lucide-react";
+import { CalendarClock, CalendarPlus, ArrowLeft, ArrowRight, Filter } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import AppointmentItem from "@/components/dashboard/AppointmentItem";
 import AppointmentPopover from "@/components/calendar/AppointmentPopover";
 import QuickAddAppointment from "@/components/calendar/QuickAddAppointment";
@@ -47,9 +54,21 @@ const DailyAppointments = ({
   onDateChange,
   onQuickAdd
 }: DailyAppointmentsProps) => {
+  const [statusFilter, setStatusFilter] = useState<"all" | "upcoming" | "completed" | "canceled">("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
   
-  const selectedDateAppointments = appointments.filter(
-    (appointment) => format(new Date(appointment.date), 'PP') === format(selectedDate, 'PP')
+  // Get all unique appointment types
+  const appointmentTypes = ["all", ...new Set(appointments.map(app => app.type.toLowerCase()))];
+  
+  // Filter appointments by selected date and applied filters
+  const filteredAppointments = appointments.filter(
+    (appointment) => {
+      const matchesDate = format(new Date(appointment.date), 'PP') === format(selectedDate, 'PP');
+      const matchesStatus = statusFilter === "all" || appointment.status === statusFilter;
+      const matchesType = typeFilter === "all" || appointment.type.toLowerCase() === typeFilter;
+      
+      return matchesDate && matchesStatus && matchesType;
+    }
   );
 
   // Status badge styling helper
@@ -75,7 +94,7 @@ const DailyAppointments = ({
         return "border-l-4 border-purple-400";
       case "consultation":
         return "border-l-4 border-green-400";
-      case "new client":
+      case "new-client":
         return "border-l-4 border-orange-400";
       case "review":
         return "border-l-4 border-yellow-400";
@@ -89,17 +108,13 @@ const DailyAppointments = ({
   // Handle date navigation
   const handlePrevDay = () => {
     if (onDateChange) {
-      const newDate = new Date(selectedDate);
-      newDate.setDate(newDate.getDate() - 1);
-      onDateChange(newDate);
+      onDateChange(subDays(selectedDate, 1));
     }
   };
   
   const handleNextDay = () => {
     if (onDateChange) {
-      const newDate = new Date(selectedDate);
-      newDate.setDate(newDate.getDate() + 1);
-      onDateChange(newDate);
+      onDateChange(addDays(selectedDate, 1));
     }
   };
 
@@ -107,7 +122,7 @@ const DailyAppointments = ({
     <Card>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle>Appointments for {format(selectedDate, 'PPP')}</CardTitle>
+          <CardTitle>Appointments</CardTitle>
           {onDateChange && (
             <div className="flex space-x-1">
               <Button variant="outline" size="icon" onClick={handlePrevDay} className="h-8 w-8">
@@ -119,11 +134,64 @@ const DailyAppointments = ({
             </div>
           )}
         </div>
+        <p className="text-sm text-muted-foreground mt-1">
+          {format(selectedDate, 'PPPP')}
+        </p>
       </CardHeader>
-      <CardContent>
-        {selectedDateAppointments.length > 0 ? (
+      
+      <div className="px-4 py-1 flex justify-between items-center">
+        <div className="flex space-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8">
+                <Filter className="h-3.5 w-3.5 mr-2" />
+                Status: {statusFilter === "all" ? "All" : statusFilter}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuRadioGroup value={statusFilter} onValueChange={(value) => setStatusFilter(value as any)}>
+                <DropdownMenuRadioItem value="all">All</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="upcoming">Upcoming</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="completed">Completed</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="canceled">Canceled</DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8">
+                <Filter className="h-3.5 w-3.5 mr-2" />
+                Type: {typeFilter === "all" ? "All" : typeFilter}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuRadioGroup value={typeFilter} onValueChange={setTypeFilter}>
+                {appointmentTypes.map((type) => (
+                  <DropdownMenuRadioItem key={type} value={type}>
+                    {type === "all" ? "All" : type}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        
+        <Button 
+          size="sm" 
+          variant="outline"
+          onClick={onAddAppointment}
+          className="h-8"
+        >
+          <CalendarPlus className="h-3.5 w-3.5 mr-2" />
+          New
+        </Button>
+      </div>
+      
+      <CardContent className="pt-4">
+        {filteredAppointments.length > 0 ? (
           <div className="space-y-4">
-            {selectedDateAppointments.map((appointment) => (
+            {filteredAppointments.map((appointment) => (
               <div 
                 key={appointment.id}
                 className={`cursor-pointer hover:bg-accent/50 rounded-md transition-colors ${getAppointmentTypeColor(appointment.type)}`}
@@ -137,6 +205,7 @@ const DailyAppointments = ({
                         time={appointment.time}
                         type={appointment.type}
                         status={appointment.status}
+                        showStatusBadge={true}
                       />
                     </div>
                   </PopoverTrigger>

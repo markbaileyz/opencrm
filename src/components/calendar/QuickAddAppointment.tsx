@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CalendarPlus } from "lucide-react";
+import { CalendarPlus, Clock } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -17,6 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import type { Appointment } from "@/types/appointment";
 
 interface QuickAddAppointmentProps {
@@ -28,6 +30,8 @@ const QuickAddAppointment = ({ selectedDate, onQuickAdd }: QuickAddAppointmentPr
   const [name, setName] = useState("");
   const [time, setTime] = useState("09:00");
   const [type, setType] = useState("consultation");
+  const [notes, setNotes] = useState("");
+  const [reminder, setReminder] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -39,13 +43,17 @@ const QuickAddAppointment = ({ selectedDate, onQuickAdd }: QuickAddAppointmentPr
       time: format(new Date(`2000-01-01T${time}`), 'h:mm a'),
       type,
       name,
-      status: "upcoming"
+      status: "upcoming",
+      notes: notes,
+      reminderSent: reminder
     };
     
     onQuickAdd(newAppointment);
     setName("");
     setTime("09:00");
     setType("consultation");
+    setNotes("");
+    setReminder(false);
     setIsOpen(false);
   };
 
@@ -55,19 +63,21 @@ const QuickAddAppointment = ({ selectedDate, onQuickAdd }: QuickAddAppointmentPr
         <Button 
           variant="secondary" 
           size="sm" 
-          className="w-full"
+          className="w-full flex items-center justify-center"
         >
           <CalendarPlus className="h-4 w-4 mr-2" />
           Quick Add
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="w-80 p-4">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <h3 className="font-medium">Quick Add Appointment</h3>
-            <p className="text-sm text-muted-foreground">
-              {format(selectedDate, 'PPP')}
-            </p>
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium">Quick Add Appointment</h3>
+              <div className="text-sm text-muted-foreground bg-secondary px-2 py-1 rounded-md">
+                {format(selectedDate, 'PPP')}
+              </div>
+            </div>
           </div>
           
           <div className="space-y-2">
@@ -77,13 +87,17 @@ const QuickAddAppointment = ({ selectedDate, onQuickAdd }: QuickAddAppointmentPr
               value={name} 
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter client name" 
+              className="w-full"
               required
             />
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="time">Time</Label>
+              <Label htmlFor="time" className="flex items-center">
+                <Clock className="h-3.5 w-3.5 mr-1 opacity-70" />
+                Time
+              </Label>
               <Input 
                 id="time" 
                 type="time" 
@@ -96,7 +110,7 @@ const QuickAddAppointment = ({ selectedDate, onQuickAdd }: QuickAddAppointmentPr
             <div className="space-y-2">
               <Label htmlFor="type">Type</Label>
               <Select value={type} onValueChange={setType}>
-                <SelectTrigger id="type">
+                <SelectTrigger id="type" className="w-full">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -105,12 +119,35 @@ const QuickAddAppointment = ({ selectedDate, onQuickAdd }: QuickAddAppointmentPr
                   <SelectItem value="check-in">Check-in</SelectItem>
                   <SelectItem value="review">Review</SelectItem>
                   <SelectItem value="new-client">New Client</SelectItem>
+                  <SelectItem value="email-follow-up">Email Follow-up</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           
-          <div className="flex justify-end space-x-2">
+          <div className="space-y-2">
+            <Label htmlFor="notes">Notes (Optional)</Label>
+            <Textarea
+              id="notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Add any notes or details about this appointment"
+              className="h-20 resize-none"
+            />
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="reminder"
+              checked={reminder}
+              onCheckedChange={setReminder}
+            />
+            <Label htmlFor="reminder" className="cursor-pointer">
+              Send appointment reminder
+            </Label>
+          </div>
+          
+          <div className="flex justify-end space-x-2 pt-2">
             <Button 
               type="button" 
               variant="outline" 
