@@ -1,6 +1,5 @@
-
 import React, { useState } from "react";
-import { ArrowLeft, Search, Plus, FileText, Heart, Activity, Thermometer, Lungs, BarChart2 } from "lucide-react";
+import { ArrowLeft, Search, Plus, FileText, Heart, Activity, Thermometer, Wind, BarChart2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -110,7 +109,7 @@ const PatientVitalsPage = () => {
               />
               <VitalSummaryCard 
                 title="Respiratory Rate"
-                icon={<Lungs className="h-5 w-5 text-green-500" />}
+                icon={<Wind className="h-5 w-5 text-green-500" />}
                 total={24}
                 abnormal={0}
                 lastUpdated="25 minutes ago"
@@ -278,7 +277,6 @@ const VitalSummaryCard: React.FC<VitalSummaryCardProps> = ({
   );
 };
 
-// Sample data for the recent vitals table
 const recentVitalsData = [
   { 
     id: 1, 
@@ -332,7 +330,6 @@ const recentVitalsData = [
   }
 ];
 
-// Sample data for the alerts table
 const alertsData = [
   {
     id: 1,
