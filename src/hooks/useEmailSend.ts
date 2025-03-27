@@ -19,7 +19,7 @@ export function useEmailSend() {
       read: true,
       starred: false,
       folder: 'sent' as const,
-      hasAttachments: data.attachments.length > 0,
+      hasAttachments: data.attachments ? data.attachments.length > 0 : false,
       labels: data.labels || [],
     };
     

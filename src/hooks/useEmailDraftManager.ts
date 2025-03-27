@@ -1,11 +1,11 @@
 
 import { useState, useEffect } from "react";
 import type { Email } from "@/types/email";
-import { useEmailActions } from "@/hooks/useEmailActions";
+import { useEmailDrafts } from "@/hooks/useEmailDrafts";
 
 export function useEmailDraftManager(initialEmails: Email[]) {
   const [emails, setEmails] = useState<Email[]>(initialEmails);
-  const { getDrafts } = useEmailActions();
+  const { getDrafts } = useEmailDrafts();
 
   // Sync drafts with the email list
   const syncDraftsWithEmails = () => {
