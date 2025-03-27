@@ -14,7 +14,8 @@ interface EmailListProps {
   onStarEmail: (id: string) => void;
   onDeleteEmail: (id: string) => void;
   onArchiveEmail: (id: string) => void;
-  folder?: string; // Add folder prop
+  folder?: string;
+  onComposeClick?: () => void;
 }
 
 const EmailList: React.FC<EmailListProps> = ({
@@ -26,7 +27,8 @@ const EmailList: React.FC<EmailListProps> = ({
   onStarEmail,
   onDeleteEmail,
   onArchiveEmail,
-  folder = "inbox"
+  folder = "inbox",
+  onComposeClick
 }) => {
   if (loading) {
     return (

@@ -4,39 +4,41 @@ import { Button } from "@/components/ui/button";
 import { Send, Save } from "lucide-react";
 import ResponsiveContainer from "@/components/ui/responsive-container";
 
-const EmailComposeActions = ({ 
-  onSaveDraft, 
-  onCancel, 
-  onSubmit, 
-  isSending, 
-  isValid 
-}: {
-  onSaveDraft: () => void;
-  onCancel: () => void;
-  onSubmit: (e?: React.FormEvent) => void;  // Updated to accept optional event parameter
+interface EmailComposeActionsProps {
+  onSend: () => void;
+  onDraft: () => void;
+  onDiscard: () => void;
   isSending: boolean;
   isValid: boolean;
+}
+
+const EmailComposeActions: React.FC<EmailComposeActionsProps> = ({ 
+  onSend, 
+  onDraft, 
+  onDiscard, 
+  isSending, 
+  isValid 
 }) => {
   // Mobile optimized actions
   const mobileActions = (
     <div className="fixed bottom-0 left-0 right-0 border-t bg-background p-3 grid grid-cols-3 gap-2 z-10">
       <Button 
         variant="outline" 
-        onClick={onCancel}
+        onClick={onDiscard}
         className="w-full"
       >
         Cancel
       </Button>
       <Button 
         variant="outline" 
-        onClick={onSaveDraft}
+        onClick={onDraft}
         className="w-full"
       >
         <Save className="h-4 w-4 mr-2" />
         Save
       </Button>
       <Button 
-        onClick={() => onSubmit()}  // Call without parameters
+        onClick={onSend}
         disabled={isSending || !isValid}
         className="w-full"
       >
@@ -56,16 +58,16 @@ const EmailComposeActions = ({
   const desktopActions = (
     <div className="flex items-center justify-between pt-4 border-t mt-4">
       <div>
-        <Button variant="outline" onClick={onCancel} className="mr-2">
+        <Button variant="outline" onClick={onDiscard} className="mr-2">
           Cancel
         </Button>
-        <Button variant="outline" onClick={onSaveDraft}>
+        <Button variant="outline" onClick={onDraft}>
           <Save className="h-4 w-4 mr-2" />
           Save Draft
         </Button>
       </div>
       <Button 
-        onClick={() => onSubmit()}  // Call without parameters
+        onClick={onSend}
         disabled={isSending || !isValid}
       >
         {isSending ? (

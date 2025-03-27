@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Separator } from "@/components/ui/separator";
-import EmailLabels from "./EmailLabels";
 
 interface EmailDetailBodyProps {
   body: string;
@@ -22,14 +21,13 @@ const EmailDetailBody: React.FC<EmailDetailBodyProps> = ({
 }) => {
   return (
     <>
-      {showLabels && (
-        <div className="mb-4">
-          <EmailLabels 
-            labels={labels}
-            allLabels={allLabels}
-            onAddLabel={onAddLabel}
-            onRemoveLabel={onRemoveLabel}
-          />
+      {showLabels && labels.length > 0 && (
+        <div className="mb-4 flex flex-wrap gap-2">
+          {labels.map(label => (
+            <div key={label} className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full flex items-center">
+              <span>{label}</span>
+            </div>
+          ))}
         </div>
       )}
 

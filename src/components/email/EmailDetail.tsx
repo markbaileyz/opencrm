@@ -13,11 +13,11 @@ import {
   Download 
 } from "lucide-react";
 import { Email } from "@/types/email";
-import { formatDate } from "@/utils/emailUtils";
-import { EmailDetailHeader } from "./EmailDetailHeader";
-import { EmailDetailSender } from "./EmailDetailSender";
-import { EmailDetailBody } from "./EmailDetailBody";
-import { EmailDetailAttachments } from "./EmailDetailAttachments";
+import { formatDistanceToNow } from "date-fns";
+import EmailDetailHeader from "./EmailDetailHeader";
+import EmailDetailSender from "./EmailDetailSender";
+import EmailDetailBody from "./EmailDetailBody";
+import EmailDetailAttachments from "./EmailDetailAttachments";
 
 interface EmailDetailProps {
   email: Email;
@@ -87,15 +87,36 @@ const EmailDetail: React.FC<EmailDetailProps> = ({
       </div>
       
       <div className="flex-1 overflow-auto p-4">
-        <EmailDetailHeader email={email} />
-        <EmailDetailSender email={email} />
+        <EmailDetailHeader 
+          subject={email.subject}
+          isStarred={email.starred}
+          onBack={onBackToList}
+          onStar={onStar}
+          onDelete={onDelete}
+          onArchive={onArchive}
+        />
+        
+        <EmailDetailSender 
+          senderName={email.senderName}
+          senderEmail={email.senderEmail}
+          recipient={email.recipient}
+          date={email.date}
+          hasAttachments={email.hasAttachments}
+        />
         
         <div className="mt-4">
-          <EmailDetailBody content={email.body} />
+          <EmailDetailBody 
+            body={email.body}
+            labels={email.labels || []}
+            allLabels={[]}
+            onAddLabel={() => {}}
+            onRemoveLabel={() => {}}
+            showLabels={true}
+          />
         </div>
         
-        {email.attachments && email.attachments.length > 0 && (
-          <EmailDetailAttachments attachments={email.attachments} />
+        {email.hasAttachments && (
+          <EmailDetailAttachments hasAttachments={true} />
         )}
       </div>
     </div>

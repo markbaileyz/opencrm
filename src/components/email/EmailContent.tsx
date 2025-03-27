@@ -55,16 +55,12 @@ const EmailContent: React.FC<EmailContentProps> = ({
       <div className="mt-0">
         <EmailDetail 
           email={selectedEmail}
-          onBack={onBackToList}
-          onStar={onStarEmail}
-          onDelete={onDeleteEmail}
-          onArchive={onArchiveEmail}
-          onReply={onReplyEmail}
-          onForward={onForwardEmail}
-          onAddLabel={onAddLabel}
-          onRemoveLabel={onRemoveLabel}
-          allLabels={allLabels}
-          keyboardShortcuts={keyboardShortcuts}
+          onBackToList={onBackToList}
+          onDelete={() => onDeleteEmail(selectedEmail.id)}
+          onArchive={() => onArchiveEmail(selectedEmail.id)}
+          onStar={() => onStarEmail(selectedEmail.id)}
+          onReply={() => onReplyEmail(selectedEmail)}
+          onForward={() => onForwardEmail(selectedEmail)}
         />
       </div>
     );
@@ -79,9 +75,6 @@ const EmailContent: React.FC<EmailContentProps> = ({
         onStarEmail={onStarEmail}
         onDeleteEmail={onDeleteEmail}
         onArchiveEmail={onArchiveEmail}
-        onComposeClick={onComposeClick}
-        sortOption={sortOption}
-        onSortChange={onSortChange}
       />
     </div>
   );

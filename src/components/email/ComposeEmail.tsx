@@ -10,11 +10,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { EmailRecipientFields } from "./EmailRecipientFields";
-import { EmailComposeActions } from "./EmailComposeActions";
-import { EmailAttachments } from "./EmailAttachments";
-import { EmailTemplateSelector } from "./EmailTemplateSelector";
-import { EmailSignatureManager } from "./EmailSignatureManager";
+import EmailRecipientFields from "./EmailRecipientFields";
+import EmailComposeActions from "./EmailComposeActions";
+import EmailAttachments from "./EmailAttachments";
+import EmailTemplateSelector from "./EmailTemplateSelector";
+import EmailSignatureManager from "./EmailSignatureManager";
 
 export interface ComposeEmailProps {
   isOpen: boolean;
@@ -42,6 +42,7 @@ const ComposeEmail: React.FC<ComposeEmailProps> = ({
   const [message, setMessage] = useState(draft?.message || "");
   const [showCc, setShowCc] = useState(!!cc);
   const [showBcc, setShowBcc] = useState(!!bcc);
+  const [attachments, setAttachments] = useState<File[]>([]);
   
   const handleSend = () => {
     // Here we would normally validate and send the email
@@ -51,6 +52,16 @@ const ComposeEmail: React.FC<ComposeEmailProps> = ({
   const handleDraft = () => {
     // Save as draft logic here
     onClose();
+  };
+  
+  const handleAttachmentAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setAttachments(prev => [...prev, ...Array.from(e.target.files!)]);
+    }
+  };
+  
+  const handleAttachmentRemove = (index: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== index));
   };
   
   return (
@@ -71,10 +82,6 @@ const ComposeEmail: React.FC<ComposeEmailProps> = ({
               setTo={setTo}
               setCc={setCc}
               setBcc={setBcc}
-              showCc={showCc}
-              showBcc={showBcc}
-              setShowCc={setShowCc}
-              setShowBcc={setShowBcc}
             />
             
             <div>
@@ -96,7 +103,11 @@ const ComposeEmail: React.FC<ComposeEmailProps> = ({
               />
             </div>
             
-            <EmailAttachments />
+            <EmailAttachments 
+              attachments={attachments}
+              onAttachmentAdd={handleAttachmentAdd}
+              onAttachmentRemove={handleAttachmentRemove}
+            />
             
             <EmailSignatureManager />
           </div>
@@ -107,6 +118,8 @@ const ComposeEmail: React.FC<ComposeEmailProps> = ({
             onSend={handleSend}
             onDraft={handleDraft}
             onDiscard={onClose}
+            isSending={false}
+            isValid={to.trim().length > 0 && subject.trim().length > 0}
           />
         </DialogFooter>
       </DialogContent>
