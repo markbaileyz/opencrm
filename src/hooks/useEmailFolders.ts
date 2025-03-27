@@ -16,7 +16,7 @@ export function useEmailFolders() {
     }
     
     const updatedEmails = emails.map(email => 
-      email.id === id ? { ...email, folder: 'trash' } : email
+      email.id === id ? { ...email, folder: 'trash' as const } : email
     );
     
     toast({
@@ -33,7 +33,7 @@ export function useEmailFolders() {
 
   const handleArchiveEmail = (emails: Email[], id: string, selectedEmailId: string | null) => {
     const updatedEmails = emails.map(email => 
-      email.id === id ? { ...email, folder: 'archive' } : email
+      email.id === id ? { ...email, folder: 'archive' as const } : email
     );
     
     toast({

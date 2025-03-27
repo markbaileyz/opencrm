@@ -18,7 +18,7 @@ export function useEmailSend() {
       date: new Date().toISOString(),
       read: true,
       starred: false,
-      folder: 'sent',
+      folder: 'sent' as const,
       hasAttachments: data.attachments.length > 0,
       labels: data.labels || [],
     };
