@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { ReportFilters } from "@/components/reports/ReportFilters";
+import ReportFilters from "@/components/reports/ReportFilters";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Download, Filter, BarChart3, PieChart, TrendingUp, Users, Tags, Calendar } from "lucide-react";
