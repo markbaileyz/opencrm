@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ButtonCustom } from "../ui/button-custom";
 import NavLink from "./NavLink";
 
@@ -11,6 +11,11 @@ interface DesktopNavProps {
 
 const DesktopNav = ({ isActive, scrollToSection }: DesktopNavProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  
+  const handleNavigate = (path: string) => {
+    navigate(path, { replace: true });
+  };
   
   return (
     <>
@@ -32,10 +37,10 @@ const DesktopNav = ({ isActive, scrollToSection }: DesktopNavProps) => {
         >
           Pricing
         </NavLink>
-        <NavLink href="/healthcare-crm" active={isActive("/healthcare-crm")} onClick={() => null}>
+        <NavLink href="/healthcare-crm" active={isActive("/healthcare-crm")} onClick={() => handleNavigate("/healthcare-crm")}>
           Healthcare CRM
         </NavLink>
-        <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={() => null}>
+        <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={() => handleNavigate("/roadmap")}>
           Roadmap
         </NavLink>
       </nav>

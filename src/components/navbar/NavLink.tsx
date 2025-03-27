@@ -57,12 +57,9 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
       return;
     }
     
-    // For standard page links, prevent default and use navigate
-    // to avoid full page reloads
-    if (!href.includes('#')) {
-      e.preventDefault();
-      navigate(href, { replace: true });
-    }
+    // For all other links (like /healthcare-crm, /roadmap, etc.)
+    e.preventDefault();
+    navigate(href, { replace: true });
   };
   
   return (
