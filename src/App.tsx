@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Index from "@/pages/Index";
@@ -36,6 +35,7 @@ import { useAuth } from "@/context/AuthContext";
 import AdminSettings from "@/pages/AdminSettings";
 import Compliance from "@/pages/Compliance";
 import UserManagement from "@/pages/UserManagement";
+import DashboardRoadmap from "@/pages/DashboardRoadmap";
 
 function App() {
   const { toast } = useToast();
@@ -181,9 +181,11 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/roadmap" element={
+          <Route path="/roadmap" element={<Roadmap />} />
+          
+          <Route path="/dashboard-roadmap" element={
             <ProtectedRoute allowedRoles={["admin"]}>
-              <Roadmap />
+              <DashboardRoadmap />
             </ProtectedRoute>
           } />
           

@@ -15,7 +15,11 @@ import StrategicPlan from "@/components/roadmap/StrategicPlan";
 import RoadmapCTA from "@/components/roadmap/RoadmapCTA";
 import ScrollToTopButton from "@/components/roadmap/ScrollToTopButton";
 
-const Roadmap = () => {
+interface RoadmapProps {
+  isDashboard?: boolean;
+}
+
+const Roadmap: React.FC<RoadmapProps> = ({ isDashboard = false }) => {
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -31,6 +35,58 @@ const Roadmap = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
+  // If this is being rendered inside the dashboard, skip the navbar and footer
+  if (isDashboard) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <main className="flex-1">
+          <RoadmapHeader 
+            showFilters={showFilters}
+            setShowFilters={setShowFilters}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            showSearch={showSearch}
+            setShowSearch={setShowSearch}
+            activeFilter={activeFilter}
+            setActiveFilter={setActiveFilter}
+            activeSort={activeSort}
+            setActiveSort={setActiveSort}
+            scrollToFeatures={scrollToFeatures}
+          />
+          
+          <div className="container mx-auto px-4 py-6">
+            <div className="flex justify-end mb-8">
+              <Link to="/mind-map">
+                <ButtonCustom variant="outline">
+                  View Mind Map
+                </ButtonCustom>
+              </Link>
+            </div>
+          </div>
+          
+          <StrategicPlan />
+          
+          <div id="features-list">
+            <CRMFeaturesList 
+              searchQuery={searchQuery} 
+              filterType={activeFilter}
+              sortOption={activeSort}
+              categoryFilter={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+            />
+          </div>
+          
+          <RoadmapCTA />
+          
+          <ScrollToTopButton scrollToTop={scrollToTop} />
+        </main>
+        
+        <Toaster />
+      </div>
+    );
+  }
+  
+  // Original Roadmap for public route with Navbar and Footer
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />

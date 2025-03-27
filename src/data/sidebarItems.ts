@@ -84,7 +84,7 @@ export const adminSidebarItems: SidebarItem[] = [
   {
     icon: React.createElement(Lightbulb, { className: "h-5 w-5" }),
     label: "Roadmap",
-    href: "/roadmap",
+    href: "/dashboard-roadmap",
     roles: ["admin"],
   },
 ];
