@@ -10,8 +10,8 @@ const PreCheckInSection = () => {
       <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-blue-600/80 z-10 opacity-80"></div>
       
       <ResponsiveImage 
-        src="/lovable-uploads/8f809609-fda6-4c5f-b64d-3eea05d2eec9.png"
-        alt="Medical professional with patient" 
+        src="https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2000"
+        alt="Woman using smartphone on bus for pre-check-in" 
         className="w-full h-full object-cover"
         aspectRatio="21/9"
       />
@@ -22,7 +22,7 @@ const PreCheckInSection = () => {
             Skip the Wait with Online Pre-Check-In
           </h2>
           <p className="text-white/90 mb-6 max-w-xl">
-            Save time at your next appointment by completing your paperwork online. Our secure pre-check-in process takes just minutes.
+            Save time at your next appointment by completing your paperwork online. Our secure pre-check-in process takes just minutes - even while commuting!
           </p>
           
           <Link to="/pre-check-in" className="inline-flex items-center group">
