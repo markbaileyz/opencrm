@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Email } from "@/types/email";
+import { Appointment } from "@/types/appointment";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import EmailDetailHeader from "./EmailDetailHeader";
 import EmailDetailSender from "./EmailDetailSender";
@@ -20,6 +21,8 @@ interface EmailDetailProps {
   onRemoveLabel?: (id: string, label: string) => void;
   allLabels?: string[];
   keyboardShortcuts?: { key: string; action: string }[];
+  relatedAppointments?: Appointment[];
+  onAppointmentCreated?: (appointment: Appointment) => void;
 }
 
 const EmailDetail = ({
@@ -34,6 +37,8 @@ const EmailDetail = ({
   onRemoveLabel,
   allLabels = [],
   keyboardShortcuts = [],
+  relatedAppointments = [],
+  onAppointmentCreated,
 }: EmailDetailProps) => {
   if (!email) return null;
 
@@ -95,6 +100,8 @@ const EmailDetail = ({
         onDelete={onDelete}
         onArchive={onArchive}
         onStar={onStar}
+        appointments={relatedAppointments}
+        onAppointmentCreated={onAppointmentCreated}
       />
     </div>
   );

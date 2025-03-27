@@ -1,11 +1,14 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import type { Appointment } from "@/types/appointment";
+import { format, isSameDay } from "date-fns";
+import type { Appointment, AppointmentWithEmail } from "@/types/appointment";
 import type { Email } from "@/types/email";
-import { format } from "date-fns";
+import { formatAppointmentForEmail } from "@/utils/calendarEmailUtils";
 
 export function useCalendarEmailIntegration() {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   
@@ -33,11 +36,23 @@ export function useCalendarEmailIntegration() {
     return newAppointment;
   };
   
+  // Navigate to email page to view an email
+  const navigateToEmail = (emailId: string) => {
+    navigate(`/email?emailId=${emailId}`);
+    toast({
+      title: "Navigating to email",
+      description: "Opening the related email thread",
+    });
+  };
+  
   // Send an email reminder for an appointment
   const sendAppointmentReminder = async (appointment: Appointment): Promise<boolean> => {
     setIsProcessing(true);
     
     try {
+      // Create email content based on appointment details
+      const emailContent = formatAppointmentForEmail(appointment);
+      
       // Simulate sending email reminder
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -75,10 +90,29 @@ export function useCalendarEmailIntegration() {
     return emails.filter(email => email.id === appointment.emailThreadId);
   };
 
+  // Find appointments for a specific date
+  const findAppointmentsForDate = (appointments: Appointment[], date: Date): Appointment[] => {
+    return appointments.filter(appointment => {
+      const appointmentDate = typeof appointment.date === 'string' 
+        ? new Date(appointment.date) 
+        : appointment.date;
+      
+      return isSameDay(appointmentDate, date);
+    });
+  };
+
+  // Check if email has any related appointments
+  const hasRelatedAppointments = (email: Email, appointments: Appointment[]): boolean => {
+    return appointments.some(appointment => appointment.emailThreadId === email.id);
+  };
+
   return {
     createAppointmentFromEmail,
+    navigateToEmail,
     sendAppointmentReminder,
     findRelatedEmails,
+    findAppointmentsForDate,
+    hasRelatedAppointments,
     isProcessing
   };
 }
