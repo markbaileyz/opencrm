@@ -1,3 +1,4 @@
+
 import { 
   LayoutDashboard, 
   Users, 
@@ -13,7 +14,7 @@ import {
   Shield,
   FileLock,
   UserCog,
-  Reception
+  ClipboardList
 } from "lucide-react";
 import React from "react";
 
@@ -42,7 +43,7 @@ export const medicalSidebarItems: SidebarItem[] = [
     roles: ["admin", "doctor", "nurse", "front-desk"],
   },
   {
-    icon: React.createElement(Reception, { className: "h-5 w-5" }),
+    icon: React.createElement(ClipboardList, { className: "h-5 w-5" }),
     label: "Front Desk",
     href: "/front-desk",
     roles: ["admin", "front-desk"],
