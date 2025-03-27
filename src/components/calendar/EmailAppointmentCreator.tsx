@@ -26,11 +26,14 @@ const EmailAppointmentCreator = ({ email, onAppointmentCreated }: EmailAppointme
   const [isOpen, setIsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [time, setTime] = useState("09:00");
-  const { createAppointmentFromEmail, isProcessing } = useCalendarEmailIntegration();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { createAppointmentFromEmail } = useCalendarEmailIntegration();
 
   const handleCreateAppointment = () => {
+    setIsProcessing(true);
     const newAppointment = createAppointmentFromEmail(email, selectedDate, formatTime(time));
     onAppointmentCreated(newAppointment);
+    setIsProcessing(false);
     setIsOpen(false);
   };
 

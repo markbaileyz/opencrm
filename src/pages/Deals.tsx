@@ -1,6 +1,9 @@
 
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
+import DealFilters from "@/components/deals/DealFilters";
+import DealsSummary from "@/components/deals/DealsSummary";
+import DealPipeline from "@/components/deals/DealPipeline";
 
 const Deals = () => {
   return (
@@ -13,9 +16,9 @@ const Deals = () => {
           </p>
         </div>
         
-        <div className="flex justify-center items-center h-64 bg-muted/30 rounded-lg border border-dashed border-muted">
-          <p className="text-muted-foreground">Deals functionality coming soon</p>
-        </div>
+        <DealFilters />
+        <DealsSummary />
+        <DealPipeline />
       </div>
     </DashboardLayout>
   );
