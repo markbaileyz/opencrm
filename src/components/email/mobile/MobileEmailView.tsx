@@ -1,139 +1,147 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, Plus, Mail, Archive, Trash, Star } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { Inbox, Search, Plus, Filter, ArrowLeft } from "lucide-react";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import EmailListItemCompact from "../EmailListItemCompact";
-import MobileEmailFilters from "./MobileEmailFilters";
 import MobileEmailComposer from "./MobileEmailComposer";
-import { Email } from "@/types/email";
+import MobileEmailFilters from "./MobileEmailFilters";
+import { useEmailContext } from "@/context/EmailContext";
 import { useEmailManager } from "@/hooks/useEmailManager";
+import { Email } from "@/types/email";
 
 const MobileEmailView: React.FC = () => {
-  const { emails } = useEmailManager();
+  const { selectedEmail, setSelectedEmail, showMobileComposer, setShowMobileComposer, activeFolder, setActiveFolder } = useEmailContext();
+  const { emails, loading, error, handleStarEmail } = useEmailManager(activeFolder);
+  const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showComposer, setShowComposer] = useState(false);
-  const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeFolder, setActiveFolder] = useState("inbox");
   
-  // Filter emails based on search query
   const filteredEmails = emails.filter(email => 
     email.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    email.from.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    email.body.toLowerCase().includes(searchQuery.toLowerCase())
+    email.senderName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    email.preview.toLowerCase().includes(searchQuery.toLowerCase())
   );
   
+  const handleSelectEmail = (email: Email) => {
+    setSelectedEmail(email);
+  };
+  
+  const handleBackToList = () => {
+    setSelectedEmail(null);
+  };
+  
+  const handleSendEmail = () => {
+    setShowMobileComposer(false);
+    // In a real app, we would update the emails list here
+  };
+  
   return (
-    <div className="flex flex-col h-full">
-      {/* Header with search */}
-      <div className="p-4 border-b flex items-center gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search emails..."
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="icon">
-              <Filter className="h-4 w-4" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-[80vw] sm:w-[385px]">
-            <MobileEmailFilters />
-          </SheetContent>
-        </Sheet>
-      </div>
-      
-      {/* Email tabs */}
-      <Tabs defaultValue="inbox" className="flex-1 flex flex-col">
-        <div className="border-b overflow-x-auto scrollbar-hide">
-          <TabsList className="px-1 h-12">
-            <TabsTrigger value="inbox" className="flex items-center gap-1.5">
-              <Mail className="h-4 w-4" />
-              <span>Inbox</span>
-              <Badge variant="secondary" className="ml-1">
-                {emails.filter(e => !e.read).length}
-              </Badge>
-            </TabsTrigger>
-            <TabsTrigger value="starred" className="flex items-center gap-1.5">
-              <Star className="h-4 w-4" />
-              <span>Starred</span>
-            </TabsTrigger>
-            <TabsTrigger value="archived" className="flex items-center gap-1.5">
-              <Archive className="h-4 w-4" />
-              <span>Archived</span>
-            </TabsTrigger>
-            <TabsTrigger value="trash" className="flex items-center gap-1.5">
-              <Trash className="h-4 w-4" />
-              <span>Trash</span>
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        <TabsContent value="inbox" className="flex-1 overflow-auto p-0">
-          {isLoading ? (
-            <div className="p-4 text-center text-muted-foreground">Loading emails...</div>
-          ) : filteredEmails.length === 0 ? (
-            <div className="p-4 text-center text-muted-foreground">
-              {searchQuery ? "No emails match your search" : "No emails in this folder"}
+    <div className="h-full flex flex-col">
+      {!selectedEmail ? (
+        // Email list view
+        <>
+          <div className="border-b p-4 sticky top-0 bg-background z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2">
+                <Inbox className="h-5 w-5" />
+                <h1 className="text-xl font-semibold">Inbox</h1>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button size="icon" variant="ghost" onClick={() => setShowFilters(true)}>
+                  <Filter className="h-5 w-5" />
+                </Button>
+                <Button size="icon" variant="ghost" onClick={() => setShowMobileComposer(true)}>
+                  <Plus className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
-          ) : (
-            <ul className="divide-y">
-              {filteredEmails.map((email: Email) => (
-                <EmailListItemCompact 
-                  key={email.id} 
-                  email={email} 
-                  onClick={() => setSelectedEmailId(email.id)} 
-                  selected={selectedEmailId === email.id}
+            
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search emails"
+                className="pl-9"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto">
+            {loading ? (
+              <div className="p-4 text-center text-muted-foreground">Loading emails...</div>
+            ) : error ? (
+              <div className="p-4 text-center text-destructive">Failed to load emails</div>
+            ) : filteredEmails.length === 0 ? (
+              <div className="p-4 text-center text-muted-foreground">No emails found</div>
+            ) : (
+              filteredEmails.map(email => (
+                <EmailListItemCompact
+                  key={email.id}
+                  email={email}
+                  isSelected={false}
+                  onClick={() => handleSelectEmail(email)}
+                  onStar={() => handleStarEmail(email.id)}
                 />
-              ))}
-            </ul>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="starred" className="flex-1 p-0">
-          <div className="p-4 text-center text-muted-foreground">
-            Starred emails will appear here
+              ))
+            )}
           </div>
-        </TabsContent>
-        
-        <TabsContent value="archived" className="flex-1 p-0">
-          <div className="p-4 text-center text-muted-foreground">
-            Archived emails will appear here
+        </>
+      ) : (
+        // Email detail view
+        <div className="flex flex-col h-full">
+          <div className="border-b p-4 sticky top-0 bg-background z-10 flex items-center">
+            <Button size="icon" variant="ghost" onClick={handleBackToList} className="mr-2">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h2 className="text-lg font-medium truncate">{selectedEmail.subject}</h2>
           </div>
-        </TabsContent>
-        
-        <TabsContent value="trash" className="flex-1 p-0">
-          <div className="p-4 text-center text-muted-foreground">
-            Deleted emails will appear here
+          
+          <div className="p-4 flex-1 overflow-y-auto">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <p className="font-medium">{selectedEmail.senderName}</p>
+                <p className="text-sm text-muted-foreground">{selectedEmail.senderEmail || (selectedEmail as any).from?.email}</p>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {new Date(selectedEmail.date).toLocaleString()}
+              </p>
+            </div>
+            
+            <div className="mt-4 prose prose-sm max-w-none">
+              {selectedEmail.body}
+            </div>
           </div>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
       
-      {/* Floating action button for compose */}
-      <Button
-        className="fixed bottom-16 right-4 rounded-full w-14 h-14 shadow-lg"
-        onClick={() => setShowComposer(true)}
-      >
-        <Plus className="h-6 w-6" />
-      </Button>
-      
-      {/* Mobile email composer */}
-      {showComposer && (
-        <MobileEmailComposer 
-          onClose={() => setShowComposer(false)}
-          onSend={() => setShowComposer(false)}
+      {showMobileComposer && (
+        <MobileEmailComposer
+          onClose={() => setShowMobileComposer(false)}
+          onSend={handleSendEmail}
+          replyToEmail={selectedEmail ? {
+            id: selectedEmail.id,
+            subject: selectedEmail.subject,
+            from: {
+              email: selectedEmail.senderEmail || (selectedEmail as any).from?.email || '',
+              name: selectedEmail.senderName
+            }
+          } : undefined}
         />
       )}
+      
+      <Sheet open={showFilters} onOpenChange={setShowFilters}>
+        <SheetContent side="left">
+          <MobileEmailFilters
+            activeFolder={activeFolder}
+            onSelectFolder={(folder) => {
+              setActiveFolder(folder);
+              setShowFilters(false);
+            }}
+          />
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

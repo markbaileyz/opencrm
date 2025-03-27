@@ -1,85 +1,66 @@
 
 import React from "react";
-import { Email } from "@/types/email";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import { Star, Paperclip } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import type { Email } from "@/types/email";
 
 interface EmailListItemCompactProps {
   email: Email;
+  isSelected: boolean;
   onClick: () => void;
-  selected: boolean;
+  onStar: () => void;
 }
 
 const EmailListItemCompact: React.FC<EmailListItemCompactProps> = ({
   email,
+  isSelected,
   onClick,
-  selected,
+  onStar
 }) => {
-  const formattedDate = formatDistanceToNow(new Date(email.date), { addSuffix: true });
+  // Convert date string to formatted date
+  const formattedDate = new Date(email.date).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric'
+  });
+  
+  // Get sender name (handling both formats - object and string)
+  const senderName = email.senderName || (email as any).from?.name || 'Unknown';
   
   return (
-    <li
+    <div
       className={cn(
-        "py-2 px-4 hover:bg-muted/50 cursor-pointer",
-        selected && "bg-muted",
+        "flex flex-col p-3 border-b cursor-pointer hover:bg-muted/50 transition-colors",
+        isSelected && "bg-muted",
         !email.read && "font-medium"
       )}
       onClick={onClick}
     >
-      <div className="flex justify-between items-start mb-1">
-        <span className="text-sm font-medium truncate max-w-[70%]">
-          {email.from.name}
-        </span>
-        <span className="text-xs text-muted-foreground whitespace-nowrap">
-          {formattedDate}
-        </span>
-      </div>
-      
-      <div className="text-sm font-medium mb-1 truncate">
-        {email.subject}
-      </div>
-      
-      <div className="text-xs text-muted-foreground truncate mb-1">
-        {email.body.substring(0, 100)}
-        {email.body.length > 100 ? "..." : ""}
-      </div>
-      
-      <div className="flex items-center justify-between mt-1">
-        <div className="flex items-center gap-2">
-          {email.hasAttachments && (
-            <Paperclip className="h-3 w-3 text-muted-foreground" />
-          )}
-          {email.labels && email.labels.length > 0 && (
-            <div className="flex gap-1">
-              {email.labels.map((label) => (
-                <div
-                  key={label}
-                  className="w-2 h-2 rounded-full"
-                  style={{
-                    backgroundColor:
-                      label === "work" ? "rgb(59, 130, 246)" :
-                      label === "personal" ? "rgb(139, 92, 246)" :
-                      label === "important" ? "rgb(249, 115, 22)" :
-                      "rgb(107, 114, 128)"
-                  }}
-                />
-              ))}
-            </div>
-          )}
+      <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center space-x-2">
+          <button 
+            className="text-muted-foreground hover:text-yellow-400 focus:outline-none"
+            onClick={(e) => {
+              e.stopPropagation();
+              onStar();
+            }}
+          >
+            <Star className={cn("h-4 w-4", email.starred && "fill-yellow-400 text-yellow-400")} />
+          </button>
+          <span className={cn("text-sm", !email.read && "font-medium")}>
+            {senderName}
+          </span>
         </div>
-        
-        <button
-          className="text-muted-foreground hover:text-yellow-400 focus:outline-none"
-          onClick={(e) => {
-            e.stopPropagation();
-            // Toggle star status
-          }}
-        >
-          <Star className={cn("h-4 w-4", email.starred && "fill-yellow-400 text-yellow-400")} />
-        </button>
+        <span className="text-xs text-muted-foreground">{formattedDate}</span>
       </div>
-    </li>
+      
+      <div className="flex items-center justify-between">
+        <span className="text-xs truncate max-w-[180px]">{email.subject}</span>
+        {email.hasAttachments && (
+          <Paperclip className="h-3 w-3 text-muted-foreground" />
+        )}
+      </div>
+    </div>
   );
 };
 
