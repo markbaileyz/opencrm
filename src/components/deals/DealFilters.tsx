@@ -5,7 +5,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Search, SlidersHorizontal } from "lucide-react";
 
-const DealFilters = () => {
+export interface DealFiltersState {
+  search: string;
+  stage: string;
+  organization: string;
+  closeDate: string;
+  value: string;
+}
+
+interface DealFiltersProps {
+  filters: DealFiltersState;
+  onFilterChange: (filters: Partial<DealFiltersState>) => void;
+}
+
+const DealFilters: React.FC<DealFiltersProps> = ({ filters, onFilterChange }) => {
   return (
     <div className="bg-muted/30 rounded-lg p-4 mb-6">
       <div className="flex flex-col md:flex-row gap-4">
@@ -14,11 +27,16 @@ const DealFilters = () => {
           <Input 
             placeholder="Search deals..." 
             className="pl-9"
+            value={filters.search}
+            onChange={(e) => onFilterChange({ search: e.target.value })}
           />
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 flex-1">
-          <Select>
+          <Select 
+            value={filters.stage} 
+            onValueChange={(value) => onFilterChange({ stage: value })}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Deal Stage" />
             </SelectTrigger>
@@ -33,7 +51,10 @@ const DealFilters = () => {
             </SelectContent>
           </Select>
           
-          <Select>
+          <Select 
+            value={filters.organization} 
+            onValueChange={(value) => onFilterChange({ organization: value })}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Organization" />
             </SelectTrigger>
@@ -47,7 +68,10 @@ const DealFilters = () => {
             </SelectContent>
           </Select>
           
-          <Select>
+          <Select 
+            value={filters.closeDate} 
+            onValueChange={(value) => onFilterChange({ closeDate: value })}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Close Date" />
             </SelectTrigger>
@@ -60,7 +84,10 @@ const DealFilters = () => {
             </SelectContent>
           </Select>
           
-          <Select>
+          <Select 
+            value={filters.value} 
+            onValueChange={(value) => onFilterChange({ value: value })}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Value" />
             </SelectTrigger>

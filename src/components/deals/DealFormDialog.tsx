@@ -4,40 +4,26 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import DealForm from "./DealForm";
 import { Deal } from "@/types/deal";
-import { useToast } from "@/hooks/use-toast";
 
 interface DealFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   deal?: Deal;
+  onSubmit: (formData: Partial<Deal>) => void;
 }
 
 const DealFormDialog: React.FC<DealFormDialogProps> = ({
   open,
   onOpenChange,
   deal,
+  onSubmit,
 }) => {
-  const { toast } = useToast();
   const isEditMode = !!deal;
-
-  const handleSubmit = (formData: Partial<Deal>) => {
-    // Here you would typically save the deal data to your API/state
-    console.log("Deal form submitted:", formData);
-    
-    toast({
-      title: `Deal ${isEditMode ? "updated" : "created"}`,
-      description: `Successfully ${isEditMode ? "updated" : "created"} deal: ${formData.name}`,
-    });
-    
-    onOpenChange(false);
-  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -55,7 +41,7 @@ const DealFormDialog: React.FC<DealFormDialogProps> = ({
         
         <DealForm 
           deal={deal} 
-          onSubmit={handleSubmit} 
+          onSubmit={onSubmit} 
           onCancel={() => onOpenChange(false)} 
         />
         

@@ -1,15 +1,17 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import DealFilters from "@/components/deals/DealFilters";
+import DealFilters, { DealFiltersState } from "@/components/deals/DealFilters";
 import DealPipeline from "@/components/deals/DealPipeline";
 import DealsSummary from "@/components/deals/DealsSummary";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusCircle, ListFilter, BarChart3, SlidersHorizontal } from "lucide-react";
+import { PlusCircle, BarChart3, SlidersHorizontal } from "lucide-react";
 import DealFormDialog from "@/components/deals/DealFormDialog";
 import DealStagesManager from "@/components/deals/DealStagesManager";
 import { Deal } from "@/types/deal";
+import { filterDeals } from "@/utils/dealFilters";
+import { useToast } from "@/hooks/use-toast";
 
 // Sample deals data
 const sampleDeals: Deal[] = [
@@ -56,9 +58,28 @@ const sampleDeals: Deal[] = [
 
 const Deals = () => {
   const [deals, setDeals] = useState<Deal[]>(sampleDeals);
+  const [filteredDeals, setFilteredDeals] = useState<Deal[]>(sampleDeals);
   const [formOpen, setFormOpen] = useState(false);
   const [selectedDeal, setSelectedDeal] = useState<Deal | undefined>(undefined);
   const [activeTab, setActiveTab] = useState("pipeline");
+  const { toast } = useToast();
+  
+  const [filters, setFilters] = useState<DealFiltersState>({
+    search: "",
+    stage: "all",
+    organization: "all",
+    closeDate: "all",
+    value: "all"
+  });
+  
+  // Apply filters whenever filters or deals change
+  useEffect(() => {
+    setFilteredDeals(filterDeals(deals, filters));
+  }, [deals, filters]);
+  
+  const handleFilterChange = (newFilters: Partial<DealFiltersState>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  };
   
   const handleAddDeal = () => {
     setSelectedDeal(undefined);
@@ -75,6 +96,52 @@ const Deals = () => {
     if (!open) {
       setSelectedDeal(undefined);
     }
+  };
+  
+  const handleDealSubmit = (formData: Partial<Deal>) => {
+    if (selectedDeal) {
+      // Update existing deal
+      const updatedDeals = deals.map(deal => 
+        deal.id === selectedDeal.id ? { ...deal, ...formData, updatedAt: new Date().toISOString() } : deal
+      );
+      setDeals(updatedDeals);
+      toast({
+        title: "Deal updated",
+        description: `Successfully updated deal: ${formData.name}`,
+      });
+    } else {
+      // Create new deal
+      const newDeal: Deal = {
+        id: `${Date.now()}`, // Simple ID generation
+        name: formData.name || "Unnamed Deal",
+        stage: formData.stage || "lead",
+        organization: formData.organization,
+        contact: formData.contact,
+        value: formData.value || 0,
+        closeDate: formData.closeDate || new Date().toISOString(),
+        probability: formData.probability || 50,
+        description: formData.description,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      
+      setDeals([...deals, newDeal]);
+      toast({
+        title: "Deal created",
+        description: `Successfully created deal: ${newDeal.name}`,
+      });
+    }
+    
+    setFormOpen(false);
+  };
+  
+  const handleDragEnd = (result: any) => {
+    // To be implemented: drag and drop functionality
+    console.log("Drag ended", result);
+    toast({
+      title: "Feature in development",
+      description: "Drag and drop functionality coming soon!",
+    });
   };
   
   return (
@@ -95,9 +162,12 @@ const Deals = () => {
           </div>
         </div>
         
-        <DealFilters />
+        <DealFilters 
+          filters={filters}
+          onFilterChange={handleFilterChange}
+        />
         
-        <DealsSummary deals={deals} />
+        <DealsSummary deals={filteredDeals} />
         
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList>
@@ -112,7 +182,7 @@ const Deals = () => {
           </TabsList>
           
           <TabsContent value="pipeline">
-            <DealPipeline deals={deals} onEdit={handleEditDeal} />
+            <DealPipeline deals={filteredDeals} onEdit={handleEditDeal} />
           </TabsContent>
           
           <TabsContent value="stages">
@@ -124,6 +194,7 @@ const Deals = () => {
           open={formOpen} 
           onOpenChange={handleFormOpenChange} 
           deal={selectedDeal}
+          onSubmit={handleDealSubmit}
         />
       </div>
     </DashboardLayout>
