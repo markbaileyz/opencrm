@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, Users, ClipboardCheck, Shield } from "lucide-react";
@@ -66,7 +65,7 @@ const MainHero = ({ scrollToSection }: MainHeroProps) => {
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-violet-500/20 rounded-3xl transform rotate-1 blur-xl"></div>
         <div className="glass rounded-3xl p-1 relative z-10 border border-white/20 shadow-xl overflow-hidden">
           <ResponsiveImage 
-            src="/lovable-uploads/8f809609-fda6-4c5f-b64d-3eea05d2eec9.png"
+            src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2000"
             alt="Healthcare professionals discussing patient data on a tablet" 
             className="w-full h-full rounded-2xl"
             aspectRatio="16/9"
