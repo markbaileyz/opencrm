@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Filter, Search } from "lucide-react";
@@ -39,8 +38,7 @@ const RoadmapHeader: React.FC<RoadmapHeaderProps> = ({
       <div className="container mx-auto px-4 text-center">
         <h1 className="text-4xl font-bold mb-4">OpenCRM Product Roadmap</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-          See what features we've implemented and what's coming next in our development journey.
-          Use the filters below to focus on specific feature statuses.
+          Our planned features and current development status. We're constantly improving OpenCRM to meet your business needs.
         </p>
         <div className="flex justify-center items-center gap-2">
           <Button 
