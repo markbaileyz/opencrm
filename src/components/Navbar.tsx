@@ -16,8 +16,20 @@ const Navbar = () => {
       setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
+    
+    // Handle initial hash navigation when page loads
+    if (location.hash && location.pathname === '/') {
+      const sectionId = location.hash.substring(1);
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+    
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [location]);
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -27,7 +39,7 @@ const Navbar = () => {
     setIsMobileMenuOpen(false);
     
     if (location.pathname !== '/') {
-      navigate(`/#${sectionId}`);
+      navigate(`/#${sectionId}`, { replace: true });
       return;
     }
 

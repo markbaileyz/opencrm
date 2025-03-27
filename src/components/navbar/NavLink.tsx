@@ -14,7 +14,9 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
   const navigate = useNavigate();
   
   const handleClick = (e: React.MouseEvent) => {
+    // If custom onClick handler is provided, use that
     if (onClick) {
+      e.preventDefault();
       onClick();
       return;
     }
@@ -30,21 +32,32 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
       return;
     }
     
+    // Handle hash links (section links within the homepage)
     if (href.startsWith("/#")) {
       e.preventDefault();
       const sectionId = href.substring(2);
       
       if (location.pathname !== '/') {
+        // Navigate to home page with the hash
         navigate(`/#${sectionId}`);
       } else {
+        // We're already on the home page, just scroll to section
         const element = document.getElementById(sectionId);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
         }
       }
+      return;
+    }
+    
+    // If we're already on the target route, prevent default navigation
+    if (location.pathname === href) {
+      e.preventDefault();
+      return;
     }
   };
   
+  // For home or hash links, use anchor tag with our custom handler
   if (href === "/" || href.startsWith("/#")) {
     return (
       <a
@@ -59,13 +72,14 @@ const NavLink = ({ href, active, children, onClick }: NavLinkProps) => {
     );
   }
   
+  // For other links, use React Router's Link
   return (
     <Link
       to={href}
       className={`font-medium text-sm hover-underline ${
         active ? "text-primary" : "text-foreground"
       }`}
-      onClick={onClick}
+      onClick={handleClick}
     >
       {children}
     </Link>
