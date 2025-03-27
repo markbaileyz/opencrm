@@ -12,7 +12,7 @@ interface TestimonialCardProps {
 
 const TestimonialCard = ({ quote, name, role, facility }: TestimonialCardProps) => {
   return (
-    <div className="relative glass rounded-xl p-6 shadow-md transition-all duration-300 hover:shadow-lg">
+    <div className="relative h-full bg-white rounded-xl p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:border-primary/20 border border-primary/5">
       <div className="absolute -top-3 left-6">
         <Badge variant="primary" className="shadow-sm">
           Testimonial
@@ -33,7 +33,7 @@ const TestimonialCard = ({ quote, name, role, facility }: TestimonialCardProps) 
         </p>
       </blockquote>
       
-      <div className="mt-6 pt-4 border-t border-border">
+      <div className="mt-8 pt-4 border-t border-border">
         <p className="font-semibold">{name}</p>
         <div className="flex flex-col text-sm text-muted-foreground">
           <span>{role}</span>

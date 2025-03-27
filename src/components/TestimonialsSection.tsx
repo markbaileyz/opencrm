@@ -1,8 +1,47 @@
 
 import React from "react";
-import TestimonialCard from "@/components/TestimonialCard";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Star } from "lucide-react";
+
+interface TestimonialProps {
+  name: string;
+  role: string;
+  content: string;
+  rating: number;
+  image: string;
+  className?: string;
+}
+
+const TestimonialCard = ({ name, role, content, rating, image, className = "" }: TestimonialProps) => {
+  return (
+    <div className={`relative bg-white rounded-xl p-6 border border-primary/10 shadow-md transition-all duration-300 hover:shadow-lg hover:border-primary/30 ${className}`}>
+      <div className="flex text-primary mb-4">
+        {Array(rating).fill(0).map((_, i) => (
+          <Star key={i} className="h-4 w-4 fill-current" />
+        ))}
+      </div>
+      
+      <blockquote className="mb-4 text-foreground">
+        <p className="relative text-base leading-relaxed">
+          <span className="absolute -left-2 -top-2 text-3xl text-primary/40">"</span>
+          {content}
+          <span className="absolute -bottom-4 right-0 text-3xl text-primary/40">"</span>
+        </p>
+      </blockquote>
+      
+      <div className="mt-6 pt-4 border-t border-border flex items-center">
+        <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
+          <img src={image} alt={name} className="w-full h-full object-cover" />
+        </div>
+        <div>
+          <p className="font-semibold">{name}</p>
+          <p className="text-sm text-muted-foreground">{role}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const TestimonialsSection = () => {
   return (

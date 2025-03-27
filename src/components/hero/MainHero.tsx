@@ -49,7 +49,7 @@ const MainHero = ({ scrollToSection }: MainHeroProps) => {
         </p>
         <div className="flex flex-wrap gap-4 pt-2">
           <CustomLink to="/login">
-            <ButtonCustom size="lg" className="group font-medium">
+            <ButtonCustom size="lg" className="group font-medium shadow-md hover:shadow-lg">
               Start Your Free Trial
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </ButtonCustom>

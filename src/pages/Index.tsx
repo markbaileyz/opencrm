@@ -7,10 +7,7 @@ import TestimonialsSection from "@/components/TestimonialsSection";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { Link } from "react-router-dom";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { Button } from "@/components/ui/button";
-import { UserPlus, ChevronDown, Building, User, Calendar, Lightbulb, Heart, Camera, FileImage } from "lucide-react";
 
 const Index = () => {
   const featuresRef = useRef<HTMLDivElement>(null);
@@ -52,34 +49,6 @@ const Index = () => {
       <main className="flex-grow">
         <Hero scrollToSection={scrollToSection} />
         
-        {/* Pre-Check-In Banner */}
-        <div className="bg-primary/5 py-12">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-8 rounded-xl bg-white shadow-lg border border-primary/10 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-blue-500/5 z-0"></div>
-              <div className="flex-1 relative z-10">
-                <h2 className="text-xl md:text-2xl font-bold mb-2">Skip the Wait, Pre-Check-In Online</h2>
-                <p className="text-muted-foreground mb-4">Upload your documents, provide your information, and save time on your next visit.</p>
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground bg-background/80 px-3 py-1.5 rounded-full">
-                    <FileImage className="h-4 w-4 text-primary" />
-                    <span>Upload ID</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground bg-background/80 px-3 py-1.5 rounded-full">
-                    <Camera className="h-4 w-4 text-primary" />
-                    <span>Take Photos</span>
-                  </div>
-                </div>
-              </div>
-              <Link to="/pre-check-in" className="relative z-10">
-                <Button size="lg" className="whitespace-nowrap shadow-md hover:shadow-lg transition-all">
-                  Pre-Check-In Now
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-        
         <div className="container mx-auto px-4 py-20">
           <div className="text-center mb-10 animate-fade-up">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">Explore Our Industry Solutions</h2>
@@ -88,22 +57,38 @@ const Index = () => {
             </p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mt-12">
-              <Link to="/healthcare-crm" className="animate-fade-up delay-100">
+              {/* Healthcare CRM - Active */}
+              <div className="animate-fade-up delay-100">
                 <div className="h-full group relative bg-white border border-primary/20 hover:border-primary/50 rounded-xl p-6 flex flex-col items-center text-center shadow-sm hover:shadow-md transition-all duration-300">
                   <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                    <Heart className="h-6 w-6 text-primary" />
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-heart h-6 w-6 text-primary">
+                      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+                    </svg>
                   </div>
                   <h3 className="font-medium">Healthcare CRM</h3>
                   <span className="text-xs text-muted-foreground mt-1 mb-2">Patient & Medical Management</span>
                   <span className="mt-auto text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">Active</span>
                 </div>
-              </Link>
+              </div>
               
+              {/* Remaining industry cards */}
               <div className="animate-fade-up delay-200">
                 <div className="h-full bg-white/60 border border-border rounded-xl p-6 flex flex-col items-center text-center opacity-70">
                   <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-4">
-                    <Building className="h-6 w-6" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-building">
+                      <rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect>
+                      <path d="M9 22v-4h6v4"></path>
+                      <path d="M8 6h.01"></path>
+                      <path d="M16 6h.01"></path>
+                      <path d="M12 6h.01"></path>
+                      <path d="M12 10h.01"></path>
+                      <path d="M12 14h.01"></path>
+                      <path d="M16 10h.01"></path>
+                      <path d="M16 14h.01"></path>
+                      <path d="M8 10h.01"></path>
+                      <path d="M8 14h.01"></path>
+                    </svg>
                   </div>
                   <h3 className="font-medium">Real Estate CRM</h3>
                   <span className="text-xs text-muted-foreground mt-1 mb-2">Property & Client Management</span>
@@ -114,7 +99,10 @@ const Index = () => {
               <div className="animate-fade-up delay-300">
                 <div className="h-full bg-white/60 border border-border rounded-xl p-6 flex flex-col items-center text-center opacity-70">
                   <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-4">
-                    <User className="h-6 w-6" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user">
+                      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
                   </div>
                   <h3 className="font-medium">Education CRM</h3>
                   <span className="text-xs text-muted-foreground mt-1 mb-2">Student & Course Management</span>
@@ -125,7 +113,12 @@ const Index = () => {
               <div className="animate-fade-up delay-400">
                 <div className="h-full bg-white/60 border border-border rounded-xl p-6 flex flex-col items-center text-center opacity-70">
                   <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-4">
-                    <Calendar className="h-6 w-6" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar">
+                      <path d="M8 2v4"></path>
+                      <path d="M16 2v4"></path>
+                      <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                      <path d="M3 10h18"></path>
+                    </svg>
                   </div>
                   <h3 className="font-medium">Event CRM</h3>
                   <span className="text-xs text-muted-foreground mt-1 mb-2">Event & Attendee Management</span>
@@ -136,7 +129,11 @@ const Index = () => {
               <div className="animate-fade-up delay-500">
                 <div className="h-full bg-white/60 border border-border rounded-xl p-6 flex flex-col items-center text-center opacity-70">
                   <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-4">
-                    <Lightbulb className="h-6 w-6" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-lightbulb">
+                      <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
+                      <path d="M9 18h6"></path>
+                      <path d="M10 22h4"></path>
+                    </svg>
                   </div>
                   <h3 className="font-medium">Custom CRM</h3>
                   <span className="text-xs text-muted-foreground mt-1 mb-2">Build Your Own Solution</span>

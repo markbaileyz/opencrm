@@ -75,7 +75,7 @@ const TestimonialsPreview = ({
       
       <div className="mt-12 text-center">
         <CustomLink to="#testimonials">
-          <ButtonCustom variant="outline" size="lg" className="font-medium group">
+          <ButtonCustom variant="outline" size="lg" className="font-medium group shadow-sm hover:shadow-md">
             Read More Success Stories
             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
           </ButtonCustom>
