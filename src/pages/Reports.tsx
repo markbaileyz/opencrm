@@ -5,6 +5,7 @@ import ReportFilters from "@/components/reports/ReportFilters";
 import SalesPerformanceReport from "@/components/reports/SalesPerformanceReport";
 import DealConversionReport from "@/components/reports/DealConversionReport";
 import LeadSourceReport from "@/components/reports/LeadSourceReport";
+import SalesForecastReport from "@/components/reports/SalesForecastReport";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Reports = () => {
@@ -56,6 +57,10 @@ const Reports = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <LeadSourceReport />
+          <SalesForecastReport />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
               <CardTitle>Activity Report</CardTitle>
@@ -83,6 +88,37 @@ const Reports = () => {
                     <p className="text-sm text-muted-foreground">Last 30 days</p>
                   </div>
                   <span className="text-2xl font-bold">156</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Team Performance</CardTitle>
+              <CardDescription>Individual sales achievements</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">Sarah Johnson</p>
+                    <p className="text-sm text-muted-foreground">Senior Account Manager</p>
+                  </div>
+                  <span className="text-2xl font-bold text-primary">$58,200</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">Michael Chen</p>
+                    <p className="text-sm text-muted-foreground">Sales Representative</p>
+                  </div>
+                  <span className="text-2xl font-bold text-primary">$42,800</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">Ava Rodriguez</p>
+                    <p className="text-sm text-muted-foreground">Account Executive</p>
+                  </div>
+                  <span className="text-2xl font-bold text-primary">$36,500</span>
                 </div>
               </div>
             </CardContent>
