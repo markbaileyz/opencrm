@@ -1,128 +1,124 @@
 
-import React from "react";
+import React, { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import ReportFilters from "@/components/reports/ReportFilters";
+import { ReportFilters } from "@/components/reports/ReportFilters";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Download, Filter, BarChart3, PieChart, TrendingUp, Users, Tags, Calendar } from "lucide-react";
 import SalesPerformanceReport from "@/components/reports/SalesPerformanceReport";
-import DealConversionReport from "@/components/reports/DealConversionReport";
 import LeadSourceReport from "@/components/reports/LeadSourceReport";
+import DealConversionReport from "@/components/reports/DealConversionReport";
 import SalesForecastReport from "@/components/reports/SalesForecastReport";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import ContactActivityReport from "@/components/reports/ContactActivityReport";
+import PipelineAnalysisReport from "@/components/reports/PipelineAnalysisReport";
+import ReportHeader from "@/components/reports/ReportHeader";
+import ReportExportOptions from "@/components/reports/ReportExportOptions";
 
 const Reports = () => {
+  const [activeTab, setActiveTab] = useState("sales-performance");
+  const [showFilters, setShowFilters] = useState(false);
+  const [showExportOptions, setShowExportOptions] = useState(false);
+  const { toast } = useToast();
+
+  const handleExport = (format: string) => {
+    toast({
+      title: "Report exported",
+      description: `Your report has been exported as ${format.toUpperCase()}.`,
+    });
+    setShowExportOptions(false);
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">Reports</h1>
-          <p className="text-muted-foreground mb-6">
-            Analyze your CRM data and generate insights
-          </p>
-        </div>
-        
-        <ReportFilters />
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <SalesPerformanceReport />
-          
-          <div className="space-y-6">
-            <DealConversionReport />
-            <Card>
-              <CardHeader>
-                <CardTitle>Key Metrics</CardTitle>
-                <CardDescription>Performance indicators</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Avg. Deal Size</span>
-                    <span className="font-medium">$12,500</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Conversion Rate</span>
-                    <span className="font-medium">24%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Sales Cycle</span>
-                    <span className="font-medium">32 days</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Revenue Growth</span>
-                    <span className="font-medium text-green-500">+18%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        <ReportHeader 
+          title="Analytics & Reports"
+          description="Comprehensive analytics and reports to track your business performance."
+        />
+
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+              <TabsTrigger value="sales-performance" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                <span className="hidden sm:inline">Sales Performance</span>
+              </TabsTrigger>
+              <TabsTrigger value="lead-source" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">Lead Sources</span>
+              </TabsTrigger>
+              <TabsTrigger value="deal-conversion" className="flex items-center gap-2">
+                <Tags className="h-4 w-4" />
+                <span className="hidden sm:inline">Deal Conversion</span>
+              </TabsTrigger>
+              <TabsTrigger value="sales-forecast" className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                <span className="hidden sm:inline">Sales Forecast</span>
+              </TabsTrigger>
+              <TabsTrigger value="contact-activity" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">Contact Activity</span>
+              </TabsTrigger>
+              <TabsTrigger value="pipeline-analysis" className="flex items-center gap-2">
+                <PieChart className="h-4 w-4" />
+                <span className="hidden sm:inline">Pipeline Analysis</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              <span>Filter</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowExportOptions(!showExportOptions)}
+              className="flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              <span>Export</span>
+            </Button>
           </div>
         </div>
+
+        {showFilters && <ReportFilters />}
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <LeadSourceReport />
-          <SalesForecastReport />
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Activity Report</CardTitle>
-              <CardDescription>User engagement metrics</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">Emails Sent</p>
-                    <p className="text-sm text-muted-foreground">Last 30 days</p>
-                  </div>
-                  <span className="text-2xl font-bold">248</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">Meetings Scheduled</p>
-                    <p className="text-sm text-muted-foreground">Last 30 days</p>
-                  </div>
-                  <span className="text-2xl font-bold">42</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">Tasks Completed</p>
-                    <p className="text-sm text-muted-foreground">Last 30 days</p>
-                  </div>
-                  <span className="text-2xl font-bold">156</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Team Performance</CardTitle>
-              <CardDescription>Individual sales achievements</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">Sarah Johnson</p>
-                    <p className="text-sm text-muted-foreground">Senior Account Manager</p>
-                  </div>
-                  <span className="text-2xl font-bold text-primary">$58,200</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">Michael Chen</p>
-                    <p className="text-sm text-muted-foreground">Sales Representative</p>
-                  </div>
-                  <span className="text-2xl font-bold text-primary">$42,800</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">Ava Rodriguez</p>
-                    <p className="text-sm text-muted-foreground">Account Executive</p>
-                  </div>
-                  <span className="text-2xl font-bold text-primary">$36,500</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {showExportOptions && (
+          <ReportExportOptions onExport={handleExport} onCancel={() => setShowExportOptions(false)} />
+        )}
+
+        <div className="bg-card rounded-lg border shadow">
+          <TabsContent value="sales-performance" className="m-0">
+            <SalesPerformanceReport />
+          </TabsContent>
+
+          <TabsContent value="lead-source" className="m-0">
+            <LeadSourceReport />
+          </TabsContent>
+
+          <TabsContent value="deal-conversion" className="m-0">
+            <DealConversionReport />
+          </TabsContent>
+
+          <TabsContent value="sales-forecast" className="m-0">
+            <SalesForecastReport />
+          </TabsContent>
+
+          <TabsContent value="contact-activity" className="m-0">
+            <ContactActivityReport />
+          </TabsContent>
+
+          <TabsContent value="pipeline-analysis" className="m-0">
+            <PipelineAnalysisReport />
+          </TabsContent>
         </div>
       </div>
     </DashboardLayout>
