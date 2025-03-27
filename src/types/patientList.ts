@@ -14,7 +14,10 @@ export interface PatientListItem {
   };
   status: string;
   lastVisit: string;
-  medicalHistory?: string[]; // This field should be string array, not object array
+  medicalHistory?: string[] | {
+    condition: string;
+    diagnosedDate: string;
+  }[]; // Allow both string array and object array
   documents?: {
     insuranceCardFront?: string;
     insuranceCardBack?: string;
