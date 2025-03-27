@@ -19,6 +19,7 @@ interface ImportSuccessDialogProps {
     contacts: number;
     organizations: number;
     deals: number;
+    activities?: number;
   };
 }
 
@@ -26,7 +27,7 @@ const ImportSuccessDialog: React.FC<ImportSuccessDialogProps> = ({
   open,
   onOpenChange,
   onConfirm,
-  stats = { contacts: 127, organizations: 43, deals: 56 }
+  stats = { contacts: 127, organizations: 43, deals: 56, activities: 94 }
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -47,7 +48,7 @@ const ImportSuccessDialog: React.FC<ImportSuccessDialogProps> = ({
               <li>{stats.contacts} contacts added/updated</li>
               <li>{stats.organizations} organizations added/updated</li>
               <li>{stats.deals} deals added/updated</li>
-              <li>94 activities added</li>
+              <li>{stats.activities || 94} activities added</li>
             </ul>
           </div>
         </div>

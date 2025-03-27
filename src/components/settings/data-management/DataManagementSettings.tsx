@@ -6,18 +6,77 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ExportDataSection from "./ExportDataSection";
 import ImportDataSection from "./ImportDataSection";
 import ImportSuccessDialog from "./ImportSuccessDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const DataManagementSettings = () => {
+  const { toast } = useToast();
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [importStats, setImportStats] = useState({
     contacts: 0,
     organizations: 0,
     deals: 0,
+    activities: 0,
   });
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
+
+  const handleFileSelect = (file: File | null) => {
+    setImportFile(file);
+  };
+
+  const handleImportStart = () => {
+    if (!importFile) return;
+    
+    setIsImporting(true);
+    setImportProgress(0);
+    
+    // Simulate import process with progress
+    const interval = setInterval(() => {
+      setImportProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsImporting(false);
+          
+          // Calculate stats based on file size (for simulation)
+          const size = importFile.size;
+          const contactCount = Math.floor(size / 1024) + 50;
+          const orgCount = Math.floor(contactCount * 0.4);
+          const dealCount = Math.floor(contactCount * 0.5);
+          const activityCount = Math.floor(contactCount * 0.8);
+          
+          setImportStats({
+            contacts: contactCount > 200 ? 200 : contactCount,
+            organizations: orgCount > 100 ? 100 : orgCount,
+            deals: dealCount > 150 ? 150 : dealCount,
+            activities: activityCount > 300 ? 300 : activityCount
+          });
+          
+          setShowSuccessDialog(true);
+          return 100;
+        }
+        return prev + 5;
+      });
+    }, 200);
+  };
 
   const handleImportSuccess = (stats: { contacts: number; organizations: number; deals: number }) => {
-    setImportStats(stats);
+    setImportStats({
+      ...stats,
+      activities: 94, // Default value for activities
+    });
     setShowSuccessDialog(true);
+  };
+
+  const handleImportConfirm = () => {
+    setShowSuccessDialog(false);
+    setImportFile(null);
+    setImportProgress(0);
+    
+    toast({
+      title: "Import complete",
+      description: `Successfully imported ${importStats.contacts} contacts, ${importStats.organizations} organizations, and ${importStats.deals} deals.`,
+    });
   };
 
   return (
@@ -40,11 +99,11 @@ const DataManagementSettings = () => {
         
         <TabsContent value="import">
           <ImportDataSection 
-            onFileSelect={(file) => {}}
-            onImportStart={() => {}}
-            importFile={null}
-            isImporting={false}
-            importProgress={0}
+            onFileSelect={handleFileSelect}
+            onImportStart={handleImportStart}
+            importFile={importFile}
+            isImporting={isImporting}
+            importProgress={importProgress}
             onImportSuccess={handleImportSuccess} 
           />
         </TabsContent>
@@ -58,7 +117,7 @@ const DataManagementSettings = () => {
         <ImportSuccessDialog
           open={showSuccessDialog}
           onOpenChange={setShowSuccessDialog}
-          onConfirm={() => setShowSuccessDialog(false)}
+          onConfirm={handleImportConfirm}
           stats={importStats}
         />
       )}
