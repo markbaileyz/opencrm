@@ -3,7 +3,6 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ButtonCustom } from "../ui/button-custom";
 import NavLink from "./NavLink";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -35,9 +34,6 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
   return (
     <div className="md:hidden glass animate-fade-down py-4">
       <nav className="container mx-auto px-4 flex flex-col space-y-4">
-        <div className="flex justify-end mb-2">
-          <ThemeToggle />
-        </div>
         <NavLink href="/" active={isActive("/")} onClick={handleHomeClick}>
           Home
         </NavLink>

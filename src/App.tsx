@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Index from "@/pages/Index";
@@ -33,22 +32,13 @@ import { useOfflineState } from "@/hooks/use-offline-state";
 import OfflineBanner from "@/components/ui/offline-banner";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
+import PlaceholderPage from "@/components/ui/placeholder-page";
 
 import AdminSettings from "@/pages/AdminSettings";
 import Compliance from "@/pages/Compliance";
 import UserManagement from "@/pages/UserManagement";
 import DashboardRoadmap from "@/pages/DashboardRoadmap";
-
-// Placeholder components for new pages
-const MedicalRecords = () => <div>Medical Records Page Coming Soon</div>;
-const Medications = () => <div>Medications Page Coming Soon</div>;
-const HealthTracker = () => <div>Health Tracker Page Coming Soon</div>;
-const ClinicalDashboard = () => <div>Clinical Dashboard Page Coming Soon</div>;
-const Prescriptions = () => <div>Prescriptions Page Coming Soon</div>;
-const PatientVitals = () => <div>Patient Vitals Page Coming Soon</div>;
-const SecureChat = () => <div>Secure Chat Page Coming Soon</div>;
-const PatientFeedback = () => <div>Patient Feedback Page Coming Soon</div>;
-const OfficeManagement = () => <div>Office Management Page Coming Soon</div>;
+import Office from "@/pages/Office";
 
 function App() {
   const { toast } = useToast();
@@ -129,59 +119,59 @@ function App() {
         {/* Patient Routes */}
         <Route path="/medical-records" element={
           <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse", "patient"]}>
-            <MedicalRecords />
+            <PlaceholderPage title="Medical Records" description="Your medical records will be available here soon. We're working on making this feature available to you." />
           </ProtectedRoute>
         } />
         
         <Route path="/medications" element={
           <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse", "patient"]}>
-            <Medications />
+            <PlaceholderPage title="Medications" description="Your medications will be displayed here soon. We're currently developing this feature." />
           </ProtectedRoute>
         } />
         
         <Route path="/health-tracker" element={
           <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "patient"]}>
-            <HealthTracker />
+            <PlaceholderPage title="Health Tracker" description="Track your health metrics and progress here. This feature is coming soon." />
           </ProtectedRoute>
         } />
         
         {/* Doctor Routes */}
         <Route path="/clinical-dashboard" element={
           <ProtectedRoute allowedRoles={["admin", "power-user", "doctor"]}>
-            <ClinicalDashboard />
+            <PlaceholderPage title="Clinical Dashboard" description="Access your clinical metrics and patient data. Coming soon." />
           </ProtectedRoute>
         } />
         
         <Route path="/prescriptions" element={
           <ProtectedRoute allowedRoles={["admin", "power-user", "doctor"]}>
-            <Prescriptions />
+            <PlaceholderPage title="Prescriptions" description="Manage patient prescriptions and medication orders. Coming soon." />
           </ProtectedRoute>
         } />
         
         {/* Nurse Routes */}
         <Route path="/patient-vitals" element={
           <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse"]}>
-            <PatientVitals />
+            <PlaceholderPage title="Patient Vitals" description="Record and monitor patient vital signs. This feature is under development." />
           </ProtectedRoute>
         } />
         
         {/* Communication Routes */}
         <Route path="/secure-chat" element={
           <ProtectedRoute>
-            <SecureChat />
+            <PlaceholderPage title="Secure Chat" description="Securely communicate with patients and staff. This feature is coming soon." />
           </ProtectedRoute>
         } />
         
         {/* Front Desk Routes */}
         <Route path="/patient-feedback" element={
           <ProtectedRoute allowedRoles={["admin", "power-user", "front-desk"]}>
-            <PatientFeedback />
+            <PlaceholderPage title="Patient Feedback" description="View and manage patient feedback and surveys. Coming soon." />
           </ProtectedRoute>
         } />
         
         <Route path="/office-management" element={
           <ProtectedRoute allowedRoles={["admin", "power-user", "front-desk"]}>
-            <OfficeManagement />
+            <Office />
           </ProtectedRoute>
         } />
         

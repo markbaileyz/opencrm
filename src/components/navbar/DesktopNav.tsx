@@ -3,7 +3,6 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ButtonCustom } from "../ui/button-custom";
 import NavLink from "./NavLink";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface DesktopNavProps {
   isActive: (path: string) => boolean;
@@ -63,7 +62,6 @@ const DesktopNav = ({ isActive, scrollToSection }: DesktopNavProps) => {
       </nav>
 
       <div className="hidden md:flex items-center space-x-4">
-        <ThemeToggle />
         <Link to="/login">
           <ButtonCustom variant="ghost">Login</ButtonCustom>
         </Link>
