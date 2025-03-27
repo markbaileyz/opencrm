@@ -7,8 +7,8 @@
 export const nonWorkingLinks = [
   {
     path: "/medical-records",
-    status: "Placeholder",
-    description: "Medical records view needs implementation",
+    status: "Basic Implementation",
+    description: "Medical records view has basic implementation, needs patient selection and detailed records",
     priority: "High"
   },
   {
