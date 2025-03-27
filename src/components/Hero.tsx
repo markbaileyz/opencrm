@@ -50,7 +50,7 @@ const Hero = () => {
               Your complete CRM solution
             </h1>
             <p className="text-lg text-muted-foreground max-w-lg">
-              NextCRM makes it easy to connect with customers and provide the best service possible, all in one intuitive platform.
+              OpenCRM makes it easy to connect with customers and provide the best service possible, all in one intuitive platform.
             </p>
             <div className="flex flex-wrap gap-4 pt-2">
               <Link to="/login">

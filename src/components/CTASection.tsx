@@ -16,7 +16,7 @@ const CTASection = () => {
               Ready to transform your business?
             </h2>
             <p className="text-lg mb-8 animate-fade-up delay-100">
-              Join thousands of businesses who trust NextCRM to streamline their customer relationships.
+              Join thousands of businesses who trust OpenCRM to streamline their customer relationships.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up delay-200">
               <Link to="/login">

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -19,12 +18,10 @@ const Roadmap = () => {
   const [activeSort, setActiveSort] = useState<SortType>("popular");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   
-  // Function to handle smooth scrolling to features list
   const scrollToFeatures = () => {
     document.getElementById('features-list')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Function to scroll back to top
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -36,7 +33,7 @@ const Roadmap = () => {
       <main className="flex-1">
         <div className="bg-gradient-to-b from-primary/10 to-background pt-16 pb-12 mb-8">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl font-bold mb-4">NextCRM Product Roadmap</h1>
+            <h1 className="text-4xl font-bold mb-4">OpenCRM Product Roadmap</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
               See what features we've implemented and what's coming next in our development journey.
               Use the filters below to focus on specific feature statuses.
