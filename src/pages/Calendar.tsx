@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -270,7 +269,7 @@ const Calendar = () => {
             {/* Regular Appointment Dialog */}
             <Dialog open={isAddAppointmentOpen} onOpenChange={setIsAddAppointmentOpen}>
               <DialogTrigger asChild>
-                <Button>
+                <Button onClick={() => setIsAddAppointmentOpen(true)}>
                   <CalendarPlus className="h-4 w-4 mr-2" />
                   New Appointment
                 </Button>
