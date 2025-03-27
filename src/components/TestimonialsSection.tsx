@@ -3,7 +3,6 @@ import React from "react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Star, Quote } from "lucide-react";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface TestimonialProps {
   name: string;
@@ -54,10 +53,6 @@ const TestimonialsSection = () => {
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
       
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="flex justify-end mb-4">
-          <ThemeToggle />
-        </div>
-        
         <div className="text-center max-w-3xl mx-auto mb-16">
           <Badge variant="primary" className="mb-4 shadow-sm bg-blue-500/20 text-blue-300 border border-blue-400/30">
             Customer Success

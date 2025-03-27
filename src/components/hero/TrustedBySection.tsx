@@ -3,7 +3,6 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface TrustedBySectionProps {
   title: string;
@@ -19,10 +18,6 @@ const TrustedBySection = ({ title, description, logos }: TrustedBySectionProps) 
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
       
       <div className="relative z-10">
-        <div className="flex justify-end px-6 mb-2">
-          <ThemeToggle />
-        </div>
-        
         <div className="text-center mb-12">
           <Badge variant="primary" className="mb-4 shadow-sm bg-blue-500/20 text-blue-300 border border-blue-400/30">
             <Users className="h-3.5 w-3.5 mr-1" />

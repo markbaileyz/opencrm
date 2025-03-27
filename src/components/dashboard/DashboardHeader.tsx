@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import NotificationCenter from "./NotificationCenter";
 import ProfileMenu from "./ProfileMenu";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   Dialog,
   DialogContent,
@@ -81,6 +82,7 @@ const DashboardHeader = ({ isAdmin }: DashboardHeaderProps) => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </form>
+          <ThemeToggle />
           <NotificationCenter />
           <Dialog open={isAIDialogOpen} onOpenChange={setIsAIDialogOpen}>
             <Button 
