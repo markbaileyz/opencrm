@@ -67,6 +67,10 @@ export const OrganizationsProvider: React.FC<{ children: React.ReactNode }> = ({
       result = result.filter((org) => org.status === filters.status);
     }
     
+    if (filters.size) {
+      result = result.filter((org) => org.size === filters.size);
+    }
+    
     setFilteredOrganizations(result);
   }, [organizations, filters]);
 

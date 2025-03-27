@@ -1,6 +1,6 @@
 
 import React from "react";
-import { OrganizationFilters, OrganizationType, OrganizationStatus } from "@/types/organization";
+import { OrganizationFilters, OrganizationType, OrganizationStatus, OrganizationSize } from "@/types/organization";
 import { useOrganizations } from "@/context/OrganizationsContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,13 @@ const OrganizationsFilters: React.FC = () => {
     "Archived",
   ];
 
+  const organizationSizes: OrganizationSize[] = [
+    "Small",
+    "Medium",
+    "Large",
+    "Enterprise",
+  ];
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilters({ ...filters, search: e.target.value });
   };
@@ -39,14 +46,21 @@ const OrganizationsFilters: React.FC = () => {
   const handleTypeChange = (value: string) => {
     setFilters({
       ...filters,
-      type: value as OrganizationType,
+      type: value === "all" ? undefined : value as OrganizationType,
     });
   };
 
   const handleStatusChange = (value: string) => {
     setFilters({
       ...filters,
-      status: value as OrganizationStatus,
+      status: value === "all" ? undefined : value as OrganizationStatus,
+    });
+  };
+
+  const handleSizeChange = (value: string) => {
+    setFilters({
+      ...filters,
+      size: value === "all" ? undefined : value as OrganizationSize,
     });
   };
 
@@ -54,7 +68,7 @@ const OrganizationsFilters: React.FC = () => {
     setFilters({});
   };
 
-  const hasFilters = filters.search || filters.type || filters.status;
+  const hasFilters = filters.search || filters.type || filters.status || filters.size;
 
   return (
     <div className="space-y-4">
@@ -97,6 +111,22 @@ const OrganizationsFilters: React.FC = () => {
             {organizationStatuses.map((status) => (
               <SelectItem key={status} value={status}>
                 {status}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={filters.size || ""}
+          onValueChange={handleSizeChange}
+        >
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Organization Size" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Sizes</SelectItem>
+            {organizationSizes.map((size) => (
+              <SelectItem key={size} value={size}>
+                {size}
               </SelectItem>
             ))}
           </SelectContent>
