@@ -1,382 +1,429 @@
-
-import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, ThumbsUp, MessageSquare, ArrowRight, Filter } from "lucide-react";
-import ResponsiveContainer from "@/components/ui/responsive-container";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-  SheetClose,
-} from "@/components/ui/sheet";
+import { Filter, Search, ThumbsUp, ThumbsDown, ArrowRight } from "lucide-react";
+import ResponsiveContainer from "../ui/responsive-container";
 
-// Sample data structure for challenges and solutions
-const challengesData = {
-  sales: [
-    {
-      id: "sales-1",
-      title: "Long Sales Cycle",
-      description: "Deals take too long to close, leading to revenue delays and forecasting challenges.",
-      solution: "Implement a structured sales process with clear milestones and follow-up schedules. Use automated reminders and activity tracking to keep deals moving forward. Identify common bottlenecks in your sales cycle and create strategies to address them.",
-      industry: "All",
-      difficulty: "Medium",
-      votes: 45,
-      comments: 12
-    },
-    {
-      id: "sales-2",
-      title: "Low Conversion Rates",
-      description: "Too many leads enter the pipeline but few convert to actual customers.",
-      solution: "Improve lead qualification criteria to focus on quality over quantity. Implement lead scoring to prioritize high-potential prospects. Analyze conversion data at each pipeline stage to identify where prospects are dropping off and optimize those areas.",
-      industry: "Retail, B2B",
-      difficulty: "High",
-      votes: 72,
-      comments: 24
-    },
-    {
-      id: "sales-3",
-      title: "Inconsistent Sales Performance",
-      description: "Sales results vary widely among team members and across different time periods.",
-      solution: "Standardize sales processes and scripts to ensure consistency. Implement regular training and coaching sessions. Create a knowledge base of successful sales tactics and objection handling techniques that all team members can access.",
-      industry: "All",
-      difficulty: "Medium",
-      votes: 38,
-      comments: 9
-    }
-  ],
-  marketing: [
-    {
-      id: "marketing-1",
-      title: "Poor Lead Quality",
-      description: "Marketing campaigns generate high volumes of leads that rarely convert to sales.",
-      solution: "Refine target audience definitions and buyer personas. Create content that addresses specific pain points of your ideal customers. Implement progressive profiling to gather more qualification data. Establish regular feedback loops between sales and marketing teams.",
-      industry: "B2B, SaaS",
-      difficulty: "High",
-      votes: 56,
-      comments: 18
-    },
-    {
-      id: "marketing-2",
-      title: "Difficulty Measuring ROI",
-      description: "Cannot accurately attribute revenue to specific marketing activities or campaigns.",
-      solution: "Implement proper tracking with UTM parameters across all campaigns. Set up multi-touch attribution models in your analytics. Create closed-loop reporting between your CRM and marketing automation tools to track leads from first touch to closed deal.",
-      industry: "All",
-      difficulty: "High",
-      votes: 64,
-      comments: 15
-    },
-    {
-      id: "marketing-3",
-      title: "Content Engagement Issues",
-      description: "Marketing content receives low engagement and fails to drive lead generation.",
-      solution: "Conduct audience research to understand content preferences and consumption habits. Develop a content strategy aligned with the buyer's journey. Test different formats, topics, and distribution channels to identify what resonates best with your audience.",
-      industry: "Media, Education, B2C",
-      difficulty: "Medium",
-      votes: 41,
-      comments: 7
-    }
-  ],
-  customer: [
-    {
-      id: "customer-1",
-      title: "High Customer Churn",
-      description: "Customers leave at a high rate, impacting recurring revenue and growth.",
-      solution: "Implement an early warning system that identifies at-risk customers based on product usage, support tickets, and engagement metrics. Create a customer success program with proactive outreach at key points in the customer lifecycle. Conduct exit interviews to understand churn reasons.",
-      industry: "SaaS, Subscription Services",
-      difficulty: "High",
-      votes: 83,
-      comments: 31
-    },
-    {
-      id: "customer-2",
-      title: "Slow Response Times",
-      description: "Customer support takes too long to respond to inquiries and resolve issues.",
-      solution: "Implement a ticket prioritization system based on issue severity and customer tier. Create a knowledge base with solutions to common problems that both customers and support staff can access. Use automation for routine inquiries and follow-ups.",
-      industry: "All",
-      difficulty: "Medium",
-      votes: 59,
-      comments: 14
-    },
-    {
-      id: "customer-3",
-      title: "Limited Customer Insights",
-      description: "Lack of data on customer behavior and preferences makes personalization difficult.",
-      solution: "Centralize customer data from all touchpoints in your CRM. Implement behavior tracking on your website and in your product. Create custom fields to track relevant industry-specific information. Develop regular voice-of-customer surveys to gather direct feedback.",
-      industry: "Retail, Financial Services",
-      difficulty: "Medium",
-      votes: 47,
-      comments: 11
-    }
-  ],
-  technical: [
-    {
-      id: "technical-1",
-      title: "Data Silos",
-      description: "Customer information is scattered across multiple systems with no integration.",
-      solution: "Map out all systems containing customer data and implement API integrations where possible. Consider middleware solutions for systems without native integration capabilities. Establish a single source of truth for customer data with bi-directional syncing between systems.",
-      industry: "All",
-      difficulty: "High",
-      votes: 76,
-      comments: 22
-    },
-    {
-      id: "technical-2",
-      title: "Poor Data Quality",
-      description: "CRM contains duplicate, outdated, or incomplete customer records.",
-      solution: "Implement validation rules and required fields to ensure data completeness. Use data cleansing tools to identify and merge duplicate records. Establish regular data audits and cleaning schedules. Create data governance policies and train staff on proper data entry.",
-      industry: "All",
-      difficulty: "Medium",
-      votes: 69,
-      comments: 17
-    },
-    {
-      id: "technical-3",
-      title: "Limited Adoption",
-      description: "Team members don't consistently use the CRM, leading to incomplete data.",
-      solution: "Customize the CRM interface to match team workflows. Provide comprehensive training and create quick reference guides. Demonstrate the value of CRM usage with relevant reports and insights. Consider gamification elements to encourage adoption.",
-      industry: "All",
-      difficulty: "Medium",
-      votes: 54,
-      comments: 13
-    }
-  ]
-};
+const ChallengesSolutions = () => {
+  const [activeTab, setActiveTab] = React.useState("sales");
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [showFilters, setShowFilters] = React.useState(false);
+  const [selectedDifficulty, setSelectedDifficulty] = React.useState<string[]>([]);
+  const [selectedIndustries, setSelectedIndustries] = React.useState<string[]>([]);
 
-const ChallengesSolutions: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("sales");
-  
-  // Filter challenges based on search query
-  const filterChallenges = (challenges: any[]) => {
-    if (!searchQuery) return challenges;
-    
-    return challenges.filter(challenge => 
-      challenge.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      challenge.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      challenge.solution.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      challenge.industry.toLowerCase().includes(searchQuery.toLowerCase())
+  const challenges = [
+    {
+      id: 1,
+      title: "Lead Qualification Bottlenecks",
+      description: "Sales teams struggle to efficiently qualify leads, resulting in wasted time on low-potential prospects.",
+      area: "sales",
+      difficulty: "medium",
+      industries: ["retail", "saas"],
+      solutions: [
+        {
+          id: 101,
+          title: "AI-Powered Lead Scoring",
+          description: "Implement machine learning algorithms to automatically score and prioritize leads based on historical conversion data.",
+          votes: 42,
+        },
+        {
+          id: 102,
+          title: "Qualification Workflow Automation",
+          description: "Create automated workflows with pre-qualification questions that route leads to appropriate sales representatives.",
+          votes: 38,
+        }
+      ]
+    },
+    {
+      id: 2,
+      title: "Customer Data Fragmentation",
+      description: "Customer information scattered across multiple systems creates an incomplete view of customer relationships.",
+      area: "service",
+      difficulty: "hard",
+      industries: ["healthcare", "financial"],
+      solutions: [
+        {
+          id: 201,
+          title: "Unified Customer Data Platform",
+          description: "Implement a CDP that aggregates data from all touchpoints to create comprehensive customer profiles.",
+          votes: 56,
+        }
+      ]
+    },
+    {
+      id: 3,
+      title: "Campaign Performance Tracking",
+      description: "Marketing teams struggle to attribute revenue to specific campaigns and measure true ROI.",
+      area: "marketing",
+      difficulty: "medium",
+      industries: ["retail", "ecommerce"],
+      solutions: [
+        {
+          id: 301,
+          title: "Multi-Touch Attribution Modeling",
+          description: "Implement advanced attribution models that track customer interactions across all touchpoints.",
+          votes: 29,
+        },
+        {
+          id: 302,
+          title: "Integrated Campaign Analytics Dashboard",
+          description: "Create a unified dashboard that pulls data from all marketing channels to provide comprehensive performance metrics.",
+          votes: 35,
+        }
+      ]
+    },
+    {
+      id: 4,
+      title: "Sales Forecast Accuracy",
+      description: "Sales managers struggle to create reliable forecasts, leading to resource allocation issues.",
+      area: "sales",
+      difficulty: "hard",
+      industries: ["manufacturing", "saas"],
+      solutions: [
+        {
+          id: 401,
+          title: "Predictive Analytics Forecasting",
+          description: "Use machine learning models that incorporate historical data, market trends, and sales activities to generate accurate forecasts.",
+          votes: 48,
+        }
+      ]
+    },
+    {
+      id: 5,
+      title: "Customer Churn Prevention",
+      description: "Identifying at-risk customers before they churn remains challenging for many service teams.",
+      area: "service",
+      difficulty: "medium",
+      industries: ["saas", "telecom"],
+      solutions: [
+        {
+          id: 501,
+          title: "Early Warning System",
+          description: "Implement a predictive churn model that identifies at-risk customers based on behavior patterns and engagement metrics.",
+          votes: 52,
+        },
+        {
+          id: 502,
+          title: "Proactive Engagement Program",
+          description: "Create automated workflows that trigger personalized outreach when customers show signs of disengagement.",
+          votes: 39,
+        }
+      ]
+    },
+    {
+      id: 6,
+      title: "Content Personalization at Scale",
+      description: "Delivering personalized content to different audience segments efficiently.",
+      area: "marketing",
+      difficulty: "medium",
+      industries: ["ecommerce", "media"],
+      solutions: [
+        {
+          id: 601,
+          title: "Dynamic Content Engine",
+          description: "Implement a system that automatically tailors content based on user behavior, preferences, and segment.",
+          votes: 44,
+        }
+      ]
+    }
+  ];
+
+  const filteredChallenges = challenges
+    .filter(challenge => challenge.area === activeTab)
+    .filter(challenge => {
+      if (searchQuery === "") return true;
+      return (
+        challenge.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        challenge.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    })
+    .filter(challenge => {
+      if (selectedDifficulty.length === 0) return true;
+      return selectedDifficulty.includes(challenge.difficulty);
+    })
+    .filter(challenge => {
+      if (selectedIndustries.length === 0) return true;
+      return challenge.industries.some(industry => selectedIndustries.includes(industry));
+    });
+
+  const handleDifficultyChange = (difficulty: string) => {
+    setSelectedDifficulty(prev => 
+      prev.includes(difficulty) 
+        ? prev.filter(d => d !== difficulty) 
+        : [...prev, difficulty]
     );
   };
-  
-  const filteredSales = filterChallenges(challengesData.sales);
-  const filteredMarketing = filterChallenges(challengesData.marketing);
-  const filteredCustomer = filterChallenges(challengesData.customer);
-  const filteredTechnical = filterChallenges(challengesData.technical);
-  
-  // Check if any results match the search query
-  const hasResults = 
-    filteredSales.length > 0 || 
-    filteredMarketing.length > 0 || 
-    filteredCustomer.length > 0 || 
-    filteredTechnical.length > 0;
-  
-  // Get difficulty badge color
+
+  const handleIndustryChange = (industry: string) => {
+    setSelectedIndustries(prev => 
+      prev.includes(industry) 
+        ? prev.filter(i => i !== industry) 
+        : [...prev, industry]
+    );
+  };
+
+  const clearFilters = () => {
+    setSelectedDifficulty([]);
+    setSelectedIndustries([]);
+    setSearchQuery("");
+  };
+
   const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty.toLowerCase()) {
-      case 'low':
-        return 'bg-green-100 text-green-800';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'high':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+    switch (difficulty) {
+      case "easy": return "bg-green-100 text-green-800";
+      case "medium": return "bg-yellow-100 text-yellow-800";
+      case "hard": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
     }
   };
 
-  // Mobile filter section
-  const MobileFilters = () => (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-1 md:hidden">
-          <Filter className="h-4 w-4" />
-          <span>Filter</span>
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="bottom" className="h-[60vh]">
-        <SheetHeader>
-          <SheetTitle>Filter Challenges</SheetTitle>
-          <SheetDescription>
-            Select a category to view related challenges
-          </SheetDescription>
-        </SheetHeader>
-        <div className="py-4">
-          <TabsList className="grid w-full grid-cols-2 gap-2">
-            <TabsTrigger value="sales" onClick={() => {
-              setActiveTab("sales");
-            }}>Sales Challenges</TabsTrigger>
-            <TabsTrigger value="marketing" onClick={() => {
-              setActiveTab("marketing");
-            }}>Marketing Challenges</TabsTrigger>
-            <TabsTrigger value="customer" onClick={() => {
-              setActiveTab("customer");
-            }}>Customer Service</TabsTrigger>
-            <TabsTrigger value="technical" onClick={() => {
-              setActiveTab("technical");
-            }}>Technical Issues</TabsTrigger>
-          </TabsList>
-        </div>
-        <div className="mt-4">
-          <SheetClose asChild>
-            <Button className="w-full">Apply Filters</Button>
-          </SheetClose>
-        </div>
-      </SheetContent>
-    </Sheet>
-  );
+  const handleVote = (challengeId: number, solutionId: number, voteType: 'up' | 'down') => {
+    console.log(`Voted ${voteType} for solution ${solutionId} of challenge ${challengeId}`);
+    // In a real app, this would update state or call an API
+  };
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col gap-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Common Challenges & Solutions</h1>
-          <p className="text-muted-foreground">
-            Explore practical solutions to common CRM challenges across various business functions.
-          </p>
+  // Mobile optimized filters
+  const MobileFilters = () => (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-medium">Filters</h3>
+        <Button variant="ghost" size="sm" onClick={clearFilters}>
+          Clear All
+        </Button>
+      </div>
+      
+      <div className="space-y-2">
+        <h4 className="text-xs font-medium text-muted-foreground">Difficulty</h4>
+        <div className="flex flex-wrap gap-2">
+          {["easy", "medium", "hard"].map(difficulty => (
+            <Badge 
+              key={difficulty}
+              variant={selectedDifficulty.includes(difficulty) ? "default" : "outline"}
+              className="cursor-pointer capitalize"
+              onClick={() => handleDifficultyChange(difficulty)}
+            >
+              {difficulty}
+            </Badge>
+          ))}
         </div>
-        
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search challenges & solutions..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-            {searchQuery && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 px-2"
-                onClick={() => setSearchQuery("")}
-              >
-                Clear
-              </Button>
-            )}
-          </div>
-          <MobileFilters />
+      </div>
+      
+      <div className="space-y-2">
+        <h4 className="text-xs font-medium text-muted-foreground">Industry</h4>
+        <div className="flex flex-wrap gap-2">
+          {["retail", "saas", "healthcare", "financial", "ecommerce", "manufacturing", "telecom", "media"].map(industry => (
+            <Badge 
+              key={industry}
+              variant={selectedIndustries.includes(industry) ? "default" : "outline"}
+              className="cursor-pointer capitalize"
+              onClick={() => handleIndustryChange(industry)}
+            >
+              {industry}
+            </Badge>
+          ))}
         </div>
-        
-        {searchQuery && (
-          <div className="text-sm text-muted-foreground text-center">
-            {hasResults ? 
-              `Showing results for "${searchQuery}"` : 
-              `No results found for "${searchQuery}"`
-            }
-          </div>
-        )}
-        
-        <Tabs defaultValue="sales" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <ResponsiveContainer>
-            <TabsList className="hidden md:grid w-full grid-cols-4">
-              <TabsTrigger value="sales">Sales Challenges</TabsTrigger>
-              <TabsTrigger value="marketing">Marketing Challenges</TabsTrigger>
-              <TabsTrigger value="customer">Customer Service</TabsTrigger>
-              <TabsTrigger value="technical">Technical Issues</TabsTrigger>
-            </TabsList>
-          </ResponsiveContainer>
-          
-          <TabsContent value="sales" className="mt-6">
-            {renderChallengesList(filteredSales)}
-          </TabsContent>
-          
-          <TabsContent value="marketing" className="mt-6">
-            {renderChallengesList(filteredMarketing)}
-          </TabsContent>
-          
-          <TabsContent value="customer" className="mt-6">
-            {renderChallengesList(filteredCustomer)}
-          </TabsContent>
-          
-          <TabsContent value="technical" className="mt-6">
-            {renderChallengesList(filteredTechnical)}
-          </TabsContent>
-        </Tabs>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Share Your Own Challenge</CardTitle>
-            <CardDescription>
-              Have you solved a CRM challenge not listed here? Share your experience to help others.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Button>Submit Your Solution</Button>
-          </CardFooter>
-        </Card>
       </div>
     </div>
   );
   
-  // Helper function to render challenges list
-  function renderChallengesList(challenges: any[]) {
-    if (challenges.length === 0) {
-      return (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">No challenges match your search criteria.</p>
-          {searchQuery && (
-            <Button 
-              variant="outline" 
-              className="mt-4" 
-              onClick={() => setSearchQuery("")}
-            >
-              Clear Search
-            </Button>
-          )}
-        </div>
-      );
-    }
-    
-    return (
-      <div className="grid grid-cols-1 gap-6">
-        {challenges.map((challenge) => (
-          <Card key={challenge.id} className="overflow-hidden">
-            <CardHeader>
-              <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2">
-                <div>
-                  <CardTitle className="text-xl">{challenge.title}</CardTitle>
-                  <CardDescription className="mt-2">{challenge.description}</CardDescription>
-                </div>
-                <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
-                  <Badge className={`${getDifficultyColor(challenge.difficulty)}`}>
-                    {challenge.difficulty}
-                  </Badge>
-                  <Badge variant="outline">{challenge.industry}</Badge>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div>
-                <h4 className="font-medium mb-2">Recommended Solution:</h4>
-                <p className="text-muted-foreground">{challenge.solution}</p>
-              </div>
-            </CardContent>
-            <CardFooter className="bg-muted/50 flex flex-col sm:flex-row justify-between gap-4">
-              <div className="flex gap-4 items-center">
-                <span className="flex items-center gap-1 text-sm">
-                  <ThumbsUp className="h-4 w-4" /> {challenge.votes}
-                </span>
-                <span className="flex items-center gap-1 text-sm">
-                  <MessageSquare className="h-4 w-4" /> {challenge.comments}
-                </span>
-              </div>
-              <Button size="sm" variant="ghost" className="gap-1 w-full sm:w-auto">
-                View Full Solution <ArrowRight className="h-4 w-4" />
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+  // Desktop optimized filters
+  const DesktopFilters = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-medium">Filters</h3>
+        <Button variant="ghost" size="sm" onClick={clearFilters}>
+          Clear All
+        </Button>
       </div>
-    );
-  }
+      
+      <div className="space-y-4">
+        <div>
+          <h4 className="text-sm font-medium mb-3">Difficulty</h4>
+          <div className="space-y-2">
+            {["easy", "medium", "hard"].map(difficulty => (
+              <div key={difficulty} className="flex items-center space-x-2">
+                <Checkbox 
+                  id={`difficulty-${difficulty}`}
+                  checked={selectedDifficulty.includes(difficulty)}
+                  onCheckedChange={() => handleDifficultyChange(difficulty)}
+                />
+                <label 
+                  htmlFor={`difficulty-${difficulty}`}
+                  className="text-sm capitalize cursor-pointer"
+                >
+                  {difficulty}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        <div>
+          <h4 className="text-sm font-medium mb-3">Industry</h4>
+          <div className="space-y-2">
+            {["retail", "saas", "healthcare", "financial", "ecommerce", "manufacturing", "telecom", "media"].map(industry => (
+              <div key={industry} className="flex items-center space-x-2">
+                <Checkbox 
+                  id={`industry-${industry}`}
+                  checked={selectedIndustries.includes(industry)}
+                  onCheckedChange={() => handleIndustryChange(industry)}
+                />
+                <label 
+                  htmlFor={`industry-${industry}`}
+                  className="text-sm capitalize cursor-pointer"
+                >
+                  {industry}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Challenges & Solutions</h2>
+          <p className="text-muted-foreground">
+            Browse common CRM challenges and recommended solutions by business area.
+          </p>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <div className="relative w-full md:w-auto">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search challenges..."
+              className="w-full md:w-[200px] pl-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setShowFilters(!showFilters)}
+            className="md:hidden"
+          >
+            <Filter className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="hidden md:block">
+          <DesktopFilters />
+        </div>
+        
+        {showFilters && (
+          <div className="md:hidden">
+            <Card>
+              <CardContent className="pt-6">
+                <MobileFilters />
+              </CardContent>
+            </Card>
+          </div>
+        )}
+        
+        <div className="md:col-span-3 space-y-6">
+          <Tabs defaultValue="sales" value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="w-full md:w-auto">
+              <TabsTrigger value="sales" className="flex-1 md:flex-none">Sales</TabsTrigger>
+              <TabsTrigger value="marketing" className="flex-1 md:flex-none">Marketing</TabsTrigger>
+              <TabsTrigger value="service" className="flex-1 md:flex-none">Service</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value={activeTab} className="mt-6 space-y-6">
+              {filteredChallenges.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">No challenges found matching your criteria.</p>
+                  <Button variant="link" onClick={clearFilters}>Clear filters</Button>
+                </div>
+              ) : (
+                filteredChallenges.map(challenge => (
+                  <Card key={challenge.id} className="overflow-hidden">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <CardTitle>{challenge.title}</CardTitle>
+                          <CardDescription className="mt-2">{challenge.description}</CardDescription>
+                        </div>
+                        <Badge className={cn("ml-2", getDifficultyColor(challenge.difficulty))}>
+                          {challenge.difficulty}
+                        </Badge>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {challenge.industries.map(industry => (
+                          <Badge key={industry} variant="outline" className="capitalize">
+                            {industry}
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <h4 className="font-medium mb-4">Recommended Solutions</h4>
+                      <div className="space-y-4">
+                        {challenge.solutions.map(solution => (
+                          <div key={solution.id} className="p-4 bg-muted/50 rounded-lg">
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <h5 className="font-medium">{solution.title}</h5>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {solution.description}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-1 text-sm">
+                                <span>{solution.votes}</span>
+                                <span className="text-muted-foreground">votes</span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center mt-4">
+                              <div className="flex gap-2">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-8 px-2"
+                                  onClick={() => handleVote(challenge.id, solution.id, 'up')}
+                                >
+                                  <ThumbsUp className="h-4 w-4 mr-1" />
+                                  Helpful
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-8 px-2"
+                                  onClick={() => handleVote(challenge.id, solution.id, 'down')}
+                                >
+                                  <ThumbsDown className="h-4 w-4 mr-1" />
+                                  Not helpful
+                                </Button>
+                              </div>
+                              <Button variant="ghost" size="sm" className="h-8">
+                                Details
+                                <ArrowRight className="h-4 w-4 ml-1" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ChallengesSolutions;

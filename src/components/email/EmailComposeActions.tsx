@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Send, Save } from "lucide-react";
-import ResponsiveContainer from "@/components/ui/responsive-container";
+import ResponsiveContainer from "../ui/responsive-container";
 
 interface EmailComposeActionsProps {
   onSaveDraft: () => void;
