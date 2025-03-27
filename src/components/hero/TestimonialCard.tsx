@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Star } from "lucide-react";
+import { Star, Quote } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface TestimonialCardProps {
@@ -8,28 +8,24 @@ interface TestimonialCardProps {
   name: string;
   role: string;
   facility: string;
+  delay?: string;
 }
 
-const TestimonialCard = ({ quote, name, role, facility }: TestimonialCardProps) => {
+const TestimonialCard = ({ quote, name, role, facility, delay = "" }: TestimonialCardProps) => {
   return (
-    <div className="relative h-full bg-white rounded-xl p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:border-primary/20 border border-primary/5">
+    <div className={`relative h-full bg-white rounded-xl p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-primary/20 border border-primary/10 animate-fade-up ${delay}`}>
       <div className="absolute -top-3 left-6">
-        <Badge variant="primary" className="shadow-sm">
-          Testimonial
+        <Badge variant="secondary" className="shadow-sm border border-primary/10">
+          <Star className="h-3.5 w-3.5 mr-1 fill-yellow-400 text-yellow-400" />
+          5.0
         </Badge>
       </div>
       
-      <div className="flex text-primary mb-4">
-        {[...Array(5)].map((_, i) => (
-          <Star key={i} className="h-4 w-4 fill-current" />
-        ))}
-      </div>
+      <Quote className="h-8 w-8 text-primary/20 mb-2" />
       
       <blockquote className="mb-4 text-foreground">
-        <p className="relative text-base leading-relaxed">
-          <span className="absolute -left-2 -top-2 text-3xl text-primary/40">"</span>
-          {quote}
-          <span className="absolute -bottom-4 right-0 text-3xl text-primary/40">"</span>
+        <p className="text-base leading-relaxed font-medium">
+          "{quote}"
         </p>
       </blockquote>
       
@@ -37,7 +33,7 @@ const TestimonialCard = ({ quote, name, role, facility }: TestimonialCardProps) 
         <p className="font-semibold">{name}</p>
         <div className="flex flex-col text-sm text-muted-foreground">
           <span>{role}</span>
-          <span>{facility}</span>
+          <span className="font-medium text-primary/80">{facility}</span>
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import MainHero from "./hero/MainHero";
 import StatsGrid from "./hero/StatsGrid";
 import PerspectiveSection from "./hero/PerspectiveSection";
 import TestimonialsPreview from "./hero/TestimonialsPreview";
+import TrustedBySection from "./hero/TrustedBySection";
 
 interface HeroProps {
   scrollToSection?: (sectionId: string) => void;
@@ -56,6 +57,14 @@ const Hero = ({ scrollToSection }: HeroProps) => {
       facility: "Regional Health Partners"
     }
   ];
+  
+  // Partner logos
+  const partnerLogos = [
+    "/public/logos/stark.svg",
+    "/public/logos/acme.svg",
+    "/public/logos/globex.svg",
+    "/public/logos/hooli.svg"
+  ];
 
   return (
     <section className="pt-24 pb-16 md:pt-36 md:pb-24 overflow-hidden" id="home">
@@ -65,6 +74,15 @@ const Hero = ({ scrollToSection }: HeroProps) => {
         
         {/* Statistics */}
         <StatsGrid stats={statsData} />
+        
+        {/* Trusted By Section */}
+        <div className="mt-20">
+          <TrustedBySection 
+            title="Trusted by Leading Healthcare Providers"
+            description="Join thousands of healthcare organizations that rely on OpenCRM to deliver exceptional patient experiences and streamline operations."
+            logos={partnerLogos}
+          />
+        </div>
         
         {/* Perspective Sections */}
         <div className="mt-32 space-y-32">
