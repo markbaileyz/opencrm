@@ -16,7 +16,12 @@ import {
   Store,
   Thermometer,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Tags,
+  HelpCircle,
+  BookOpen,
+  Shield,
+  FileLock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -81,6 +86,8 @@ const DashboardSidebar = () => {
   const { user, logout } = useAuth();
   const [officeOpen, setOfficeOpen] = React.useState(true);
   const [patientOpen, setPatientOpen] = React.useState(true);
+  const [adminOpen, setAdminOpen] = React.useState(false);
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -217,20 +224,140 @@ const DashboardSidebar = () => {
           </Collapsible>
           
           <SidebarLink
+            href="/organizations"
+            icon={<Building2 className="h-4 w-4" />}
+            isActive={isActive("/organizations")}
+          >
+            Organizations
+          </SidebarLink>
+
+          <SidebarLink
+            href="/deals"
+            icon={<Tags className="h-4 w-4" />}
+            isActive={isActive("/deals")}
+          >
+            Deals
+          </SidebarLink>
+          
+          <SidebarLink
             href="/reports"
             icon={<BarChart3 className="h-4 w-4" />}
             isActive={isActive("/reports")}
           >
             Reports
           </SidebarLink>
-          
+
           <SidebarLink
-            href="/settings"
-            icon={<Settings className="h-4 w-4" />}
-            isActive={isActive("/settings")}
+            href="/dashboard-roadmap"
+            icon={<FileText className="h-4 w-4" />}
+            isActive={isActive("/dashboard-roadmap")}
           >
-            Settings
+            Roadmap
           </SidebarLink>
+          
+          <Collapsible
+            open={settingsOpen}
+            onOpenChange={setSettingsOpen}
+            className="w-full mt-4"
+          >
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "flex w-full items-center justify-between p-2",
+                  (isActive("/settings") || isActive("/knowledge-base")) && "bg-primary/10 text-primary font-medium"
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <Settings className="h-4 w-4" />
+                  <span>Support & Settings</span>
+                </div>
+                {settingsOpen ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-1">
+              <SidebarLink
+                href="/knowledge-base"
+                icon={<HelpCircle className="h-4 w-4" />}
+                isActive={isActive("/knowledge-base")}
+                indented
+              >
+                Knowledge Base
+              </SidebarLink>
+              <SidebarLink
+                href="/challenges-solutions"
+                icon={<BookOpen className="h-4 w-4" />}
+                isActive={isActive("/challenges-solutions")}
+                indented
+              >
+                Challenges & Solutions
+              </SidebarLink>
+              <SidebarLink
+                href="/settings"
+                icon={<Settings className="h-4 w-4" />}
+                isActive={isActive("/settings")}
+                indented
+              >
+                Settings
+              </SidebarLink>
+            </CollapsibleContent>
+          </Collapsible>
+
+          <Collapsible
+            open={adminOpen}
+            onOpenChange={setAdminOpen}
+            className="w-full mt-2"
+          >
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "flex w-full items-center justify-between p-2",
+                  (isActive("/admin-settings") || isActive("/compliance")) && "bg-primary/10 text-primary font-medium"
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <Shield className="h-4 w-4" />
+                  <span>Admin</span>
+                </div>
+                {adminOpen ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-1">
+              <SidebarLink
+                href="/admin-settings"
+                icon={<Shield className="h-4 w-4" />}
+                isActive={isActive("/admin-settings")}
+                indented
+              >
+                Admin Settings
+              </SidebarLink>
+              <SidebarLink
+                href="/compliance"
+                icon={<FileLock className="h-4 w-4" />}
+                isActive={isActive("/compliance")}
+                indented
+              >
+                Compliance
+              </SidebarLink>
+              <SidebarLink
+                href="/user-management"
+                icon={<UserCog className="h-4 w-4" />}
+                isActive={isActive("/user-management")}
+                indented
+              >
+                User Management
+              </SidebarLink>
+            </CollapsibleContent>
+          </Collapsible>
         </nav>
       </div>
       
