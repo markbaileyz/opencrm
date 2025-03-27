@@ -11,6 +11,7 @@ import UserPreferencesSettings from "@/components/settings/UserPreferencesSettin
 import AccessibilitySettings from "@/components/settings/AccessibilitySettings";
 import DangerZoneSection from "@/components/settings/DangerZoneSection";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
 import { 
   User, 
   Bell, 
@@ -24,6 +25,79 @@ import {
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("profile");
+  const { toast } = useToast();
+  
+  // State for ProfileSettingsForm
+  const [profileSettings, setProfileSettings] = useState({
+    name: "John Doe",
+    email: "john.doe@example.com",
+    role: "Sales Manager",
+    company: "OpenCRM Inc.",
+    timezone: "America/New_York"
+  });
+  
+  // List of timezones for ProfileSettingsForm
+  const timezones = [
+    "America/New_York",
+    "America/Chicago",
+    "America/Denver",
+    "America/Los_Angeles",
+    "Europe/London",
+    "Europe/Paris",
+    "Asia/Tokyo",
+    "Australia/Sydney"
+  ];
+  
+  // State for NotificationSettingsForm
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [smsNotifications, setSmsNotifications] = useState(false);
+  const [dataAnalytics, setDataAnalytics] = useState(true);
+  
+  // State for SecuritySettingsForm
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  
+  // Handlers for forms
+  const handleProfileSubmit = (values: any) => {
+    setProfileSettings(values);
+    toast({
+      title: "Profile updated",
+      description: "Your profile settings have been updated.",
+    });
+  };
+  
+  const handleNotificationsSubmit = () => {
+    toast({
+      title: "Notification preferences saved",
+      description: "Your notification settings have been updated.",
+    });
+  };
+  
+  const handlePasswordChange = (values: { currentPassword: string; newPassword: string }) => {
+    // In a real app, this would call an API to change the password
+    toast({
+      title: "Password updated",
+      description: "Your password has been successfully changed.",
+    });
+  };
+  
+  const handleTwoFactorChange = (enabled: boolean) => {
+    setTwoFactorEnabled(enabled);
+    toast({
+      title: enabled ? "Two-factor authentication enabled" : "Two-factor authentication disabled",
+      description: enabled 
+        ? "Your account is now more secure." 
+        : "Two-factor authentication has been disabled.",
+    });
+  };
+  
+  const handleDeleteAccount = () => {
+    // In a real app, this would call an API to delete the account
+    toast({
+      title: "Account deletion requested",
+      description: "Your account deletion request has been submitted.",
+      variant: "destructive",
+    });
+  };
 
   return (
     <DashboardLayout>
@@ -66,7 +140,11 @@ const Settings = () => {
           </TabsList>
           
           <TabsContent value="profile" className="space-y-6">
-            <ProfileSettingsForm />
+            <ProfileSettingsForm 
+              defaultValues={profileSettings}
+              timezones={timezones}
+              onSubmit={handleProfileSubmit}
+            />
           </TabsContent>
           
           <TabsContent value="preferences" className="space-y-6">
@@ -78,11 +156,23 @@ const Settings = () => {
           </TabsContent>
           
           <TabsContent value="notifications" className="space-y-6">
-            <NotificationSettingsForm />
+            <NotificationSettingsForm 
+              emailNotifications={emailNotifications}
+              setEmailNotifications={setEmailNotifications}
+              smsNotifications={smsNotifications}
+              setSmsNotifications={setSmsNotifications}
+              dataAnalytics={dataAnalytics}
+              setDataAnalytics={setDataAnalytics}
+              onSave={handleNotificationsSubmit}
+            />
           </TabsContent>
           
           <TabsContent value="security" className="space-y-6">
-            <SecuritySettingsForm />
+            <SecuritySettingsForm 
+              onPasswordChange={handlePasswordChange}
+              twoFactorEnabled={twoFactorEnabled}
+              onTwoFactorChange={handleTwoFactorChange}
+            />
           </TabsContent>
           
           <TabsContent value="data" className="space-y-6">
@@ -94,7 +184,7 @@ const Settings = () => {
           </TabsContent>
         </Tabs>
         
-        <DangerZoneSection />
+        <DangerZoneSection onDeleteAccount={handleDeleteAccount} />
       </div>
     </DashboardLayout>
   );
