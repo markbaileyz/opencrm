@@ -42,14 +42,14 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
         >
           Pricing
         </NavLink>
-        <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={closeMobileMenu}>
-          Roadmap
-        </NavLink>
         <NavLink href="/mind-map" active={isActive("/mind-map")} onClick={closeMobileMenu}>
           Mind Map
         </NavLink>
         <NavLink href="/healthcare-crm" active={isActive("/healthcare-crm")} onClick={closeMobileMenu}>
           Healthcare CRM
+        </NavLink>
+        <NavLink href="/roadmap" active={isActive("/roadmap")} onClick={closeMobileMenu}>
+          Roadmap
         </NavLink>
         <div className="flex space-x-4 pt-2">
           <Link to="/login" onClick={closeMobileMenu}>
