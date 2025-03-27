@@ -19,7 +19,7 @@ import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Filter, Calendar as CalendarIcon, Check, X } from "lucide-react";
-import ResponsiveContainer from "../ui/responsive-container";
+import ResponsiveContainer from "@/components/ui/responsive-container";
 
 const ReportFilters = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());

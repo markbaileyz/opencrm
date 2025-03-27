@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 import { Filter, Search, ThumbsUp, ThumbsDown, ArrowRight } from "lucide-react";
-import ResponsiveContainer from "../ui/responsive-container";
+import ResponsiveContainer from "@/components/ui/responsive-container";
 
 const ChallengesSolutions = () => {
   const [activeTab, setActiveTab] = React.useState("sales");
