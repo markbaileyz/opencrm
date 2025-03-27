@@ -20,8 +20,16 @@ export function useEmailManager(initialEmails: Email[]) {
     selectedEmail, 
     setSelectedEmail, 
     handleSelectEmail, 
-    handleBackToList 
-  } = useEmailSelection();
+    handleBackToList,
+    selectedEmails,
+    isBulkMode,
+    handleSelectAll,
+    handleClearSelection,
+    toggleBulkMode,
+    handleBulkAction,
+    isAllSelected,
+    isIndeterminate
+  } = useEmailSelection(emails);
   
   const { 
     handleAddLabel: addLabel, 
@@ -49,7 +57,7 @@ export function useEmailManager(initialEmails: Email[]) {
       const updatedEmails = markEmailAsRead(emails, email.id);
       setEmails(updatedEmails);
     }
-    setSelectedEmail(updatedEmail);
+    setSelectedEmail(updatedEmail as Email);
   };
 
   const handleStarEmail = (id: string) => {
@@ -92,6 +100,8 @@ export function useEmailManager(initialEmails: Email[]) {
   return {
     emails,
     selectedEmail,
+    selectedEmails,
+    isBulkMode,
     handleSelectEmail: handleSelectEmailWrapper,
     handleBackToList,
     handleStarEmail,
@@ -101,6 +111,12 @@ export function useEmailManager(initialEmails: Email[]) {
     handleAddLabel,
     handleRemoveLabel,
     handleEditDraft,
-    refreshDrafts
+    refreshDrafts,
+    handleSelectAll,
+    handleClearSelection,
+    toggleBulkMode,
+    handleBulkAction,
+    isAllSelected,
+    isIndeterminate
   };
 }

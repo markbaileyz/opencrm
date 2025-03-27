@@ -25,7 +25,7 @@ export function useEmailDraftManager(initialEmails: Email[]) {
       date: draft.lastSaved,
       read: true,
       starred: false,
-      folder: 'drafts',
+      folder: 'drafts' as const,
       hasAttachments: false,
       labels: []
     }));
