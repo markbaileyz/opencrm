@@ -54,6 +54,11 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
   const handleAppointmentSelect = (appointmentId: string) => {
     setSelectedAppointmentId(appointmentId);
   };
+
+  // Handler to close appointment details
+  const handleCloseAppointmentDetails = () => {
+    setSelectedAppointmentId(null);
+  };
   
   return (
     <div className="space-y-6">
@@ -131,7 +136,7 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
           onDeleteAppointment={onDeleteAppointment}
           onReminderSent={onReminderSent}
           onViewEmail={onViewEmail}
-          onClose={() => setSelectedAppointmentId(null)}
+          onClose={handleCloseAppointmentDetails}
         />
       )}
     </div>

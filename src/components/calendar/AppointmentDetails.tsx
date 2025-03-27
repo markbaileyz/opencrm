@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar as CalendarIcon, Mail, Clock, FileText, Edit, Trash } from "lucide-react";
+import { Calendar as CalendarIcon, Mail, Clock, FileText, Edit, Trash, X } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import AppointmentReminder from "./AppointmentReminder";
 import AppointmentRelatedEmails from "./AppointmentRelatedEmails";
@@ -18,6 +18,7 @@ interface AppointmentDetailsProps {
   onDeleteAppointment: (id: string) => void;
   onReminderSent: (appointmentId: string) => void;
   onViewEmail: (emailId: string) => void;
+  onClose?: () => void; // Added onClose prop as optional
 }
 
 const AppointmentDetails = ({
@@ -27,6 +28,7 @@ const AppointmentDetails = ({
   onDeleteAppointment,
   onReminderSent,
   onViewEmail,
+  onClose,
 }: AppointmentDetailsProps) => {
   const statusColors = {
     upcoming: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
@@ -47,7 +49,15 @@ const AppointmentDetails = ({
               {appointment.time}
             </CardDescription>
           </div>
-          <Badge className={statusColors[appointment.status]}>{appointment.status}</Badge>
+          <div className="flex items-center gap-2">
+            <Badge className={statusColors[appointment.status]}>{appointment.status}</Badge>
+            {onClose && (
+              <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
       
