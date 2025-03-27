@@ -13,14 +13,14 @@ export const nonWorkingLinks = [
   },
   {
     path: "/medications",
-    status: "Placeholder",
-    description: "Medications management needs implementation",
+    status: "Basic Implementation",
+    description: "Medications management has basic implementation, needs integration with patient data",
     priority: "High"
   },
   {
     path: "/health-tracker",
-    status: "Placeholder",
-    description: "Health tracking features need implementation",
+    status: "Basic Implementation",
+    description: "Health tracking features have basic implementation, needs data visualization enhancements",
     priority: "Medium"
   },
   {
