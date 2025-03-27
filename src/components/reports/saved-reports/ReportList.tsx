@@ -2,6 +2,7 @@
 import React from "react";
 import ReportItem from "./ReportItem";
 import { SavedReport } from "./types";
+import { AlertTriangle } from "lucide-react";
 
 interface ReportListProps {
   reports: SavedReport[];
@@ -24,8 +25,9 @@ const ReportList: React.FC<ReportListProps> = ({
 }) => {
   if (reports.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">No saved reports found</p>
+      <div className="text-center py-8 border rounded-md bg-muted/30">
+        <AlertTriangle className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+        <p className="font-medium">No saved reports found</p>
         <p className="text-sm text-muted-foreground mt-1">
           Save a report from the reports section to see it here
         </p>
@@ -34,7 +36,7 @@ const ReportList: React.FC<ReportListProps> = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {reports.map((report) => (
         <ReportItem
           key={report.id}

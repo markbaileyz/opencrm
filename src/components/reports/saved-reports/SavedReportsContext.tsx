@@ -1,10 +1,18 @@
 
-import React, { createContext, useState, ReactNode } from "react";
+import React, { createContext, useState, ReactNode, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { SavedReport } from "./types";
 
 interface SavedReportsContextProps {
   reports: SavedReport[];
+  filteredReports: SavedReport[];
+  filterText: string;
+  setFilterText: (text: string) => void;
+  showFavoritesOnly: boolean;
+  setShowFavoritesOnly: (show: boolean) => void;
+  showScheduledOnly: boolean;
+  setShowScheduledOnly: (show: boolean) => void;
+  clearFilters: () => void;
   showScheduleForm: string | null;
   setShowScheduleForm: (id: string | null) => void;
   handleRunReport: (id: string) => void;
@@ -16,6 +24,14 @@ interface SavedReportsContextProps {
 
 export const SavedReportsContext = createContext<SavedReportsContextProps>({
   reports: [],
+  filteredReports: [],
+  filterText: "",
+  setFilterText: () => {},
+  showFavoritesOnly: false,
+  setShowFavoritesOnly: () => {},
+  showScheduledOnly: false,
+  setShowScheduledOnly: () => {},
+  clearFilters: () => {},
   showScheduleForm: null,
   setShowScheduleForm: () => {},
   handleRunReport: () => {},
@@ -65,10 +81,54 @@ export const SavedReportsProvider: React.FC<SavedReportsProviderProps> = ({ chil
         lastSent: "2024-04-08"
       }
     },
+    {
+      id: "4",
+      name: "Deal Conversion Rates",
+      type: "conversion",
+      createdAt: "2024-03-05",
+      lastRun: "2024-04-07",
+      isFavorite: false,
+      schedule: {
+        frequency: "bi-weekly",
+        email: "sales@example.com",
+        lastSent: "2024-04-05"
+      }
+    },
+    {
+      id: "5",
+      name: "Customer Retention Analysis",
+      type: "sales",
+      createdAt: "2024-02-10",
+      lastRun: "2024-04-03",
+      isFavorite: true
+    }
   ]);
   
   const [showScheduleForm, setShowScheduleForm] = useState<string | null>(null);
+  const [filterText, setFilterText] = useState("");
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [showScheduledOnly, setShowScheduledOnly] = useState(false);
   const { toast } = useToast();
+
+  // Filtered reports based on search text and filters
+  const filteredReports = useMemo(() => {
+    return reports.filter(report => {
+      const matchesText = filterText === "" || 
+        report.name.toLowerCase().includes(filterText.toLowerCase()) ||
+        report.type.toLowerCase().includes(filterText.toLowerCase());
+      
+      const matchesFavorite = !showFavoritesOnly || report.isFavorite;
+      const matchesScheduled = !showScheduledOnly || !!report.schedule;
+      
+      return matchesText && matchesFavorite && matchesScheduled;
+    });
+  }, [reports, filterText, showFavoritesOnly, showScheduledOnly]);
+
+  const clearFilters = () => {
+    setFilterText("");
+    setShowFavoritesOnly(false);
+    setShowScheduledOnly(false);
+  };
 
   const handleRunReport = (id: string) => {
     console.log("Running report", id);
@@ -178,6 +238,14 @@ export const SavedReportsProvider: React.FC<SavedReportsProviderProps> = ({ chil
 
   const value = {
     reports,
+    filteredReports,
+    filterText,
+    setFilterText,
+    showFavoritesOnly,
+    setShowFavoritesOnly,
+    showScheduledOnly,
+    setShowScheduledOnly,
+    clearFilters,
     showScheduleForm,
     setShowScheduleForm,
     handleRunReport,
