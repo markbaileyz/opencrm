@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Clock, InfoCircle } from "lucide-react";
+import { MapPin, Clock, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Appointment } from "@/types/appointment";
@@ -131,7 +131,7 @@ const AppointmentForm = ({
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <InfoCircle className="h-3 w-3 text-muted-foreground" />
+                              <Info className="h-3 w-3 text-muted-foreground" />
                             </TooltipTrigger>
                             <TooltipContent>
                               <p>{type.description}</p>
