@@ -3,6 +3,7 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ButtonCustom } from "../ui/button-custom";
 import NavLink from "./NavLink";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -71,15 +72,18 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
         >
           Pre-Check-In
         </NavLink>
-        <div className="flex space-x-4 pt-2">
-          <Link to="/login" onClick={closeMobileMenu}>
-            <ButtonCustom variant="ghost" size="sm">
-              Login
-            </ButtonCustom>
-          </Link>
-          <Link to="/login" onClick={closeMobileMenu}>
-            <ButtonCustom size="sm">Sign Up</ButtonCustom>
-          </Link>
+        <div className="flex items-center justify-between pt-2">
+          <ThemeToggle />
+          <div className="flex space-x-2">
+            <Link to="/login" onClick={closeMobileMenu}>
+              <ButtonCustom variant="ghost" size="sm">
+                Login
+              </ButtonCustom>
+            </Link>
+            <Link to="/login" onClick={closeMobileMenu}>
+              <ButtonCustom size="sm">Sign Up</ButtonCustom>
+            </Link>
+          </div>
         </div>
       </nav>
     </div>

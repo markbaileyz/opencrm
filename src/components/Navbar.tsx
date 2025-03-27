@@ -4,7 +4,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import DesktopNav from "./navbar/DesktopNav";
 import MobileNav from "./navbar/MobileNav";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface NavbarProps {
   scrollToSection?: (sectionId: string) => void;
@@ -85,10 +84,9 @@ const Navbar = ({ scrollToSection }: NavbarProps) => {
 
         <DesktopNav isActive={isActive} scrollToSection={handleScrollToSection} />
 
-        <div className="flex items-center space-x-2">
-          <ThemeToggle />
+        <div className="flex items-center md:hidden">
           <button
-            className="md:hidden"
+            className="ml-2"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? (
