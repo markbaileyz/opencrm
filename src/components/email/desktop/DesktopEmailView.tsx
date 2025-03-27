@@ -118,6 +118,7 @@ const DesktopEmailView: React.FC = () => {
             onStarEmail={handleStarEmail}
             onDeleteEmail={handleDeleteEmail}
             onArchiveEmail={handleArchiveEmail}
+            folder={activeFolder}
           />
         </div>
         
@@ -150,6 +151,7 @@ const DesktopEmailView: React.FC = () => {
       
       {showCompose && (
         <ComposeEmail
+          isOpen={showCompose}
           onClose={() => setShowCompose(false)}
           onSend={handleSendEmail}
         />

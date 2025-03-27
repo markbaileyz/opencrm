@@ -1,145 +1,157 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Inbox, Search, Plus, Filter, ArrowLeft } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import EmailListItemCompact from "../EmailListItemCompact";
-import MobileEmailComposer from "./MobileEmailComposer";
-import MobileEmailFilters from "./MobileEmailFilters";
+import { Plus, Menu, Filter } from "lucide-react";
 import { useEmailContext } from "@/context/EmailContext";
 import { useEmailManager } from "@/hooks/useEmailManager";
+import EmailDetail from "@/components/email/EmailDetail";
+import ComposeEmail from "@/components/email/ComposeEmail";
+import MobileEmailFilters from "./MobileEmailFilters";
+import EmailList from "@/components/email/EmailList";
 import { Email } from "@/types/email";
 
 const MobileEmailView: React.FC = () => {
-  const { selectedEmail, setSelectedEmail, showMobileComposer, setShowMobileComposer, activeFolder, setActiveFolder } = useEmailContext();
-  const { emails, handleStarEmail } = useEmailManager(activeFolder);
-  const [showFilters, setShowFilters] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { activeFolder, setActiveFolder, selectedEmail, setSelectedEmail } = useEmailContext();
+  const { 
+    emails, 
+    loading, 
+    error, 
+    handleSelectEmail, 
+    handleStarEmail, 
+    handleDeleteEmail, 
+    handleArchiveEmail 
+  } = useEmailManager(activeFolder);
   
-  const filteredEmails = emails.filter(email => 
-    email.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    email.senderName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    email.preview.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const [showComposer, setShowComposer] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [activeTab, setActiveTab] = useState("all");
   
-  const handleSelectEmail = (email: Email) => {
-    setSelectedEmail(email);
-  };
+  const filteredEmails = emails.filter(email => {
+    if (activeTab === "all") return true;
+    if (activeTab === "unread") return !email.read;
+    if (activeTab === "flagged") return email.starred;
+    return true;
+  });
   
   const handleBackToList = () => {
     setSelectedEmail(null);
   };
   
-  const handleSendEmail = () => {
-    setShowMobileComposer(false);
-    // In a real app, we would update the emails list here
-  };
-  
+  useEffect(() => {
+    // Reset selected email when changing folders
+    setSelectedEmail(null);
+  }, [activeFolder, setSelectedEmail]);
+
   return (
     <div className="h-full flex flex-col">
+      <div className="border-b p-2 flex items-center justify-between">
+        <Button variant="ghost" size="icon" onClick={() => setShowSidebar(true)}>
+          <Menu className="h-5 w-5" />
+        </Button>
+        
+        <h1 className="text-lg font-medium">
+          {activeFolder.charAt(0).toUpperCase() + activeFolder.slice(1)}
+        </h1>
+        
+        <div className="flex">
+          <Button variant="ghost" size="icon" onClick={() => setShowComposer(true)}>
+            <Plus className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" size="icon">
+            <Filter className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
+      
       {!selectedEmail ? (
-        // Email list view
         <>
-          <div className="border-b p-4 sticky top-0 bg-background z-10">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-2">
-                <Inbox className="h-5 w-5" />
-                <h1 className="text-xl font-semibold">{activeFolder.charAt(0).toUpperCase() + activeFolder.slice(1)}</h1>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Button size="icon" variant="ghost" onClick={() => setShowFilters(true)}>
-                  <Filter className="h-5 w-5" />
-                </Button>
-                <Button size="icon" variant="ghost" onClick={() => setShowMobileComposer(true)}>
-                  <Plus className="h-5 w-5" />
-                </Button>
-              </div>
+          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="px-4 pt-2">
+              <TabsList className="w-full">
+                <TabsTrigger value="all" className="flex-1">All</TabsTrigger>
+                <TabsTrigger value="unread" className="flex-1">Unread</TabsTrigger>
+                <TabsTrigger value="flagged" className="flex-1">Flagged</TabsTrigger>
+              </TabsList>
             </div>
             
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search emails"
-                className="pl-9"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+            <TabsContent value="all" className="mt-0 flex-1">
+              <EmailList 
+                emails={filteredEmails}
+                loading={loading}
+                error={error}
+                onSelectEmail={(email: Email) => handleSelectEmail(email)}
+                onStarEmail={handleStarEmail}
+                onDeleteEmail={handleDeleteEmail}
+                onArchiveEmail={handleArchiveEmail}
+                folder={activeFolder}
               />
-            </div>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto">
-            {loading ? (
-              <div className="p-4 text-center text-muted-foreground">Loading emails...</div>
-            ) : error ? (
-              <div className="p-4 text-center text-destructive">Failed to load emails</div>
-            ) : filteredEmails.length === 0 ? (
-              <div className="p-4 text-center text-muted-foreground">No emails found</div>
-            ) : (
-              filteredEmails.map(email => (
-                <EmailListItemCompact
-                  key={email.id}
-                  email={email}
-                  isSelected={false}
-                  onClick={() => handleSelectEmail(email)}
-                  onStar={() => handleStarEmail(email.id)}
-                />
-              ))
-            )}
-          </div>
+            </TabsContent>
+            
+            <TabsContent value="unread" className="mt-0 flex-1">
+              <EmailList 
+                emails={filteredEmails}
+                loading={loading}
+                error={error}
+                onSelectEmail={(email: Email) => handleSelectEmail(email)}
+                onStarEmail={handleStarEmail}
+                onDeleteEmail={handleDeleteEmail}
+                onArchiveEmail={handleArchiveEmail}
+                folder={activeFolder}
+              />
+            </TabsContent>
+            
+            <TabsContent value="flagged" className="mt-0 flex-1">
+              <EmailList 
+                emails={filteredEmails}
+                loading={loading}
+                error={error}
+                onSelectEmail={(email: Email) => handleSelectEmail(email)}
+                onStarEmail={handleStarEmail}
+                onDeleteEmail={handleDeleteEmail}
+                onArchiveEmail={handleArchiveEmail}
+                folder={activeFolder}
+              />
+            </TabsContent>
+          </Tabs>
         </>
       ) : (
-        // Email detail view
-        <div className="flex flex-col h-full">
-          <div className="border-b p-4 sticky top-0 bg-background z-10 flex items-center">
-            <Button size="icon" variant="ghost" onClick={handleBackToList} className="mr-2">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <h2 className="text-lg font-medium truncate">{selectedEmail.subject}</h2>
-          </div>
-          
-          <div className="p-4 flex-1 overflow-y-auto">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <p className="font-medium">{selectedEmail.senderName}</p>
-                <p className="text-sm text-muted-foreground">{selectedEmail.senderEmail || (selectedEmail as any).from?.email}</p>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {new Date(selectedEmail.date).toLocaleString()}
-              </p>
-            </div>
-            
-            <div className="mt-4 prose prose-sm max-w-none">
-              {selectedEmail.body}
-            </div>
-          </div>
+        <div className="flex-1 overflow-hidden">
+          <EmailDetail 
+            email={selectedEmail}
+            onBackToList={handleBackToList}
+            onDelete={() => {
+              handleDeleteEmail(selectedEmail.id);
+              handleBackToList();
+            }}
+            onArchive={() => {
+              handleArchiveEmail(selectedEmail.id);
+              handleBackToList();
+            }}
+            onStar={() => handleStarEmail(selectedEmail.id)}
+          />
         </div>
       )}
       
-      {showMobileComposer && (
-        <MobileEmailComposer
-          onClose={() => setShowMobileComposer(false)}
-          onSend={handleSendEmail}
-          replyToEmail={selectedEmail ? {
-            id: selectedEmail.id,
-            subject: selectedEmail.subject,
-            from: {
-              email: selectedEmail.senderEmail || (selectedEmail as any).from?.email || '',
-              name: selectedEmail.senderName
-            }
-          } : undefined}
+      {showComposer && (
+        <ComposeEmail
+          isOpen={showComposer}
+          onClose={() => setShowComposer(false)}
+          onSend={() => {
+            // Handle send email
+            setShowComposer(false);
+          }}
         />
       )}
       
-      <Sheet open={showFilters} onOpenChange={setShowFilters}>
+      <Sheet open={showSidebar} onOpenChange={setShowSidebar}>
         <SheetContent side="left">
           <MobileEmailFilters
             activeFolder={activeFolder}
             onSelectFolder={(folder) => {
               setActiveFolder(folder);
-              setShowFilters(false);
+              setShowSidebar(false);
             }}
           />
         </SheetContent>

@@ -1,16 +1,8 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Separator } from "@/components/ui/separator";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Inbox, Archive, Star, Send, Trash } from "lucide-react";
-import { format } from "date-fns";
+import { SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Inbox, Star, Send, File, Archive, Trash } from "lucide-react";
 
 interface MobileEmailFiltersProps {
   activeFolder: string;
@@ -21,125 +13,33 @@ const MobileEmailFilters: React.FC<MobileEmailFiltersProps> = ({
   activeFolder, 
   onSelectFolder 
 }) => {
-  const [dateRange, setDateRange] = useState<Date | undefined>(undefined);
-  const [hasAttachments, setHasAttachments] = useState(false);
-  const [readStatus, setReadStatus] = useState("all");
-  
   const folders = [
-    { id: 'inbox', name: 'Inbox', icon: Inbox },
-    { id: 'starred', name: 'Starred', icon: Star },
-    { id: 'sent', name: 'Sent', icon: Send },
-    { id: 'archive', name: 'Archive', icon: Archive },
-    { id: 'trash', name: 'Trash', icon: Trash },
+    { id: 'inbox', name: 'Inbox', icon: <Inbox className="h-4 w-4 mr-2" /> },
+    { id: 'starred', name: 'Starred', icon: <Star className="h-4 w-4 mr-2" /> },
+    { id: 'sent', name: 'Sent', icon: <Send className="h-4 w-4 mr-2" /> },
+    { id: 'drafts', name: 'Drafts', icon: <File className="h-4 w-4 mr-2" /> },
+    { id: 'archive', name: 'Archive', icon: <Archive className="h-4 w-4 mr-2" /> },
+    { id: 'trash', name: 'Trash', icon: <Trash className="h-4 w-4 mr-2" /> },
   ];
-  
-  return (
-    <div className="space-y-6 py-4">
-      <h3 className="font-medium text-lg">Email Folders</h3>
-      
-      <div className="space-y-2">
-        {folders.map((folder) => {
-          const Icon = folder.icon;
-          return (
-            <Button
-              key={folder.id}
-              variant={activeFolder === folder.id ? "secondary" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => onSelectFolder(folder.id)}
-            >
-              <Icon className="mr-2 h-4 w-4" />
-              {folder.name}
-            </Button>
-          );
-        })}
-      </div>
-      
-      <Separator />
-      
-      <h3 className="font-medium text-lg">Filters</h3>
-      
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="from">From</Label>
-          <Input id="from" placeholder="Sender email or name" />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="subject">Subject</Label>
-          <Input id="subject" placeholder="Contains text" />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="date-range">Date</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start text-left font-normal"
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateRange ? format(dateRange, "PPP") : "Pick a date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={dateRange}
-                onSelect={setDateRange}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
 
-        <Separator />
-        
-        <div className="space-y-2">
-          <Label htmlFor="importance">Priority</Label>
-          <Select>
-            <SelectTrigger id="importance">
-              <SelectValue placeholder="Any priority" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="high">High priority</SelectItem>
-              <SelectItem value="normal">Normal priority</SelectItem>
-              <SelectItem value="low">Low priority</SelectItem>
-              <SelectItem value="any">Any priority</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <Switch 
-            id="has-attachments" 
-            checked={hasAttachments}
-            onCheckedChange={setHasAttachments}
-          />
-          <Label htmlFor="has-attachments">Has attachments</Label>
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Read status</Label>
-          <RadioGroup value={readStatus} onValueChange={setReadStatus}>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="all" id="all" />
-              <Label htmlFor="all">All</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="read" id="read" />
-              <Label htmlFor="read">Read</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="unread" id="unread" />
-              <Label htmlFor="unread">Unread</Label>
-            </div>
-          </RadioGroup>
-        </div>
-      </div>
+  return (
+    <div className="py-4">
+      <SheetHeader className="mb-5">
+        <SheetTitle>Email Folders</SheetTitle>
+      </SheetHeader>
       
-      <div className="flex gap-2">
-        <Button variant="outline" className="flex-1">Reset</Button>
-        <Button className="flex-1">Apply Filters</Button>
+      <div className="space-y-1">
+        {folders.map((folder) => (
+          <Button
+            key={folder.id}
+            variant={activeFolder === folder.id ? "secondary" : "ghost"}
+            className="w-full justify-start"
+            onClick={() => onSelectFolder(folder.id)}
+          >
+            {folder.icon}
+            {folder.name}
+          </Button>
+        ))}
       </div>
     </div>
   );

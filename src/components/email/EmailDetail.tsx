@@ -1,108 +1,103 @@
 
 import React from "react";
+import { Button } from "@/components/ui/button";
+import { 
+  ArrowLeft, 
+  Star, 
+  Trash, 
+  Archive, 
+  Reply, 
+  ReplyAll, 
+  Forward, 
+  MoreVertical,
+  Download 
+} from "lucide-react";
 import { Email } from "@/types/email";
-import { Appointment } from "@/types/appointment";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import EmailDetailHeader from "./EmailDetailHeader";
-import EmailDetailSender from "./EmailDetailSender";
-import EmailDetailBody from "./EmailDetailBody";
-import EmailDetailAttachments from "./EmailDetailAttachments";
-import EmailDetailActions from "./EmailDetailActions";
+import { formatDate } from "@/utils/emailUtils";
+import { EmailDetailHeader } from "./EmailDetailHeader";
+import { EmailDetailSender } from "./EmailDetailSender";
+import { EmailDetailBody } from "./EmailDetailBody";
+import { EmailDetailAttachments } from "./EmailDetailAttachments";
 
 interface EmailDetailProps {
   email: Email;
-  onBack: () => void;
-  onStar: (id: string) => void;
-  onDelete: (id: string) => void;
-  onArchive: (id: string) => void;
-  onReply: (email: Email) => void;
-  onForward: (email: Email) => void;
-  onAddLabel?: (id: string, label: string) => void;
-  onRemoveLabel?: (id: string, label: string) => void;
-  allLabels?: string[];
-  keyboardShortcuts?: { key: string; action: string }[];
-  relatedAppointments?: Appointment[];
-  onAppointmentCreated?: (appointment: Appointment) => void;
+  onBackToList: () => void;
+  onDelete: () => void;
+  onArchive: () => void;
+  onStar: () => void;
+  onReply?: () => void;
+  onReplyAll?: () => void;
+  onForward?: () => void;
+  onShowImages?: () => void;
 }
 
-const EmailDetail = ({
+const EmailDetail: React.FC<EmailDetailProps> = ({
   email,
-  onBack,
-  onStar,
+  onBackToList,
   onDelete,
   onArchive,
+  onStar,
   onReply,
+  onReplyAll,
   onForward,
-  onAddLabel,
-  onRemoveLabel,
-  allLabels = [],
-  keyboardShortcuts = [],
-  relatedAppointments = [],
-  onAppointmentCreated,
-}: EmailDetailProps) => {
-  if (!email) return null;
-
-  const handleAddLabel = (label: string) => {
-    if (onAddLabel) {
-      onAddLabel(email.id, label);
-    }
-  };
-
-  const handleRemoveLabel = (label: string) => {
-    if (onRemoveLabel) {
-      onRemoveLabel(email.id, label);
-    }
-  };
-
-  const showLabels = Boolean(onAddLabel && onRemoveLabel);
-
+  onShowImages
+}) => {
   return (
-    <div className="bg-card rounded-md border shadow-sm flex flex-col h-full">
-      <EmailDetailHeader 
-        subject={email.subject}
-        isStarred={email.starred}
-        onBack={onBack}
-        onStar={() => onStar(email.id)}
-        onDelete={() => onDelete(email.id)}
-        onArchive={() => onArchive(email.id)}
-        keyboardShortcuts={keyboardShortcuts}
-      />
-
-      <ScrollArea className="flex-1">
-        <div className="p-4">
-          <EmailDetailSender 
-            senderName={email.senderName}
-            senderEmail={email.senderEmail}
-            recipient={email.recipient}
-            date={email.date}
-            hasAttachments={email.hasAttachments}
-          />
-
-          <EmailDetailBody 
-            body={email.body}
-            labels={email.labels || []}
-            allLabels={allLabels}
-            onAddLabel={handleAddLabel}
-            onRemoveLabel={handleRemoveLabel}
-            showLabels={showLabels}
-          />
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex items-center p-4 border-b">
+        <Button variant="ghost" size="icon" onClick={onBackToList}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        
+        <div className="ml-2 flex items-center space-x-1">
+          <Button variant="ghost" size="icon" onClick={onStar}>
+            <Star className={`h-5 w-5 ${email.starred ? "text-yellow-400 fill-yellow-400" : ""}`} />
+          </Button>
           
-          <EmailDetailAttachments 
-            hasAttachments={email.hasAttachments} 
-          />
+          <Button variant="ghost" size="icon" onClick={onDelete}>
+            <Trash className="h-5 w-5" />
+          </Button>
+          
+          <Button variant="ghost" size="icon" onClick={onArchive}>
+            <Archive className="h-5 w-5" />
+          </Button>
+          
+          {onReply && (
+            <Button variant="ghost" size="icon" onClick={onReply}>
+              <Reply className="h-5 w-5" />
+            </Button>
+          )}
+          
+          {onReplyAll && (
+            <Button variant="ghost" size="icon" onClick={onReplyAll}>
+              <ReplyAll className="h-5 w-5" />
+            </Button>
+          )}
+          
+          {onForward && (
+            <Button variant="ghost" size="icon" onClick={onForward}>
+              <Forward className="h-5 w-5" />
+            </Button>
+          )}
+          
+          <Button variant="ghost" size="icon">
+            <MoreVertical className="h-5 w-5" />
+          </Button>
         </div>
-      </ScrollArea>
-
-      <EmailDetailActions 
-        email={email}
-        onReply={() => onReply(email)}
-        onForward={() => onForward(email)}
-        onDelete={onDelete}
-        onArchive={onArchive}
-        onStar={onStar}
-        appointments={relatedAppointments}
-        onAppointmentCreated={onAppointmentCreated}
-      />
+      </div>
+      
+      <div className="flex-1 overflow-auto p-4">
+        <EmailDetailHeader email={email} />
+        <EmailDetailSender email={email} />
+        
+        <div className="mt-4">
+          <EmailDetailBody content={email.body} />
+        </div>
+        
+        {email.attachments && email.attachments.length > 0 && (
+          <EmailDetailAttachments attachments={email.attachments} />
+        )}
+      </div>
     </div>
   );
 };
