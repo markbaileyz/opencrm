@@ -13,7 +13,7 @@ const EmailComposeActions = ({
 }: {
   onSaveDraft: () => void;
   onCancel: () => void;
-  onSubmit: () => void;
+  onSubmit: (e?: React.FormEvent) => void;  // Updated to accept optional event parameter
   isSending: boolean;
   isValid: boolean;
 }) => {
@@ -36,7 +36,7 @@ const EmailComposeActions = ({
         Save
       </Button>
       <Button 
-        onClick={onSubmit}
+        onClick={() => onSubmit()}  // Call without parameters
         disabled={isSending || !isValid}
         className="w-full"
       >
@@ -65,7 +65,7 @@ const EmailComposeActions = ({
         </Button>
       </div>
       <Button 
-        onClick={onSubmit}
+        onClick={() => onSubmit()}  // Call without parameters
         disabled={isSending || !isValid}
       >
         {isSending ? (

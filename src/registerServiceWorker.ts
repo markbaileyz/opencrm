@@ -40,3 +40,34 @@ export const updateServiceWorker = () => {
     });
   }
 };
+
+// Register for background sync
+export const registerBackgroundSync = (syncTag: string = 'sync-pending-actions') => {
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    navigator.serviceWorker.ready.then(registration => {
+      // @ts-ignore: SyncManager is not yet in TypeScript types
+      return registration.sync.register(syncTag);
+    }).catch(err => {
+      console.log('Background sync registration failed:', err);
+    });
+  }
+};
+
+// Check if the app is online or offline
+export const isOnline = (): boolean => {
+  return navigator.onLine;
+};
+
+// Add listeners for online/offline events
+export const addNetworkStatusListeners = (
+  onlineCallback: () => void,
+  offlineCallback: () => void
+) => {
+  window.addEventListener('online', onlineCallback);
+  window.addEventListener('offline', offlineCallback);
+  
+  return () => {
+    window.removeEventListener('online', onlineCallback);
+    window.removeEventListener('offline', offlineCallback);
+  };
+};

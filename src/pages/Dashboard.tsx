@@ -1,91 +1,85 @@
 
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { useAuth } from "@/context/AuthContext";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import KeyMetrics from "@/components/dashboard/KeyMetrics";
+import StatsGrid from "@/components/dashboard/StatsGrid";
 import ActivityChart from "@/components/dashboard/ActivityChart";
-import AppointmentList from "@/components/dashboard/AppointmentList";
-import MessageList from "@/components/dashboard/MessageList";
+import KeyMetrics from "@/components/dashboard/KeyMetrics";
 import SalesPipeline from "@/components/dashboard/SalesPipeline";
 import RecentContacts from "@/components/dashboard/RecentContacts";
-import RealtimeMetricsChart from "@/components/dashboard/RealtimeMetricsChart";
-import { OrganizationsProvider } from "@/context/OrganizationsContext";
-import OrganizationInsights from "@/components/dashboard/OrganizationInsights";
 import MobileDashboard from "@/components/dashboard/MobileDashboard";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useOfflineState } from "@/hooks/use-offline-state";
+import AppointmentList from "@/components/dashboard/AppointmentList";
+import MessageList from "@/components/dashboard/MessageList";
+import OrganizationInsights from "@/components/dashboard/OrganizationInsights";
+import NotificationCenter from "@/components/dashboard/NotificationCenter";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import OfflineBanner from "@/components/ui/offline-banner";
+import { useOfflineState } from "@/hooks/use-offline-state";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 const Dashboard = () => {
-  const { user } = useAuth();
-  const isAdmin = user?.email.includes("admin");
-  const isDoctor = user?.email.includes("doctor");
-  const isMobile = useIsMobile();
-  const { isOnline, pendingActions } = useOfflineState();
+  const { isOnline, pendingActions, isSyncing, processPendingActions } = useOfflineState();
+  const isMobile = useMediaQuery("(max-width: 768px)");
   
-  // Simulated data
-  const customerActivityData = [
-    { name: "Jan", value: 24 },
-    { name: "Feb", value: 28 },
-    { name: "Mar", value: 32 },
-    { name: "Apr", value: 30 },
-    { name: "May", value: 35 },
-    { name: "Jun", value: 42 },
-    { name: "Jul", value: 45 },
-    { name: "Aug", value: 50 },
-    { name: "Sep", value: 48 },
-    { name: "Oct", value: 52 },
-    { name: "Nov", value: 58 },
-    { name: "Dec", value: 62 },
-  ];
-
-  return (
-    <OrganizationsProvider>
+  if (isMobile) {
+    return (
       <DashboardLayout>
-        <div className="space-y-6">
-          {!isOnline && <OfflineBanner isOnline={isOnline} pendingActions={pendingActions} />}
+        <div className="container mx-auto py-4 space-y-6">
+          <DashboardHeader />
           
-          {isMobile ? (
-            <MobileDashboard />
-          ) : (
-            <>
-              <DashboardHeader isAdmin={isAdmin} />
-              
-              {/* Key Metrics */}
-              <KeyMetrics />
-
-              {/* Real-time Metrics */}
-              <RealtimeMetricsChart />
-
-              {/* Organization Insights */}
-              <div className="grid grid-cols-1 gap-6 animate-fade-up delay-50">
-                <OrganizationInsights />
-              </div>
-
-              {/* Sales Pipeline */}
-              <div className="grid grid-cols-1 gap-6 animate-fade-up delay-100">
-                <SalesPipeline />
-              </div>
-
-              {/* Activity Chart */}
-              <div className="space-y-6 animate-fade-up delay-200">
-                <ActivityChart data={customerActivityData} />
-              </div>
-
-              {/* Recent items grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-up delay-300">
-                <RecentContacts />
-                <div className="space-y-6">
-                  <AppointmentList />
-                  <MessageList />
-                </div>
-              </div>
-            </>
+          {/* Show offline banner if needed */}
+          {(!isOnline || pendingActions > 0) && (
+            <OfflineBanner 
+              isOnline={isOnline} 
+              pendingActions={pendingActions}
+              isSyncing={isSyncing}
+              onTryReconnect={processPendingActions}
+            />
           )}
+          
+          <MobileDashboard />
         </div>
       </DashboardLayout>
-    </OrganizationsProvider>
+    );
+  }
+  
+  return (
+    <DashboardLayout>
+      <div className="container mx-auto py-6">
+        <DashboardHeader />
+        
+        {/* Show offline banner if needed - only shown here if not already in App.tsx */}
+        {(!isOnline || pendingActions > 0) && (
+          <OfflineBanner 
+            isOnline={isOnline} 
+            pendingActions={pendingActions}
+            isSyncing={isSyncing}
+            className="mb-6"
+          />
+        )}
+        
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-3 space-y-6">
+            <StatsGrid />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ActivityChart />
+              <KeyMetrics />
+            </div>
+            <SalesPipeline />
+          </div>
+          
+          <div className="lg:col-span-1 space-y-6">
+            <NotificationCenter />
+            <AppointmentList />
+            <MessageList />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <RecentContacts />
+          <OrganizationInsights />
+        </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
