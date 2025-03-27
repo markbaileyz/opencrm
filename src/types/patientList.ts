@@ -14,7 +14,7 @@ export interface PatientListItem {
   };
   status: string;
   lastVisit: string;
-  medicalHistory?: string[]; // Added to fix the type errors in Patients.tsx
+  medicalHistory?: string[]; // This field should be string array, not object array
   documents?: {
     insuranceCardFront?: string;
     insuranceCardBack?: string;
