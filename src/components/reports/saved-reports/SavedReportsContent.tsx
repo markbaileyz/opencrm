@@ -4,19 +4,28 @@ import { SavedReportsContext } from "./SavedReportsContext";
 import ReportList from "./ReportList";
 import ReportsFilter from "./ReportsFilter";
 import ReportsDashboard from "./ReportsDashboard";
+import EmailReportDialog from "./EmailReportDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, BarChart } from "lucide-react";
 
 const SavedReportsContent: React.FC = () => {
   const {
     filteredReports,
+    reports,
     showScheduleForm,
     setShowScheduleForm,
+    emailReportId,
+    setEmailReportId,
     handleRunReport,
     handleToggleFavorite,
     handleDeleteReport,
     handleCancelSchedule,
+    handleScheduleReport,
+    handleEmailReport
   } = useContext(SavedReportsContext);
+
+  // Find the current report being emailed
+  const emailReport = emailReportId ? reports.find(r => r.id === emailReportId) : null;
 
   return (
     <div className="space-y-4">
@@ -40,6 +49,7 @@ const SavedReportsContent: React.FC = () => {
             onToggleFavorite={handleToggleFavorite}
             onDeleteReport={handleDeleteReport}
             onCancelSchedule={handleCancelSchedule}
+            onEmailReport={(id) => setEmailReportId(id)}
             showScheduleForm={showScheduleForm}
             setShowScheduleForm={setShowScheduleForm}
           />
@@ -49,6 +59,14 @@ const SavedReportsContent: React.FC = () => {
           <ReportsDashboard />
         </TabsContent>
       </Tabs>
+
+      <EmailReportDialog
+        open={!!emailReportId}
+        onOpenChange={(open) => !open && setEmailReportId(null)}
+        report={emailReport}
+        onEmailReport={handleEmailReport}
+        onScheduleReport={handleScheduleReport}
+      />
     </div>
   );
 };

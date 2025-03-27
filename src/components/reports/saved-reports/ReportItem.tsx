@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Clock, Download, Play, Star, Trash2, Calendar } from "lucide-react";
+import { Clock, Download, Play, Star, Trash2, Calendar, Mail } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import ScheduleForm from "./ScheduleForm";
 import { SavedReport } from "./types";
@@ -13,6 +13,7 @@ interface ReportItemProps {
   onToggleFavorite: (id: string) => void;
   onDeleteReport: (id: string) => void;
   onCancelSchedule: (id: string) => void;
+  onEmailReport?: (id: string) => void;
   showScheduleForm: string | null;
   setShowScheduleForm: (id: string | null) => void;
 }
@@ -23,6 +24,7 @@ const ReportItem: React.FC<ReportItemProps> = ({
   onToggleFavorite,
   onDeleteReport,
   onCancelSchedule,
+  onEmailReport,
   showScheduleForm,
   setShowScheduleForm,
 }) => {
@@ -77,6 +79,11 @@ const ReportItem: React.FC<ReportItemProps> = ({
           <Button variant="ghost" size="icon">
             <Download className="h-4 w-4" />
           </Button>
+          {onEmailReport && (
+            <Button variant="ghost" size="icon" onClick={() => onEmailReport(report.id)}>
+              <Mail className="h-4 w-4" />
+            </Button>
+          )}
           <Popover open={showScheduleForm === report.id} onOpenChange={() => setShowScheduleForm(showScheduleForm === report.id ? null : report.id)}>
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon">

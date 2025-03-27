@@ -10,6 +10,7 @@ interface ReportListProps {
   onToggleFavorite: (id: string) => void;
   onDeleteReport: (id: string) => void;
   onCancelSchedule: (id: string) => void;
+  onEmailReport?: (id: string) => void;
   showScheduleForm: string | null;
   setShowScheduleForm: (id: string | null) => void;
 }
@@ -20,6 +21,7 @@ const ReportList: React.FC<ReportListProps> = ({
   onToggleFavorite,
   onDeleteReport,
   onCancelSchedule,
+  onEmailReport,
   showScheduleForm,
   setShowScheduleForm,
 }) => {
@@ -45,6 +47,7 @@ const ReportList: React.FC<ReportListProps> = ({
           onToggleFavorite={onToggleFavorite}
           onDeleteReport={onDeleteReport}
           onCancelSchedule={onCancelSchedule}
+          onEmailReport={onEmailReport}
           showScheduleForm={showScheduleForm}
           setShowScheduleForm={setShowScheduleForm}
         />

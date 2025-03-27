@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, ReactNode, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { SavedReport } from "./types";
@@ -15,11 +14,14 @@ interface SavedReportsContextProps {
   clearFilters: () => void;
   showScheduleForm: string | null;
   setShowScheduleForm: (id: string | null) => void;
+  emailReportId: string | null;
+  setEmailReportId: (id: string | null) => void;
   handleRunReport: (id: string) => void;
   handleToggleFavorite: (id: string) => void;
   handleDeleteReport: (id: string) => void;
   handleScheduleReport: (reportId: string, email: string, frequency: string) => void;
   handleCancelSchedule: (reportId: string) => void;
+  handleEmailReport: (reportId: string, email: string) => void;
 }
 
 export const SavedReportsContext = createContext<SavedReportsContextProps>({
@@ -34,11 +36,14 @@ export const SavedReportsContext = createContext<SavedReportsContextProps>({
   clearFilters: () => {},
   showScheduleForm: null,
   setShowScheduleForm: () => {},
+  emailReportId: null,
+  setEmailReportId: () => {},
   handleRunReport: () => {},
   handleToggleFavorite: () => {},
   handleDeleteReport: () => {},
   handleScheduleReport: () => {},
   handleCancelSchedule: () => {},
+  handleEmailReport: () => {},
 });
 
 interface SavedReportsProviderProps {
@@ -105,12 +110,12 @@ export const SavedReportsProvider: React.FC<SavedReportsProviderProps> = ({ chil
   ]);
   
   const [showScheduleForm, setShowScheduleForm] = useState<string | null>(null);
+  const [emailReportId, setEmailReportId] = useState<string | null>(null);
   const [filterText, setFilterText] = useState("");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [showScheduledOnly, setShowScheduledOnly] = useState(false);
   const { toast } = useToast();
 
-  // Filtered reports based on search text and filters
   const filteredReports = useMemo(() => {
     return reports.filter(report => {
       const matchesText = filterText === "" || 
@@ -236,6 +241,37 @@ export const SavedReportsProvider: React.FC<SavedReportsProviderProps> = ({ chil
     });
   };
 
+  const handleEmailReport = (reportId: string, email: string) => {
+    if (!email) {
+      toast({
+        title: "Email required",
+        description: "Please enter an email address to send this report.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    console.log("Emailing report", {
+      reportId,
+      email
+    });
+    
+    setReports(prevReports => 
+      prevReports.map(report => 
+        report.id === reportId 
+          ? { ...report, lastRun: new Date().toISOString().split('T')[0] } 
+          : report
+      )
+    );
+    
+    toast({
+      title: "Report sent",
+      description: `The report has been sent to ${email}`,
+    });
+    
+    setEmailReportId(null);
+  };
+
   const value = {
     reports,
     filteredReports,
@@ -248,11 +284,14 @@ export const SavedReportsProvider: React.FC<SavedReportsProviderProps> = ({ chil
     clearFilters,
     showScheduleForm,
     setShowScheduleForm,
+    emailReportId,
+    setEmailReportId,
     handleRunReport,
     handleToggleFavorite,
     handleDeleteReport,
     handleScheduleReport,
     handleCancelSchedule,
+    handleEmailReport,
   };
 
   return (
