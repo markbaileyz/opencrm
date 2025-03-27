@@ -1,15 +1,14 @@
 
-import React, { useState } from "react";
-import { format } from "date-fns";
+import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import AppointmentList from "@/components/dashboard/AppointmentList";
-import EmailIntegrationSection from "@/components/calendar/EmailIntegrationSection";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { CalendarPlus } from "lucide-react";
 
 // Import custom hooks
 import { useCalendar } from "@/hooks/useCalendar";
@@ -19,8 +18,8 @@ import { useCalendarEmailIntegration } from "@/hooks/useCalendarEmailIntegration
 // Import refactored components
 import CalendarHeader from "@/components/calendar/CalendarHeader";
 import CalendarMainContent from "@/components/calendar/CalendarMainContent";
-import { Button } from "@/components/ui/button";
-import { CalendarPlus } from "lucide-react";
+import EmailIntegrationSection from "@/components/calendar/EmailIntegrationSection";
+import AppointmentForm from "@/components/calendar/AppointmentForm";
 
 const Calendar = () => {
   const {
@@ -62,8 +61,6 @@ const Calendar = () => {
     editAppointmentId,
     setEditAppointmentId
   });
-
-  const [activeView, setActiveView] = useState<'calendar' | 'upcoming'>('calendar');
 
   return (
     <DashboardLayout>
@@ -118,7 +115,13 @@ const Calendar = () => {
                 {editAppointmentId ? "Edit Appointment" : "New Appointment"}
               </DialogTitle>
             </DialogHeader>
-            {/* AppointmentForm would be imported and used here */}
+            <AppointmentForm
+              selectedDate={selectedDate}
+              editAppointmentId={editAppointmentId}
+              appointments={appointments}
+              emails={emails}
+              onSubmit={handleAddAppointment}
+            />
           </DialogContent>
         </Dialog>
       </div>

@@ -23,6 +23,7 @@ interface DailyAppointmentsProps {
   onDeleteAppointment: (id: string) => void;
   onReminderSent: (appointmentId: string) => void;
   onViewEmail: (emailId: string) => void;
+  onAppointmentSelect: (id: string) => void;
   findRelatedEmails: (emails: Email[], appointment: Appointment) => Email[];
 }
 
@@ -35,11 +36,12 @@ const DailyAppointments = ({
   onDeleteAppointment,
   onReminderSent,
   onViewEmail,
+  onAppointmentSelect,
   findRelatedEmails
 }: DailyAppointmentsProps) => {
   
   const selectedDateAppointments = appointments.filter(
-    (appointment) => format(appointment.date, 'PP') === format(selectedDate, 'PP')
+    (appointment) => format(new Date(appointment.date), 'PP') === format(selectedDate, 'PP')
   );
 
   return (
@@ -51,28 +53,34 @@ const DailyAppointments = ({
         {selectedDateAppointments.length > 0 ? (
           <div className="space-y-4">
             {selectedDateAppointments.map((appointment) => (
-              <Popover key={appointment.id}>
-                <PopoverTrigger asChild>
-                  <div className="cursor-pointer">
-                    <AppointmentItem
-                      name={appointment.name}
-                      time={appointment.time}
-                      type={appointment.type}
-                      status={appointment.status}
+              <div 
+                key={appointment.id}
+                className="cursor-pointer hover:bg-accent/50 rounded-md transition-colors"
+                onClick={() => onAppointmentSelect(appointment.id)}
+              >
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <div className="cursor-pointer">
+                      <AppointmentItem
+                        name={appointment.name}
+                        time={appointment.time}
+                        type={appointment.type}
+                        status={appointment.status}
+                      />
+                    </div>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80">
+                    <AppointmentPopover
+                      appointment={appointment}
+                      relatedEmails={findRelatedEmails(emails, appointment)}
+                      onEditAppointment={onEditAppointment}
+                      onDeleteAppointment={onDeleteAppointment}
+                      onReminderSent={onReminderSent}
+                      onViewEmail={onViewEmail}
                     />
-                  </div>
-                </PopoverTrigger>
-                <PopoverContent className="w-80">
-                  <AppointmentPopover
-                    appointment={appointment}
-                    relatedEmails={findRelatedEmails(emails, appointment)}
-                    onEditAppointment={onEditAppointment}
-                    onDeleteAppointment={onDeleteAppointment}
-                    onReminderSent={onReminderSent}
-                    onViewEmail={onViewEmail}
-                  />
-                </PopoverContent>
-              </Popover>
+                  </PopoverContent>
+                </Popover>
+              </div>
             ))}
           </div>
         ) : (

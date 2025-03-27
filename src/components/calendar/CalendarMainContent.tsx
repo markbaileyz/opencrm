@@ -1,9 +1,11 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CalendarView from "@/components/calendar/CalendarView";
 import DailyAppointments from "@/components/calendar/DailyAppointments";
 import AppointmentDetails from "@/components/calendar/AppointmentDetails";
+import UpcomingAppointmentsList from "@/components/calendar/UpcomingAppointmentsList";
+import CalendarViewToggle from "@/components/calendar/CalendarViewToggle";
 import type { Appointment } from "@/types/appointment";
 import type { Email } from "@/types/email";
 
@@ -40,10 +42,18 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
   onViewEmail,
   findRelatedEmails
 }) => {
-  // Filter appointments for selected date
-  const selectedAppointment = appointments.find(
-    app => app.id === "selected" // This would be replaced with actual selection logic
-  );
+  const [calendarView, setCalendarView] = useState<'day' | 'week' | 'month'>('month');
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
+  
+  // Find the selected appointment if any
+  const selectedAppointment = selectedAppointmentId 
+    ? appointments.find(app => app.id === selectedAppointmentId)
+    : null;
+  
+  // Handler for selecting an appointment
+  const handleAppointmentSelect = (appointmentId: string) => {
+    setSelectedAppointmentId(appointmentId);
+  };
   
   return (
     <div className="space-y-6">
@@ -51,9 +61,15 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
         <TabsList className="mb-4">
           <TabsTrigger value="calendar">Calendar View</TabsTrigger>
           <TabsTrigger value="list">List View</TabsTrigger>
+          <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
         </TabsList>
         
         <TabsContent value="calendar" className="space-y-6">
+          <CalendarViewToggle 
+            currentView={calendarView} 
+            onViewChange={setCalendarView} 
+          />
+          
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
               <CalendarView
@@ -64,6 +80,7 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
                 onMonthChange={onMonthChange}
                 onPrevMonth={onPrevMonth}
                 onNextMonth={onNextMonth}
+                currentView={calendarView}
               />
             </div>
             
@@ -77,6 +94,7 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
                 onDeleteAppointment={onDeleteAppointment}
                 onReminderSent={onReminderSent}
                 onViewEmail={onViewEmail}
+                onAppointmentSelect={handleAppointmentSelect}
                 findRelatedEmails={findRelatedEmails}
               />
             </div>
@@ -84,27 +102,24 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
         </TabsContent>
         
         <TabsContent value="list">
-          <div className="grid grid-cols-1 gap-4">
-            {appointments.map(appointment => (
-              <div 
-                key={appointment.id} 
-                className="border rounded-md p-4 hover:bg-accent cursor-pointer"
-                onClick={() => onEditAppointment(appointment.id)}
-              >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="font-medium">{appointment.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {appointment.time} with {appointment.name}
-                    </p>
-                  </div>
-                  <div className="text-sm">
-                    {appointment.status}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <UpcomingAppointmentsList 
+            appointments={appointments}
+            onEditAppointment={onEditAppointment}
+            onDeleteAppointment={onDeleteAppointment}
+            onReminderSent={onReminderSent}
+            onAppointmentSelect={handleAppointmentSelect}
+          />
+        </TabsContent>
+        
+        <TabsContent value="upcoming">
+          <UpcomingAppointmentsList 
+            appointments={appointments.filter(app => app.status === "upcoming")}
+            onEditAppointment={onEditAppointment}
+            onDeleteAppointment={onDeleteAppointment}
+            onReminderSent={onReminderSent}
+            onAppointmentSelect={handleAppointmentSelect}
+            showOnlyUpcoming
+          />
         </TabsContent>
       </Tabs>
       
@@ -116,6 +131,7 @@ const CalendarMainContent: React.FC<CalendarMainContentProps> = ({
           onDeleteAppointment={onDeleteAppointment}
           onReminderSent={onReminderSent}
           onViewEmail={onViewEmail}
+          onClose={() => setSelectedAppointmentId(null)}
         />
       )}
     </div>
