@@ -7,9 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Clock } from "lucide-react";
+import { MapPin, Clock, InfoCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Appointment } from "@/types/appointment";
 import type { Email } from "@/types/email";
+import { APPOINTMENT_TYPES } from "@/types/appointment";
 
 interface AppointmentFormProps {
   selectedDate: Date;
@@ -109,22 +112,39 @@ const AppointmentForm = ({
           <Label htmlFor="type" className="text-right">
             Type
           </Label>
-          <Select 
-            name="type" 
-            defaultValue={appointmentToEdit?.type || "consultation"}
-          >
-            <SelectTrigger className="col-span-3">
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="consultation">Consultation</SelectItem>
-              <SelectItem value="follow-up">Follow-up</SelectItem>
-              <SelectItem value="check-in">Check-in</SelectItem>
-              <SelectItem value="review">Review</SelectItem>
-              <SelectItem value="new-client">New Client</SelectItem>
-              <SelectItem value="email-follow-up">Email Follow-up</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="col-span-3">
+            <Select 
+              name="type" 
+              defaultValue={appointmentToEdit?.type || "consultation"}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                {APPOINTMENT_TYPES.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    <div className="flex items-center">
+                      <Badge variant="outline" className={cn("mr-2 px-2 py-0", type.color)}>
+                        {type.label}
+                      </Badge>
+                      {type.description && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <InfoCircle className="h-3 w-3 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{type.description}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="notes" className="text-right">
@@ -169,6 +189,11 @@ const AppointmentForm = ({
       </DialogFooter>
     </form>
   );
+};
+
+// Helper function to combine tailwind classes
+const cn = (...classes: any[]) => {
+  return classes.filter(Boolean).join(' ');
 };
 
 export default AppointmentForm;

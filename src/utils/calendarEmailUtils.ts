@@ -2,6 +2,7 @@
 import { format, addDays, getDay, parse, isSameDay } from "date-fns";
 import type { Email } from "@/types/email";
 import type { Appointment } from "@/types/appointment";
+import { getAppointmentTypeInfo } from "@/types/appointment";
 
 // Extract possible date information from email
 export const extractDatesFromEmail = (email: Email): Date[] => {
@@ -79,6 +80,8 @@ export const formatAppointmentForEmail = (appointment: Appointment): string => {
   const durationStr = appointment.duration 
     ? formatDuration(appointment.duration)
     : "1 hour";
+
+  const typeInfo = getAppointmentTypeInfo(appointment.type);
   
   return `
 Appointment Details:
@@ -88,7 +91,7 @@ Date: ${dateStr}
 Time: ${appointment.time}
 Duration: ${durationStr}
 With: ${appointment.name}
-Type: ${appointment.type}
+Type: ${typeInfo.label}
 ${appointment.location ? `Location: ${appointment.location}\n` : ''}
 ${appointment.notes ? `\nNotes: ${appointment.notes}` : ''}
 `;
@@ -171,4 +174,28 @@ export const checkAppointmentConflicts = (
       (newStartTime <= existingStartTime && newEndTime >= existingEndTime)
     );
   });
+};
+
+// Get duration options for appointments
+export const getDurationOptions = () => [
+  { value: 15, label: "15 minutes" },
+  { value: 30, label: "30 minutes" },
+  { value: 45, label: "45 minutes" },
+  { value: 60, label: "1 hour" },
+  { value: 90, label: "1.5 hours" },
+  { value: 120, label: "2 hours" },
+];
+
+// Get appropriate color for appointment status
+export const getStatusColors = (status: "upcoming" | "completed" | "canceled") => {
+  switch(status) {
+    case "upcoming":
+      return "bg-blue-100 text-blue-800 border-blue-300";
+    case "completed":
+      return "bg-green-100 text-green-800 border-green-300";
+    case "canceled":
+      return "bg-red-100 text-red-800 border-red-300";
+    default:
+      return "bg-gray-100 text-gray-800 border-gray-300";
+  }
 };

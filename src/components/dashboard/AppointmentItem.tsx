@@ -3,6 +3,7 @@ import React from "react";
 import { CheckCircle, Clock, AlertCircle, CalendarX, CalendarClock, MapPin, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { getAppointmentTypeInfo } from "@/types/appointment";
 
 // Appointment Item Component
 interface AppointmentItemProps {
@@ -33,15 +34,8 @@ const AppointmentItem = ({
     canceled: "text-red-500",
   };
 
-  // Appointment type color mapping
-  const typeColorClasses = {
-    "check-in": "text-blue-500",
-    "follow-up": "text-purple-500",
-    "consultation": "text-green-500",
-    "new-client": "text-orange-500",
-    "review": "text-yellow-500",
-    "email-follow-up": "text-sky-500",
-  };
+  // Get appointment type info
+  const typeInfo = getAppointmentTypeInfo(type);
 
   // Get the appropriate status icon
   const StatusIcon = () => {
@@ -88,12 +82,6 @@ const AppointmentItem = ({
     }
   };
 
-  // Get type color
-  const getTypeColor = () => {
-    const key = type.toLowerCase() as keyof typeof typeColorClasses;
-    return typeColorClasses[key] || "text-gray-500";
-  };
-
   return (
     <div className={cn(
       "flex items-center justify-between p-3 rounded-lg hover:bg-secondary/50 transition-colors",
@@ -112,7 +100,9 @@ const AppointmentItem = ({
             {name}
           </p>
           <div className="flex items-center gap-1 flex-wrap">
-            <p className={cn("text-xs", getTypeColor())}>{type}</p>
+            <Badge variant="outline" className={cn("text-xs px-2 py-0", typeInfo.color)}>
+              {type}
+            </Badge>
             {location && (
               <div className="flex items-center text-xs text-muted-foreground">
                 <MapPin className="h-3 w-3 ml-1 mr-0.5" />

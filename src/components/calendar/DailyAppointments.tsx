@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { format, addDays, subDays } from "date-fns";
 import { Card, CardHeader, CardContent, CardTitle, CardFooter } from "@/components/ui/card";
@@ -21,6 +22,7 @@ import AppointmentPopover from "@/components/calendar/AppointmentPopover";
 import QuickAddAppointment from "@/components/calendar/QuickAddAppointment";
 import type { Appointment } from "@/types/appointment";
 import type { Email } from "@/types/email";
+import { APPOINTMENT_TYPES, getAppointmentTypeInfo } from "@/types/appointment";
 
 interface DailyAppointmentsProps {
   selectedDate: Date;
@@ -56,7 +58,10 @@ const DailyAppointments = ({
   const [statusFilter, setStatusFilter] = useState<"all" | "upcoming" | "completed" | "canceled">("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   
-  const appointmentTypes = ["all", ...new Set(appointments.map(app => app.type.toLowerCase()))];
+  // Get all unique appointment types
+  const uniqueAppointmentTypes = Array.from(
+    new Set(appointments.map(app => app.type.toLowerCase()))
+  );
   
   const filteredAppointments = appointments.filter(
     (appointment) => {
@@ -68,36 +73,10 @@ const DailyAppointments = ({
     }
   );
 
-  const getStatusBadge = (status: "upcoming" | "completed" | "canceled") => {
-    switch(status) {
-      case "upcoming":
-        return <Badge className="bg-blue-100 text-blue-800">Upcoming</Badge>;
-      case "completed":
-        return <Badge className="bg-green-100 text-green-800">Completed</Badge>;
-      case "canceled":
-        return <Badge className="bg-red-100 text-red-800">Canceled</Badge>;
-      default:
-        return <Badge>Unknown</Badge>;
-    }
-  };
-
   const getAppointmentTypeColor = (type: string) => {
-    switch(type.toLowerCase()) {
-      case "check-in":
-        return "border-l-4 border-blue-400";
-      case "follow-up":
-        return "border-l-4 border-purple-400";
-      case "consultation":
-        return "border-l-4 border-green-400";
-      case "new-client":
-        return "border-l-4 border-orange-400";
-      case "review":
-        return "border-l-4 border-yellow-400";
-      case "email follow-up":
-        return "border-l-4 border-sky-400";
-      default:
-        return "border-l-4 border-gray-300";
-    }
+    const typeInfo = getAppointmentTypeInfo(type);
+    const colorClass = typeInfo.color.split(' ')[0]; // Extract the bg color part
+    return `border-l-4 ${colorClass.replace('bg-', 'border-')}`;
   };
   
   const handlePrevDay = () => {
@@ -156,14 +135,21 @@ const DailyAppointments = ({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="h-8">
                 <Filter className="h-3.5 w-3.5 mr-2" />
-                Type: {typeFilter === "all" ? "All" : typeFilter}
+                Type: {typeFilter === "all" ? "All" : getAppointmentTypeInfo(typeFilter).label}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuRadioGroup value={typeFilter} onValueChange={setTypeFilter}>
-                {appointmentTypes.map((type) => (
-                  <DropdownMenuRadioItem key={type} value={type}>
-                    {type === "all" ? "All" : type}
+                <DropdownMenuRadioItem value="all">
+                  All Types
+                </DropdownMenuRadioItem>
+                {APPOINTMENT_TYPES.map(type => (
+                  <DropdownMenuRadioItem key={type.value} value={type.value}>
+                    <div className="flex items-center">
+                      <Badge variant="outline" className={`mr-2 px-1.5 py-0 text-xs ${type.color}`}>
+                        {type.label}
+                      </Badge>
+                    </div>
                   </DropdownMenuRadioItem>
                 ))}
               </DropdownMenuRadioGroup>
@@ -200,6 +186,7 @@ const DailyAppointments = ({
                         type={appointment.type}
                         status={appointment.status}
                         location={appointment.location}
+                        duration={appointment.duration}
                         showStatusBadge={true}
                       />
                     </div>
