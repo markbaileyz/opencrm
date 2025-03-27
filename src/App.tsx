@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Index from "@/pages/Index";
@@ -42,6 +43,7 @@ import Office from "@/pages/Office";
 import MedicalRecordsPage from "@/pages/MedicalRecordsPage";
 import HealthTrackerPage from "@/pages/HealthTrackerPage";
 import PatientVitalsPage from "@/pages/PatientVitalsPage";
+import PrescriptionsPage from "@/pages/PrescriptionsPage";
 
 function App() {
   const { toast } = useToast();
@@ -147,7 +149,7 @@ function App() {
         
         <Route path="/prescriptions" element={
           <ProtectedRoute allowedRoles={["admin", "power-user", "doctor"]}>
-            <PlaceholderPage title="Prescriptions" description="Manage patient prescriptions and medication orders. Coming soon." />
+            <PrescriptionsPage />
           </ProtectedRoute>
         } />
         

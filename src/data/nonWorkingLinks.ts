@@ -1,4 +1,5 @@
 
+
 /**
  * This file catalogs links that need to be implemented or fixed.
  * It serves as a reference for future development tasks.
@@ -31,8 +32,8 @@ export const nonWorkingLinks = [
   },
   {
     path: "/prescriptions",
-    status: "Placeholder",
-    description: "Prescription management needs implementation",
+    status: "Basic Implementation",
+    description: "Prescription management has basic implementation with active prescriptions, history, and templates",
     priority: "High"
   },
   {
