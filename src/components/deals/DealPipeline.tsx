@@ -8,71 +8,17 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Deal } from "@/types/deal";
 
-type DealStage = "lead" | "qualified" | "proposal" | "negotiation" | "closed-won" | "closed-lost";
-
-interface Deal {
-  id: string;
-  name: string;
-  company: string;
-  amount: number;
-  stage: DealStage;
-  lastUpdated: string;
-  probability: number;
+interface DealPipelineProps {
+  deals: Deal[];
+  onEdit?: (deal: Deal) => void;
 }
 
-const deals: Deal[] = [
-  {
-    id: "1",
-    name: "Software Implementation",
-    company: "Acme Corp",
-    amount: 45000,
-    stage: "proposal",
-    lastUpdated: "2023-09-15",
-    probability: 60
-  },
-  {
-    id: "2",
-    name: "Annual Subscription",
-    company: "Global Industries",
-    amount: 12000,
-    stage: "qualified",
-    lastUpdated: "2023-09-10",
-    probability: 40
-  },
-  {
-    id: "3",
-    name: "Enterprise License",
-    company: "TechStart Inc",
-    amount: 75000,
-    stage: "negotiation",
-    lastUpdated: "2023-09-18",
-    probability: 80
-  },
-  {
-    id: "4",
-    name: "Cloud Migration",
-    company: "First Financial",
-    amount: 35000,
-    stage: "lead",
-    lastUpdated: "2023-09-05",
-    probability: 20
-  },
-  {
-    id: "5",
-    name: "Support Contract",
-    company: "Metro Healthcare",
-    amount: 18000,
-    stage: "closed-won",
-    lastUpdated: "2023-09-01",
-    probability: 100
-  }
-];
-
-const DealPipeline = () => {
-  const stages: { id: DealStage; name: string }[] = [
+const DealPipeline: React.FC<DealPipelineProps> = ({ deals, onEdit }) => {
+  const stages = [
     { id: "lead", name: "Lead" },
-    { id: "qualified", name: "Qualified" },
+    { id: "qualification", name: "Qualified" },
     { id: "proposal", name: "Proposal" },
     { id: "negotiation", name: "Negotiation" },
     { id: "closed-won", name: "Closed Won" },
@@ -104,15 +50,19 @@ const DealPipeline = () => {
                     .map(deal => (
                       <div 
                         key={deal.id} 
-                        className="bg-card border rounded-md p-3 mb-2 cursor-move hover:border-primary transition-colors"
+                        className="bg-card border rounded-md p-3 mb-2 cursor-pointer hover:border-primary transition-colors"
+                        onClick={() => onEdit && onEdit(deal)}
                       >
                         <div className="flex justify-between mb-2">
                           <div className="font-medium">{deal.name}</div>
-                          <div className="text-sm font-medium">${deal.amount.toLocaleString()}</div>
+                          <div className="text-sm font-medium">${deal.value.toLocaleString()}</div>
                         </div>
-                        <div className="text-sm text-muted-foreground mb-2">{deal.company}</div>
+                        <div className="text-sm text-muted-foreground mb-2">
+                          {/* Here we would show organization name, but for now we're just showing the id */}
+                          {deal.organization ? `Organization ID: ${deal.organization}` : 'No organization'}
+                        </div>
                         <div className="flex justify-between items-center text-xs">
-                          <span>Updated: {new Date(deal.lastUpdated).toLocaleDateString()}</span>
+                          <span>Updated: {new Date(deal.updatedAt).toLocaleDateString()}</span>
                           <Badge variant={deal.probability >= 50 ? "default" : "outline"}>
                             {deal.probability}%
                           </Badge>
