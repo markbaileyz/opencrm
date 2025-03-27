@@ -1,64 +1,73 @@
 
 import React from "react";
-import { Reply, Forward } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from "@/components/ui/tooltip";
+import { Mail, Trash, Archive, Star, Reply, Forward, CalendarPlus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import type { Email } from "@/types/email";
 
 interface EmailDetailActionsProps {
-  onReply: () => void;
-  onForward: () => void;
+  email: Email;
+  onReply: (email: Email) => void;
+  onForward: (email: Email) => void;
+  onDelete: (id: string) => void;
+  onArchive: (id: string) => void;
+  onStar: (id: string) => void;
 }
 
-const EmailDetailActions: React.FC<EmailDetailActionsProps> = ({
+const EmailDetailActions = ({
+  email,
   onReply,
-  onForward
-}) => {
+  onForward,
+  onDelete,
+  onArchive,
+  onStar,
+}: EmailDetailActionsProps) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleCreateAppointment = () => {
+    // Navigate to calendar with email ID as parameter
+    navigate(`/calendar?emailId=${email.id}`);
+    
+    toast({
+      title: "Creating appointment",
+      description: "Navigating to calendar to create an appointment from this email",
+      variant: "default"
+    });
+  };
+
   return (
-    <div className="p-3 border-t">
-      <div className="flex gap-2">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-1" 
-                onClick={onReply}
-              >
-                <Reply className="h-4 w-4" />
-                Reply
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              Reply (r)
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-1" 
-                onClick={onForward}
-              >
-                <Forward className="h-4 w-4" />
-                Forward
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              Forward (f)
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+    <div className="flex flex-wrap gap-2">
+      <Button variant="ghost" size="sm" onClick={() => onReply(email)}>
+        <Reply className="h-4 w-4 mr-2" />
+        Reply
+      </Button>
+      <Button variant="ghost" size="sm" onClick={() => onForward(email)}>
+        <Forward className="h-4 w-4 mr-2" />
+        Forward
+      </Button>
+      <Button variant="ghost" size="sm" onClick={handleCreateAppointment}>
+        <CalendarPlus className="h-4 w-4 mr-2" />
+        Schedule Meeting
+      </Button>
+      <Button 
+        variant="ghost" 
+        size="sm" 
+        onClick={() => onStar(email.id)}
+        className={email.starred ? "text-yellow-500" : ""}
+      >
+        <Star className={`h-4 w-4 mr-2 ${email.starred ? "fill-yellow-500" : ""}`} />
+        {email.starred ? "Unstar" : "Star"}
+      </Button>
+      <Button variant="ghost" size="sm" onClick={() => onArchive(email.id)}>
+        <Archive className="h-4 w-4 mr-2" />
+        Archive
+      </Button>
+      <Button variant="ghost" size="sm" onClick={() => onDelete(email.id)}>
+        <Trash className="h-4 w-4 mr-2" />
+        Delete
+      </Button>
     </div>
   );
 };

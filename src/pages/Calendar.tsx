@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -23,23 +22,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarPlus, CalendarClock, ChevronLeft, ChevronRight } from "lucide-react";
-import { format, addMonths, subMonths } from "date-fns";
+import { CalendarPlus, CalendarClock, ChevronLeft, ChevronRight, Mail, MoveRight } from "lucide-react";
+import { format, addMonths, subMonths, isToday, isFuture } from "date-fns";
 import AppointmentList from "@/components/dashboard/AppointmentList";
 import AppointmentItem from "@/components/dashboard/AppointmentItem";
+import AppointmentRelatedEmails from "@/components/calendar/AppointmentRelatedEmails";
+import AppointmentReminder from "@/components/calendar/AppointmentReminder";
 import { useToast } from "@/hooks/use-toast";
-
-// Appointment type definition
-interface Appointment {
-  id: string;
-  title: string;
-  date: Date;
-  time: string;
-  type: string;
-  name: string;
-  status: "upcoming" | "completed" | "canceled";
-  notes?: string;
-}
+import { useNavigate } from "react-router-dom";
+import { emailData } from "@/data/emailData";
+import type { Appointment } from "@/types/appointment";
 
 const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -92,9 +84,29 @@ const Calendar = () => {
       status: "upcoming"
     }
   ]);
+  const [emails] = useState(emailData);
+  const navigate = useNavigate();
   
-  // Moved the useToast hook inside the component function
   const { toast } = useToast();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const emailId = params.get('emailId');
+    
+    if (emailId) {
+      const email = emails.find(e => e.id === emailId);
+      if (email) {
+        setIsAddAppointmentOpen(true);
+        toast({
+          title: "Email imported",
+          description: "Creating an appointment from email: " + email.subject,
+          variant: "default"
+        });
+        
+        navigate('/calendar', { replace: true });
+      }
+    }
+  }, []);
 
   const nextMonth = () => {
     setCurrentMonth(addMonths(currentMonth, 1));
@@ -122,7 +134,9 @@ const Calendar = () => {
       type: formData.get('type') as string,
       name: formData.get('name') as string,
       status: "upcoming",
-      notes: formData.get('notes') as string
+      notes: formData.get('notes') as string,
+      emailThreadId: formData.get('emailThread') as string || undefined,
+      reminderSent: false
     };
     
     setAppointments([...appointments, newAppointment]);
@@ -135,12 +149,24 @@ const Calendar = () => {
     });
   };
 
-  // Filter appointments for the selected date
+  const handleSendReminder = (appointmentId: string) => {
+    setAppointments(prevAppointments => 
+      prevAppointments.map(app => 
+        app.id === appointmentId 
+          ? { ...app, reminderSent: true } 
+          : app
+      )
+    );
+  };
+
+  const handleGoToEmail = () => {
+    navigate('/email');
+  };
+
   const selectedDateAppointments = appointments.filter(
     (appointment) => format(appointment.date, 'PP') === format(selectedDate, 'PP')
   );
 
-  // Function to determine if a date has appointments
   const dateHasAppointment = (date: Date) => {
     return appointments.some(
       (appointment) => format(appointment.date, 'PP') === format(date, 'PP')
@@ -157,77 +183,101 @@ const Calendar = () => {
               Manage appointments and schedule follow-ups
             </p>
           </div>
-          <Dialog open={isAddAppointmentOpen} onOpenChange={setIsAddAppointmentOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <CalendarPlus className="h-4 w-4 mr-2" />
-                New Appointment
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Add New Appointment</DialogTitle>
-                <DialogDescription>
-                  Create a new appointment for {format(selectedDate, 'PPP')}
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleAddAppointment}>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="title" className="text-right">
-                      Title
-                    </Label>
-                    <Input id="title" name="title" className="col-span-3" required />
+          <div className="flex space-x-2">
+            <Button variant="outline" onClick={handleGoToEmail}>
+              <Mail className="h-4 w-4 mr-2" />
+              Go to Email
+            </Button>
+            <Dialog open={isAddAppointmentOpen} onOpenChange={setIsAddAppointmentOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <CalendarPlus className="h-4 w-4 mr-2" />
+                  New Appointment
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Add New Appointment</DialogTitle>
+                  <DialogDescription>
+                    Create a new appointment for {format(selectedDate, 'PPP')}
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleAddAppointment}>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="title" className="text-right">
+                        Title
+                      </Label>
+                      <Input id="title" name="title" className="col-span-3" required />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="name" className="text-right">
+                        Client Name
+                      </Label>
+                      <Input id="name" name="name" className="col-span-3" required />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="time" className="text-right">
+                        Time
+                      </Label>
+                      <Input id="time" name="time" type="time" className="col-span-3" required />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="type" className="text-right">
+                        Type
+                      </Label>
+                      <Select name="type" defaultValue="consultation">
+                        <SelectTrigger className="col-span-3">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="consultation">Consultation</SelectItem>
+                          <SelectItem value="follow-up">Follow-up</SelectItem>
+                          <SelectItem value="check-in">Check-in</SelectItem>
+                          <SelectItem value="review">Review</SelectItem>
+                          <SelectItem value="new-client">New Client</SelectItem>
+                          <SelectItem value="email-followup">Email Follow-up</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="notes" className="text-right">
+                        Notes
+                      </Label>
+                      <Textarea id="notes" name="notes" className="col-span-3" />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="emailThread" className="text-right">
+                        Email Thread
+                      </Label>
+                      <Select name="emailThread">
+                        <SelectTrigger className="col-span-3">
+                          <SelectValue placeholder="Related email (optional)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">None</SelectItem>
+                          {emails.slice(0, 5).map(email => (
+                            <SelectItem key={email.id} value={email.id}>
+                              {email.subject.substring(0, 30)}...
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                      Client Name
-                    </Label>
-                    <Input id="name" name="name" className="col-span-3" required />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="time" className="text-right">
-                      Time
-                    </Label>
-                    <Input id="time" name="time" type="time" className="col-span-3" required />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="type" className="text-right">
-                      Type
-                    </Label>
-                    <Select name="type" defaultValue="consultation">
-                      <SelectTrigger className="col-span-3">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="consultation">Consultation</SelectItem>
-                        <SelectItem value="follow-up">Follow-up</SelectItem>
-                        <SelectItem value="check-in">Check-in</SelectItem>
-                        <SelectItem value="review">Review</SelectItem>
-                        <SelectItem value="new-client">New Client</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="notes" className="text-right">
-                      Notes
-                    </Label>
-                    <Textarea id="notes" name="notes" className="col-span-3" />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button type="button" variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button type="submit">Save Appointment</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button type="button" variant="outline">Cancel</Button>
+                    </DialogClose>
+                    <Button type="submit">Save Appointment</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Calendar Navigation and Display */}
           <Card className="md:col-span-2">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
@@ -256,16 +306,17 @@ const Calendar = () => {
                   className="rounded-md p-3 w-full"
                   modifiers={{
                     hasAppointment: (date) => dateHasAppointment(date),
+                    today: (date) => isToday(date),
                   }}
                   modifiersClassNames={{
                     hasAppointment: "bg-primary/20 font-bold text-primary",
+                    today: "border border-primary ring-2 ring-primary/20"
                   }}
                 />
               </div>
             </CardContent>
           </Card>
           
-          {/* Appointments for Selected Date */}
           <Card>
             <CardHeader>
               <CardTitle>Appointments for {format(selectedDate, 'PPP')}</CardTitle>
@@ -310,6 +361,18 @@ const Calendar = () => {
                               <p className="text-sm">{appointment.notes}</p>
                             </>
                           )}
+                          <div className="flex items-center pt-2 space-x-2">
+                            {isFuture(appointment.date) && (
+                              <AppointmentReminder 
+                                appointment={appointment}
+                                onReminderSent={handleSendReminder}
+                              />
+                            )}
+                            <AppointmentRelatedEmails
+                              appointment={appointment}
+                              emails={emails}
+                            />
+                          </div>
                           <div className="flex justify-end space-x-2 pt-2">
                             <Button variant="ghost" size="sm">Edit</Button>
                             <Button 
@@ -350,7 +413,49 @@ const Calendar = () => {
           </Card>
         </div>
         
-        {/* Today's Meetings Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Email & Calendar Integration</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div>
+                  <h3 className="font-medium">Create appointments from emails</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Schedule follow-up meetings directly from your email inbox
+                  </p>
+                </div>
+                <Button onClick={handleGoToEmail}>
+                  Go to Email
+                  <MoveRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+              
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div>
+                  <h3 className="font-medium">Send email reminders</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Automatically send email reminders for upcoming appointments
+                  </p>
+                </div>
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    toast({
+                      title: "Reminder emails sent",
+                      description: "Reminder emails have been sent for tomorrow's appointments",
+                      variant: "success"
+                    });
+                  }}
+                >
+                  Send All Reminders
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
         <div className="mt-6">
           <AppointmentList />
         </div>
