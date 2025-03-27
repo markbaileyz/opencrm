@@ -11,7 +11,12 @@ import {
   medicalSidebarItems,
   adminSidebarItems,
   settingsSidebarItems,
-  adminSettingsItems
+  adminSettingsItems,
+  patientSidebarItems,
+  doctorSidebarItems,
+  nurseSidebarItems,
+  communicationItems,
+  frontDeskItems
 } from "@/data/sidebarItems";
 
 const MobileNavigationMenu = () => {
@@ -73,6 +78,91 @@ const MobileNavigationMenu = () => {
           ))}
         </div>
         
+        {/* Patient specific section - only show for patients */}
+        {(hasRole("patient") || hasRole("admin") || hasRole("power-user")) && filterItemsByRole(patientSidebarItems).length > 0 && (
+          <>
+            <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase">
+              Patient
+            </div>
+            <div className="p-2">
+              {filterItemsByRole(patientSidebarItems).map((item) => (
+                <NavLink
+                  key={item.href}
+                  href={item.href}
+                  icon={item.icon}
+                  label={item.label}
+                  active={isActive(item.href)}
+                  onClick={closeMobileMenu}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        
+        {/* Doctor specific section */}
+        {(hasRole("doctor") || hasRole("admin") || hasRole("power-user")) && filterItemsByRole(doctorSidebarItems).length > 0 && (
+          <>
+            <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase">
+              Doctor
+            </div>
+            <div className="p-2">
+              {filterItemsByRole(doctorSidebarItems).map((item) => (
+                <NavLink
+                  key={item.href}
+                  href={item.href}
+                  icon={item.icon}
+                  label={item.label}
+                  active={isActive(item.href)}
+                  onClick={closeMobileMenu}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        
+        {/* Nurse specific section */}
+        {(hasRole("nurse") || hasRole("admin") || hasRole("power-user") || hasRole("doctor")) && filterItemsByRole(nurseSidebarItems).length > 0 && (
+          <>
+            <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase">
+              Nurse
+            </div>
+            <div className="p-2">
+              {filterItemsByRole(nurseSidebarItems).map((item) => (
+                <NavLink
+                  key={item.href}
+                  href={item.href}
+                  icon={item.icon}
+                  label={item.label}
+                  active={isActive(item.href)}
+                  onClick={closeMobileMenu}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        
+        {/* Front desk specific section */}
+        {(hasRole("front-desk") || hasRole("admin") || hasRole("power-user")) && filterItemsByRole(frontDeskItems).length > 0 && (
+          <>
+            <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase">
+              Front Desk
+            </div>
+            <div className="p-2">
+              {filterItemsByRole(frontDeskItems).map((item) => (
+                <NavLink
+                  key={item.href}
+                  href={item.href}
+                  icon={item.icon}
+                  label={item.label}
+                  active={isActive(item.href)}
+                  onClick={closeMobileMenu}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        
+        {/* Medical staff section */}
         {filterItemsByRole(medicalSidebarItems).length > 0 && (
           <>
             <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase">
@@ -93,7 +183,29 @@ const MobileNavigationMenu = () => {
           </>
         )}
         
-        {hasRole("admin") && filterItemsByRole(adminSidebarItems).length > 0 && (
+        {/* Communication section */}
+        {filterItemsByRole(communicationItems).length > 0 && (
+          <>
+            <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase">
+              Communication
+            </div>
+            <div className="p-2">
+              {filterItemsByRole(communicationItems).map((item) => (
+                <NavLink
+                  key={item.href}
+                  href={item.href}
+                  icon={item.icon}
+                  label={item.label}
+                  active={isActive(item.href)}
+                  onClick={closeMobileMenu}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        
+        {/* Admin section */}
+        {(hasRole("admin") || hasRole("power-user")) && filterItemsByRole(adminSidebarItems).length > 0 && (
           <>
             <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase">
               Admin

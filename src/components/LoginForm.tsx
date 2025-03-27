@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ButtonCustom } from "./ui/button-custom";
@@ -36,6 +37,14 @@ const LoginForm = ({ isSignUp = false }: LoginFormProps) => {
           role: "admin" 
         });
         toast.success(`Welcome, Admin`);
+        navigate("/dashboard");
+      } else if (email === "poweruser@example.com") {
+        login({ 
+          email, 
+          displayName: "Power User", 
+          role: "power-user" 
+        });
+        toast.success(`Welcome, Power User`);
         navigate("/dashboard");
       } else if (email === "doctor@example.com") {
         login({ 
@@ -170,6 +179,13 @@ const LoginForm = ({ isSignUp = false }: LoginFormProps) => {
             onClick={() => handleDemoLogin("admin@example.com")}
           >
             Admin Demo Account
+          </ButtonCustom>
+          <ButtonCustom
+            type="button"
+            variant="outline"
+            onClick={() => handleDemoLogin("poweruser@example.com")}
+          >
+            Power User Demo Account
           </ButtonCustom>
           <ButtonCustom
             type="button"

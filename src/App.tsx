@@ -39,6 +39,17 @@ import Compliance from "@/pages/Compliance";
 import UserManagement from "@/pages/UserManagement";
 import DashboardRoadmap from "@/pages/DashboardRoadmap";
 
+// Placeholder components for new pages
+const MedicalRecords = () => <div>Medical Records Page Coming Soon</div>;
+const Medications = () => <div>Medications Page Coming Soon</div>;
+const HealthTracker = () => <div>Health Tracker Page Coming Soon</div>;
+const ClinicalDashboard = () => <div>Clinical Dashboard Page Coming Soon</div>;
+const Prescriptions = () => <div>Prescriptions Page Coming Soon</div>;
+const PatientVitals = () => <div>Patient Vitals Page Coming Soon</div>;
+const SecureChat = () => <div>Secure Chat Page Coming Soon</div>;
+const PatientFeedback = () => <div>Patient Feedback Page Coming Soon</div>;
+const OfficeManagement = () => <div>Office Management Page Coming Soon</div>;
+
 function App() {
   const { toast } = useToast();
   const { 
@@ -115,20 +126,80 @@ function App() {
           </ProtectedRoute>
         } />
         
+        {/* Patient Routes */}
+        <Route path="/medical-records" element={
+          <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse", "patient"]}>
+            <MedicalRecords />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/medications" element={
+          <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse", "patient"]}>
+            <Medications />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/health-tracker" element={
+          <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "patient"]}>
+            <HealthTracker />
+          </ProtectedRoute>
+        } />
+        
+        {/* Doctor Routes */}
+        <Route path="/clinical-dashboard" element={
+          <ProtectedRoute allowedRoles={["admin", "power-user", "doctor"]}>
+            <ClinicalDashboard />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/prescriptions" element={
+          <ProtectedRoute allowedRoles={["admin", "power-user", "doctor"]}>
+            <Prescriptions />
+          </ProtectedRoute>
+        } />
+        
+        {/* Nurse Routes */}
+        <Route path="/patient-vitals" element={
+          <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse"]}>
+            <PatientVitals />
+          </ProtectedRoute>
+        } />
+        
+        {/* Communication Routes */}
+        <Route path="/secure-chat" element={
+          <ProtectedRoute>
+            <SecureChat />
+          </ProtectedRoute>
+        } />
+        
+        {/* Front Desk Routes */}
+        <Route path="/patient-feedback" element={
+          <ProtectedRoute allowedRoles={["admin", "power-user", "front-desk"]}>
+            <PatientFeedback />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/office-management" element={
+          <ProtectedRoute allowedRoles={["admin", "power-user", "front-desk"]}>
+            <OfficeManagement />
+          </ProtectedRoute>
+        } />
+        
+        {/* Original Routes */}
         <Route path="/patients" element={
-          <ProtectedRoute allowedRoles={["admin", "doctor", "nurse", "front-desk"]}>
+          <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse", "front-desk"]}>
             <Patients />
           </ProtectedRoute>
         } />
         
         <Route path="/front-desk" element={
-          <ProtectedRoute allowedRoles={["admin", "front-desk"]}>
+          <ProtectedRoute allowedRoles={["admin", "power-user", "front-desk"]}>
             <FrontDesk />
           </ProtectedRoute>
         } />
         
         <Route path="/calendar" element={
-          <ProtectedRoute allowedRoles={["admin", "doctor", "nurse", "front-desk"]}>
+          <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse", "front-desk"]}>
             <Calendar />
           </ProtectedRoute>
         } />
@@ -140,7 +211,7 @@ function App() {
         } />
         
         <Route path="/compliance" element={
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={["admin", "power-user"]}>
             <Compliance />
           </ProtectedRoute>
         } />
@@ -152,25 +223,25 @@ function App() {
         } />
         
         <Route path="/reports" element={
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={["admin", "power-user"]}>
             <Reports />
           </ProtectedRoute>
         } />
         
         <Route path="/contacts" element={
-          <ProtectedRoute allowedRoles={["admin", "doctor", "nurse"]}>
+          <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse"]}>
             <Contacts />
           </ProtectedRoute>
         } />
         
         <Route path="/organizations" element={
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={["admin", "power-user"]}>
             <Organizations />
           </ProtectedRoute>
         } />
         
         <Route path="/deals" element={
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={["admin", "power-user"]}>
             <Deals />
           </ProtectedRoute>
         } />
@@ -184,7 +255,7 @@ function App() {
         <Route path="/roadmap" element={<Roadmap />} />
         
         <Route path="/dashboard-roadmap" element={
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={["admin", "power-user"]}>
             <DashboardRoadmap />
           </ProtectedRoute>
         } />
@@ -202,19 +273,19 @@ function App() {
         } />
         
         <Route path="/healthcare-crm" element={
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={["admin", "power-user"]}>
             <HealthcareCRM />
           </ProtectedRoute>
         } />
         
         <Route path="/open-crm-roadmap" element={
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={["admin", "power-user"]}>
             <OpenCRMRoadmap />
           </ProtectedRoute>
         } />
         
         <Route path="/mind-map" element={
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={["admin", "power-user"]}>
             <MindMap />
           </ProtectedRoute>
         } />
