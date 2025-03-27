@@ -1,371 +1,326 @@
 
 import React, { useState } from "react";
-import { Search, BookOpen, ShieldCheck, Clock, Users, Database, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Search, ThumbsUp, MessageSquare, ArrowRight } from "lucide-react";
 
-interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  category: "security" | "performance" | "adoption" | "data" | "integration";
-  impact: "low" | "medium" | "high" | "critical";
-  solutions: Solution[];
-}
+// Sample data structure for challenges and solutions
+const challengesData = {
+  sales: [
+    {
+      id: "sales-1",
+      title: "Long Sales Cycle",
+      description: "Deals take too long to close, leading to revenue delays and forecasting challenges.",
+      solution: "Implement a structured sales process with clear milestones and follow-up schedules. Use automated reminders and activity tracking to keep deals moving forward. Identify common bottlenecks in your sales cycle and create strategies to address them.",
+      industry: "All",
+      difficulty: "Medium",
+      votes: 45,
+      comments: 12
+    },
+    {
+      id: "sales-2",
+      title: "Low Conversion Rates",
+      description: "Too many leads enter the pipeline but few convert to actual customers.",
+      solution: "Improve lead qualification criteria to focus on quality over quantity. Implement lead scoring to prioritize high-potential prospects. Analyze conversion data at each pipeline stage to identify where prospects are dropping off and optimize those areas.",
+      industry: "Retail, B2B",
+      difficulty: "High",
+      votes: 72,
+      comments: 24
+    },
+    {
+      id: "sales-3",
+      title: "Inconsistent Sales Performance",
+      description: "Sales results vary widely among team members and across different time periods.",
+      solution: "Standardize sales processes and scripts to ensure consistency. Implement regular training and coaching sessions. Create a knowledge base of successful sales tactics and objection handling techniques that all team members can access.",
+      industry: "All",
+      difficulty: "Medium",
+      votes: 38,
+      comments: 9
+    }
+  ],
+  marketing: [
+    {
+      id: "marketing-1",
+      title: "Poor Lead Quality",
+      description: "Marketing campaigns generate high volumes of leads that rarely convert to sales.",
+      solution: "Refine target audience definitions and buyer personas. Create content that addresses specific pain points of your ideal customers. Implement progressive profiling to gather more qualification data. Establish regular feedback loops between sales and marketing teams.",
+      industry: "B2B, SaaS",
+      difficulty: "High",
+      votes: 56,
+      comments: 18
+    },
+    {
+      id: "marketing-2",
+      title: "Difficulty Measuring ROI",
+      description: "Cannot accurately attribute revenue to specific marketing activities or campaigns.",
+      solution: "Implement proper tracking with UTM parameters across all campaigns. Set up multi-touch attribution models in your analytics. Create closed-loop reporting between your CRM and marketing automation tools to track leads from first touch to closed deal.",
+      industry: "All",
+      difficulty: "High",
+      votes: 64,
+      comments: 15
+    },
+    {
+      id: "marketing-3",
+      title: "Content Engagement Issues",
+      description: "Marketing content receives low engagement and fails to drive lead generation.",
+      solution: "Conduct audience research to understand content preferences and consumption habits. Develop a content strategy aligned with the buyer's journey. Test different formats, topics, and distribution channels to identify what resonates best with your audience.",
+      industry: "Media, Education, B2C",
+      difficulty: "Medium",
+      votes: 41,
+      comments: 7
+    }
+  ],
+  customer: [
+    {
+      id: "customer-1",
+      title: "High Customer Churn",
+      description: "Customers leave at a high rate, impacting recurring revenue and growth.",
+      solution: "Implement an early warning system that identifies at-risk customers based on product usage, support tickets, and engagement metrics. Create a customer success program with proactive outreach at key points in the customer lifecycle. Conduct exit interviews to understand churn reasons.",
+      industry: "SaaS, Subscription Services",
+      difficulty: "High",
+      votes: 83,
+      comments: 31
+    },
+    {
+      id: "customer-2",
+      title: "Slow Response Times",
+      description: "Customer support takes too long to respond to inquiries and resolve issues.",
+      solution: "Implement a ticket prioritization system based on issue severity and customer tier. Create a knowledge base with solutions to common problems that both customers and support staff can access. Use automation for routine inquiries and follow-ups.",
+      industry: "All",
+      difficulty: "Medium",
+      votes: 59,
+      comments: 14
+    },
+    {
+      id: "customer-3",
+      title: "Limited Customer Insights",
+      description: "Lack of data on customer behavior and preferences makes personalization difficult.",
+      solution: "Centralize customer data from all touchpoints in your CRM. Implement behavior tracking on your website and in your product. Create custom fields to track relevant industry-specific information. Develop regular voice-of-customer surveys to gather direct feedback.",
+      industry: "Retail, Financial Services",
+      difficulty: "Medium",
+      votes: 47,
+      comments: 11
+    }
+  ],
+  technical: [
+    {
+      id: "technical-1",
+      title: "Data Silos",
+      description: "Customer information is scattered across multiple systems with no integration.",
+      solution: "Map out all systems containing customer data and implement API integrations where possible. Consider middleware solutions for systems without native integration capabilities. Establish a single source of truth for customer data with bi-directional syncing between systems.",
+      industry: "All",
+      difficulty: "High",
+      votes: 76,
+      comments: 22
+    },
+    {
+      id: "technical-2",
+      title: "Poor Data Quality",
+      description: "CRM contains duplicate, outdated, or incomplete customer records.",
+      solution: "Implement validation rules and required fields to ensure data completeness. Use data cleansing tools to identify and merge duplicate records. Establish regular data audits and cleaning schedules. Create data governance policies and train staff on proper data entry.",
+      industry: "All",
+      difficulty: "Medium",
+      votes: 69,
+      comments: 17
+    },
+    {
+      id: "technical-3",
+      title: "Limited Adoption",
+      description: "Team members don't consistently use the CRM, leading to incomplete data.",
+      solution: "Customize the CRM interface to match team workflows. Provide comprehensive training and create quick reference guides. Demonstrate the value of CRM usage with relevant reports and insights. Consider gamification elements to encourage adoption.",
+      industry: "All",
+      difficulty: "Medium",
+      votes: 54,
+      comments: 13
+    }
+  ]
+};
 
-interface Solution {
-  id: string;
-  title: string;
-  steps: string[];
-  resources?: string[];
-}
-
-const ChallengesSolutions = () => {
+const ChallengesSolutions: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("sales");
   
-  const challengeCategories = [
-    { id: "security", label: "Security", icon: <ShieldCheck className="h-4 w-4" /> },
-    { id: "performance", label: "Performance", icon: <Clock className="h-4 w-4" /> },
-    { id: "adoption", label: "User Adoption", icon: <Users className="h-4 w-4" /> },
-    { id: "data", label: "Data Management", icon: <Database className="h-4 w-4" /> },
-    { id: "integration", label: "Integration", icon: <BookOpen className="h-4 w-4" /> },
-  ];
-  
-  const challenges: Challenge[] = [
-    {
-      id: "sec-1",
-      title: "Securing Sensitive Customer Data",
-      description: "Organizations often struggle with properly securing personal and financial information in their CRM, leading to potential data breaches and compliance issues.",
-      category: "security",
-      impact: "critical",
-      solutions: [
-        {
-          id: "sec-1-sol-1",
-          title: "Implement Role-Based Access Controls",
-          steps: [
-            "Define user roles based on job responsibilities",
-            "Configure field-level security to restrict sensitive data",
-            "Implement IP restrictions for admin access",
-            "Enable two-factor authentication for all users",
-            "Regularly audit user permissions and access logs"
-          ],
-          resources: [
-            "Security Settings Documentation",
-            "Compliance Best Practices Guide"
-          ]
-        },
-        {
-          id: "sec-1-sol-2",
-          title: "Enable Data Encryption",
-          steps: [
-            "Configure encryption for data at rest",
-            "Set up TLS/SSL for data in transit",
-            "Implement API security measures",
-            "Create secure data backup procedures"
-          ]
-        }
-      ]
-    },
-    {
-      id: "perf-1",
-      title: "Slow CRM Performance with Large Data Sets",
-      description: "As organizations accumulate more data, many experience performance degradation, leading to user frustration and decreased productivity.",
-      category: "performance",
-      impact: "high",
-      solutions: [
-        {
-          id: "perf-1-sol-1",
-          title: "Optimize Database Performance",
-          steps: [
-            "Implement regular database maintenance",
-            "Create optimized indexes for commonly searched fields",
-            "Archive historical data not needed for daily operations",
-            "Configure caching for frequently accessed data"
-          ]
-        },
-        {
-          id: "perf-1-sol-2",
-          title: "Optimize User Interface",
-          steps: [
-            "Limit records displayed per page",
-            "Implement lazy loading for complex components",
-            "Optimize custom code and components",
-            "Use client-side caching where appropriate"
-          ]
-        }
-      ]
-    },
-    {
-      id: "adopt-1",
-      title: "Low User Adoption Rates",
-      description: "Many organizations struggle with getting employees to consistently use the CRM system, resulting in incomplete data and reduced ROI.",
-      category: "adoption",
-      impact: "high",
-      solutions: [
-        {
-          id: "adopt-1-sol-1",
-          title: "Develop Comprehensive Training Program",
-          steps: [
-            "Create role-specific training materials",
-            "Implement a phased training approach",
-            "Develop quick reference guides for common tasks",
-            "Schedule regular refresher training sessions",
-            "Create a knowledge base of FAQs and tutorials"
-          ]
-        },
-        {
-          id: "adopt-1-sol-2",
-          title: "Improve User Experience",
-          steps: [
-            "Customize layouts to match department workflows",
-            "Implement single sign-on for easier access",
-            "Create automation for repetitive tasks",
-            "Gather and act on user feedback",
-            "Recognize and reward active CRM users"
-          ]
-        }
-      ]
-    },
-    {
-      id: "data-1",
-      title: "Maintaining Data Quality and Consistency",
-      description: "Organizations often struggle with duplicate records, inconsistent data formats, and incomplete information, reducing CRM effectiveness.",
-      category: "data",
-      impact: "medium",
-      solutions: [
-        {
-          id: "data-1-sol-1",
-          title: "Implement Data Validation Rules",
-          steps: [
-            "Create required fields for essential information",
-            "Set up data format validation",
-            "Implement picklists for standardized inputs",
-            "Configure duplicate detection rules",
-            "Create data completeness scoring"
-          ]
-        },
-        {
-          id: "data-1-sol-2",
-          title: "Establish Data Governance Processes",
-          steps: [
-            "Appoint data stewards within each department",
-            "Create clear data entry guidelines",
-            "Schedule regular data quality reviews",
-            "Set up automated data cleansing routines",
-            "Develop data quality metrics and reporting"
-          ]
-        }
-      ]
-    },
-    {
-      id: "int-1",
-      title: "Integrating CRM with Legacy Systems",
-      description: "Many organizations struggle to connect their CRM with existing legacy systems, resulting in data silos and duplicate data entry.",
-      category: "integration",
-      impact: "high",
-      solutions: [
-        {
-          id: "int-1-sol-1",
-          title: "Develop API Integration Strategy",
-          steps: [
-            "Map data structures between systems",
-            "Implement middleware for complex integrations",
-            "Create robust error handling processes",
-            "Establish data synchronization schedules",
-            "Monitor integration performance"
-          ]
-        },
-        {
-          id: "int-1-sol-2",
-          title: "Use Pre-built Connectors",
-          steps: [
-            "Evaluate available integration tools and connectors",
-            "Configure bidirectional data syncing",
-            "Test integrations thoroughly in staging environment",
-            "Document integration points and data mappings",
-            "Train users on cross-system workflows"
-          ]
-        }
-      ]
-    }
-  ];
-  
-  const getImpactColor = (impact: string) => {
-    switch (impact) {
-      case "low": return "bg-green-100 text-green-800";
-      case "medium": return "bg-yellow-100 text-yellow-800";
-      case "high": return "bg-orange-100 text-orange-800";
-      case "critical": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-  
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case "security": return <ShieldCheck className="h-4 w-4" />;
-      case "performance": return <Clock className="h-4 w-4" />;
-      case "adoption": return <Users className="h-4 w-4" />;
-      case "data": return <Database className="h-4 w-4" />;
-      case "integration": return <BookOpen className="h-4 w-4" />;
-      default: return <AlertTriangle className="h-4 w-4" />;
-    }
-  };
-  
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  
-  // Filter challenges based on search query and category
-  const filteredChallenges = challenges.filter(challenge => {
-    const matchesSearch = searchQuery === "" || 
+  // Filter challenges based on search query
+  const filterChallenges = (challenges: any[]) => {
+    if (!searchQuery) return challenges;
+    
+    return challenges.filter(challenge => 
       challenge.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       challenge.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      challenge.solutions.some(sol => sol.title.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    const matchesCategory = activeCategory === null || challenge.category === activeCategory;
-    
-    return matchesSearch && matchesCategory;
-  });
+      challenge.solution.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      challenge.industry.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
+  
+  const filteredSales = filterChallenges(challengesData.sales);
+  const filteredMarketing = filterChallenges(challengesData.marketing);
+  const filteredCustomer = filterChallenges(challengesData.customer);
+  const filteredTechnical = filterChallenges(challengesData.technical);
+  
+  // Check if any results match the search query
+  const hasResults = 
+    filteredSales.length > 0 || 
+    filteredMarketing.length > 0 || 
+    filteredCustomer.length > 0 || 
+    filteredTechnical.length > 0;
+  
+  // Get difficulty badge color
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty.toLowerCase()) {
+      case 'low':
+        return 'bg-green-100 text-green-800';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'high':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Common Challenges & Solutions</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Discover solutions to common CRM implementation challenges and best practices for overcoming them.
-        </p>
-      </div>
-
-      <div className="mb-8 max-w-xl mx-auto">
-        <div className="relative">
-          <Input
-            placeholder="Search challenges and solutions..."
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col gap-8">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Common Challenges & Solutions</h1>
+          <p className="text-muted-foreground">
+            Explore practical solutions to common CRM challenges across various business functions.
+          </p>
+        </div>
+        
+        <div className="relative max-w-md mx-auto w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input 
+            placeholder="Search challenges & solutions..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pr-10"
-            icon={<Search className="h-4 w-4" />}
+            className="pl-10"
           />
-        </div>
-      </div>
-      
-      <div className="mb-8">
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <Button 
-            variant={activeCategory === null ? "default" : "outline"} 
-            size="sm" 
-            onClick={() => setActiveCategory(null)}
-            className="rounded-full"
-          >
-            All Categories
-          </Button>
-          
-          {challengeCategories.map(category => (
-            <Button
-              key={category.id}
-              variant={activeCategory === category.id ? "default" : "outline"}
-              size="sm"
-              onClick={() => setActiveCategory(category.id)}
-              className="rounded-full flex items-center gap-1"
+          {searchQuery && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 px-2"
+              onClick={() => setSearchQuery("")}
             >
-              {category.icon}
-              <span>{category.label}</span>
+              Clear
             </Button>
-          ))}
+          )}
         </div>
+        
+        {searchQuery && (
+          <div className="text-sm text-muted-foreground text-center">
+            {hasResults ? 
+              `Showing results for "${searchQuery}"` : 
+              `No results found for "${searchQuery}"`
+            }
+          </div>
+        )}
+        
+        <Tabs defaultValue="sales" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="sales">Sales Challenges</TabsTrigger>
+            <TabsTrigger value="marketing">Marketing Challenges</TabsTrigger>
+            <TabsTrigger value="customer">Customer Service</TabsTrigger>
+            <TabsTrigger value="technical">Technical Issues</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="sales" className="mt-6">
+            {renderChallengesList(filteredSales)}
+          </TabsContent>
+          
+          <TabsContent value="marketing" className="mt-6">
+            {renderChallengesList(filteredMarketing)}
+          </TabsContent>
+          
+          <TabsContent value="customer" className="mt-6">
+            {renderChallengesList(filteredCustomer)}
+          </TabsContent>
+          
+          <TabsContent value="technical" className="mt-6">
+            {renderChallengesList(filteredTechnical)}
+          </TabsContent>
+        </Tabs>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Share Your Own Challenge</CardTitle>
+            <CardDescription>
+              Have you solved a CRM challenge not listed here? Share your experience to help others.
+            </CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Button>Submit Your Solution</Button>
+          </CardFooter>
+        </Card>
       </div>
-
-      {filteredChallenges.length === 0 ? (
-        <div className="text-center py-8">
-          <AlertTriangle className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
-          <h3 className="text-lg font-medium">No challenges match your search</h3>
-          <p className="text-muted-foreground mt-1">Try a different search term or category</p>
-          <Button 
-            variant="outline" 
-            className="mt-4"
-            onClick={() => {
-              setSearchQuery("");
-              setActiveCategory(null);
-            }}
-          >
-            Clear Filters
-          </Button>
-        </div>
-      ) : (
-        <div className="space-y-8">
-          {filteredChallenges.map((challenge) => (
-            <Card key={challenge.id} className="overflow-hidden">
-              <CardHeader className="bg-muted border-b">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      {getCategoryIcon(challenge.category)}
-                      <Badge variant="outline" className="capitalize">
-                        {challenge.category.replace('-', ' ')}
-                      </Badge>
-                      <Badge className={`ml-2 ${getImpactColor(challenge.impact)}`}>
-                        {challenge.impact} impact
-                      </Badge>
-                    </div>
-                    <CardTitle>{challenge.title}</CardTitle>
-                    <CardDescription className="mt-2">
-                      {challenge.description}
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  Recommended Solutions
-                </h3>
-                
-                <Tabs defaultValue={challenge.solutions[0].id} className="w-full">
-                  <TabsList className="w-full mb-4 grid" style={{ gridTemplateColumns: `repeat(${challenge.solutions.length}, 1fr)` }}>
-                    {challenge.solutions.map((solution) => (
-                      <TabsTrigger key={solution.id} value={solution.id}>
-                        {solution.title}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                  
-                  {challenge.solutions.map((solution) => (
-                    <TabsContent key={solution.id} value={solution.id} className="space-y-4">
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <h4 className="font-medium">Implementation Steps</h4>
-                          <ol className="space-y-2 list-decimal list-inside text-muted-foreground">
-                            {solution.steps.map((step, idx) => (
-                              <li key={idx} className="pl-2">{step}</li>
-                            ))}
-                          </ol>
-                        </div>
-                        
-                        {solution.resources && (
-                          <div className="space-y-2">
-                            <h4 className="font-medium">Additional Resources</h4>
-                            <ul className="space-y-1 list-disc list-inside text-muted-foreground">
-                              {solution.resources.map((resource, idx) => (
-                                <li key={idx} className="pl-2">
-                                  <Button variant="link" className="p-0 h-auto" onClick={() => {}}>
-                                    {resource}
-                                  </Button>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </TabsContent>
-                  ))}
-                </Tabs>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
     </div>
   );
+  
+  // Helper function to render challenges list
+  function renderChallengesList(challenges: any[]) {
+    if (challenges.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No challenges match your search criteria.</p>
+          {searchQuery && (
+            <Button 
+              variant="outline" 
+              className="mt-4" 
+              onClick={() => setSearchQuery("")}
+            >
+              Clear Search
+            </Button>
+          )}
+        </div>
+      );
+    }
+    
+    return (
+      <div className="grid grid-cols-1 gap-6">
+        {challenges.map((challenge) => (
+          <Card key={challenge.id} className="overflow-hidden">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="text-xl">{challenge.title}</CardTitle>
+                  <CardDescription className="mt-2">{challenge.description}</CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Badge className={`${getDifficultyColor(challenge.difficulty)}`}>
+                    {challenge.difficulty}
+                  </Badge>
+                  <Badge variant="outline">{challenge.industry}</Badge>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div>
+                <h4 className="font-medium mb-2">Recommended Solution:</h4>
+                <p className="text-muted-foreground">{challenge.solution}</p>
+              </div>
+            </CardContent>
+            <CardFooter className="bg-muted/50 flex justify-between">
+              <div className="flex gap-4 items-center">
+                <span className="flex items-center gap-1 text-sm">
+                  <ThumbsUp className="h-4 w-4" /> {challenge.votes}
+                </span>
+                <span className="flex items-center gap-1 text-sm">
+                  <MessageSquare className="h-4 w-4" /> {challenge.comments}
+                </span>
+              </div>
+              <Button size="sm" variant="ghost" className="gap-1">
+                View Full Solution <ArrowRight className="h-4 w-4" />
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 };
 
 export default ChallengesSolutions;
