@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Send, Save } from "lucide-react";
+import ResponsiveContainer from "@/components/ui/responsive-container";
 
 interface EmailComposeActionsProps {
   onSaveDraft: () => void;
@@ -18,7 +19,42 @@ const EmailComposeActions: React.FC<EmailComposeActionsProps> = ({
   isSending,
   isValid
 }) => {
-  return (
+  // Mobile optimized actions
+  const MobileActions = () => (
+    <div className="flex w-full items-center justify-between gap-2">
+      <Button 
+        type="button" 
+        variant="outline" 
+        onClick={onCancel}
+        className="flex-1"
+      >
+        Cancel
+      </Button>
+      
+      <div className="flex gap-2">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={onSaveDraft}
+          className="w-10 h-10 p-0"
+        >
+          <Save className="h-4 w-4" />
+        </Button>
+        
+        <Button 
+          type="submit" 
+          disabled={isSending || !isValid}
+          onClick={onSubmit}
+          className="w-10 h-10 p-0"
+        >
+          {isSending ? "..." : <Send className="h-4 w-4" />}
+        </Button>
+      </div>
+    </div>
+  );
+  
+  // Desktop actions
+  const DesktopActions = () => (
     <div className="flex items-center gap-2">
       <Button 
         type="button" 
@@ -48,6 +84,13 @@ const EmailComposeActions: React.FC<EmailComposeActionsProps> = ({
         )}
       </Button>
     </div>
+  );
+
+  return (
+    <ResponsiveContainer
+      mobileView={<MobileActions />}
+      desktopView={<DesktopActions />}
+    />
   );
 };
 

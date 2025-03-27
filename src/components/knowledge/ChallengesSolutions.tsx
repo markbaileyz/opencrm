@@ -5,7 +5,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, ThumbsUp, MessageSquare, ArrowRight } from "lucide-react";
+import { Search, ThumbsUp, MessageSquare, ArrowRight, Filter } from "lucide-react";
+import ResponsiveContainer from "@/components/ui/responsive-container";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
 
 // Sample data structure for challenges and solutions
 const challengesData = {
@@ -181,6 +191,47 @@ const ChallengesSolutions: React.FC = () => {
     }
   };
 
+  // Mobile filter section
+  const MobileFilters = () => (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-1 md:hidden">
+          <Filter className="h-4 w-4" />
+          <span>Filter</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="bottom" className="h-[60vh]">
+        <SheetHeader>
+          <SheetTitle>Filter Challenges</SheetTitle>
+          <SheetDescription>
+            Select a category to view related challenges
+          </SheetDescription>
+        </SheetHeader>
+        <div className="py-4">
+          <TabsList className="grid w-full grid-cols-2 gap-2">
+            <TabsTrigger value="sales" onClick={() => {
+              setActiveTab("sales");
+            }}>Sales Challenges</TabsTrigger>
+            <TabsTrigger value="marketing" onClick={() => {
+              setActiveTab("marketing");
+            }}>Marketing Challenges</TabsTrigger>
+            <TabsTrigger value="customer" onClick={() => {
+              setActiveTab("customer");
+            }}>Customer Service</TabsTrigger>
+            <TabsTrigger value="technical" onClick={() => {
+              setActiveTab("technical");
+            }}>Technical Issues</TabsTrigger>
+          </TabsList>
+        </div>
+        <div className="mt-4">
+          <SheetClose asChild>
+            <Button className="w-full">Apply Filters</Button>
+          </SheetClose>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col gap-8">
@@ -191,24 +242,27 @@ const ChallengesSolutions: React.FC = () => {
           </p>
         </div>
         
-        <div className="relative max-w-md mx-auto w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search challenges & solutions..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-          {searchQuery && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 px-2"
-              onClick={() => setSearchQuery("")}
-            >
-              Clear
-            </Button>
-          )}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+              placeholder="Search challenges & solutions..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+            {searchQuery && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 px-2"
+                onClick={() => setSearchQuery("")}
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+          <MobileFilters />
         </div>
         
         {searchQuery && (
@@ -221,12 +275,14 @@ const ChallengesSolutions: React.FC = () => {
         )}
         
         <Tabs defaultValue="sales" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="sales">Sales Challenges</TabsTrigger>
-            <TabsTrigger value="marketing">Marketing Challenges</TabsTrigger>
-            <TabsTrigger value="customer">Customer Service</TabsTrigger>
-            <TabsTrigger value="technical">Technical Issues</TabsTrigger>
-          </TabsList>
+          <ResponsiveContainer>
+            <TabsList className="hidden md:grid w-full grid-cols-4">
+              <TabsTrigger value="sales">Sales Challenges</TabsTrigger>
+              <TabsTrigger value="marketing">Marketing Challenges</TabsTrigger>
+              <TabsTrigger value="customer">Customer Service</TabsTrigger>
+              <TabsTrigger value="technical">Technical Issues</TabsTrigger>
+            </TabsList>
+          </ResponsiveContainer>
           
           <TabsContent value="sales" className="mt-6">
             {renderChallengesList(filteredSales)}
@@ -284,12 +340,12 @@ const ChallengesSolutions: React.FC = () => {
         {challenges.map((challenge) => (
           <Card key={challenge.id} className="overflow-hidden">
             <CardHeader>
-              <div className="flex justify-between items-start">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2">
                 <div>
                   <CardTitle className="text-xl">{challenge.title}</CardTitle>
                   <CardDescription className="mt-2">{challenge.description}</CardDescription>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
                   <Badge className={`${getDifficultyColor(challenge.difficulty)}`}>
                     {challenge.difficulty}
                   </Badge>
@@ -303,7 +359,7 @@ const ChallengesSolutions: React.FC = () => {
                 <p className="text-muted-foreground">{challenge.solution}</p>
               </div>
             </CardContent>
-            <CardFooter className="bg-muted/50 flex justify-between">
+            <CardFooter className="bg-muted/50 flex flex-col sm:flex-row justify-between gap-4">
               <div className="flex gap-4 items-center">
                 <span className="flex items-center gap-1 text-sm">
                   <ThumbsUp className="h-4 w-4" /> {challenge.votes}
@@ -312,7 +368,7 @@ const ChallengesSolutions: React.FC = () => {
                   <MessageSquare className="h-4 w-4" /> {challenge.comments}
                 </span>
               </div>
-              <Button size="sm" variant="ghost" className="gap-1">
+              <Button size="sm" variant="ghost" className="gap-1 w-full sm:w-auto">
                 View Full Solution <ArrowRight className="h-4 w-4" />
               </Button>
             </CardFooter>
