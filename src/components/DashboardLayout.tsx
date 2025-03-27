@@ -16,7 +16,9 @@ import {
   Mailbox,
   Tags,
   Building,
-  Lightbulb
+  Lightbulb,
+  HelpCircle,
+  BookOpen
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -73,6 +75,16 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       icon: <Lightbulb className="h-5 w-5" />,
       label: "Roadmap",
       href: "/roadmap",
+    },
+    {
+      icon: <HelpCircle className="h-5 w-5" />,
+      label: "Knowledge Base",
+      href: "/knowledge-base",
+    },
+    {
+      icon: <BookOpen className="h-5 w-5" />,
+      label: "Challenges & Solutions",
+      href: "/challenges-solutions",
     },
     {
       icon: <Settings className="h-5 w-5" />,
