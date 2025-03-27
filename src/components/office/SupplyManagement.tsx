@@ -1,172 +1,423 @@
 
 import React, { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { type SupplyItem } from "@/types/office";
-import { Plus, Search, ArrowDown, ArrowUp } from "lucide-react";
+import { Plus, Search, ShoppingCart, AlertTriangle, Filter, Download, Upload } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import type { SupplyItem } from "@/types/office";
 
 const SupplyManagement: React.FC = () => {
+  const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentItem, setCurrentItem] = useState<SupplyItem | null>(null);
   const [supplies, setSupplies] = useState<SupplyItem[]>([
     {
-      id: "sup-1",
-      name: "Copy Paper",
+      id: "1",
+      name: "Examination Gloves",
+      category: "medical",
+      currentStock: 500,
+      minStock: 100,
+      unit: "boxes",
+      lastOrdered: "2023-10-15",
+      supplier: "MedSupply Inc.",
+      reorderAmount: 200,
+      location: "Storage Room A"
+    },
+    {
+      id: "2",
+      name: "Printer Paper",
       category: "office",
-      currentStock: 10,
+      currentStock: 15,
       minStock: 5,
-      unit: "ream",
+      unit: "reams",
+      lastOrdered: "2023-11-02",
       supplier: "Office Depot",
       reorderAmount: 20,
-      location: "Storage Room"
+      location: "Supply Closet 1"
     },
     {
-      id: "sup-2",
-      name: "Pens",
-      category: "office",
-      currentStock: 50,
-      minStock: 20,
-      unit: "box",
-      supplier: "Staples",
-      reorderAmount: 10,
-      location: "Front Desk"
+      id: "3",
+      name: "Disposable Face Masks",
+      category: "medical",
+      currentStock: 30,
+      minStock: 50,
+      unit: "boxes",
+      lastOrdered: "2023-09-20",
+      supplier: "MedSupply Inc.",
+      reorderAmount: 100,
+      location: "Storage Room A"
     },
     {
-      id: "sup-3",
+      id: "4",
       name: "Coffee",
       category: "kitchen",
-      currentStock: 3,
-      minStock: 5,
-      unit: "bag",
-      supplier: "Amazon",
-      reorderAmount: 5,
+      currentStock: 8,
+      minStock: 3,
+      unit: "bags",
+      lastOrdered: "2023-10-28",
+      supplier: "Office Depot",
+      reorderAmount: 10,
       location: "Break Room"
     },
     {
-      id: "sup-4",
-      name: "Hand Sanitizer",
+      id: "5",
+      name: "Disinfectant Wipes",
       category: "cleaning",
-      currentStock: 8,
-      minStock: 3,
-      unit: "bottle",
-      supplier: "Costco",
-      reorderAmount: 12,
-      location: "All Rooms"
-    },
+      currentStock: 12,
+      minStock: 10,
+      unit: "containers",
+      lastOrdered: "2023-10-05",
+      supplier: "Cleaning Supplies Co.",
+      reorderAmount: 24,
+      location: "Cleaning Closet"
+    }
   ]);
-  
-  const [isAddSupplyOpen, setIsAddSupplyOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [newSupply, setNewSupply] = useState<Partial<SupplyItem>>({
-    name: "",
-    category: "office",
-    currentStock: 0,
-    minStock: 1,
-    unit: "",
-    supplier: "",
-    reorderAmount: 0,
-    location: ""
-  });
-  
-  const handleAddSupply = () => {
-    const supplyToAdd: SupplyItem = {
-      id: `sup-${Date.now()}`,
-      name: newSupply.name || "New Supply",
-      category: newSupply.category || "office",
-      currentStock: newSupply.currentStock || 0,
-      minStock: newSupply.minStock || 1,
-      unit: newSupply.unit || "item",
-      supplier: newSupply.supplier,
-      reorderAmount: newSupply.reorderAmount,
-      location: newSupply.location
-    };
-    
-    setSupplies([...supplies, supplyToAdd]);
-    setIsAddSupplyOpen(false);
-    setNewSupply({
+
+  const handleAddItem = () => {
+    setCurrentItem({
+      id: String(Date.now()),
       name: "",
-      category: "office",
+      category: "medical",
       currentStock: 0,
-      minStock: 1,
+      minStock: 0,
       unit: "",
+      lastOrdered: new Date().toISOString().split('T')[0],
       supplier: "",
       reorderAmount: 0,
       location: ""
     });
+    setIsDialogOpen(true);
   };
-  
-  const filteredSupplies = supplies.filter(item => 
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (item.supplier && item.supplier.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-  
-  const getCategoryLabel = (category: SupplyItem["category"]) => {
+
+  const handleEditItem = (item: SupplyItem) => {
+    setCurrentItem(item);
+    setIsDialogOpen(true);
+  };
+
+  const handleDeleteItem = (itemId: string) => {
+    setSupplies(supplies.filter(item => item.id !== itemId));
+    toast({
+      title: "Item deleted",
+      description: "The supply item has been removed from inventory",
+      variant: "default"
+    });
+  };
+
+  const handleReorderItem = (item: SupplyItem) => {
+    toast({
+      title: "Reorder initiated",
+      description: `Ordered ${item.reorderAmount} ${item.unit} of ${item.name} from ${item.supplier}`,
+      variant: "default"
+    });
+    
+    // Update last ordered date and increase stock
+    const updatedSupplies = supplies.map(supply => {
+      if (supply.id === item.id) {
+        return {
+          ...supply,
+          lastOrdered: new Date().toISOString().split('T')[0],
+          currentStock: supply.currentStock + (supply.reorderAmount || 0)
+        };
+      }
+      return supply;
+    });
+    
+    setSupplies(updatedSupplies);
+  };
+
+  const handleSaveItem = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!currentItem) return;
+
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const category = formData.get("category") as SupplyItem["category"];
+    const currentStock = parseInt(formData.get("currentStock") as string, 10);
+    const minStock = parseInt(formData.get("minStock") as string, 10);
+    const unit = formData.get("unit") as string;
+    const supplier = formData.get("supplier") as string;
+    const reorderAmount = parseInt(formData.get("reorderAmount") as string, 10);
+    const location = formData.get("location") as string;
+
+    const updatedItem: SupplyItem = {
+      ...currentItem,
+      name,
+      category,
+      currentStock,
+      minStock,
+      unit,
+      supplier,
+      reorderAmount,
+      location
+    };
+
+    const isNewItem = !supplies.some(item => item.id === currentItem.id);
+    
+    if (isNewItem) {
+      setSupplies([...supplies, updatedItem]);
+      toast({
+        title: "Item added",
+        description: `${name} has been added to inventory`,
+        variant: "default"
+      });
+    } else {
+      setSupplies(supplies.map(item => 
+        item.id === currentItem.id ? updatedItem : item
+      ));
+      toast({
+        title: "Item updated",
+        description: `${name} has been updated in inventory`,
+        variant: "default"
+      });
+    }
+
+    setIsDialogOpen(false);
+    setCurrentItem(null);
+  };
+
+  const getStockStatus = (item: SupplyItem) => {
+    if (item.currentStock <= 0) {
+      return { status: "Out of stock", color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" };
+    }
+    if (item.currentStock < item.minStock) {
+      return { status: "Low stock", color: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300" };
+    }
+    return { status: "In stock", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" };
+  };
+
+  const getCategoryColor = (category: string) => {
     switch (category) {
-      case "medical": return "Medical";
-      case "office": return "Office";
-      case "kitchen": return "Kitchen";
-      case "cleaning": return "Cleaning";
-      default: return "Other";
+      case "medical":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
+      case "office":
+        return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
+      case "kitchen":
+        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+      case "cleaning":
+        return "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300";
+      default:
+        return "bg-slate-100 text-slate-800 dark:bg-slate-800/50 dark:text-slate-300";
     }
   };
-  
-  const getStockStatus = (current: number, min: number) => {
-    if (current <= 0) return { label: "Out of Stock", className: "bg-red-100 text-red-800" };
-    if (current <= min) return { label: "Low Stock", className: "bg-yellow-100 text-yellow-800" };
-    return { label: "In Stock", className: "bg-green-100 text-green-800" };
-  };
-  
+
+  const filteredSupplies = supplies.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         item.supplier?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         item.location?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = categoryFilter === "all" || item.category === categoryFilter;
+    
+    return matchesSearch && matchesCategory;
+  });
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-xl font-semibold">Supply Inventory</h2>
-        
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <div className="relative w-full sm:w-60">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search supplies..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8"
-            />
+      <div className="flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center">
+        <div>
+          <h2 className="text-xl font-semibold">Supply Management</h2>
+          <p className="text-muted-foreground">
+            Track and manage office and medical supplies
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+          <Button size="sm" variant="outline">
+            <Upload className="h-4 w-4 mr-2" />
+            Import
+          </Button>
+          <Button onClick={handleAddItem}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Item
+          </Button>
+        </div>
+      </div>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center">
+            <CardTitle>Inventory</CardTitle>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search supplies..."
+                  className="pl-8 w-full sm:w-[250px]"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Filter className="h-4 w-4 mr-2" />
+                    {categoryFilter === "all" ? "All Categories" : 
+                      categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1)}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuRadioGroup value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <DropdownMenuRadioItem value="all">All Categories</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="medical">Medical</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="office">Office</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="kitchen">Kitchen</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="cleaning">Cleaning</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="other">Other</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
-          
-          <Dialog open={isAddSupplyOpen} onOpenChange={setIsAddSupplyOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Supply
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Supply</DialogTitle>
-              </DialogHeader>
-              
-              <div className="grid gap-4 py-4">
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Current Stock</TableHead>
+                <TableHead>Min. Stock</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Last Ordered</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredSupplies.length > 0 ? (
+                filteredSupplies.map((item) => {
+                  const status = getStockStatus(item);
+                  return (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.name}</TableCell>
+                      <TableCell>
+                        <Badge className={getCategoryColor(item.category)}>
+                          {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={status.color}>
+                          {status.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {item.currentStock} {item.unit}
+                      </TableCell>
+                      <TableCell>{item.minStock} {item.unit}</TableCell>
+                      <TableCell>{item.location}</TableCell>
+                      <TableCell>{item.lastOrdered ? new Date(item.lastOrdered).toLocaleDateString() : "Never"}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          {item.currentStock < item.minStock && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8"
+                              onClick={() => handleReorderItem(item)}
+                            >
+                              <ShoppingCart className="h-3.5 w-3.5 mr-1" />
+                              Reorder
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8"
+                            onClick={() => handleEditItem(item)}
+                          >
+                            Edit
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center h-32">
+                    <div className="flex flex-col items-center justify-center">
+                      <AlertTriangle className="h-8 w-8 text-muted-foreground mb-2" />
+                      <p className="text-muted-foreground">No items found</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <div className="text-sm text-muted-foreground">
+            {filteredSupplies.length} items • {supplies.filter(i => i.currentStock < i.minStock).length} low stock
+          </div>
+        </CardFooter>
+      </Card>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader>
+            <DialogTitle>{currentItem?.name ? 'Edit Supply Item' : 'Add New Supply Item'}</DialogTitle>
+            <DialogDescription>
+              {currentItem?.name 
+                ? 'Update the supply item details below.'
+                : 'Fill in the details for the new supply item.'}
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveItem}>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Item Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  placeholder="Enter item name"
+                  defaultValue={currentItem?.name}
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="supply-name">Name</Label>
-                  <Input 
-                    id="supply-name" 
-                    value={newSupply.name || ""}
-                    onChange={(e) => setNewSupply({...newSupply, name: e.target.value})}
-                    placeholder="Enter supply name" 
-                  />
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="supply-category">Category</Label>
-                  <Select 
-                    value={newSupply.category || "office"}
-                    onValueChange={(value) => setNewSupply({...newSupply, category: value as SupplyItem["category"]})}
-                  >
-                    <SelectTrigger id="supply-category">
+                  <Label htmlFor="category">Category</Label>
+                  <Select name="category" defaultValue={currentItem?.category}>
+                    <SelectTrigger>
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
@@ -178,185 +429,89 @@ const SupplyManagement: React.FC = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="current-stock">Current Stock</Label>
-                    <Input 
-                      id="current-stock" 
-                      type="number" 
-                      min="0"
-                      value={newSupply.currentStock || 0}
-                      onChange={(e) => setNewSupply({...newSupply, currentStock: parseInt(e.target.value)})}
-                    />
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="min-stock">Min Stock</Label>
-                    <Input 
-                      id="min-stock" 
-                      type="number" 
-                      min="0"
-                      value={newSupply.minStock || 1}
-                      onChange={(e) => setNewSupply({...newSupply, minStock: parseInt(e.target.value)})}
-                    />
-                  </div>
-                </div>
-                
+
                 <div className="grid gap-2">
-                  <Label htmlFor="unit">Unit</Label>
-                  <Input 
-                    id="unit" 
-                    value={newSupply.unit || ""}
-                    onChange={(e) => setNewSupply({...newSupply, unit: e.target.value})}
-                    placeholder="e.g., box, ream, bottle" 
+                  <Label htmlFor="location">Storage Location</Label>
+                  <Input
+                    id="location"
+                    name="location"
+                    placeholder="Where is it stored?"
+                    defaultValue={currentItem?.location}
                   />
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="supplier">Supplier (Optional)</Label>
-                  <Input 
-                    id="supplier" 
-                    value={newSupply.supplier || ""}
-                    onChange={(e) => setNewSupply({...newSupply, supplier: e.target.value})}
-                    placeholder="Enter supplier name" 
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="reorder-amount">Reorder Amount</Label>
-                    <Input 
-                      id="reorder-amount" 
-                      type="number" 
-                      min="0"
-                      value={newSupply.reorderAmount || 0}
-                      onChange={(e) => setNewSupply({...newSupply, reorderAmount: parseInt(e.target.value)})}
-                    />
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="location">Location</Label>
-                    <Input 
-                      id="location" 
-                      value={newSupply.location || ""}
-                      onChange={(e) => setNewSupply({...newSupply, location: e.target.value})}
-                      placeholder="e.g., Storage Room" 
-                    />
-                  </div>
                 </div>
               </div>
-              
-              <Button onClick={handleAddSupply}>Add Supply</Button>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>Current Inventory</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead className="text-right">Current Stock</TableHead>
-                <TableHead className="text-right">Min Stock</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredSupplies.map((item) => {
-                const stockStatus = getStockStatus(item.currentStock, item.minStock);
-                
-                return (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell>{getCategoryLabel(item.category)}</TableCell>
-                    <TableCell className="text-right">{item.currentStock} {item.unit}</TableCell>
-                    <TableCell className="text-right">{item.minStock} {item.unit}</TableCell>
-                    <TableCell>
-                      <Badge className={stockStatus.className}>
-                        {stockStatus.label}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{item.location || "—"}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end space-x-2">
-                        <Button size="sm" variant="outline">
-                          <ArrowUp className="h-4 w-4 mr-1" />
-                          Add
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <ArrowDown className="h-4 w-4 mr-1" />
-                          Use
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-              
-              {filteredSupplies.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
-                    No supplies found
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>Items to Reorder</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Current Stock</TableHead>
-                <TableHead>Min Stock</TableHead>
-                <TableHead>Reorder Amount</TableHead>
-                <TableHead>Supplier</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {supplies
-                .filter(item => item.currentStock <= item.minStock)
-                .map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell>{item.currentStock} {item.unit}</TableCell>
-                    <TableCell>{item.minStock} {item.unit}</TableCell>
-                    <TableCell>{item.reorderAmount || "—"} {item.unit}</TableCell>
-                    <TableCell>{item.supplier || "—"}</TableCell>
-                    <TableCell className="text-right">
-                      <Button size="sm">Reorder</Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              
-              {supplies.filter(item => item.currentStock <= item.minStock).length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
-                    No items to reorder
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="currentStock">Current Stock</Label>
+                  <Input
+                    id="currentStock"
+                    name="currentStock"
+                    type="number"
+                    min="0"
+                    defaultValue={currentItem?.currentStock}
+                    required
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="minStock">Minimum Stock</Label>
+                  <Input
+                    id="minStock"
+                    name="minStock"
+                    type="number"
+                    min="0"
+                    defaultValue={currentItem?.minStock}
+                    required
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="unit">Unit</Label>
+                  <Input
+                    id="unit"
+                    name="unit"
+                    placeholder="boxes, items, etc."
+                    defaultValue={currentItem?.unit}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="supplier">Supplier</Label>
+                  <Input
+                    id="supplier"
+                    name="supplier"
+                    placeholder="Who supplies this item?"
+                    defaultValue={currentItem?.supplier}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="reorderAmount">Reorder Amount</Label>
+                  <Input
+                    id="reorderAmount"
+                    name="reorderAmount"
+                    type="number"
+                    min="0"
+                    defaultValue={currentItem?.reorderAmount}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Save</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

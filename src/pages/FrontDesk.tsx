@@ -1,19 +1,14 @@
 
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import ResponsiveContainer from "@/components/ui/responsive-container";
-import MobileFrontDesk from "@/components/front-desk/MobileFrontDesk";
-import DesktopFrontDesk from "@/components/front-desk/DesktopFrontDesk";
+import FrontDeskDashboard from "@/components/front-desk/FrontDeskDashboard";
 
-const FrontDesk = () => {
+const FrontDeskPage: React.FC = () => {
   return (
     <DashboardLayout>
-      <ResponsiveContainer
-        mobileView={<MobileFrontDesk />}
-        desktopView={<DesktopFrontDesk />}
-      />
+      <FrontDeskDashboard />
     </DashboardLayout>
   );
 };
 
-export default FrontDesk;
+export default FrontDeskPage;
