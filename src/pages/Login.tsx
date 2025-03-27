@@ -3,7 +3,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import LoginForm from "@/components/LoginForm";
 
-const Login = () => {
+interface LoginProps {
+  isSignUp?: boolean;
+}
+
+const Login = ({ isSignUp = false }: LoginProps) => {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-background to-secondary/20 p-4">
       <div className="mb-8 text-center">
@@ -14,7 +18,7 @@ const Login = () => {
         </Link>
       </div>
       
-      <LoginForm />
+      <LoginForm isSignUp={isSignUp} />
       
       <div className="mt-8 text-center text-sm text-muted-foreground">
         <p>Test accounts available for demo purposes.</p>

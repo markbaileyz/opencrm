@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,13 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
+interface SidebarItem {
+  icon: React.ReactNode;
+  label: string;
+  href: string;
+  roles?: string[];
+}
+
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const { logout, user, hasRole } = useAuth();
   const location = useLocation();
@@ -38,7 +46,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { toast } = useToast();
   
-  const baseSidebarItems = [
+  const baseSidebarItems: SidebarItem[] = [
     {
       icon: <LayoutDashboard className="h-5 w-5" />,
       label: "Dashboard",
@@ -46,7 +54,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     },
   ];
 
-  const medicalSidebarItems = [
+  const medicalSidebarItems: SidebarItem[] = [
     {
       icon: <Users className="h-5 w-5" />,
       label: "Patients",
@@ -67,7 +75,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     },
   ];
 
-  const adminSidebarItems = [
+  const adminSidebarItems: SidebarItem[] = [
     {
       icon: <Building className="h-5 w-5" />,
       label: "Organizations",
@@ -94,7 +102,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     },
   ];
 
-  const settingsSidebarItems = [
+  const settingsSidebarItems: SidebarItem[] = [
     {
       icon: <HelpCircle className="h-5 w-5" />,
       label: "Knowledge Base",
@@ -112,7 +120,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     },
   ];
 
-  const adminSettingsItems = [
+  const adminSettingsItems: SidebarItem[] = [
     {
       icon: <Shield className="h-5 w-5" />,
       label: "Admin Settings",
