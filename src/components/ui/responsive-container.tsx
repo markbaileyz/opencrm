@@ -1,12 +1,15 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ResponsiveContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   breakpoint?: "sm" | "md" | "lg" | "xl";
   mobileView?: React.ReactNode;
   desktopView?: React.ReactNode;
+  forceMobile?: boolean;
+  forceDesktop?: boolean;
 }
 
 /**
@@ -20,8 +23,11 @@ const ResponsiveContainer = ({
   breakpoint = "md",
   mobileView,
   desktopView,
+  forceMobile = false,
+  forceDesktop = false,
   ...props
 }: ResponsiveContainerProps) => {
+  const isMobile = useIsMobile();
   const breakpointMap = {
     sm: "sm:block",
     md: "md:block",
@@ -29,7 +35,17 @@ const ResponsiveContainer = ({
     xl: "xl:block",
   };
 
-  // If specific mobile and desktop views are provided
+  // Force specific view if requested
+  if (forceMobile && mobileView) return <>{mobileView}</>;
+  if (forceDesktop && desktopView) return <>{desktopView}</>;
+  
+  // Use isMobile hook to determine which view to render if auto-detection preferred
+  if ((mobileView || desktopView) && isMobile !== undefined) {
+    if (isMobile && mobileView) return <>{mobileView}</>;
+    if (!isMobile && desktopView) return <>{desktopView}</>;
+  }
+
+  // If specific mobile and desktop views are provided but no auto-detection
   if (mobileView || desktopView) {
     return (
       <div className={cn(className)} {...props}>

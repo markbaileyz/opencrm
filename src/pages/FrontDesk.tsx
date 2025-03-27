@@ -1,43 +1,77 @@
-
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Clock, Users, UserPlus, Check, Search } from "lucide-react";
+import ResponsiveContainer from "@/components/ui/responsive-container";
+import MobileLayout from "@/components/layout/MobileLayout";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const FrontDesk = () => {
-  return (
-    <DashboardLayout>
-      <div className="flex flex-col space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold mb-1">Front Desk</h1>
-            <p className="text-muted-foreground">
-              Manage patient check-ins, appointments, and scheduling
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button>
-              <UserPlus className="h-4 w-4 mr-2" />
-              Check-In Patient
-            </Button>
-            <Button variant="outline">
-              <Calendar className="h-4 w-4 mr-2" />
-              View Schedule
-            </Button>
-          </div>
-        </div>
+  const isMobile = useIsMobile();
 
+  // Mobile versions of components
+  const MobileHeader = () => (
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold">Front Desk</h2>
+      <p className="text-sm text-muted-foreground">
+        Manage patient check-ins, appointments, and scheduling
+      </p>
+      <div className="flex gap-2">
+        <Button className="w-full">
+          <UserPlus className="h-4 w-4 mr-2" />
+          Check-In
+        </Button>
+        <Button variant="outline" className="w-full">
+          <Calendar className="h-4 w-4 mr-2" />
+          Schedule
+        </Button>
+      </div>
+    </div>
+  );
+
+  const MobileStats = () => (
+    <div className="grid grid-cols-2 gap-3 mt-4">
+      <Card className="p-3">
+        <CardTitle className="text-xs font-medium">Check-ins</CardTitle>
+        <div className="text-xl font-bold mt-2">24</div>
+        <p className="text-xs text-muted-foreground">+12% from yesterday</p>
+      </Card>
+      <Card className="p-3">
+        <CardTitle className="text-xs font-medium">Wait Time</CardTitle>
+        <div className="text-xl font-bold mt-2">14 min</div>
+        <p className="text-xs text-muted-foreground">-3 min from avg</p>
+      </Card>
+      <Card className="p-3">
+        <CardTitle className="text-xs font-medium">Pending</CardTitle>
+        <div className="text-xl font-bold mt-2">8</div>
+        <p className="text-xs text-muted-foreground">next 2 hours</p>
+      </Card>
+      <Card className="p-3">
+        <CardTitle className="text-xs font-medium">Rooms</CardTitle>
+        <div className="text-xl font-bold mt-2">7/12</div>
+        <p className="text-xs text-muted-foreground">58% utilization</p>
+      </Card>
+    </div>
+  );
+
+  const MobileFrontDesk = () => (
+    <MobileLayout title="Front Desk" navigationContent={<div className="p-4">Navigation placeholder</div>}>
+      <div className="space-y-6">
+        <MobileHeader />
+        
         <Tabs defaultValue="waiting" className="w-full">
-          <TabsList className="grid grid-cols-3 w-full md:w-[400px]">
+          <TabsList className="grid grid-cols-3 w-full">
             <TabsTrigger value="waiting">Waiting</TabsTrigger>
             <TabsTrigger value="checked-in">Checked In</TabsTrigger>
             <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="waiting" className="mt-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <MobileStats />
+          
+          <TabsContent value="waiting" className="mt-4">
+            <div className="space-y-3">
               <PatientWaitingCard 
                 name="John Smith" 
                 time="10:30 AM" 
@@ -62,8 +96,8 @@ const FrontDesk = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="checked-in" className="mt-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <TabsContent value="checked-in" className="mt-4">
+            <div className="space-y-3">
               <PatientCheckedInCard 
                 name="Maria Rodriguez" 
                 time="10:15 AM" 
@@ -81,8 +115,8 @@ const FrontDesk = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="upcoming" className="mt-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <TabsContent value="upcoming" className="mt-4">
+            <div className="space-y-3">
               <PatientUpcomingCard 
                 name="Sarah Johnson" 
                 time="11:30 AM" 
@@ -101,55 +135,163 @@ const FrontDesk = () => {
                 provider="Dr. Williams"
                 appointmentType="Consultation" 
               />
-              <PatientUpcomingCard 
-                name="James Martin" 
-                time="1:15 PM" 
-                provider="Dr. Smith"
-                appointmentType="Follow-up" 
-              />
             </div>
           </TabsContent>
         </Tabs>
+      </div>
+    </MobileLayout>
+  );
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Total Check-ins Today</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">24</div>
-              <p className="text-xs text-muted-foreground mt-1">+12% from yesterday</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Average Wait Time</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">14 min</div>
-              <p className="text-xs text-muted-foreground mt-1">-3 min from average</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Pending Appointments</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">8</div>
-              <p className="text-xs text-muted-foreground mt-1">for the next 2 hours</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Rooms Available</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">7/12</div>
-              <p className="text-xs text-muted-foreground mt-1">58% utilization</p>
-            </CardContent>
-          </Card>
+  const DesktopFrontDesk = () => (
+    <div className="flex flex-col space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold mb-1">Front Desk</h1>
+          <p className="text-muted-foreground">
+            Manage patient check-ins, appointments, and scheduling
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button>
+            <UserPlus className="h-4 w-4 mr-2" />
+            Check-In Patient
+          </Button>
+          <Button variant="outline">
+            <Calendar className="h-4 w-4 mr-2" />
+            View Schedule
+          </Button>
         </div>
       </div>
+
+      <Tabs defaultValue="waiting" className="w-full">
+        <TabsList className="grid grid-cols-3 w-full md:w-[400px]">
+          <TabsTrigger value="waiting">Waiting</TabsTrigger>
+          <TabsTrigger value="checked-in">Checked In</TabsTrigger>
+          <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="waiting" className="mt-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <PatientWaitingCard 
+              name="John Smith" 
+              time="10:30 AM" 
+              waitTime="15 min" 
+              provider="Dr. Johnson"
+              appointmentType="Follow-up" 
+            />
+            <PatientWaitingCard 
+              name="Alice Chen" 
+              time="10:45 AM" 
+              waitTime="5 min" 
+              provider="Dr. Williams"
+              appointmentType="New Patient" 
+            />
+            <PatientWaitingCard 
+              name="Robert Davis" 
+              time="11:00 AM" 
+              waitTime="Just arrived" 
+              provider="Dr. Smith"
+              appointmentType="Consultation" 
+            />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="checked-in" className="mt-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <PatientCheckedInCard 
+              name="Maria Rodriguez" 
+              time="10:15 AM" 
+              checkInTime="10:10 AM"
+              provider="Dr. Johnson"
+              room="103" 
+            />
+            <PatientCheckedInCard 
+              name="David Lee" 
+              time="10:00 AM" 
+              checkInTime="9:55 AM"
+              provider="Dr. Williams"
+              room="105" 
+            />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="upcoming" className="mt-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <PatientUpcomingCard 
+              name="Sarah Johnson" 
+              time="11:30 AM" 
+              provider="Dr. Smith"
+              appointmentType="Follow-up" 
+            />
+            <PatientUpcomingCard 
+              name="Michael Brown" 
+              time="11:45 AM" 
+              provider="Dr. Johnson"
+              appointmentType="New Patient" 
+            />
+            <PatientUpcomingCard 
+              name="Jennifer Wilson" 
+              time="12:00 PM" 
+              provider="Dr. Williams"
+              appointmentType="Consultation" 
+            />
+            <PatientUpcomingCard 
+              name="James Martin" 
+              time="1:15 PM" 
+              provider="Dr. Smith"
+              appointmentType="Follow-up" 
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-6">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Total Check-ins Today</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">24</div>
+            <p className="text-xs text-muted-foreground mt-1">+12% from yesterday</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Average Wait Time</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">14 min</div>
+            <p className="text-xs text-muted-foreground mt-1">-3 min from average</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Pending Appointments</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">8</div>
+            <p className="text-xs text-muted-foreground mt-1">for the next 2 hours</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Rooms Available</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">7/12</div>
+            <p className="text-xs text-muted-foreground mt-1">58% utilization</p>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  return (
+    <DashboardLayout>
+      <ResponsiveContainer
+        mobileView={<MobileFrontDesk />}
+        desktopView={<DesktopFrontDesk />}
+      />
     </DashboardLayout>
   );
 };

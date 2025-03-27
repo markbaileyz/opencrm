@@ -1,9 +1,11 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, Menu, X } from "lucide-react";
+import { ChevronLeft, Menu, X, Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/context/AuthContext";
 
 interface MobileLayoutProps {
   children: React.ReactNode;
@@ -12,6 +14,8 @@ interface MobileLayoutProps {
   onBack?: () => void;
   actions?: React.ReactNode;
   navigationContent?: React.ReactNode;
+  showNotifications?: boolean;
+  showSearch?: boolean;
   className?: string;
 }
 
@@ -19,11 +23,15 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({
   children,
   title,
   showBackButton = false,
-  onBack,
+  onBack = () => window.history.back(),
   actions,
   navigationContent,
+  showNotifications = false,
+  showSearch = false,
   className
 }) => {
+  const { user } = useAuth();
+
   return (
     <div className={cn("flex flex-col min-h-full", className)}>
       {/* Mobile header */}
@@ -42,16 +50,18 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[80%] max-w-sm">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-lg font-semibold">Menu</h2>
+              <SheetContent side="left" className="w-[80%] max-w-sm p-0">
+                <div className="flex justify-between items-center p-4 border-b">
+                  <h2 className="text-lg font-semibold">{user?.displayName || "Menu"}</h2>
                   <SheetClose asChild>
                     <Button variant="ghost" size="icon">
                       <X className="h-5 w-5" />
                     </Button>
                   </SheetClose>
                 </div>
-                {navigationContent}
+                <div className="p-0 overflow-y-auto max-h-[calc(100vh-70px)]">
+                  {navigationContent}
+                </div>
               </SheetContent>
             </Sheet>
           )}
@@ -59,7 +69,24 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({
           {title && <h1 className="text-lg font-semibold">{title}</h1>}
         </div>
         
-        {actions && <div className="flex items-center gap-2">{actions}</div>}
+        <div className="flex items-center gap-2">
+          {showSearch && (
+            <Button variant="ghost" size="icon">
+              <Search className="h-5 w-5" />
+            </Button>
+          )}
+          
+          {showNotifications && (
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="h-5 w-5" />
+              <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                3
+              </Badge>
+            </Button>
+          )}
+          
+          {actions}
+        </div>
       </div>
       
       {/* Content area */}
