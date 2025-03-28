@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { WorkflowExecution } from "../types/executionHistory";
 import { generateSampleHistory } from "../execution/executionHistoryUtils";
-import { calculateAnalyticsData } from "../execution/analyticsUtils";
+import { calculateAnalyticsData } from "../execution/analytics/analyticsUtils";
 
 export const useExecutionHistory = () => {
   const [executionHistory, setExecutionHistory] = useState<WorkflowExecution[]>([]);

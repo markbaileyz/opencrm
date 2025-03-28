@@ -4,15 +4,14 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { CheckCircle, XCircle } from "lucide-react";
 import { format } from "date-fns";
 import { WorkflowExecution } from "../../types/executionHistory";
+import { formatDuration } from "./analyticsUtils";
 
 interface RecentExecutionsTableProps {
   executionHistory: WorkflowExecution[];
-  formatDuration: (ms: number) => string;
 }
 
 const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({ 
-  executionHistory,
-  formatDuration
+  executionHistory
 }) => {
   return (
     <Card>

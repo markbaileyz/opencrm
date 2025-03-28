@@ -80,7 +80,6 @@ const WorkflowAnalytics: React.FC<WorkflowAnalyticsProps> = ({
       
       <RecentExecutionsTable 
         executionHistory={executionHistory}
-        formatDuration={formatDuration}
       />
     </div>
   );
