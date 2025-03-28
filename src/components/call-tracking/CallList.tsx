@@ -49,6 +49,8 @@ const CallList: React.FC<CallListProps> = ({
         return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Outgoing</Badge>;
       case "missed":
         return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Missed</Badge>;
+      case "scheduled":
+        return <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">Scheduled</Badge>;
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
@@ -58,6 +60,18 @@ const CallList: React.FC<CallListProps> = ({
     if (onCallSelect) {
       onCallSelect(id);
     }
+  };
+
+  const getCallDate = (call: CallRecord) => {
+    return call.timestamp || call.date;
+  };
+
+  const getCallName = (call: CallRecord) => {
+    return call.contactName || call.name;
+  };
+
+  const getCallPhone = (call: CallRecord) => {
+    return call.phoneNumber || call.phone;
   };
 
   return (
@@ -79,14 +93,14 @@ const CallList: React.FC<CallListProps> = ({
                     {getCallIcon(call)}
                   </div>
                   <div>
-                    <p className="font-medium">{call.name}</p>
+                    <p className="font-medium">{getCallName(call)}</p>
                     <div className="flex items-center text-sm text-muted-foreground">
                       <Phone className="h-3 w-3 mr-1" />
-                      <span>{call.phone}</span>
+                      <span>{getCallPhone(call)}</span>
                     </div>
                     <div className="flex items-center text-xs text-muted-foreground mt-1">
                       <Clock className="h-3 w-3 mr-1" />
-                      <span>{formatDistanceToNow(new Date(call.date), { addSuffix: true })}</span>
+                      <span>{formatDistanceToNow(new Date(getCallDate(call)), { addSuffix: true })}</span>
                       <span className="mx-1">•</span>
                       <span>{call.duration} seconds</span>
                     </div>

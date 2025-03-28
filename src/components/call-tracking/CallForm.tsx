@@ -20,31 +20,33 @@ import {
 } from "@/components/ui/select";
 import { CallRecord } from "@/types/call";
 
-interface CallFormProps {
+export interface CallFormProps {
   open: boolean;
   onClose: () => void;
   onSave: (call: CallRecord) => void;
   initialData: CallRecord | null;
+  title?: string;
 }
 
 const CallForm: React.FC<CallFormProps> = ({ 
   open, 
   onClose, 
   onSave, 
-  initialData 
+  initialData,
+  title = initialData ? "Edit Call" : "Add Call"
 }) => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [type, setType] = useState<"incoming" | "outgoing" | "missed">("incoming");
+  const [type, setType] = useState<"incoming" | "outgoing" | "missed" | "scheduled">("incoming");
   const [duration, setDuration] = useState<number>(0);
   const [notes, setNotes] = useState("");
   
   useEffect(() => {
     if (initialData) {
-      setName(initialData.name);
-      setPhone(initialData.phone);
-      setType(initialData.type);
-      setDuration(initialData.duration);
+      setName(initialData.name || initialData.contactName || "");
+      setPhone(initialData.phone || initialData.phoneNumber || "");
+      setType(initialData.type || "incoming");
+      setDuration(initialData.duration || 0);
       setNotes(initialData.notes || "");
     } else {
       setName("");
@@ -63,7 +65,10 @@ const CallForm: React.FC<CallFormProps> = ({
       type,
       duration,
       notes,
-      date: initialData?.date || new Date().toISOString()
+      date: initialData?.date || initialData?.timestamp || new Date().toISOString(),
+      timestamp: initialData?.timestamp || initialData?.date || new Date().toISOString(),
+      contactName: name,
+      phoneNumber: phone
     };
     
     onSave(callData);
@@ -73,7 +78,7 @@ const CallForm: React.FC<CallFormProps> = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{initialData ? "Edit Call" : "Add Call"}</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
@@ -109,7 +114,7 @@ const CallForm: React.FC<CallFormProps> = ({
             </Label>
             <Select 
               value={type} 
-              onValueChange={(value) => setType(value as "incoming" | "outgoing" | "missed")}
+              onValueChange={(value) => setType(value as "incoming" | "outgoing" | "missed" | "scheduled")}
             >
               <SelectTrigger id="type" className="col-span-3">
                 <SelectValue placeholder="Call type" />
@@ -118,6 +123,7 @@ const CallForm: React.FC<CallFormProps> = ({
                 <SelectItem value="incoming">Incoming</SelectItem>
                 <SelectItem value="outgoing">Outgoing</SelectItem>
                 <SelectItem value="missed">Missed</SelectItem>
+                <SelectItem value="scheduled">Scheduled</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -134,7 +140,7 @@ const CallForm: React.FC<CallFormProps> = ({
               className="col-span-3"
               placeholder="Call duration in seconds"
               min={0}
-              disabled={type === "missed"}
+              disabled={type === "missed" || type === "scheduled"}
             />
           </div>
           

@@ -18,13 +18,13 @@ const CallLogForm: React.FC<CallLogFormProps> = ({
   initialData,
   isEditing = false
 }) => {
-  const handleSave = (callData: Partial<CallRecord>) => {
+  const handleSave = (callData: CallRecord) => {
     // Add the required fields for a CallRecord
     const completedCall: Omit<CallRecord, "id"> = {
       ...callData,
       createdBy: callData.createdBy || "current-user",
       createdAt: callData.createdAt || new Date().toISOString(),
-    } as Omit<CallRecord, "id">;
+    };
     
     onSave(completedCall);
   };
@@ -32,7 +32,7 @@ const CallLogForm: React.FC<CallLogFormProps> = ({
   return (
     <CallForm
       open={isOpen}
-      onOpenChange={onClose}
+      onClose={onClose}
       onSave={handleSave}
       initialData={initialData}
       title={isEditing ? "Edit Call" : "Log Call"}

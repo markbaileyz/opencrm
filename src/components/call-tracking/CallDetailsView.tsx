@@ -48,6 +48,8 @@ const CallDetailsView: React.FC<CallDetailsViewProps> = ({
         return <Badge className="bg-green-500">Outgoing</Badge>;
       case "missed":
         return <Badge variant="destructive">Missed</Badge>;
+      case "scheduled":
+        return <Badge variant="outline">Scheduled</Badge>;
       default:
         return <Badge variant="secondary">{type}</Badge>;
     }
@@ -65,6 +67,10 @@ const CallDetailsView: React.FC<CallDetailsViewProps> = ({
     
     return `${minutes}m ${remainingSeconds}s`;
   };
+  
+  const displayName = call.contactName || call.name;
+  const displayPhone = call.phoneNumber || call.phone;
+  const displayDate = call.timestamp || call.date;
   
   return (
     <div>
@@ -90,18 +96,18 @@ const CallDetailsView: React.FC<CallDetailsViewProps> = ({
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h2 className="text-2xl font-bold mb-2">{call.name}</h2>
+              <h2 className="text-2xl font-bold mb-2">{displayName}</h2>
               <div className="flex items-center mb-4">
                 {getCallTypeBadge(call.type)}
                 <span className="ml-2 text-muted-foreground">
-                  {format(new Date(call.date), 'MMMM d, yyyy \'at\' h:mm a')}
+                  {format(new Date(displayDate), 'MMMM d, yyyy \'at\' h:mm a')}
                 </span>
               </div>
               
               <div className="space-y-4">
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">Contact Information</h3>
-                  <p className="text-sm">{call.phone}</p>
+                  <p className="text-sm">{displayPhone}</p>
                 </div>
                 
                 <div>
