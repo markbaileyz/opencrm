@@ -1,4 +1,3 @@
-
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +7,7 @@ import { Calendar, CheckSquare, Package, FileText, MessageSquare, Users, Home, C
 import RoomManagement from "@/components/office/RoomManagement";
 import SuppliesManagement from "@/components/office/SuppliesManagement";
 import ScheduledTasksManagement from "@/components/office/ScheduledTasksManagement";
+import CommunicationsManagement from "@/components/office/CommunicationsManagement";
 import { useOfficeResources } from "@/hooks/useOfficeResources";
 
 const Office = () => {
@@ -179,19 +179,7 @@ const Office = () => {
           </TabsContent>
           
           <TabsContent value="communications" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Office Communications</CardTitle>
-                <CardDescription>
-                  Manage internal and external communications
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[400px] flex items-center justify-center bg-muted/30 rounded-md">
-                  <p className="text-muted-foreground">Communication tools coming soon</p>
-                </div>
-              </CardContent>
-            </Card>
+            <CommunicationsManagement />
           </TabsContent>
         </Tabs>
       </div>
