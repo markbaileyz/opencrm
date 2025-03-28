@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Calendar, CheckCircle, XCircle } from "lucide-react";
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { WorkflowExecution } from "../hooks/useExecutionHistory";
+import { WorkflowExecution } from "../types/executionHistory";
 import { useToast } from "@/hooks/use-toast";
 
 interface WorkflowExecutionHistoryProps {

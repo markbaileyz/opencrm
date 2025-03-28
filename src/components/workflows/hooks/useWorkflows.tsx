@@ -1,142 +1,157 @@
 
-import { useState } from "react";
-import { Workflow, WorkflowStatus } from "@/types/workflow";
-import { useToast } from "@/hooks/use-toast";
+import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { Workflow, WorkflowStep, WorkflowStatus } from "@/types/workflow";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
-// Sample data (this would typically come from an API/database)
+// Sample initial workflows for demonstration
 const initialWorkflows: Workflow[] = [
   {
-    id: "workflow-1",
-    name: "New Patient Welcome",
-    description: "Sends a welcome email to new patients and creates a follow-up task",
+    id: "wf-1",
+    name: "Patient Welcome Sequence",
+    description: "Send welcome emails to new patients",
     status: "active",
     trigger: "new_patient",
     steps: [
       {
+        id: uuidv4(),
         type: "email",
         config: {
-          subject: "Welcome to Our Practice",
-          content: "Dear patient, welcome to our healthcare practice. We're glad to have you with us.",
-          recipient: "patient"
+          subject: "Welcome to our clinic!",
+          content: "Thank you for choosing our clinic. Here's what you need to know for your first visit.",
+          recipient: "{{patient.email}}"
         }
       },
       {
+        id: uuidv4(),
         type: "wait",
         config: {
-          delay: "24"
+          delay: "2 days"
         }
       },
       {
+        id: uuidv4(),
         type: "task",
         config: {
           subject: "Follow up with new patient",
-          description: "Call the patient to ensure they have everything they need",
-          assignee: "nurse"
+          description: "Call the patient to ensure they received welcome materials and address any questions.",
+          assignee: "{{user.id}}"
         }
       }
     ],
-    createdAt: "2023-05-10T08:00:00Z",
-    updatedAt: "2023-05-12T10:30:00Z",
-    lastRun: "2023-06-01T14:22:00Z",
-    createdBy: "admin"
+    createdAt: "2023-05-15T10:30:00Z",
+    updatedAt: "2023-06-01T14:45:00Z",
+    lastRun: "2023-06-10T09:15:00Z",
+    createdBy: "user-1"
   },
   {
-    id: "workflow-2",
+    id: "wf-2",
     name: "Appointment Reminder",
-    description: "Sends reminder notifications before scheduled appointments",
+    description: "Send reminders before scheduled appointments",
     status: "active",
     trigger: "appointment_scheduled",
     steps: [
       {
+        id: uuidv4(),
         type: "wait",
         config: {
-          delay: "48"
+          delay: "3 days before appointment"
         }
       },
       {
+        id: uuidv4(),
         type: "email",
         config: {
-          subject: "Upcoming Appointment Reminder",
-          content: "This is a reminder about your upcoming appointment. Please arrive 15 minutes early.",
-          recipient: "patient"
+          subject: "Your Upcoming Appointment",
+          content: "This is a reminder about your appointment scheduled for {{appointment.date}} at {{appointment.time}}.",
+          recipient: "{{patient.email}}"
         }
       },
       {
+        id: uuidv4(),
         type: "sms",
         config: {
-          message: "Reminder: You have an appointment tomorrow. Reply C to confirm or R to reschedule.",
-          recipient: "patient"
+          message: "Reminder: Your appointment is tomorrow at {{appointment.time}}. Reply C to confirm or R to reschedule.",
+          recipient: "{{patient.phone}}"
         }
       }
     ],
-    createdAt: "2023-05-15T09:20:00Z",
-    updatedAt: "2023-05-15T09:20:00Z",
-    lastRun: "2023-06-02T08:15:00Z",
-    createdBy: "admin"
+    createdAt: "2023-04-20T11:20:00Z",
+    updatedAt: "2023-05-25T13:10:00Z",
+    lastRun: "2023-06-12T08:45:00Z",
+    createdBy: "user-1"
   },
   {
-    id: "workflow-3",
+    id: "wf-3",
     name: "Follow-up Survey",
-    description: "Sends a satisfaction survey after appointments",
+    description: "Send survey after appointments to gather feedback",
     status: "paused",
     trigger: "appointment_completed",
     steps: [
       {
+        id: uuidv4(),
         type: "wait",
         config: {
-          delay: "24"
+          delay: "1 day after appointment"
         }
       },
       {
+        id: uuidv4(),
         type: "email",
         config: {
           subject: "How was your appointment?",
-          content: "We value your feedback. Please take a moment to complete this short survey about your recent visit.",
-          recipient: "patient"
+          content: "Please take a moment to complete this survey about your recent appointment.",
+          recipient: "{{patient.email}}"
         }
       }
     ],
-    createdAt: "2023-05-20T13:40:00Z",
-    updatedAt: "2023-05-22T11:05:00Z",
-    createdBy: "admin"
+    createdAt: "2023-02-10T09:00:00Z",
+    updatedAt: "2023-05-05T16:30:00Z",
+    lastRun: "2023-05-20T14:15:00Z",
+    createdBy: "user-2"
   },
   {
-    id: "workflow-4",
-    name: "Prescription Renewal",
-    description: "Notify patients when their prescriptions are due for renewal",
+    id: "wf-4",
+    name: "Medication Reminder",
+    description: "Regular reminders for medication adherence",
     status: "draft",
     trigger: "scheduled",
     steps: [
       {
+        id: uuidv4(),
         type: "condition",
         config: {
-          condition: "days_until_renewal <= 7"
+          condition: "patient.needs_reminder == true"
         }
       },
       {
+        id: uuidv4(),
         type: "email",
         config: {
-          subject: "Prescription Renewal Reminder",
-          content: "Your prescription will expire soon. Please contact us to arrange a renewal.",
-          recipient: "patient"
+          subject: "Medication Reminder",
+          content: "This is a reminder to take your medication as prescribed.",
+          recipient: "{{patient.email}}"
         }
       }
     ],
-    createdAt: "2023-05-25T16:10:00Z",
-    updatedAt: "2023-05-25T16:10:00Z",
-    createdBy: "admin"
+    createdAt: "2023-03-25T13:45:00Z",
+    updatedAt: "2023-03-25T13:45:00Z",
+    createdBy: "user-1"
   }
 ];
 
-export interface WorkflowsFilter {
+// Define the type for our filters
+interface WorkflowFilters {
   searchQuery: string;
   selectedStatuses: WorkflowStatus[];
 }
 
+// Custom hook for workflow management
 export const useWorkflows = () => {
-  const { toast } = useToast();
-  const [workflows, setWorkflows] = useState<Workflow[]>(initialWorkflows);
+  // State for workflows and UI controls
+  const [workflows, setWorkflows] = useState<Workflow[]>([]);
+  const [filteredWorkflows, setFilteredWorkflows] = useState<Workflow[]>([]);
   const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -144,162 +159,222 @@ export const useWorkflows = () => {
   const [isTemplatesDialogOpen, setIsTemplatesDialogOpen] = useState(false);
   
   // Filter state
-  const [filters, setFilters] = useState<WorkflowsFilter>({
+  const [filters, setFilters] = useState<WorkflowFilters>({
     searchQuery: "",
     selectedStatuses: [],
   });
   
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // Load initial workflows on mount (from localStorage if available)
+  useEffect(() => {
+    const storedWorkflows = localStorage.getItem("workflows");
+    if (storedWorkflows) {
+      try {
+        setWorkflows(JSON.parse(storedWorkflows));
+      } catch (error) {
+        console.error("Failed to parse workflows from localStorage:", error);
+        setWorkflows(initialWorkflows);
+      }
+    } else {
+      setWorkflows(initialWorkflows);
+    }
+  }, []);
+
+  // Update filtered workflows when workflows or filters change
+  useEffect(() => {
+    let filtered = [...workflows];
+    
+    // Apply search filter
+    if (filters.searchQuery) {
+      const search = filters.searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        workflow => 
+          workflow.name.toLowerCase().includes(search) || 
+          workflow.description.toLowerCase().includes(search)
+      );
+    }
+    
+    // Apply status filter
+    if (filters.selectedStatuses.length > 0) {
+      filtered = filtered.filter(
+        workflow => filters.selectedStatuses.includes(workflow.status)
+      );
+    }
+    
+    setFilteredWorkflows(filtered);
+  }, [workflows, filters]);
+
+  // Helper to save workflows to localStorage
+  const saveWorkflows = (updatedWorkflows: Workflow[]) => {
+    localStorage.setItem("workflows", JSON.stringify(updatedWorkflows));
+  };
+
+  // Handle creating a new workflow
   const handleCreateWorkflow = () => {
     setIsCreateDialogOpen(true);
   };
 
+  // Handle opening templates dialog
   const handleOpenTemplates = () => {
     setIsTemplatesDialogOpen(true);
   };
-  
-  const handleSaveWorkflow = (workflowData: Omit<Workflow, "id">) => {
+
+  // Handle saving a new workflow
+  const handleSaveWorkflow = (data: Partial<Workflow>) => {
     const newWorkflow: Workflow = {
-      ...workflowData,
-      id: `workflow-${uuidv4()}`,
+      id: `wf-${Date.now()}`,
+      name: data.name || "Untitled Workflow",
+      description: data.description || "",
+      status: data.status || "draft",
+      trigger: data.trigger || "manual",
+      steps: data.steps || [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: "current-user", // This would come from auth context in a real app
     };
     
-    setWorkflows(prev => [newWorkflow, ...prev]);
-    setIsCreateDialogOpen(false);
+    const updatedWorkflows = [...workflows, newWorkflow];
+    setWorkflows(updatedWorkflows);
+    saveWorkflows(updatedWorkflows);
     
     toast({
       title: "Workflow Created",
-      description: "The workflow has been created successfully.",
+      description: `"${newWorkflow.name}" has been created successfully.`,
     });
+    
+    setIsCreateDialogOpen(false);
   };
 
-  const handleUseTemplate = (template: Omit<Workflow, "id">) => {
-    const newWorkflow: Workflow = {
-      ...template,
-      id: `workflow-${uuidv4()}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: "current-user",
-    };
+  // Handle using a template
+  const handleUseTemplate = (templateData: Partial<Workflow>) => {
+    setIsCreateDialogOpen(true);
     
-    setWorkflows(prev => [newWorkflow, ...prev]);
-    setIsTemplatesDialogOpen(false);
-    
-    toast({
-      title: "Template Applied",
-      description: "The workflow template has been applied successfully.",
-    });
+    // We'll use the template data as the initial data for the create workflow form
+    // This will happen in the WorkflowFormDialog component
   };
-  
-  const handleUpdateWorkflow = (workflowData: Omit<Workflow, "id">) => {
+
+  // Handle updating an existing workflow
+  const handleUpdateWorkflow = (data: Partial<Workflow>) => {
     if (!workflowToEdit) return;
     
     const updatedWorkflow: Workflow = {
-      ...workflowData,
-      id: workflowToEdit.id,
+      ...workflowToEdit,
+      name: data.name || workflowToEdit.name,
+      description: data.description || workflowToEdit.description,
+      status: data.status || workflowToEdit.status,
+      trigger: data.trigger || workflowToEdit.trigger,
+      steps: data.steps || workflowToEdit.steps,
+      updatedAt: new Date().toISOString(),
     };
     
-    setWorkflows(prev => 
-      prev.map(workflow => workflow.id === updatedWorkflow.id ? updatedWorkflow : workflow)
+    const updatedWorkflows = workflows.map(wf => 
+      wf.id === updatedWorkflow.id ? updatedWorkflow : wf
     );
+    
+    setWorkflows(updatedWorkflows);
+    saveWorkflows(updatedWorkflows);
+    
+    toast({
+      title: "Workflow Updated",
+      description: `"${updatedWorkflow.name}" has been updated successfully.`,
+    });
     
     setIsEditDialogOpen(false);
     setWorkflowToEdit(null);
     
-    toast({
-      title: "Workflow Updated",
-      description: "The workflow has been updated successfully.",
-    });
-    
-    // If we're currently viewing this workflow, update the view
+    // If we're viewing the details of this workflow, refresh the view
     if (selectedWorkflowId === updatedWorkflow.id) {
       setSelectedWorkflowId(null);
-      setTimeout(() => setSelectedWorkflowId(updatedWorkflow.id), 0);
+      // After a brief delay, re-select the workflow to refresh the view
+      setTimeout(() => setSelectedWorkflowId(updatedWorkflow.id), 10);
     }
   };
-  
+
+  // Handle editing a workflow
   const handleEditWorkflow = (id: string) => {
-    const workflow = workflows.find(w => w.id === id);
-    if (workflow) {
-      setWorkflowToEdit(workflow);
+    const workflowToEdit = workflows.find(w => w.id === id);
+    if (workflowToEdit) {
+      setWorkflowToEdit(workflowToEdit);
       setIsEditDialogOpen(true);
     }
   };
-  
+
+  // Handle deleting a workflow
   const handleDeleteWorkflow = (id: string) => {
-    setWorkflows(prev => prev.filter(workflow => workflow.id !== id));
-    
-    if (selectedWorkflowId === id) {
-      setSelectedWorkflowId(null);
-    }
+    const updatedWorkflows = workflows.filter(w => w.id !== id);
+    setWorkflows(updatedWorkflows);
+    saveWorkflows(updatedWorkflows);
     
     toast({
       title: "Workflow Deleted",
       description: "The workflow has been deleted successfully.",
+      variant: "destructive"
     });
+    
+    // If we're viewing the details of this workflow, go back to the list
+    if (selectedWorkflowId === id) {
+      setSelectedWorkflowId(null);
+      navigate('/workflows');
+    }
   };
-  
+
+  // Handle activating a workflow
   const handleActivateWorkflow = (id: string) => {
-    setWorkflows(prev => 
-      prev.map(workflow => 
-        workflow.id === id ? { ...workflow, status: "active" as const } : workflow
-      )
+    const updatedWorkflows = workflows.map(w => 
+      w.id === id ? { ...w, status: "active" as WorkflowStatus, updatedAt: new Date().toISOString() } : w
     );
+    setWorkflows(updatedWorkflows);
+    saveWorkflows(updatedWorkflows);
     
     toast({
       title: "Workflow Activated",
-      description: "The workflow has been activated successfully.",
-    });
-  };
-  
-  const handlePauseWorkflow = (id: string) => {
-    setWorkflows(prev => 
-      prev.map(workflow => 
-        workflow.id === id ? { ...workflow, status: "paused" as const } : workflow
-      )
-    );
-    
-    toast({
-      title: "Workflow Paused",
-      description: "The workflow has been paused successfully.",
-    });
-  };
-  
-  const handleViewWorkflow = (id: string) => {
-    setSelectedWorkflowId(id);
-  };
-  
-  const handleBackToList = () => {
-    setSelectedWorkflowId(null);
-  };
-  
-  const filterWorkflows = (workflows: Workflow[], filters: WorkflowsFilter) => {
-    return workflows.filter(workflow => {
-      // Filter by search query
-      const searchMatch = 
-        workflow.name.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
-        workflow.description.toLowerCase().includes(filters.searchQuery.toLowerCase());
-      
-      // Filter by status
-      const statusMatch = filters.selectedStatuses.length === 0 || 
-                          filters.selectedStatuses.includes(workflow.status);
-      
-      return searchMatch && statusMatch;
+      description: "The workflow is now active and will process events.",
+      variant: "success"
     });
   };
 
-  const updateFilters = (newFilters: Partial<WorkflowsFilter>) => {
+  // Handle pausing a workflow
+  const handlePauseWorkflow = (id: string) => {
+    const updatedWorkflows = workflows.map(w => 
+      w.id === id ? { ...w, status: "paused" as WorkflowStatus, updatedAt: new Date().toISOString() } : w
+    );
+    setWorkflows(updatedWorkflows);
+    saveWorkflows(updatedWorkflows);
+    
+    toast({
+      title: "Workflow Paused",
+      description: "The workflow has been paused and will not process new events.",
+      variant: "info"
+    });
+  };
+
+  // Handle viewing a workflow's details
+  const handleViewWorkflow = (id: string) => {
+    setSelectedWorkflowId(id);
+    navigate(`/workflows/detail/${id}`);
+  };
+
+  // Handle going back to the workflow list
+  const handleBackToList = () => {
+    setSelectedWorkflowId(null);
+    navigate('/workflows');
+  };
+
+  // Update filters
+  const updateFilters = (newFilters: Partial<WorkflowFilters>) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
   };
-  
+
+  // Reset filters
   const resetFilters = () => {
     setFilters({
       searchQuery: "",
       selectedStatuses: [],
     });
   };
-  
-  const filteredWorkflows = filterWorkflows(workflows, filters);
-  
+
   return {
     workflows,
     filteredWorkflows,

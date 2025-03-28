@@ -1,582 +1,483 @@
 
-import React, { useState } from "react";
-import { Workflow, WorkflowStepType, WorkflowTrigger } from "@/types/workflow";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import React from "react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, Clock, MessageSquare, UserPlus, Calendar, Heart, Activity, Clipboard, FileText } from "lucide-react";
+import { Workflow, WorkflowStep } from "@/types/workflow";
+import { v4 as uuidv4 } from "uuid";
 
 interface WorkflowTemplatesProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUseTemplate: (template: Omit<Workflow, "id">) => void;
+  onUseTemplate: (template: Partial<Workflow>) => void;
 }
 
-// Template categories
-type TemplateCategory = "patient" | "appointment" | "communication" | "clinical" | "administrative";
-
-// Define workflow templates
-const workflowTemplates: (Omit<Workflow, "id"> & { category: TemplateCategory })[] = [
-  // Patient Engagement templates
-  {
-    name: "New Patient Onboarding",
-    description: "Welcome new patients and guide them through initial steps",
-    status: "draft",
-    trigger: "new_patient",
-    steps: [
-      {
-        type: "email",
-        config: {
-          subject: "Welcome to Our Practice",
-          content: "Dear {{patient.name}}, welcome to our healthcare practice. We're excited to have you join us. Here's what to expect for your first visit...",
-          recipient: "patient"
+const WorkflowTemplates: React.FC<WorkflowTemplatesProps> = ({ open, onOpenChange, onUseTemplate }) => {
+  // Pre-defined workflow templates
+  const templates = [
+    {
+      id: "patient-welcome",
+      name: "Patient Welcome Sequence",
+      description: "A sequence of emails and SMS to welcome new patients",
+      trigger: "new_patient" as const,
+      steps: [
+        {
+          id: uuidv4(),
+          type: "email" as const,
+          config: {
+            subject: "Welcome to our clinic!",
+            content: "Thank you for choosing our clinic. Here's what you need to know for your first visit.",
+            recipient: "{{patient.email}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "wait" as const,
+          config: {
+            delay: "2 days"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "task" as const,
+          config: {
+            subject: "Follow up with new patient",
+            description: "Call the patient to ensure they received welcome materials and address any questions.",
+            assignee: "{{user.id}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "sms" as const,
+          config: {
+            message: "Don't forget about your upcoming appointment. Reply CONFIRM to confirm.",
+            recipient: "{{patient.phone}}"
+          }
         }
-      },
-      {
-        type: "wait",
-        config: {
-          delay: "24"
+      ]
+    },
+    {
+      id: "appointment-reminder",
+      name: "Appointment Reminder",
+      description: "Multi-channel appointment reminders at different intervals",
+      trigger: "appointment_scheduled" as const,
+      steps: [
+        {
+          id: uuidv4(),
+          type: "wait" as const,
+          config: {
+            delay: "3 days before appointment"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "email" as const,
+          config: {
+            subject: "Your Upcoming Appointment",
+            content: "This is a reminder about your appointment scheduled for {{appointment.date}} at {{appointment.time}}.",
+            recipient: "{{patient.email}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "wait" as const,
+          config: {
+            delay: "1 day before appointment"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "condition" as const,
+          config: {
+            condition: "patient.preferences.sms_notifications == true"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "sms" as const,
+          config: {
+            message: "Reminder: Your appointment is tomorrow at {{appointment.time}}. Reply C to confirm or R to reschedule.",
+            recipient: "{{patient.phone}}"
+          }
         }
-      },
-      {
-        type: "task",
-        config: {
-          subject: "Call new patient for initial screening",
-          description: "Contact the patient to answer any questions and confirm initial appointment",
-          assignee: "nurse"
+      ]
+    },
+    {
+      id: "appointment-followup",
+      name: "Post-Appointment Follow-up",
+      description: "Feedback and follow-up after appointments",
+      trigger: "appointment_completed" as const,
+      steps: [
+        {
+          id: uuidv4(),
+          type: "wait" as const,
+          config: {
+            delay: "4 hours after appointment"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "email" as const,
+          config: {
+            subject: "How was your appointment?",
+            content: "Thank you for visiting us today. We'd appreciate your feedback on your experience.",
+            recipient: "{{patient.email}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "wait" as const,
+          config: {
+            delay: "3 days"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "sms" as const,
+          config: {
+            message: "We hope you're feeling better after your recent visit. Any questions or concerns?",
+            recipient: "{{patient.phone}}"
+          }
         }
-      },
-      {
-        type: "sms",
-        config: {
-          message: "Your patient portal is ready! Access your records and communicate with our team at: {{portalLink}}",
-          recipient: "patient"
+      ]
+    },
+    {
+      id: "task-assignment",
+      name: "Clinical Task Assignment",
+      description: "Automated task assignments for clinical workflows",
+      trigger: "form_submission" as const,
+      steps: [
+        {
+          id: uuidv4(),
+          type: "task" as const,
+          config: {
+            subject: "Review submitted form",
+            description: "Review the patient's submitted form and provide feedback.",
+            assignee: "{{provider.id}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "wait" as const,
+          config: {
+            delay: "1 day"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "sms" as const,
+          config: {
+            message: "Your form has been received and is being reviewed by our staff.",
+            recipient: "{{patient.phone}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "wait" as const,
+          config: {
+            delay: "3 days"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "email" as const,
+          config: {
+            subject: "Your Form Review Results",
+            content: "We've completed reviewing your submitted form. Here are our findings and recommendations.",
+            recipient: "{{patient.email}}"
+          }
         }
-      }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdBy: "system",
-    category: "patient"
-  },
-  {
-    name: "Patient Satisfaction Survey",
-    description: "Collect feedback after completed appointments",
-    status: "draft",
-    trigger: "appointment_completed",
-    steps: [
-      {
-        type: "wait",
-        config: {
-          delay: "24"
+      ]
+    },
+    {
+      id: "medication-reminder",
+      name: "Medication Reminder",
+      description: "Reminders for medication adherence",
+      trigger: "scheduled" as const,
+      steps: [
+        {
+          id: uuidv4(),
+          type: "task" as const,
+          config: {
+            subject: "Prepare medication reminder list",
+            description: "Compile list of patients who need medication reminders.",
+            assignee: "{{nurse.id}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "condition" as const,
+          config: {
+            condition: "patient.medications.count > 0"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "email" as const,
+          config: {
+            subject: "Medication Reminder",
+            content: "This is a friendly reminder to take your prescribed medications. Maintaining your regimen is important for your health.",
+            recipient: "{{patient.email}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "sms" as const,
+          config: {
+            message: "Reminder: Please take your medications as prescribed. Need a refill? Reply REFILL.",
+            recipient: "{{patient.phone}}"
+          }
         }
-      },
-      {
-        type: "email",
-        config: {
-          subject: "How was your recent visit?",
-          content: "We value your feedback. Please take a moment to share your experience during your recent visit with Dr. {{provider.name}}. {{surveyLink}}",
-          recipient: "patient"
+      ]
+    },
+    {
+      id: "lab-results",
+      name: "Lab Results Notification",
+      description: "Notify patients about lab results and next steps",
+      trigger: "manual" as const,
+      steps: [
+        {
+          id: uuidv4(),
+          type: "task" as const,
+          config: {
+            subject: "Review lab results",
+            description: "Review lab results before sending to patient.",
+            assignee: "{{provider.id}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "email" as const,
+          config: {
+            subject: "Your Lab Results Are Available",
+            content: "Your recent lab results have been reviewed by your provider and are now available in your patient portal.",
+            recipient: "{{patient.email}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "wait" as const,
+          config: {
+            delay: "2 days"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "condition" as const,
+          config: {
+            condition: "lab_results.requires_followup == true"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "sms" as const,
+          config: {
+            message: "Please schedule a follow-up appointment to discuss your recent lab results.",
+            recipient: "{{patient.phone}}"
+          }
         }
-      },
-      {
-        type: "wait",
-        config: {
-          delay: "72"
+      ]
+    },
+    {
+      id: "preventive-care",
+      name: "Preventive Care Reminder",
+      description: "Reminders for preventive care and screenings",
+      trigger: "scheduled" as const,
+      steps: [
+        {
+          id: uuidv4(),
+          type: "condition" as const,
+          config: {
+            condition: "patient.age > 50"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "email" as const,
+          config: {
+            subject: "Important Preventive Care Reminder",
+            content: "Based on your age and health history, it's time to schedule preventive screenings.",
+            recipient: "{{patient.email}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "wait" as const,
+          config: {
+            delay: "1 week"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "condition" as const,
+          config: {
+            condition: "patient.has_scheduled_screening == false"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "sms" as const,
+          config: {
+            message: "Your health matters! Please schedule your recommended preventive screenings.",
+            recipient: "{{patient.phone}}"
+          }
         }
-      },
-      {
-        type: "condition",
-        config: {
-          condition: "survey.completed == false"
+      ]
+    },
+    {
+      id: "referral-followup",
+      name: "Referral Follow-up",
+      description: "Follow-up process for patient referrals",
+      trigger: "manual" as const,
+      steps: [
+        {
+          id: uuidv4(),
+          type: "task" as const,
+          config: {
+            subject: "Send referral to specialist",
+            description: "Prepare and send referral documentation to specialist.",
+            assignee: "{{staff.id}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "condition" as const,
+          config: {
+            condition: "referral.status == 'sent'"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "email" as const,
+          config: {
+            subject: "Your Referral Information",
+            content: "We've processed your referral. Here's the specialist's information and what to expect next.",
+            recipient: "{{patient.email}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "condition" as const,
+          config: {
+            condition: "patient.has_contacted_specialist == false"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "task" as const,
+          config: {
+            subject: "Follow up on referral",
+            description: "Check if patient has contacted the specialist and if they need assistance.",
+            assignee: "{{staff.id}}"
+          }
         }
-      },
-      {
-        type: "sms",
-        config: {
-          message: "We'd still love to hear your feedback on your recent visit. Take our quick survey here: {{surveyLink}}",
-          recipient: "patient"
+      ]
+    },
+    {
+      id: "reactivation-campaign",
+      name: "Patient Reactivation Campaign",
+      description: "Re-engage inactive patients",
+      trigger: "scheduled" as const,
+      steps: [
+        {
+          id: uuidv4(),
+          type: "email" as const,
+          config: {
+            subject: "We miss seeing you!",
+            content: "It's been a while since your last visit. Schedule your next appointment today and prioritize your health.",
+            recipient: "{{patient.email}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "wait" as const,
+          config: {
+            delay: "1 week"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "condition" as const,
+          config: {
+            condition: "patient.has_scheduled_appointment == false"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "sms" as const,
+          config: {
+            message: "We haven't seen you recently at our clinic. Would you like to schedule an appointment? Reply YES for us to call you.",
+            recipient: "{{patient.phone}}"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "wait" as const,
+          config: {
+            delay: "2 weeks"
+          }
+        },
+        {
+          id: uuidv4(),
+          type: "task" as const,
+          config: {
+            subject: "Call inactive patient",
+            description: "Reach out to patient who hasn't responded to reactivation communications.",
+            assignee: "{{staff.id}}"
+          }
         }
-      }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdBy: "system",
-    category: "patient"
-  },
-  
-  // Appointment Management templates
-  {
-    name: "Appointment Reminder Sequence",
-    description: "Send reminders before scheduled appointments",
-    status: "draft",
-    trigger: "appointment_scheduled",
-    steps: [
-      {
-        type: "wait",
-        config: {
-          delay: "72"
-        }
-      },
-      {
-        type: "email",
-        config: {
-          subject: "Upcoming Appointment Reminder",
-          content: "This is a reminder about your appointment with Dr. {{provider.name}} on {{appointment.date}} at {{appointment.time}}. Please arrive 15 minutes early to complete any paperwork.",
-          recipient: "patient"
-        }
-      },
-      {
-        type: "wait",
-        config: {
-          delay: "24"
-        }
-      },
-      {
-        type: "sms",
-        config: {
-          message: "Reminder: Your appointment is tomorrow at {{appointment.time}}. Reply C to confirm or R to reschedule.",
-          recipient: "patient"
-        }
-      }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdBy: "system",
-    category: "appointment"
-  },
-  {
-    name: "No-Show Follow Up",
-    description: "Reconnect with patients who missed appointments",
-    status: "draft",
-    trigger: "manual",
-    steps: [
-      {
-        type: "task",
-        config: {
-          subject: "Contact patient about missed appointment",
-          description: "Call the patient to determine reason for no-show and reschedule if appropriate",
-          assignee: "frontdesk"
-        }
-      },
-      {
-        type: "wait",
-        config: {
-          delay: "4"
-        }
-      },
-      {
-        type: "sms",
-        config: {
-          message: "We missed you at your appointment today. Please call {{practice.phone}} to reschedule.",
-          recipient: "patient"
-        }
-      },
-      {
-        type: "wait",
-        config: {
-          delay: "24"
-        }
-      },
-      {
-        type: "email",
-        config: {
-          subject: "Important: Missed Appointment",
-          content: "We noticed you missed your scheduled appointment today. Regular care is important for your health. Please contact us at {{practice.phone}} to reschedule at your earliest convenience.",
-          recipient: "patient"
-        }
-      }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdBy: "system",
-    category: "appointment"
-  },
-  
-  // Communication templates
-  {
-    name: "Test Results Notification",
-    description: "Notify patients when test results are available",
-    status: "draft",
-    trigger: "manual",
-    steps: [
-      {
-        type: "task",
-        config: {
-          subject: "Review test results before sending",
-          description: "Provider needs to review test results and add comments before notification is sent",
-          assignee: "provider"
-        }
-      },
-      {
-        type: "condition",
-        config: {
-          condition: "results.reviewed == true"
-        }
-      },
-      {
-        type: "email",
-        config: {
-          subject: "Your Test Results Are Available",
-          content: "Your recent test results are now available in your patient portal. {{resultsNotes}}",
-          recipient: "patient"
-        }
-      },
-      {
-        type: "sms",
-        config: {
-          message: "Your test results are now available in your patient portal. Please log in to review them.",
-          recipient: "patient"
-        }
-      }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdBy: "system",
-    category: "communication"
-  },
-  
-  // Clinical templates
-  {
-    name: "Chronic Condition Monitoring",
-    description: "Regular check-ins for patients with chronic conditions",
-    status: "draft",
-    trigger: "scheduled",
-    steps: [
-      {
-        type: "task",
-        config: {
-          subject: "Review patient monitoring data",
-          description: "Check latest readings and determine if intervention is needed",
-          assignee: "nurse"
-        }
-      },
-      {
-        type: "email",
-        config: {
-          subject: "Your Monthly Health Check-In",
-          content: "It's time for your monthly check-in for your {{condition.name}} management. Please submit your latest readings on the patient portal.",
-          recipient: "patient"
-        }
-      },
-      {
-        type: "wait",
-        config: {
-          delay: "72"
-        }
-      },
-      {
-        type: "condition",
-        config: {
-          condition: "readings.submitted == false"
-        }
-      },
-      {
-        type: "sms",
-        config: {
-          message: "Reminder: Please submit your monthly health readings for your condition monitoring.",
-          recipient: "patient"
-        }
-      }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdBy: "system",
-    category: "clinical"
-  },
-  {
-    name: "Medication Refill Reminder",
-    description: "Remind patients when prescriptions are due for refill",
-    status: "draft",
-    trigger: "scheduled",
-    steps: [
-      {
-        type: "condition",
-        config: {
-          condition: "medication.daysUntilRefill <= 7"
-        }
-      },
-      {
-        type: "email",
-        config: {
-          subject: "Medication Refill Reminder",
-          content: "Your prescription for {{medication.name}} will need a refill soon. Please contact our office at {{practice.phone}} to arrange this.",
-          recipient: "patient"
-        }
-      },
-      {
-        type: "wait",
-        config: {
-          delay: "72"
-        }
-      },
-      {
-        type: "condition",
-        config: {
-          condition: "medication.refillRequested == false"
-        }
-      },
-      {
-        type: "sms",
-        config: {
-          message: "Your {{medication.name}} prescription needs refilling. Please call us or request through your patient portal.",
-          recipient: "patient"
-        }
-      }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdBy: "system",
-    category: "clinical"
-  },
-  
-  // Administrative templates
-  {
-    name: "Insurance Verification",
-    description: "Verify patient insurance before appointments",
-    status: "draft",
-    trigger: "appointment_scheduled",
-    steps: [
-      {
-        type: "task",
-        config: {
-          subject: "Verify patient insurance coverage",
-          description: "Contact insurance provider to verify coverage and benefits for upcoming appointment",
-          assignee: "frontdesk"
-        }
-      },
-      {
-        type: "condition",
-        config: {
-          condition: "insurance.verified == true"
-        }
-      },
-      {
-        type: "email",
-        config: {
-          subject: "Insurance Verification Complete",
-          content: "We've verified your insurance coverage for your upcoming appointment. Your estimated responsibility is: {{insurance.patientResponsibility}}",
-          recipient: "patient"
-        }
-      },
-      {
-        type: "condition",
-        config: {
-          condition: "insurance.verified == false"
-        }
-      },
-      {
-        type: "task",
-        config: {
-          subject: "Contact patient about insurance issues",
-          description: "There are issues with insurance verification. Contact patient to resolve before appointment.",
-          assignee: "frontdesk"
-        }
-      }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdBy: "system",
-    category: "administrative"
-  },
-  {
-    name: "Patient Document Collection",
-    description: "Request and track required documents from patients",
-    status: "draft",
-    trigger: "manual",
-    steps: [
-      {
-        type: "email",
-        config: {
-          subject: "Required Documents for Your Care",
-          content: "To provide you with the best care, we need the following documents: {{documents.list}}. Please upload them to your patient portal or bring them to your next appointment.",
-          recipient: "patient"
-        }
-      },
-      {
-        type: "wait",
-        config: {
-          delay: "72"
-        }
-      },
-      {
-        type: "condition",
-        config: {
-          condition: "documents.submitted == false"
-        }
-      },
-      {
-        type: "sms",
-        config: {
-          message: "Reminder: We still need your medical documents. Please upload them to your patient portal.",
-          recipient: "patient"
-        }
-      },
-      {
-        type: "wait",
-        config: {
-          delay: "72"
-        }
-      },
-      {
-        type: "task",
-        config: {
-          subject: "Follow up on missing documents",
-          description: "Call patient to remind about required documents that haven't been submitted",
-          assignee: "frontdesk"
-        }
-      }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdBy: "system",
-    category: "administrative"
-  }
-];
-
-const WorkflowTemplates: React.FC<WorkflowTemplatesProps> = ({
-  open,
-  onOpenChange,
-  onUseTemplate,
-}) => {
-  const [selectedCategory, setSelectedCategory] = useState<TemplateCategory>("patient");
-  
-  const categoryIcons = {
-    patient: <UserPlus className="h-5 w-5 mr-2" />,
-    appointment: <Calendar className="h-5 w-5 mr-2" />,
-    communication: <MessageSquare className="h-5 w-5 mr-2" />,
-    clinical: <Heart className="h-5 w-5 mr-2" />,
-    administrative: <Clipboard className="h-5 w-5 mr-2" />
-  };
-  
-  const filteredTemplates = workflowTemplates.filter(
-    template => template.category === selectedCategory
-  );
-
-  const getCategoryName = (category: TemplateCategory): string => {
-    switch (category) {
-      case "patient": return "Patient Engagement";
-      case "appointment": return "Appointment Management";
-      case "communication": return "Communication";
-      case "clinical": return "Clinical Care";
-      case "administrative": return "Administrative";
-      default: return category;
+      ]
     }
-  };
+  ];
 
-  const getStepIcon = (stepType: WorkflowStepType) => {
-    switch (stepType) {
-      case "email": return <MessageSquare className="h-4 w-4 text-blue-500" />;
-      case "sms": return <MessageSquare className="h-4 w-4 text-green-500" />;
-      case "task": return <Clipboard className="h-4 w-4 text-orange-500" />;
-      case "wait": return <Clock className="h-4 w-4 text-gray-500" />;
-      case "condition": return <Activity className="h-4 w-4 text-purple-500" />;
-      case "template": return <FileText className="h-4 w-4 text-blue-500" />;
-      default: return null;
-    }
+  const handleUseTemplate = (template: typeof templates[0]) => {
+    onUseTemplate({
+      name: template.name,
+      description: template.description,
+      trigger: template.trigger,
+      steps: template.steps,
+    });
+    onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Workflow Templates</DialogTitle>
           <DialogDescription>
-            Choose a pre-built workflow template to get started quickly.
+            Choose a template as a starting point for your workflow
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs value={selectedCategory} onValueChange={(v) => setSelectedCategory(v as TemplateCategory)}>
-          <TabsList className="mb-4 w-full justify-start overflow-x-auto">
-            <TabsTrigger value="patient" className="flex items-center">
-              {categoryIcons.patient} Patient Engagement
-            </TabsTrigger>
-            <TabsTrigger value="appointment" className="flex items-center">
-              {categoryIcons.appointment} Appointment Management
-            </TabsTrigger>
-            <TabsTrigger value="communication" className="flex items-center">
-              {categoryIcons.communication} Communication
-            </TabsTrigger>
-            <TabsTrigger value="clinical" className="flex items-center">
-              {categoryIcons.clinical} Clinical Care
-            </TabsTrigger>
-            <TabsTrigger value="administrative" className="flex items-center">
-              {categoryIcons.administrative} Administrative
-            </TabsTrigger>
-          </TabsList>
-          
-          {Object.keys(categoryIcons).map((category) => (
-            <TabsContent key={category} value={category} className="mt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredTemplates.map((template, index) => (
-                  <Card key={index} className="border-l-4 border-l-primary">
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-lg font-semibold">{template.name}</CardTitle>
-                        <Badge variant="outline">{getCategoryName(template.category)}</Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{template.description}</p>
-                    </CardHeader>
-                    <CardContent className="pb-2">
-                      <div className="text-sm">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">Trigger:</span>
-                          <span className="text-muted-foreground">
-                            {template.trigger.replace('_', ' ')}
-                          </span>
-                        </div>
-                        <div className="space-y-1">
-                          <span className="font-medium">Steps ({template.steps.length}):</span>
-                          <ul className="mt-1 space-y-1">
-                            {template.steps.slice(0, 3).map((step, idx) => (
-                              <li key={idx} className="flex items-center text-xs">
-                                {getStepIcon(step.type)}
-                                <span className="ml-2 capitalize">{step.type}</span>
-                              </li>
-                            ))}
-                            {template.steps.length > 3 && (
-                              <li className="text-xs text-muted-foreground">
-                                +{template.steps.length - 3} more steps...
-                              </li>
-                            )}
-                          </ul>
-                        </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="pt-2">
-                      <Button 
-                        className="w-full"
-                        onClick={() => onUseTemplate(template)}
-                      >
-                        Use This Template
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+          {templates.map(template => (
+            <Card key={template.id} className="transition-shadow hover:shadow-md">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">{template.name}</CardTitle>
+                <CardDescription className="text-xs">{template.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="pb-2">
+                <div className="text-xs text-muted-foreground mb-2">
+                  Trigger: <span className="font-medium">{template.trigger}</span>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Steps: <span className="font-medium">{template.steps.length}</span>
+                </div>
+              </CardContent>
+              <CardContent className="pt-0">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => handleUseTemplate(template)}
+                >
+                  Use Template
+                </Button>
+              </CardContent>
+            </Card>
           ))}
-        </Tabs>
-        
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

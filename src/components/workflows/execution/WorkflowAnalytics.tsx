@@ -1,28 +1,11 @@
-
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { BarChart, PieChart, LineChart, CheckCircle, XCircle, Clock, Zap } from "lucide-react";
 import { format, parseISO } from "date-fns";
-import { WorkflowExecution } from "../hooks/useExecutionHistory";
+import { WorkflowExecution, AnalyticsData } from "../types/executionHistory";
 import { BarChart as ReBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RePieChart, Pie, Cell, LineChart as ReLineChart, Line } from "recharts";
-
-interface AnalyticsData {
-  totalExecutions: number;
-  successfulExecutions: number;
-  failedExecutions: number;
-  successRate: number;
-  averageDuration: number;
-  categoryCounts: Record<string, number>;
-  executionsPerDay: { date: string; count: number }[];
-  topWorkflows: {
-    name: string;
-    count: number;
-    successCount: number;
-    successRate: number;
-  }[];
-}
 
 interface WorkflowAnalyticsProps {
   executionHistory: WorkflowExecution[];
