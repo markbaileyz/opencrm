@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Tabs,
@@ -13,6 +14,7 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Gauge, BarChart3, Calendar, TrendingUp, Activity } from "lucide-react";
+import { format, parseISO } from "date-fns";
 import MetricCard from "./MetricCard";
 import TopWorkflowsChart from "./TopWorkflowsChart";
 import DailyExecutionsChart from "./DailyExecutionsChart";
