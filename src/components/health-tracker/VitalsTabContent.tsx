@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { LineChart, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useHealthData, VitalRecord } from "@/hooks/health-tracker/useHealthData";
@@ -57,12 +57,15 @@ const VitalsTabContent: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Vital Signs</h3>
-        <DialogTrigger asChild>
-          <Button onClick={() => setIsDialogOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Vitals
-          </Button>
-        </DialogTrigger>
+        {/* Wrap the DialogTrigger with Dialog component */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Vitals
+            </Button>
+          </DialogTrigger>
+        </Dialog>
       </div>
 
       <VitalCardsList vitalRecords={vitalRecords} />
