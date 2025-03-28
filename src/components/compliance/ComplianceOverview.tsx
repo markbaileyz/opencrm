@@ -7,6 +7,7 @@ import ComplianceMetricsCards from "./ComplianceMetricsCards";
 import ComplianceTasksList from "./ComplianceTasksList";
 import ComplianceAuditLog from "./ComplianceAuditLog";
 import ComplianceReports from "./ComplianceReports";
+import ComplianceAuditSchedule from "./ComplianceAuditSchedule";
 
 const ComplianceOverview: React.FC = () => {
   return (
@@ -55,17 +56,7 @@ const ComplianceOverview: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="schedule" className="m-0">
-          <Card>
-            <CardHeader>
-              <CardTitle>Audit Schedule</CardTitle>
-              <CardDescription>Upcoming and planned compliance audits</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-center py-10 text-muted-foreground">
-                Audit scheduling feature coming soon
-              </p>
-            </CardContent>
-          </Card>
+          <ComplianceAuditSchedule />
         </TabsContent>
       </Tabs>
     </div>
