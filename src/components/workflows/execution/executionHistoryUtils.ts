@@ -23,7 +23,7 @@ export const generateSampleHistory = (): WorkflowExecution[] => {
     "Prescription Renewal"
   ];
   
-  const messages = [
+  const errorMessages = [
     "Workflow completed successfully",
     "Email sent to patient",
     "Task created for staff",
@@ -42,7 +42,7 @@ export const generateSampleHistory = (): WorkflowExecution[] => {
   for (let i = 0; i < 30; i++) {
     const success = Math.random() > 0.3; // 70% success rate
     const workflowName = workflowNames[Math.floor(Math.random() * workflowNames.length)];
-    const message = messages[Math.floor(Math.random() * messages.length)];
+    const errorMessage = errorMessages[Math.floor(Math.random() * errorMessages.length)];
     const category = categories[Math.floor(Math.random() * categories.length)];
     const stepCount = Math.floor(Math.random() * 10) + 1;
     const branchesUsed = Math.floor(Math.random() * 3); // 0-2 branches used
@@ -57,7 +57,8 @@ export const generateSampleHistory = (): WorkflowExecution[] => {
       workflowName,
       timestamp: date.toISOString(),
       success,
-      message,
+      errorMessage,
+      message: errorMessage, // For backward compatibility
       duration: Math.floor(Math.random() * 10000), // Random duration between 0-10000ms
       stepCount,
       category,

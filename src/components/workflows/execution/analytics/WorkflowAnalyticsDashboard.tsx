@@ -84,6 +84,12 @@ const WorkflowAnalyticsDashboard: React.FC = () => {
     setTimeRange(value as 'week' | 'month' | 'quarter' | 'year');
   };
 
+  // Transform timeline data to match the expected format for DailyExecutionsChart
+  const transformedTimelineData = executionTimelineData.map(item => ({
+    date: item.date,
+    count: item.executions
+  }));
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -151,7 +157,7 @@ const WorkflowAnalyticsDashboard: React.FC = () => {
           </>
         ) : (
           <>
-            <DailyExecutionsChart executionsPerDay={executionTimelineData} />
+            <DailyExecutionsChart executionsPerDay={transformedTimelineData} />
             <TopWorkflowsChart topWorkflows={summaryMetrics.topWorkflows.map(wf => ({
               name: wf.name,
               count: wf.executions,

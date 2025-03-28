@@ -22,14 +22,40 @@ export const calculateAnalyticsData = (executionHistory: WorkflowExecution[]): A
   const { categoryCounts } = calculateCategoryStats(executionHistory);
   const { executionsPerDay } = calculateDailyExecutions(executionHistory);
   const { branchUsageStats } = calculateBranchStats(executionHistory);
-  const topWorkflows = getTopWorkflows(executionHistory);
+  const topWorkflowsData = getTopWorkflows(executionHistory);
+  
+  // Transform the topWorkflows to match the expected format
+  const topWorkflows = topWorkflowsData.map(workflow => ({
+    name: workflow.name,
+    count: workflow.count,
+    successCount: workflow.successCount,
+    successRate: workflow.successRate,
+    // Add missing properties
+    branchCount: executionHistory
+      .filter(e => e.workflowName === workflow.name && e.branchesUsed)
+      .reduce((sum, e) => sum + (e.branchesUsed || 0), 0),
+    avgBranchesPerExecution: workflow.count > 0 
+      ? executionHistory
+          .filter(e => e.workflowName === workflow.name && e.branchesUsed)
+          .reduce((sum, e) => sum + (e.branchesUsed || 0), 0) / workflow.count
+      : 0
+  }));
 
   return {
     ...executionStats,
     categoryCounts,
     executionsPerDay,
     topWorkflows,
-    branchUsageStats
+    branchUsageStats: {
+      totalBranches: branchUsageStats.totalBranchesUsed || 0,
+      avgBranchesPerWorkflow: branchUsageStats.averageBranchesPerWorkflow || 0,
+      mostUsedBranch: "Condition Branch" // Default value
+    },
+    // Add additional fields for compatibility
+    failedExecutions: executionHistory.length - executionHistory.filter(e => e.success).length,
+    successfulExecutions: executionHistory.filter(e => e.success).length,
+    averageDuration: executionHistory.reduce((sum, e) => sum + (e.duration || 0), 0) / 
+      (executionHistory.length || 1)
   };
 };
 

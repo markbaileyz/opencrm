@@ -60,7 +60,7 @@ const WorkflowExecutionHistory: React.FC<WorkflowExecutionHistoryProps> = ({
                 )}
                 <div>
                   <p className="font-medium">{execution.workflowName}</p>
-                  <p className="text-sm text-muted-foreground">{execution.message}</p>
+                  <p className="text-sm text-muted-foreground">{execution.message || execution.errorMessage || "Execution completed"}</p>
                 </div>
               </div>
               <div className="flex items-center">

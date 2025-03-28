@@ -48,7 +48,7 @@ export const useExecutionHistory = () => {
     // Show notification based on execution success/failure
     toast({
       title: execution.success ? "Workflow Step Completed" : "Workflow Error",
-      description: `${execution.workflowName}: ${execution.message}`,
+      description: `${execution.workflowName}: ${execution.errorMessage || execution.message || "Execution completed"}`,
       variant: execution.success ? "success" : "destructive",
     });
     

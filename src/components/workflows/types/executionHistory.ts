@@ -12,6 +12,8 @@ export interface WorkflowExecution {
   triggeredBy?: string;
   completedSteps?: number;
   branchesUsed?: number;
+  message?: string; // Added for compatibility
+  executionPath?: string[]; // Added for execution path tracking
 }
 
 export interface AnalyticsData {
@@ -37,4 +39,10 @@ export interface AnalyticsData {
     avgBranchesPerWorkflow: number;
     mostUsedBranch: string;
   };
+  // Added properties to match usage in code
+  failedExecutions?: number;
+  successfulExecutions?: number;
+  averageDuration?: number;
+  activeWorkflows?: number;
+  activeWorkflowsTrend?: number;
 }

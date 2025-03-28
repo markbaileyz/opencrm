@@ -38,13 +38,13 @@ const WorkflowAnalytics: React.FC<WorkflowAnalyticsProps> = ({
         
         <MetricCard 
           title="Failed Executions" 
-          value={analyticsData.failedExecutions}
+          value={analyticsData.failedExecutions || (analyticsData.totalExecutions - (analyticsData.successfulExecutions || 0))}
           icon={<XCircle className="h-4 w-4 text-red-500" />}
         />
         
         <MetricCard 
           title="Avg. Duration" 
-          value={formatDuration(analyticsData.averageDuration)}
+          value={formatDuration(analyticsData.avgExecutionTime * 1000 || analyticsData.averageDuration || 0)}
           icon={<Clock className="h-4 w-4 text-muted-foreground" />}
         />
       </div>
