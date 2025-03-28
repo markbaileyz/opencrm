@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import StatsGrid from "@/components/dashboard/StatsGrid";
@@ -23,6 +22,7 @@ import { useExecutionHistory } from "@/components/workflows/hooks/useExecutionHi
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BarChart3 } from "lucide-react";
+import { adaptWorkflowsForMonitor } from "@/components/workflows/execution/adapter";
 
 const Dashboard = () => {
   const { isOnline, pendingActions, isSyncing, processPendingActions } = useOfflineState();
@@ -37,6 +37,9 @@ const Dashboard = () => {
     handlePauseWorkflow, 
     handleViewWorkflow 
   } = useWorkflows();
+  
+  // Convert workflows to the format expected by WorkflowExecutionMonitor
+  const adaptedWorkflows = adaptWorkflowsForMonitor(workflows);
   
   // Mock sample data for activity chart
   const activityData = [
@@ -105,7 +108,7 @@ const Dashboard = () => {
           
           {/* Add mobile workflow execution monitor */}
           <WorkflowExecutionMonitor
-            workflows={workflows}
+            workflows={adaptedWorkflows}
             onActivate={handleActivateWorkflow}
             onPause={handlePauseWorkflow}
             onViewDetails={handleViewDetails}
@@ -151,7 +154,7 @@ const Dashboard = () => {
             
             {/* Add workflow execution monitor */}
             <WorkflowExecutionMonitor
-              workflows={workflows}
+              workflows={adaptedWorkflows}
               onActivate={handleActivateWorkflow}
               onPause={handlePauseWorkflow}
               onViewDetails={handleViewDetails}
