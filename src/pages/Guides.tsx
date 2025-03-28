@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useGuide } from "@/contexts/GuideContext";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Video, MessageSquare, FileText, HelpCircle } from "lucide-react";
+import VideoTutorials from "@/components/guides/VideoTutorials";
 
 const Guides = () => {
   const { guides, startGuide } = useGuide();
@@ -73,8 +74,19 @@ const Guides = () => {
               <p className="text-sm text-muted-foreground mb-4">
                 Video tutorials provide detailed explanations of features and workflows.
               </p>
-              <div className="text-sm text-center py-6 border border-dashed rounded-md">
-                <p className="text-muted-foreground">Video tutorials coming soon</p>
+              <div className="grid gap-2">
+                <Button variant="outline" className="justify-start">
+                  <span className="mr-auto">Getting Started</span>
+                  <Badge variant="secondary">5:32</Badge>
+                </Button>
+                <Button variant="outline" className="justify-start">
+                  <span className="mr-auto">Advanced Features</span>
+                  <Badge variant="secondary">8:45</Badge>
+                </Button>
+                <Button variant="outline" className="justify-start">
+                  <span className="mr-auto">Workflow Automation</span>
+                  <Badge variant="secondary">12:10</Badge>
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -97,6 +109,9 @@ const Guides = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Add the VideoTutorials component */}
+        <VideoTutorials />
 
         <Card>
           <CardHeader>
