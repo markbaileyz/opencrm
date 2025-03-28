@@ -1,7 +1,15 @@
 
 import { Home, Users, Calendar, FileText, Settings, Building2, DollarSign, BriefcaseMedical, Activity, Phone, GitBranch } from "lucide-react";
 
-export const sidebarItems = [
+export interface SidebarItem {
+  title: string;
+  href: string;
+  icon: any; // Using any for icon type for simplicity
+  role?: string;
+  submenu?: SidebarItem[];
+}
+
+export const sidebarItems: SidebarItem[] = [
   {
     title: "Dashboard",
     href: "/",
