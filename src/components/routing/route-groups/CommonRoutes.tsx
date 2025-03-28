@@ -12,6 +12,12 @@ import Settings from "@/pages/Settings";
 import Login from "@/pages/Login";
 import { useAuth } from "@/context/AuthContext";
 
+// Helper component to handle auth state
+const AuthWrapper = ({ isSignUp }: { isSignUp: boolean }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login isSignUp={isSignUp} />;
+};
+
 export const CommonRoutes = (
   <>
     <Route path="/dashboard" element={
@@ -62,9 +68,3 @@ export const CommonRoutes = (
     />
   </>
 );
-
-// Helper component to handle auth state
-const AuthWrapper = ({ isSignUp }: { isSignUp: boolean }) => {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login isSignUp={isSignUp} />;
-};
