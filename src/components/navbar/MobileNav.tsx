@@ -6,7 +6,8 @@ import NavLink from "./NavLink";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, ChevronDown, ChevronRight } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -18,6 +19,8 @@ interface MobileNavProps {
 const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: MobileNavProps) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const [expandedSections, setExpandedSections] = React.useState<string[]>([]);
   
   if (!isOpen) return null;
   
@@ -28,6 +31,14 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => 
+      prev.includes(section)
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
+    );
   };
   
   return (
@@ -50,7 +61,8 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
           <ThemeToggle />
         </div>
         
-        <div className="flex flex-col space-y-1 py-6 flex-grow">
+        <div className="flex flex-col space-y-1 py-6 flex-grow overflow-y-auto">
+          {/* Main Navigation Links */}
           <NavLink 
             href="/" 
             active={isActive("/")} 
@@ -97,39 +109,134 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
           >
             Roadmap
           </NavLink>
-          <NavLink 
-            href="/front-desk" 
-            active={isActive("/front-desk")} 
-            onClick={() => {
-              closeMobileMenu();
-              navigate("/front-desk");
-            }}
-            className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
-          >
-            Front Desk
-          </NavLink>
-          <NavLink 
-            href="/office" 
-            active={isActive("/office")} 
-            onClick={() => {
-              closeMobileMenu();
-              navigate("/office");
-            }}
-            className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
-          >
-            Office
-          </NavLink>
-          <NavLink 
-            href="/compliance" 
-            active={isActive("/compliance")} 
-            onClick={() => {
-              closeMobileMenu();
-              navigate("/compliance");
-            }}
-            className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
-          >
-            Compliance
-          </NavLink>
+          
+          {/* Doctor-specific routes */}
+          <div className="border-t pt-2 mt-2">
+            <button 
+              onClick={() => toggleSection("clinical")}
+              className="w-full flex items-center justify-between py-4 px-2 text-lg font-medium rounded-md hover:bg-muted/50 transition-colors"
+            >
+              <span>Clinical</span>
+              {expandedSections.includes("clinical") ? (
+                <ChevronDown className="h-5 w-5" />
+              ) : (
+                <ChevronRight className="h-5 w-5" />
+              )}
+            </button>
+            
+            {expandedSections.includes("clinical") && (
+              <div className="pl-4 space-y-1">
+                <NavLink 
+                  href="/prescriptions" 
+                  active={isActive("/prescriptions")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/prescriptions");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Prescriptions
+                </NavLink>
+                <NavLink 
+                  href="/medications" 
+                  active={isActive("/medications")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/medications");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Medications
+                </NavLink>
+                <NavLink 
+                  href="/clinical-dashboard" 
+                  active={isActive("/clinical-dashboard")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/clinical-dashboard");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Clinical Dashboard
+                </NavLink>
+              </div>
+            )}
+          </div>
+          
+          {/* Admin-specific routes */}
+          <div className="border-t pt-2">
+            <button 
+              onClick={() => toggleSection("admin")}
+              className="w-full flex items-center justify-between py-4 px-2 text-lg font-medium rounded-md hover:bg-muted/50 transition-colors"
+            >
+              <span>Admin</span>
+              {expandedSections.includes("admin") ? (
+                <ChevronDown className="h-5 w-5" />
+              ) : (
+                <ChevronRight className="h-5 w-5" />
+              )}
+            </button>
+            
+            {expandedSections.includes("admin") && (
+              <div className="pl-4 space-y-1">
+                <NavLink 
+                  href="/front-desk" 
+                  active={isActive("/front-desk")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/front-desk");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Front Desk
+                </NavLink>
+                <NavLink 
+                  href="/office" 
+                  active={isActive("/office")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/office");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Office
+                </NavLink>
+                <NavLink 
+                  href="/compliance" 
+                  active={isActive("/compliance")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/compliance");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Compliance
+                </NavLink>
+                <NavLink 
+                  href="/admin-settings" 
+                  active={isActive("/admin-settings")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/admin-settings");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Admin Settings
+                </NavLink>
+                <NavLink 
+                  href="/user-management" 
+                  active={isActive("/user-management")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/user-management");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  User Management
+                </NavLink>
+              </div>
+            )}
+          </div>
         </div>
         
         <div className="mt-auto py-6 border-t">
@@ -142,14 +249,22 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
           </Link>
           
           <div className="flex items-center justify-center gap-3">
-            <Link to="/login" onClick={closeMobileMenu} className="w-full">
-              <ButtonCustom variant="outline" size="lg" className="w-full">
-                Login
-              </ButtonCustom>
-            </Link>
-            <Link to="/login" onClick={closeMobileMenu} className="w-full">
-              <ButtonCustom size="lg" className="w-full">Sign Up</ButtonCustom>
-            </Link>
+            {!isAuthenticated ? (
+              <>
+                <Link to="/login" onClick={closeMobileMenu} className="w-full">
+                  <ButtonCustom variant="outline" size="lg" className="w-full">
+                    Login
+                  </ButtonCustom>
+                </Link>
+                <Link to="/login" onClick={closeMobileMenu} className="w-full">
+                  <ButtonCustom size="lg" className="w-full">Sign Up</ButtonCustom>
+                </Link>
+              </>
+            ) : (
+              <Link to="/dashboard" onClick={closeMobileMenu} className="w-full">
+                <ButtonCustom size="lg" className="w-full">Dashboard</ButtonCustom>
+              </Link>
+            )}
           </div>
         </div>
       </nav>

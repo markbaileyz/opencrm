@@ -1,16 +1,18 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SidebarItem, sidebarItems } from "@/data/sidebarItems";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 const MobileNavigationMenu = () => {
   const location = useLocation();
   const { setOpenMobile } = useSidebar();
   const { user, hasRole } = useAuth();
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   
   const getInitials = (name: string) => {
     if (!name) return "U";
@@ -39,6 +41,26 @@ const MobileNavigationMenu = () => {
 
   // Get all items
   const allSidebarItems = sidebarItems;
+
+  // Toggle submenu visibility
+  const toggleSubmenu = (title: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setExpandedItems(prev => 
+      prev.includes(title) 
+        ? prev.filter(item => item !== title)
+        : [...prev, title]
+    );
+  };
+  
+  // Render icon components properly
+  const renderIcon = (IconComponent: any) => {
+    if (React.isValidElement(IconComponent)) {
+      return IconComponent;
+    }
+    const Icon = IconComponent;
+    return <Icon size={20} />;
+  };
   
   return (
     <div className="flex flex-col h-full">
@@ -58,14 +80,59 @@ const MobileNavigationMenu = () => {
       <div className="flex-1 overflow-y-auto">
         <div className="p-2">
           {filterItemsByRole(allSidebarItems).map((item) => (
-            <NavLink
-              key={item.href}
-              href={item.href}
-              icon={item.icon}
-              label={item.title}
-              active={isActive(item.href)}
-              onClick={closeMobileMenu}
-            />
+            <div key={item.href || item.title} className="mb-1">
+              {item.submenu ? (
+                <div>
+                  <button
+                    onClick={(e) => toggleSubmenu(item.title, e)}
+                    className={cn(
+                      "w-full flex items-center justify-between p-3 rounded-md text-sm font-medium transition-colors",
+                      isActive(item.href) 
+                        ? "bg-primary/10 text-primary" 
+                        : "hover:bg-muted"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-current">{renderIcon(item.icon)}</span>
+                      {item.title}
+                    </div>
+                    {expandedItems.includes(item.title) ? (
+                      <ChevronDown size={16} />
+                    ) : (
+                      <ChevronRight size={16} />
+                    )}
+                  </button>
+                  
+                  {expandedItems.includes(item.title) && (
+                    <div className="pl-10 mt-1 space-y-1">
+                      {item.submenu
+                        .filter(subItem => {
+                          if (!subItem.role) return true;
+                          return hasRole(subItem.role);
+                        })
+                        .map((subItem) => (
+                          <NavLink
+                            key={subItem.href}
+                            href={subItem.href}
+                            icon={renderIcon(subItem.icon)}
+                            label={subItem.title}
+                            active={isActive(subItem.href)}
+                            onClick={closeMobileMenu}
+                          />
+                        ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <NavLink
+                  href={item.href}
+                  icon={renderIcon(item.icon)}
+                  label={item.title}
+                  active={isActive(item.href)}
+                  onClick={closeMobileMenu}
+                />
+              )}
+            </div>
           ))}
         </div>
       </div>
