@@ -6,17 +6,21 @@ import {
   checkForServiceWorkerUpdate, 
   updateServiceWorker 
 } from "../../registerServiceWorker";
+import { VERSION } from "@/version";
 
 const ServiceWorkerManager: React.FC = () => {
   const { toast } = useToast();
   const [updateAvailable, setUpdateAvailable] = useState(false);
 
   useEffect(() => {
+    // Log version information to console
+    console.log(`App Version: ${VERSION.toString()}`);
+    
     registerServiceWorker();
     checkForServiceWorkerUpdate(() => {
       setUpdateAvailable(true);
       toast({
-        title: "Update available",
+        title: `Update available (v${VERSION.toString()})`,
         description: "A new version of the app is available. Refresh to update.",
         duration: 10000,
         action: (
@@ -34,7 +38,12 @@ const ServiceWorkerManager: React.FC = () => {
     });
   }, [toast]);
 
-  return null; // This component doesn't render anything
+  return (
+    <div className="hidden">
+      {/* Version information hidden but available for debugging */}
+      <span data-app-version={VERSION.toString()}></span>
+    </div>
+  );
 };
 
 export default ServiceWorkerManager;

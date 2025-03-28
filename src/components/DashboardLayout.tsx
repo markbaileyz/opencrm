@@ -9,6 +9,7 @@ import UserInfo from "@/components/sidebar/UserInfo";
 import LogoutButton from "@/components/sidebar/LogoutButton";
 import MobileBottomNav from "@/components/ui/mobile-bottom-nav";
 import { useIsMobile } from "@/hooks/use-mobile";
+import VersionDisplay from "@/components/common/VersionDisplay";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -41,6 +42,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         <Separator className="my-6" />
         <div className="p-4">
           <LogoutButton />
+          <VersionDisplay className="mt-4 text-center" />
         </div>
       </aside>
 
