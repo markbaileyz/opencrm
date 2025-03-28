@@ -19,6 +19,7 @@ interface WorkflowFiltersProps {
   onReset: () => void;
   searchValue: string;
   selectedStatuses: WorkflowStatus[];
+  disabled?: boolean; // Added disabled prop
 }
 
 const WorkflowFilters: React.FC<WorkflowFiltersProps> = ({
@@ -26,7 +27,8 @@ const WorkflowFilters: React.FC<WorkflowFiltersProps> = ({
   onStatusFilterChange,
   onReset,
   searchValue,
-  selectedStatuses
+  selectedStatuses,
+  disabled = false // Default to false
 }) => {
   const [search, setSearch] = useState(searchValue);
   
@@ -62,13 +64,14 @@ const WorkflowFilters: React.FC<WorkflowFiltersProps> = ({
           className="pl-8"
           value={search}
           onChange={handleSearch}
+          disabled={disabled} // Apply disabled prop to input
         />
       </div>
       
       <div className="flex gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2">
+            <Button variant="outline" className="flex items-center gap-2" disabled={disabled}>
               <Filter className="h-4 w-4" />
               <span>Filter</span>
               {selectedStatuses.length > 0 && (
@@ -109,7 +112,7 @@ const WorkflowFilters: React.FC<WorkflowFiltersProps> = ({
         </DropdownMenu>
         
         {(search || selectedStatuses.length > 0) && (
-          <Button variant="ghost" onClick={handleReset}>
+          <Button variant="ghost" onClick={handleReset} disabled={disabled}>
             Reset
           </Button>
         )}
