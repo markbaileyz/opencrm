@@ -1,4 +1,3 @@
-
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +11,7 @@ import CommunicationsManagement from "@/components/office/CommunicationsManageme
 import { useOfficeResources } from "@/hooks/useOfficeResources";
 import SupplyManagementContainer from "@/components/office/supplies/SupplyManagementContainer";
 import StaffManagementContainer from "@/components/office/staff/StaffManagementContainer";
+import SchedulingContainer from "@/components/office/scheduling/SchedulingContainer";
 
 const Office = () => {
   const { lowStockSupplies, overdueTasks } = useOfficeResources();
@@ -160,19 +160,7 @@ const Office = () => {
           </TabsContent>
           
           <TabsContent value="scheduling" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Office Schedule</CardTitle>
-                <CardDescription>
-                  Manage appointments and staff schedules
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[400px] flex items-center justify-center bg-muted/30 rounded-md">
-                  <p className="text-muted-foreground">Calendar view coming soon</p>
-                </div>
-              </CardContent>
-            </Card>
+            <SchedulingContainer />
           </TabsContent>
           
           <TabsContent value="tasks" className="space-y-4">
