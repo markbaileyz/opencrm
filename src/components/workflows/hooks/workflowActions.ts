@@ -15,7 +15,8 @@ export const useWorkflowActions = (
   setIsCreateDialogOpen: React.Dispatch<React.SetStateAction<boolean>>,
   setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>,
   setIsTemplatesDialogOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  setFilters: React.Dispatch<React.SetStateAction<WorkflowFilters>>
+  setFilters: React.Dispatch<React.SetStateAction<WorkflowFilters>>,
+  setSaveError: React.Dispatch<React.SetStateAction<Error | null>>
 ) => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -30,67 +31,113 @@ export const useWorkflowActions = (
     setIsTemplatesDialogOpen(true);
   };
 
-  // Handle saving a new workflow
+  // Handle saving a new workflow with error handling
   const handleSaveWorkflow = (data: Partial<Workflow>) => {
-    const newWorkflow = createWorkflow(data);
-    
-    const updatedWorkflows = [...workflows, newWorkflow];
-    setWorkflows(updatedWorkflows);
-    saveWorkflows(updatedWorkflows);
-    
-    toast({
-      title: "Workflow Created",
-      description: `"${newWorkflow.name}" has been created successfully.`,
-    });
-    
-    setIsCreateDialogOpen(false);
+    try {
+      const newWorkflow = createWorkflow(data);
+      
+      const updatedWorkflows = [...workflows, newWorkflow];
+      const saveResult = saveWorkflows(updatedWorkflows);
+      
+      if (saveResult.success) {
+        setWorkflows(updatedWorkflows);
+        setSaveError(null);
+        
+        toast({
+          title: "Workflow Created",
+          description: `"${newWorkflow.name}" has been created successfully.`,
+        });
+      } else {
+        // Handle save error
+        setSaveError(saveResult.error);
+        toast({
+          title: "Error Creating Workflow",
+          description: saveResult.error?.message || "Failed to save the new workflow.",
+          variant: "destructive"
+        });
+      }
+      
+      setIsCreateDialogOpen(false);
+    } catch (error) {
+      console.error("Error creating workflow:", error);
+      const errorObj = error instanceof Error ? error : new Error("Unknown error creating workflow");
+      setSaveError(errorObj);
+      
+      toast({
+        title: "Error Creating Workflow",
+        description: errorObj.message,
+        variant: "destructive"
+      });
+    }
   };
 
   // Handle using a template
   const handleUseTemplate = (templateData: Partial<Workflow>) => {
     setIsCreateDialogOpen(true);
-    
     // We'll use the template data as the initial data for the create workflow form
-    // This will happen in the WorkflowFormDialog component
   };
 
-  // Handle updating an existing workflow
+  // Handle updating an existing workflow with error handling
   const handleUpdateWorkflow = (data: Partial<Workflow>) => {
-    if (!setWorkflowToEdit) return;
-    
-    const workflowToEdit = workflows.find(w => w.id === selectedWorkflowId);
-    if (!workflowToEdit) return;
-    
-    const updatedWorkflow: Workflow = {
-      ...workflowToEdit,
-      name: data.name || workflowToEdit.name,
-      description: data.description || workflowToEdit.description,
-      status: data.status || workflowToEdit.status,
-      trigger: data.trigger || workflowToEdit.trigger,
-      steps: data.steps || workflowToEdit.steps,
-      updatedAt: new Date().toISOString(),
-    };
-    
-    const updatedWorkflows = workflows.map(wf => 
-      wf.id === updatedWorkflow.id ? updatedWorkflow : wf
-    );
-    
-    setWorkflows(updatedWorkflows);
-    saveWorkflows(updatedWorkflows);
-    
-    toast({
-      title: "Workflow Updated",
-      description: `"${updatedWorkflow.name}" has been updated successfully.`,
-    });
-    
-    setIsEditDialogOpen(false);
-    setWorkflowToEdit(null);
-    
-    // If we're viewing the details of this workflow, refresh the view
-    if (selectedWorkflowId === updatedWorkflow.id) {
-      setSelectedWorkflowId(null);
-      // After a brief delay, re-select the workflow to refresh the view
-      setTimeout(() => setSelectedWorkflowId(updatedWorkflow.id), 10);
+    try {
+      if (!setWorkflowToEdit) return;
+      
+      const workflowToEdit = workflows.find(w => w.id === selectedWorkflowId);
+      if (!workflowToEdit) return;
+      
+      const updatedWorkflow: Workflow = {
+        ...workflowToEdit,
+        name: data.name || workflowToEdit.name,
+        description: data.description || workflowToEdit.description,
+        status: data.status || workflowToEdit.status,
+        trigger: data.trigger || workflowToEdit.trigger,
+        steps: data.steps || workflowToEdit.steps,
+        updatedAt: new Date().toISOString(),
+      };
+      
+      const updatedWorkflows = workflows.map(wf => 
+        wf.id === updatedWorkflow.id ? updatedWorkflow : wf
+      );
+      
+      const saveResult = saveWorkflows(updatedWorkflows);
+      
+      if (saveResult.success) {
+        setWorkflows(updatedWorkflows);
+        setSaveError(null);
+        
+        toast({
+          title: "Workflow Updated",
+          description: `"${updatedWorkflow.name}" has been updated successfully.`,
+        });
+        
+        // If we're viewing the details of this workflow, refresh the view
+        if (selectedWorkflowId === updatedWorkflow.id) {
+          setSelectedWorkflowId(null);
+          // After a brief delay, re-select the workflow to refresh the view
+          setTimeout(() => setSelectedWorkflowId(updatedWorkflow.id), 10);
+        }
+      } else {
+        // Handle save error
+        setSaveError(saveResult.error);
+        toast({
+          title: "Error Updating Workflow",
+          description: saveResult.error?.message || "Failed to update the workflow.",
+          variant: "destructive"
+        });
+      }
+      
+      setIsEditDialogOpen(false);
+      setWorkflowToEdit(null);
+    } catch (error) {
+      console.error("Error updating workflow:", error);
+      const errorObj = error instanceof Error ? error : new Error("Unknown error updating workflow");
+      setSaveError(errorObj);
+      
+      toast({
+        title: "Error Updating Workflow",
+        description: errorObj.message,
+        variant: "destructive"
+      });
     }
   };
 
@@ -103,63 +150,135 @@ export const useWorkflowActions = (
     }
   };
 
-  // Handle deleting a workflow
+  // Handle deleting a workflow with error handling
   const handleDeleteWorkflow = (id: string) => {
-    const updatedWorkflows = workflows.filter(w => w.id !== id);
-    setWorkflows(updatedWorkflows);
-    saveWorkflows(updatedWorkflows);
-    
-    toast({
-      title: "Workflow Deleted",
-      description: "The workflow has been deleted successfully.",
-      variant: "destructive"
-    });
-    
-    // If we're viewing the details of this workflow, go back to the list
-    if (selectedWorkflowId === id) {
-      setSelectedWorkflowId(null);
-      navigate('/workflows');
+    try {
+      const updatedWorkflows = workflows.filter(w => w.id !== id);
+      const saveResult = saveWorkflows(updatedWorkflows);
+      
+      if (saveResult.success) {
+        setWorkflows(updatedWorkflows);
+        setSaveError(null);
+        
+        toast({
+          title: "Workflow Deleted",
+          description: "The workflow has been deleted successfully.",
+          variant: "destructive"
+        });
+        
+        // If we're viewing the details of this workflow, go back to the list
+        if (selectedWorkflowId === id) {
+          setSelectedWorkflowId(null);
+          navigate('/workflows');
+        }
+      } else {
+        // Handle save error
+        setSaveError(saveResult.error);
+        toast({
+          title: "Error Deleting Workflow",
+          description: saveResult.error?.message || "Failed to delete the workflow.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting workflow:", error);
+      const errorObj = error instanceof Error ? error : new Error("Unknown error deleting workflow");
+      setSaveError(errorObj);
+      
+      toast({
+        title: "Error Deleting Workflow",
+        description: errorObj.message,
+        variant: "destructive"
+      });
     }
   };
 
-  // Handle activating a workflow
+  // Handle activating a workflow with error handling
   const handleActivateWorkflow = (id: string) => {
-    const workflow = workflows.find(w => w.id === id);
-    if (!workflow) return;
-    
-    const updatedWorkflow = updateWorkflowStatus(workflow, "active");
-    const updatedWorkflows = workflows.map(w => 
-      w.id === id ? updatedWorkflow : w
-    );
-    
-    setWorkflows(updatedWorkflows);
-    saveWorkflows(updatedWorkflows);
-    
-    toast({
-      title: "Workflow Activated",
-      description: "The workflow is now active and will process events.",
-      variant: "success"
-    });
+    try {
+      const workflow = workflows.find(w => w.id === id);
+      if (!workflow) return;
+      
+      const updatedWorkflow = updateWorkflowStatus(workflow, "active");
+      const updatedWorkflows = workflows.map(w => 
+        w.id === id ? updatedWorkflow : w
+      );
+      
+      const saveResult = saveWorkflows(updatedWorkflows);
+      
+      if (saveResult.success) {
+        setWorkflows(updatedWorkflows);
+        setSaveError(null);
+        
+        toast({
+          title: "Workflow Activated",
+          description: "The workflow is now active and will process events.",
+          variant: "success"
+        });
+      } else {
+        // Handle save error
+        setSaveError(saveResult.error);
+        toast({
+          title: "Error Activating Workflow",
+          description: saveResult.error?.message || "Failed to activate the workflow.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Error activating workflow:", error);
+      const errorObj = error instanceof Error ? error : new Error("Unknown error activating workflow");
+      setSaveError(errorObj);
+      
+      toast({
+        title: "Error Activating Workflow",
+        description: errorObj.message,
+        variant: "destructive"
+      });
+    }
   };
 
-  // Handle pausing a workflow
+  // Handle pausing a workflow with error handling
   const handlePauseWorkflow = (id: string) => {
-    const workflow = workflows.find(w => w.id === id);
-    if (!workflow) return;
-    
-    const updatedWorkflow = updateWorkflowStatus(workflow, "paused");
-    const updatedWorkflows = workflows.map(w => 
-      w.id === id ? updatedWorkflow : w
-    );
-    
-    setWorkflows(updatedWorkflows);
-    saveWorkflows(updatedWorkflows);
-    
-    toast({
-      title: "Workflow Paused",
-      description: "The workflow has been paused and will not process new events.",
-      variant: "info"
-    });
+    try {
+      const workflow = workflows.find(w => w.id === id);
+      if (!workflow) return;
+      
+      const updatedWorkflow = updateWorkflowStatus(workflow, "paused");
+      const updatedWorkflows = workflows.map(w => 
+        w.id === id ? updatedWorkflow : w
+      );
+      
+      const saveResult = saveWorkflows(updatedWorkflows);
+      
+      if (saveResult.success) {
+        setWorkflows(updatedWorkflows);
+        setSaveError(null);
+        
+        toast({
+          title: "Workflow Paused",
+          description: "The workflow has been paused and will not process new events.",
+          variant: "info"
+        });
+      } else {
+        // Handle save error
+        setSaveError(saveResult.error);
+        toast({
+          title: "Error Pausing Workflow",
+          description: saveResult.error?.message || "Failed to pause the workflow.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Error pausing workflow:", error);
+      const errorObj = error instanceof Error ? error : new Error("Unknown error pausing workflow");
+      setSaveError(errorObj);
+      
+      toast({
+        title: "Error Pausing Workflow",
+        description: errorObj.message,
+        variant: "destructive"
+      });
+    }
   };
 
   // Handle viewing a workflow's details

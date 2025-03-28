@@ -2,9 +2,36 @@
 import { Workflow, WorkflowStatus } from "@/types/workflow";
 import { WorkflowFilters } from "./types";
 
-// Helper to save workflows to localStorage
-export const saveWorkflows = (workflows: Workflow[]): void => {
-  localStorage.setItem("workflows", JSON.stringify(workflows));
+// Helper to load workflows from localStorage with error handling
+export const loadWorkflows = (): { workflows: Workflow[] | null; error: Error | null } => {
+  try {
+    const storedWorkflows = localStorage.getItem("workflows");
+    if (storedWorkflows) {
+      const parsedWorkflows = JSON.parse(storedWorkflows);
+      return { workflows: parsedWorkflows, error: null };
+    }
+    return { workflows: null, error: null };
+  } catch (error) {
+    console.error("Failed to load workflows from localStorage:", error);
+    return { 
+      workflows: null, 
+      error: new Error("Failed to load workflows. The stored data may be corrupted.") 
+    };
+  }
+};
+
+// Helper to save workflows to localStorage with error handling
+export const saveWorkflows = (workflows: Workflow[]): { success: boolean; error: Error | null } => {
+  try {
+    localStorage.setItem("workflows", JSON.stringify(workflows));
+    return { success: true, error: null };
+  } catch (error) {
+    console.error("Failed to save workflows to localStorage:", error);
+    return { 
+      success: false, 
+      error: new Error("Failed to save workflows. Please try again or check your browser storage settings.") 
+    };
+  }
 };
 
 // Filter workflows based on search query and status filters

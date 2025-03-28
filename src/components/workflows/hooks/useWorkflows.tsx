@@ -2,9 +2,10 @@
 import { useState, useEffect } from "react";
 import { Workflow } from "@/types/workflow";
 import { initialWorkflows } from "./initialData";
-import { filterWorkflows } from "./workflowUtils";
+import { filterWorkflows, loadWorkflows } from "./workflowUtils";
 import { useWorkflowActions } from "./workflowActions";
 import { WorkflowFilters, UseWorkflowsReturn } from "./types";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 // Custom hook for workflow management
 export const useWorkflows = (): UseWorkflowsReturn => {
@@ -16,6 +17,12 @@ export const useWorkflows = (): UseWorkflowsReturn => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [workflowToEdit, setWorkflowToEdit] = useState<Workflow | null>(null);
   const [isTemplatesDialogOpen, setIsTemplatesDialogOpen] = useState(false);
+  
+  // Loading and error states
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [loadError, setLoadError] = useState<Error | null>(null);
+  const [saveError, setSaveError] = useState<Error | null>(null);
   
   // Filter state
   const [filters, setFilters] = useState<WorkflowFilters>({
@@ -33,22 +40,43 @@ export const useWorkflows = (): UseWorkflowsReturn => {
     setIsCreateDialogOpen,
     setIsEditDialogOpen,
     setIsTemplatesDialogOpen,
-    setFilters
+    setFilters,
+    setSaveError
   );
 
-  // Load initial workflows on mount (from localStorage if available)
-  useEffect(() => {
-    const storedWorkflows = localStorage.getItem("workflows");
-    if (storedWorkflows) {
-      try {
-        setWorkflows(JSON.parse(storedWorkflows));
-      } catch (error) {
-        console.error("Failed to parse workflows from localStorage:", error);
+  // Load workflows function with error handling
+  const loadWorkflowsFromStorage = () => {
+    setIsLoading(true);
+    setLoadError(null);
+    
+    try {
+      const { workflows: loadedWorkflows, error: loadError } = loadWorkflows();
+      
+      if (loadError) {
+        setLoadError(loadError);
+        setWorkflows(initialWorkflows);
+      } else if (loadedWorkflows) {
+        setWorkflows(loadedWorkflows);
+      } else {
         setWorkflows(initialWorkflows);
       }
-    } else {
+    } catch (error) {
+      console.error("Error in loadWorkflowsFromStorage:", error);
+      setLoadError(error instanceof Error ? error : new Error("Failed to load workflows"));
       setWorkflows(initialWorkflows);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  // Function to retry loading workflows
+  const retryLoadWorkflows = () => {
+    loadWorkflowsFromStorage();
+  };
+
+  // Load initial workflows on mount
+  useEffect(() => {
+    loadWorkflowsFromStorage();
   }, []);
 
   // Update filtered workflows when workflows or filters change
@@ -56,6 +84,11 @@ export const useWorkflows = (): UseWorkflowsReturn => {
     const filtered = filterWorkflows(workflows, filters);
     setFilteredWorkflows(filtered);
   }, [workflows, filters]);
+
+  // Set general error if either loadError or saveError is set
+  useEffect(() => {
+    setError(loadError || saveError);
+  }, [loadError, saveError]);
 
   return {
     workflows,
@@ -66,9 +99,14 @@ export const useWorkflows = (): UseWorkflowsReturn => {
     workflowToEdit,
     isTemplatesDialogOpen,
     filters,
+    isLoading,
+    error,
+    loadError,
+    saveError,
     ...actions,
     setIsCreateDialogOpen,
     setIsEditDialogOpen,
     setIsTemplatesDialogOpen,
+    retryLoadWorkflows,
   };
 };

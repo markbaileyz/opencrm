@@ -7,6 +7,7 @@ export interface WorkflowFilters {
   selectedStatuses: WorkflowStatus[];
 }
 
+// Add error states to our return type
 export interface UseWorkflowsReturn {
   workflows: Workflow[];
   filteredWorkflows: Workflow[];
@@ -16,6 +17,10 @@ export interface UseWorkflowsReturn {
   workflowToEdit: Workflow | null;
   isTemplatesDialogOpen: boolean;
   filters: WorkflowFilters;
+  isLoading: boolean;
+  error: Error | null;
+  loadError: Error | null;
+  saveError: Error | null;
   handleCreateWorkflow: () => void;
   handleOpenTemplates: () => void;
   handleSaveWorkflow: (data: Partial<Workflow>) => void;
@@ -32,4 +37,5 @@ export interface UseWorkflowsReturn {
   setIsCreateDialogOpen: (isOpen: boolean) => void;
   setIsEditDialogOpen: (isOpen: boolean) => void;
   setIsTemplatesDialogOpen: (isOpen: boolean) => void;
+  retryLoadWorkflows: () => void;
 }
