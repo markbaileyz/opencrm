@@ -5,6 +5,7 @@ import { Menu, X } from "lucide-react";
 import DesktopNav from "./navbar/DesktopNav";
 import MobileNav from "./navbar/MobileNav";
 import { cn } from "@/lib/utils";
+import { AnimatePresence } from "framer-motion";
 
 interface NavbarProps {
   scrollToSection?: (sectionId: string) => void;
@@ -48,6 +49,11 @@ const Navbar = ({ scrollToSection }: NavbarProps) => {
     };
   }, [isMobileMenuOpen]);
 
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname, location.hash]);
+
   const isActive = (path: string) => {
     return location.pathname === path;
   };
@@ -78,6 +84,10 @@ const Navbar = ({ scrollToSection }: NavbarProps) => {
     }
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   return (
@@ -90,7 +100,7 @@ const Navbar = ({ scrollToSection }: NavbarProps) => {
       )}
     >
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
-        <Link to="/" className="flex items-center z-50">
+        <Link to="/" className="flex items-center z-50" onClick={() => setIsMobileMenuOpen(false)}>
           <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
             OpenCRM
           </span>
@@ -100,8 +110,8 @@ const Navbar = ({ scrollToSection }: NavbarProps) => {
 
         <div className="flex items-center md:hidden">
           <button
-            className="p-2 rounded-full bg-background/50 backdrop-blur-sm z-50"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 rounded-full hover:bg-background/80 hover:shadow-sm transition-all"
+            onClick={toggleMobileMenu}
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
             {isMobileMenuOpen ? (
@@ -113,12 +123,16 @@ const Navbar = ({ scrollToSection }: NavbarProps) => {
         </div>
       </div>
 
-      <MobileNav 
-        isOpen={isMobileMenuOpen}
-        isActive={isActive}
-        scrollToSection={handleScrollToSection}
-        closeMobileMenu={closeMobileMenu}
-      />
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <MobileNav 
+            isOpen={isMobileMenuOpen}
+            isActive={isActive}
+            scrollToSection={handleScrollToSection}
+            closeMobileMenu={closeMobileMenu}
+          />
+        )}
+      </AnimatePresence>
     </header>
   );
 };

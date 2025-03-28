@@ -5,6 +5,7 @@ import { ButtonCustom } from "../ui/button-custom";
 import NavLink from "./NavLink";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -34,21 +35,27 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
   };
   
   return (
-    <div className="md:hidden fixed top-[60px] left-0 right-0 bottom-0 z-40 bg-background/95 backdrop-blur-sm animate-in slide-in-from-top duration-300 overflow-y-auto">
-      <nav className="container mx-auto px-4 flex flex-col space-y-4 py-6">
-        <div className="flex items-center justify-between pb-4 border-b">
+    <motion.div 
+      className="md:hidden fixed top-[60px] left-0 right-0 bottom-0 z-40 bg-background/95 backdrop-blur-sm overflow-y-auto"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.2 }}
+    >
+      <nav className="container mx-auto px-4 flex flex-col h-full">
+        <div className="flex items-center justify-between py-4 border-b">
           <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
             OpenCRM
           </h2>
           <ThemeToggle />
         </div>
         
-        <div className="space-y-3 py-4">
+        <div className="flex flex-col space-y-1 py-6 flex-grow">
           <NavLink 
             href="/" 
             active={isActive("/")} 
             onClick={handleHomeClick}
-            className="text-lg font-medium py-3"
+            className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
           >
             Home
           </NavLink>
@@ -59,7 +66,7 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
               closeMobileMenu();
               scrollToSection("features");
             }}
-            className="text-lg font-medium py-3"
+            className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
           >
             Features
           </NavLink>
@@ -70,7 +77,7 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
               closeMobileMenu();
               scrollToSection("pricing");
             }}
-            className="text-lg font-medium py-3"
+            className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
           >
             Pricing
           </NavLink>
@@ -78,7 +85,7 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
             href="/healthcare-crm" 
             active={isActive("/healthcare-crm")} 
             onClick={() => handleNavigate("/healthcare-crm")}
-            className="text-lg font-medium py-3"
+            className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
           >
             Healthcare CRM
           </NavLink>
@@ -86,32 +93,34 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
             href="/roadmap" 
             active={isActive("/roadmap")} 
             onClick={() => handleNavigate("/roadmap")}
-            className="text-lg font-medium py-3"
+            className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
           >
             Roadmap
           </NavLink>
         </div>
         
-        <Link 
-          to="/pre-check-in" 
-          onClick={closeMobileMenu}
-          className="w-full bg-gradient-to-r from-blue-400 to-primary text-white font-semibold rounded-full py-3 px-6 text-center shadow-md hover:shadow-lg transition-all duration-300"
-        >
-          Pre-Check-In
-        </Link>
-        
-        <div className="flex items-center justify-center gap-3 mt-6 pt-4 border-t">
-          <Link to="/login" onClick={closeMobileMenu}>
-            <ButtonCustom variant="outline" size="lg">
-              Login
-            </ButtonCustom>
+        <div className="mt-auto py-6 border-t">
+          <Link 
+            to="/pre-check-in" 
+            onClick={closeMobileMenu}
+            className="block w-full mb-6 bg-gradient-to-r from-blue-400 to-primary text-white font-semibold rounded-full py-3 px-6 text-center shadow-md hover:shadow-lg transition-all duration-300"
+          >
+            Pre-Check-In
           </Link>
-          <Link to="/login" onClick={closeMobileMenu}>
-            <ButtonCustom size="lg">Sign Up</ButtonCustom>
-          </Link>
+          
+          <div className="flex items-center justify-center gap-3">
+            <Link to="/login" onClick={closeMobileMenu} className="w-full">
+              <ButtonCustom variant="outline" size="lg" className="w-full">
+                Login
+              </ButtonCustom>
+            </Link>
+            <Link to="/login" onClick={closeMobileMenu} className="w-full">
+              <ButtonCustom size="lg" className="w-full">Sign Up</ButtonCustom>
+            </Link>
+          </div>
         </div>
       </nav>
-    </div>
+    </motion.div>
   );
 };
 
