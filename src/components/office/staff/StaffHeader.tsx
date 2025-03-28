@@ -121,7 +121,10 @@ const StaffHeader: React.FC<StaffHeaderProps> = ({
                     value={newStaff.contact?.email || ""}
                     onChange={(e) => setNewStaff({
                       ...newStaff, 
-                      contact: {...(newStaff.contact || {}), email: e.target.value}
+                      contact: {
+                        email: e.target.value,
+                        phone: newStaff.contact?.phone || "" // Ensure phone is set even if it wasn't before
+                      }
                     })}
                     placeholder="email@example.com"
                   />
@@ -134,7 +137,10 @@ const StaffHeader: React.FC<StaffHeaderProps> = ({
                     value={newStaff.contact?.phone || ""}
                     onChange={(e) => setNewStaff({
                       ...newStaff, 
-                      contact: {...(newStaff.contact || {}), phone: e.target.value}
+                      contact: {
+                        email: newStaff.contact?.email || "", // Ensure email is set even if it wasn't before
+                        phone: e.target.value
+                      }
                     })}
                     placeholder="123-456-7890" 
                   />

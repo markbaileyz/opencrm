@@ -26,7 +26,8 @@ const OfficeSettings: React.FC = () => {
     },
     rooms: [],
     supplies: [],
-    scheduledTasks: []
+    scheduledTasks: [],
+    staff: [] // Added the required staff property to fix type error
   });
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
