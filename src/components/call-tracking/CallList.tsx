@@ -15,13 +15,15 @@ import {
 
 interface CallListProps {
   calls: CallRecord[];
+  onCallSelect?: (id: string) => void;
   onEditCall: (id: string) => void;
-  onFollowUp: (id: string) => void;
+  onFollowUp?: (id: string) => void;
   onDeleteCall: (id: string) => void;
 }
 
 const CallList: React.FC<CallListProps> = ({
   calls,
+  onCallSelect,
   onEditCall,
   onFollowUp,
   onDeleteCall
@@ -52,6 +54,12 @@ const CallList: React.FC<CallListProps> = ({
     }
   };
 
+  const handleItemClick = (id: string) => {
+    if (onCallSelect) {
+      onCallSelect(id);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -61,7 +69,11 @@ const CallList: React.FC<CallListProps> = ({
         <div className="divide-y">
           {calls.length > 0 ? (
             calls.map((call) => (
-              <div key={call.id} className="flex items-center justify-between p-4 hover:bg-muted/50">
+              <div 
+                key={call.id} 
+                className="flex items-center justify-between p-4 hover:bg-muted/50 cursor-pointer"
+                onClick={() => handleItemClick(call.id)}
+              >
                 <div className="flex items-center space-x-4">
                   <div className="flex-shrink-0">
                     {getCallIcon(call)}
@@ -89,13 +101,27 @@ const CallList: React.FC<CallListProps> = ({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => onEditCall(call.id)}>
+                      <DropdownMenuItem onClick={(e) => {
+                        e.stopPropagation();
+                        onEditCall(call.id);
+                      }}>
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onFollowUp(call.id)}>
-                        Follow Up
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onDeleteCall(call.id)} className="text-red-600">
+                      {onFollowUp && (
+                        <DropdownMenuItem onClick={(e) => {
+                          e.stopPropagation();
+                          onFollowUp(call.id);
+                        }}>
+                          Follow Up
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteCall(call.id);
+                        }} 
+                        className="text-red-600"
+                      >
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>

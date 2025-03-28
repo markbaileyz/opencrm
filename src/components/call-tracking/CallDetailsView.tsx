@@ -1,11 +1,11 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { format } from "date-fns";
 import { CallRecord } from "@/types/call";
-import CallDetails from "@/components/call-tracking/CallDetails";
-import FollowUpForm from "@/components/call-tracking/notes/FollowUpForm";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft, Edit, Trash2 } from "lucide-react";
+import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
 interface CallDetailsViewProps {
   callId: string;
@@ -13,8 +13,8 @@ interface CallDetailsViewProps {
   onBack: () => void;
   onDeleteCall: (callId: string) => void;
   onEditCall: (callId: string) => void;
-  onScheduleFollowUp: (callId: string, date: string, notes: string) => void;
-  onCompleteFollowUp: (callId: string) => void;
+  onScheduleFollowUp?: (callId: string, date: string, notes: string) => void;
+  onCompleteFollowUp?: (callId: string) => void;
 }
 
 const CallDetailsView: React.FC<CallDetailsViewProps> = ({
@@ -40,45 +40,86 @@ const CallDetailsView: React.FC<CallDetailsViewProps> = ({
     );
   }
   
-  const handleOpenFollowUp = () => {
-    setIsFollowUpOpen(true);
+  const getCallTypeBadge = (type: string) => {
+    switch (type) {
+      case "incoming":
+        return <Badge className="bg-blue-500">Incoming</Badge>;
+      case "outgoing":
+        return <Badge className="bg-green-500">Outgoing</Badge>;
+      case "missed":
+        return <Badge variant="destructive">Missed</Badge>;
+      default:
+        return <Badge variant="secondary">{type}</Badge>;
+    }
   };
-  
-  const handleCloseFollowUp = () => {
-    setIsFollowUpOpen(false);
+
+  const formatDuration = (seconds: number): string => {
+    if (!seconds) return "N/A";
+    
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    
+    if (minutes === 0) {
+      return `${remainingSeconds}s`;
+    }
+    
+    return `${minutes}m ${remainingSeconds}s`;
   };
-  
-  const handleFollowUpSave = (date: string, notes: string) => {
-    onScheduleFollowUp(callId, date, notes);
-    setIsFollowUpOpen(false);
-  };
-  
-  const isPending = call.followUp && call.followUp.status === "pending";
   
   return (
     <div>
-      <CallDetails 
-        call={call}
-        onBack={onBack}
-        onEdit={() => onEditCall(callId)}
-        onCreateFollowUp={handleOpenFollowUp}
-      />
-      
-      {isPending && (
-        <div className="mt-4 flex justify-end">
-          <Button variant="outline" onClick={() => onCompleteFollowUp(callId)}>
-            Mark Follow-up as Completed
+      <div className="flex items-center mb-4">
+        <Button variant="ghost" onClick={onBack} className="mr-2">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to List
+        </Button>
+        <div className="flex-grow"></div>
+        <div className="space-x-2">
+          <Button variant="outline" onClick={() => onEditCall(callId)}>
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
+          </Button>
+          <Button variant="destructive" onClick={() => onDeleteCall(callId)}>
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete
           </Button>
         </div>
-      )}
+      </div>
       
-      <FollowUpForm
-        isOpen={isFollowUpOpen}
-        onClose={handleCloseFollowUp}
-        onSave={handleFollowUpSave}
-        initialDate={call.followUp?.date ? new Date(call.followUp.date) : undefined}
-        initialNotes={call.followUp?.notes}
-      />
+      <Card>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h2 className="text-2xl font-bold mb-2">{call.name}</h2>
+              <div className="flex items-center mb-4">
+                {getCallTypeBadge(call.type)}
+                <span className="ml-2 text-muted-foreground">
+                  {format(new Date(call.date), 'MMMM d, yyyy \'at\' h:mm a')}
+                </span>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Contact Information</h3>
+                  <p className="text-sm">{call.phone}</p>
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Call Duration</h3>
+                  <p className="text-sm">{formatDuration(call.duration)}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">Notes</h3>
+              <div className="bg-muted/50 p-3 rounded-md min-h-[100px]">
+                {call.notes || "No notes recorded for this call."}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

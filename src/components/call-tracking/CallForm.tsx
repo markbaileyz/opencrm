@@ -57,7 +57,7 @@ const CallForm: React.FC<CallFormProps> = ({
   
   const handleSubmit = () => {
     const callData: CallRecord = {
-      id: initialData?.id || "",
+      id: initialData?.id || Date.now().toString(),
       name,
       phone,
       type,
