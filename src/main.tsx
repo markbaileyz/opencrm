@@ -6,6 +6,7 @@ import App from './App.tsx';
 import './index.css';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from "./components/theme-provider";
+import { CRMProvider } from './contexts/CRMContext';
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -17,7 +18,9 @@ createRoot(document.getElementById("root")!).render(
           enableSystem
           disableTransitionOnChange
         >
-          <App />
+          <CRMProvider>
+            <App />
+          </CRMProvider>
         </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>

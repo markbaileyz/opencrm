@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -45,6 +46,9 @@ import Compliance from "@/pages/Compliance";
 import WorkflowAnalytics from "@/pages/WorkflowAnalytics";
 import OrganizationInsights from "@/pages/OrganizationInsights";
 import Guides from "@/pages/Guides";
+import ModularCRM from "@/pages/ModularCRM";
+import CRMConfig from "@/pages/CRMConfig";
+import CRMModule from "@/pages/CRMModule";
 
 import "./App.css";
 import ServiceWorkerManager from "./components/service-worker/ServiceWorkerManager";
@@ -66,6 +70,11 @@ function App() {
           <Route path="/opencrm-roadmap" element={<OpenCRMRoadmap />} />
           <Route path="/knowledge-base" element={<KnowledgeBase />} />
           <Route path="/challenges-solutions" element={<ChallengesSolutions />} />
+          
+          {/* CRM Routes */}
+          <Route path="/crm" element={<ModularCRM />} />
+          <Route path="/crm-config" element={<CRMConfig />} />
+          <Route path="/crm/:moduleId" element={<CRMModule />} />
 
           {/* Protected Routes - requires authentication */}
           <Route
