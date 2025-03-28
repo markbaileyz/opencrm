@@ -6,6 +6,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Edit, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import CallNotes from "./CallNotes";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CallRecordingControls from "./CallRecordingControls";
 
 interface CallDetailsViewProps {
   callId: string;
@@ -26,7 +29,7 @@ const CallDetailsView: React.FC<CallDetailsViewProps> = ({
   onScheduleFollowUp,
   onCompleteFollowUp
 }) => {
-  const [isFollowUpOpen, setIsFollowUpOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("details");
   
   const call = calls.find(c => c.id === callId);
   
@@ -108,24 +111,127 @@ const CallDetailsView: React.FC<CallDetailsViewProps> = ({
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">Contact Information</h3>
                   <p className="text-sm">{displayPhone}</p>
+                  {call.organization && (
+                    <p className="text-sm">{call.organization}</p>
+                  )}
+                  {call.contactRole && (
+                    <p className="text-sm text-muted-foreground">{call.contactRole}</p>
+                  )}
                 </div>
                 
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">Call Duration</h3>
                   <p className="text-sm">{formatDuration(call.duration)}</p>
                 </div>
+                
+                {call.purpose && (
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-1">Purpose</h3>
+                    <p className="text-sm">{call.purpose}</p>
+                  </div>
+                )}
+                
+                {call.tags && call.tags.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-1">Tags</h3>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {call.tags.map((tag, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">Notes</h3>
-              <div className="bg-muted/50 p-3 rounded-md min-h-[100px]">
-                {call.notes || "No notes recorded for this call."}
-              </div>
+              <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="mb-4">
+                  <TabsTrigger value="details">Notes</TabsTrigger>
+                  {call.recordingUrl && (
+                    <TabsTrigger value="recording">Recording</TabsTrigger>
+                  )}
+                  {call.relatedRecords && call.relatedRecords.length > 0 && (
+                    <TabsTrigger value="related">Related Records</TabsTrigger>
+                  )}
+                </TabsList>
+                
+                <TabsContent value="details">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Notes</h3>
+                  <div className="bg-muted/50 p-3 rounded-md min-h-[100px]">
+                    {call.notes || "No notes recorded for this call."}
+                  </div>
+                  
+                  {call.followUp && (
+                    <div className="mt-4">
+                      <h3 className="text-sm font-medium text-muted-foreground mb-1">Follow-up</h3>
+                      <div className="bg-muted/50 p-3 rounded-md">
+                        <div className="flex items-center justify-between mb-1">
+                          <Badge variant={call.followUp.status === "completed" ? "success" : "secondary"}>
+                            {call.followUp.status === "completed" ? "Completed" : "Pending"}
+                          </Badge>
+                          <span className="text-sm text-muted-foreground">
+                            {format(new Date(call.followUp.date), 'MMMM d, yyyy')}
+                          </span>
+                        </div>
+                        {call.followUp.notes && <p className="text-sm">{call.followUp.notes}</p>}
+                        
+                        {call.followUp.status === "pending" && onCompleteFollowUp && (
+                          <Button 
+                            size="sm" 
+                            className="mt-2" 
+                            onClick={() => onCompleteFollowUp(callId)}
+                          >
+                            Mark as Completed
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+                
+                {call.recordingUrl && (
+                  <TabsContent value="recording">
+                    <CallRecordingControls 
+                      call={call}
+                      onUpdate={(updates) => console.log("Recording updated", updates)}
+                    />
+                  </TabsContent>
+                )}
+                
+                {call.relatedRecords && call.relatedRecords.length > 0 && (
+                  <TabsContent value="related">
+                    <h3 className="text-sm font-medium text-muted-foreground mb-2">Related Records</h3>
+                    <div className="space-y-2">
+                      {call.relatedRecords.map((record, idx) => (
+                        <div key={idx} className="flex justify-between items-center p-2 bg-muted/50 rounded-md">
+                          <div>
+                            <span className="font-medium">{record.name}</span>
+                            <p className="text-xs text-muted-foreground">{record.type}</p>
+                          </div>
+                          <Button variant="ghost" size="sm">View</Button>
+                        </div>
+                      ))}
+                    </div>
+                  </TabsContent>
+                )}
+              </Tabs>
             </div>
           </div>
         </CardContent>
       </Card>
+      
+      <div className="mt-6">
+        {onScheduleFollowUp && (
+          <CallNotes
+            call={call}
+            onUpdate={(id, updates) => console.log("Call updated", id, updates)}
+            onScheduleFollowUp={onScheduleFollowUp}
+          />
+        )}
+      </div>
     </div>
   );
 };
