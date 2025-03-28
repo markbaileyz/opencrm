@@ -74,7 +74,10 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
           <NavLink 
             href="/#features" 
             active={location.pathname === "/" && location.hash === "#features"} 
-            onClick={() => scrollToSection("features")}
+            onClick={() => {
+              scrollToSection("features");
+              closeMobileMenu();
+            }}
             className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
           >
             Features
@@ -82,7 +85,10 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
           <NavLink 
             href="/#pricing" 
             active={location.pathname === "/" && location.hash === "#pricing"} 
-            onClick={() => scrollToSection("pricing")}
+            onClick={() => {
+              scrollToSection("pricing");
+              closeMobileMenu();
+            }}
             className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
           >
             Pricing
@@ -109,8 +115,19 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
           >
             Roadmap
           </NavLink>
+          <NavLink 
+            href="/knowledge-base" 
+            active={isActive("/knowledge-base")} 
+            onClick={() => {
+              closeMobileMenu();
+              navigate("/knowledge-base");
+            }}
+            className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
+          >
+            Knowledge Base
+          </NavLink>
           
-          {/* Doctor-specific routes */}
+          {/* Clinical routes */}
           <div className="border-t pt-2 mt-2">
             <button 
               onClick={() => toggleSection("clinical")}
@@ -159,11 +176,86 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
                 >
                   Clinical Dashboard
                 </NavLink>
+                <NavLink 
+                  href="/medical-records" 
+                  active={isActive("/medical-records")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/medical-records");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Medical Records
+                </NavLink>
+                <NavLink 
+                  href="/patient-vitals" 
+                  active={isActive("/patient-vitals")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/patient-vitals");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Patient Vitals
+                </NavLink>
+                <NavLink 
+                  href="/health-tracker" 
+                  active={isActive("/health-tracker")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/health-tracker");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Health Tracker
+                </NavLink>
               </div>
             )}
           </div>
           
-          {/* Admin-specific routes */}
+          {/* Patient Management */}
+          <div className="border-t pt-2">
+            <button 
+              onClick={() => toggleSection("patients")}
+              className="w-full flex items-center justify-between py-4 px-2 text-lg font-medium rounded-md hover:bg-muted/50 transition-colors"
+            >
+              <span>Patient Management</span>
+              {expandedSections.includes("patients") ? (
+                <ChevronDown className="h-5 w-5" />
+              ) : (
+                <ChevronRight className="h-5 w-5" />
+              )}
+            </button>
+            
+            {expandedSections.includes("patients") && (
+              <div className="pl-4 space-y-1">
+                <NavLink 
+                  href="/patients" 
+                  active={isActive("/patients")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/patients");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  All Patients
+                </NavLink>
+                <NavLink 
+                  href="/calendar" 
+                  active={isActive("/calendar")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/calendar");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Calendar
+                </NavLink>
+              </div>
+            )}
+          </div>
+          
+          {/* Admin section */}
           <div className="border-t pt-2">
             <button 
               onClick={() => toggleSection("admin")}
@@ -233,6 +325,103 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
                   className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
                 >
                   User Management
+                </NavLink>
+                <NavLink 
+                  href="/workflows" 
+                  active={isActive("/workflows")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/workflows");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Workflows
+                </NavLink>
+                <NavLink 
+                  href="/call-tracking" 
+                  active={isActive("/call-tracking")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/call-tracking");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Call Tracking
+                </NavLink>
+              </div>
+            )}
+          </div>
+          
+          {/* CRM Features */}
+          <div className="border-t pt-2">
+            <button 
+              onClick={() => toggleSection("crm")}
+              className="w-full flex items-center justify-between py-4 px-2 text-lg font-medium rounded-md hover:bg-muted/50 transition-colors"
+            >
+              <span>CRM</span>
+              {expandedSections.includes("crm") ? (
+                <ChevronDown className="h-5 w-5" />
+              ) : (
+                <ChevronRight className="h-5 w-5" />
+              )}
+            </button>
+            
+            {expandedSections.includes("crm") && (
+              <div className="pl-4 space-y-1">
+                <NavLink 
+                  href="/contacts" 
+                  active={isActive("/contacts")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/contacts");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Contacts
+                </NavLink>
+                <NavLink 
+                  href="/organizations" 
+                  active={isActive("/organizations")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/organizations");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Organizations
+                </NavLink>
+                <NavLink 
+                  href="/deals" 
+                  active={isActive("/deals")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/deals");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Deals
+                </NavLink>
+                <NavLink 
+                  href="/email" 
+                  active={isActive("/email")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/email");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Email
+                </NavLink>
+                <NavLink 
+                  href="/reports" 
+                  active={isActive("/reports")} 
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/reports");
+                  }}
+                  className="text-md font-medium py-3 px-2 rounded-md hover:bg-muted/50 transition-colors"
+                >
+                  Reports
                 </NavLink>
               </div>
             )}

@@ -44,6 +44,21 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
     );
   };
   
+  // On mount, check if any menu should be open based on current route
+  React.useEffect(() => {
+    const currentPath = location.pathname;
+    
+    // Check if current path is in any submenu
+    filteredItems.forEach(item => {
+      if (item.submenu) {
+        const isInSubmenu = item.submenu.some(subItem => subItem.href === currentPath);
+        if (isInSubmenu && !openMenus.includes(item.title)) {
+          setOpenMenus(prev => [...prev, item.title]);
+        }
+      }
+    });
+  }, [location.pathname, filteredItems]);
+  
   return (
     <nav className="space-y-1">
       {filteredItems.map((item) => (

@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -61,6 +61,21 @@ const MobileNavigationMenu = () => {
     const Icon = IconComponent;
     return <Icon size={20} />;
   };
+  
+  // On mount, check if any menu should be open based on current route
+  useEffect(() => {
+    const currentPath = location.pathname;
+    
+    // Check if current path is in any submenu
+    filterItemsByRole(allSidebarItems).forEach(item => {
+      if (item.submenu) {
+        const isInSubmenu = item.submenu.some(subItem => subItem.href === currentPath);
+        if (isInSubmenu && !expandedItems.includes(item.title)) {
+          setExpandedItems(prev => [...prev, item.title]);
+        }
+      }
+    });
+  }, [location.pathname]);
   
   return (
     <div className="flex flex-col h-full">
