@@ -5,22 +5,18 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import PrescriptionsPage from "@/pages/PrescriptionsPage";
 import PlaceholderPage from "@/components/ui/placeholder-page";
 
-const DoctorRoutes: React.FC = () => {
-  return (
-    <>
-      <Route path="/clinical-dashboard" element={
-        <ProtectedRoute allowedRoles={["admin", "power-user", "doctor"]}>
-          <PlaceholderPage title="Clinical Dashboard" description="Access your clinical metrics and patient data. Coming soon." />
-        </ProtectedRoute>
-      } />
-      
-      <Route path="/prescriptions" element={
-        <ProtectedRoute allowedRoles={["admin", "power-user", "doctor"]}>
-          <PrescriptionsPage />
-        </ProtectedRoute>
-      } />
-    </>
-  );
-};
-
-export default DoctorRoutes;
+export const DoctorRoutes = (
+  <>
+    <Route path="/clinical-dashboard" element={
+      <ProtectedRoute allowedRoles={["admin", "power-user", "doctor"]}>
+        <PlaceholderPage title="Clinical Dashboard" description="Access your clinical metrics and patient data. Coming soon." />
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/prescriptions" element={
+      <ProtectedRoute allowedRoles={["admin", "power-user", "doctor"]}>
+        <PrescriptionsPage />
+      </ProtectedRoute>
+    } />
+  </>
+);
