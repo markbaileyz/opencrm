@@ -1,205 +1,338 @@
 
 import React, { useState } from "react";
-import { 
-  Table, 
-  TableHeader, 
-  TableRow, 
-  TableHead, 
-  TableBody, 
-  TableCell 
-} from "@/components/ui/table";
+import { Workflow } from "@/types/workflow";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Search, 
-  PlusCircle, 
-  MoreHorizontal, 
-  Activity,
-  Pause,
-  Edit,
-  Copy,
-  Trash
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Workflow, WorkflowStatus } from "@/types/workflow";
-import { format, formatDistanceToNow } from "date-fns";
+import { Plus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { v4 as uuidv4 } from "uuid";
+import WorkflowGrid from "./WorkflowGrid";
+import WorkflowFilters from "./WorkflowFilters";
+import WorkflowFormDialog from "./WorkflowFormDialog";
+import WorkflowDetailView from "./WorkflowDetailView";
 
-interface WorkflowListProps {
-  workflows: Workflow[];
-  onCreateWorkflow: () => void;
-  onEditWorkflow: (workflowId: string) => void;
-  onDeleteWorkflow: (workflowId: string) => void;
-  onDuplicateWorkflow: (workflowId: string) => void;
-  onToggleWorkflowStatus: (workflowId: string, newStatus: WorkflowStatus) => void;
-}
+// Sample data (this would typically come from an API/database)
+const initialWorkflows: Workflow[] = [
+  {
+    id: "workflow-1",
+    name: "New Patient Welcome",
+    description: "Sends a welcome email to new patients and creates a follow-up task",
+    status: "active",
+    trigger: "new_patient",
+    steps: [
+      {
+        type: "email",
+        config: {
+          subject: "Welcome to Our Practice",
+          content: "Dear patient, welcome to our healthcare practice. We're glad to have you with us.",
+          recipient: "patient"
+        }
+      },
+      {
+        type: "wait",
+        config: {
+          delay: "24"
+        }
+      },
+      {
+        type: "task",
+        config: {
+          subject: "Follow up with new patient",
+          description: "Call the patient to ensure they have everything they need",
+          assignee: "nurse"
+        }
+      }
+    ],
+    createdAt: "2023-05-10T08:00:00Z",
+    updatedAt: "2023-05-12T10:30:00Z",
+    lastRun: "2023-06-01T14:22:00Z",
+    createdBy: "admin"
+  },
+  {
+    id: "workflow-2",
+    name: "Appointment Reminder",
+    description: "Sends reminder notifications before scheduled appointments",
+    status: "active",
+    trigger: "appointment_scheduled",
+    steps: [
+      {
+        type: "wait",
+        config: {
+          delay: "48"
+        }
+      },
+      {
+        type: "email",
+        config: {
+          subject: "Upcoming Appointment Reminder",
+          content: "This is a reminder about your upcoming appointment. Please arrive 15 minutes early.",
+          recipient: "patient"
+        }
+      },
+      {
+        type: "sms",
+        config: {
+          message: "Reminder: You have an appointment tomorrow. Reply C to confirm or R to reschedule.",
+          recipient: "patient"
+        }
+      }
+    ],
+    createdAt: "2023-05-15T09:20:00Z",
+    updatedAt: "2023-05-15T09:20:00Z",
+    lastRun: "2023-06-02T08:15:00Z",
+    createdBy: "admin"
+  },
+  {
+    id: "workflow-3",
+    name: "Follow-up Survey",
+    description: "Sends a satisfaction survey after appointments",
+    status: "paused",
+    trigger: "appointment_completed",
+    steps: [
+      {
+        type: "wait",
+        config: {
+          delay: "24"
+        }
+      },
+      {
+        type: "email",
+        config: {
+          subject: "How was your appointment?",
+          content: "We value your feedback. Please take a moment to complete this short survey about your recent visit.",
+          recipient: "patient"
+        }
+      }
+    ],
+    createdAt: "2023-05-20T13:40:00Z",
+    updatedAt: "2023-05-22T11:05:00Z",
+    createdBy: "admin"
+  },
+  {
+    id: "workflow-4",
+    name: "Prescription Renewal",
+    description: "Notify patients when their prescriptions are due for renewal",
+    status: "draft",
+    trigger: "scheduled",
+    steps: [
+      {
+        type: "condition",
+        config: {
+          condition: "days_until_renewal <= 7"
+        }
+      },
+      {
+        type: "email",
+        config: {
+          subject: "Prescription Renewal Reminder",
+          content: "Your prescription will expire soon. Please contact us to arrange a renewal.",
+          recipient: "patient"
+        }
+      }
+    ],
+    createdAt: "2023-05-25T16:10:00Z",
+    updatedAt: "2023-05-25T16:10:00Z",
+    createdBy: "admin"
+  }
+];
 
-const WorkflowList: React.FC<WorkflowListProps> = ({
-  workflows,
-  onCreateWorkflow,
-  onEditWorkflow,
-  onDeleteWorkflow,
-  onDuplicateWorkflow,
-  onToggleWorkflowStatus,
-}) => {
-  const [searchQuery, setSearchQuery] = useState("");
+const WorkflowList: React.FC = () => {
+  const { toast } = useToast();
+  const [workflows, setWorkflows] = useState<Workflow[]>(initialWorkflows);
+  const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [workflowToEdit, setWorkflowToEdit] = useState<Workflow | null>(null);
   
-  const filteredWorkflows = workflows.filter((workflow) => {
-    if (!searchQuery) return true;
+  // Filter state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  
+  const handleCreateWorkflow = () => {
+    setIsCreateDialogOpen(true);
+  };
+  
+  const handleSaveWorkflow = (workflowData: Omit<Workflow, "id">) => {
+    const newWorkflow: Workflow = {
+      ...workflowData,
+      id: `workflow-${uuidv4()}`,
+    };
     
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      workflow.name.toLowerCase().includes(searchLower) ||
-      workflow.description?.toLowerCase().includes(searchLower) ||
-      workflow.trigger.toLowerCase().includes(searchLower)
+    setWorkflows(prev => [newWorkflow, ...prev]);
+    setIsCreateDialogOpen(false);
+    
+    toast({
+      title: "Workflow Created",
+      description: "The workflow has been created successfully.",
+    });
+  };
+  
+  const handleUpdateWorkflow = (workflowData: Omit<Workflow, "id">) => {
+    if (!workflowToEdit) return;
+    
+    const updatedWorkflow: Workflow = {
+      ...workflowData,
+      id: workflowToEdit.id,
+    };
+    
+    setWorkflows(prev => 
+      prev.map(workflow => workflow.id === updatedWorkflow.id ? updatedWorkflow : workflow)
     );
-  });
-
-  const getStatusBadge = (status: WorkflowStatus) => {
-    switch (status) {
-      case "active":
-        return <Badge className="bg-green-500">Active</Badge>;
-      case "inactive":
-        return <Badge variant="secondary">Inactive</Badge>;
-      case "draft":
-        return <Badge variant="outline">Draft</Badge>;
-      default:
-        return null;
+    
+    setIsEditDialogOpen(false);
+    setWorkflowToEdit(null);
+    
+    toast({
+      title: "Workflow Updated",
+      description: "The workflow has been updated successfully.",
+    });
+    
+    // If we're currently viewing this workflow, update the view
+    if (selectedWorkflowId === updatedWorkflow.id) {
+      setSelectedWorkflowId(null);
+      setTimeout(() => setSelectedWorkflowId(updatedWorkflow.id), 0);
     }
   };
-
-  const formatTriggerName = (trigger: string): string => {
-    return trigger
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+  
+  const handleEditWorkflow = (id: string) => {
+    const workflow = workflows.find(w => w.id === id);
+    if (workflow) {
+      setWorkflowToEdit(workflow);
+      setIsEditDialogOpen(true);
+    }
   };
-
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <div className="relative w-64">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search workflows..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8"
-          />
+  
+  const handleDeleteWorkflow = (id: string) => {
+    setWorkflows(prev => prev.filter(workflow => workflow.id !== id));
+    
+    if (selectedWorkflowId === id) {
+      setSelectedWorkflowId(null);
+    }
+    
+    toast({
+      title: "Workflow Deleted",
+      description: "The workflow has been deleted successfully.",
+    });
+  };
+  
+  const handleActivateWorkflow = (id: string) => {
+    setWorkflows(prev => 
+      prev.map(workflow => 
+        workflow.id === id ? { ...workflow, status: "active" as const } : workflow
+      )
+    );
+    
+    toast({
+      title: "Workflow Activated",
+      description: "The workflow has been activated successfully.",
+    });
+  };
+  
+  const handlePauseWorkflow = (id: string) => {
+    setWorkflows(prev => 
+      prev.map(workflow => 
+        workflow.id === id ? { ...workflow, status: "paused" as const } : workflow
+      )
+    );
+    
+    toast({
+      title: "Workflow Paused",
+      description: "The workflow has been paused successfully.",
+    });
+  };
+  
+  const handleViewWorkflow = (id: string) => {
+    setSelectedWorkflowId(id);
+  };
+  
+  const handleBackToList = () => {
+    setSelectedWorkflowId(null);
+  };
+  
+  const filteredWorkflows = workflows.filter(workflow => {
+    // Filter by search query
+    const searchMatch = 
+      workflow.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      workflow.description.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Filter by status
+    const statusMatch = selectedStatuses.length === 0 || selectedStatuses.includes(workflow.status);
+    
+    return searchMatch && statusMatch;
+  });
+  
+  const resetFilters = () => {
+    setSearchQuery("");
+    setSelectedStatuses([]);
+  };
+  
+  // If a workflow is selected, show its details
+  if (selectedWorkflowId) {
+    const selectedWorkflow = workflows.find(w => w.id === selectedWorkflowId);
+    
+    if (!selectedWorkflow) {
+      return (
+        <div className="text-center p-8">
+          <h2 className="text-xl font-medium mb-2">Workflow Not Found</h2>
+          <p className="text-muted-foreground mb-4">The workflow you're looking for doesn't exist.</p>
+          <Button onClick={handleBackToList}>Back to Workflow List</Button>
         </div>
-        <Button onClick={onCreateWorkflow}>
-          <PlusCircle className="h-4 w-4 mr-2" />
+      );
+    }
+    
+    return (
+      <WorkflowDetailView
+        workflow={selectedWorkflow}
+        onBack={handleBackToList}
+        onEdit={handleEditWorkflow}
+        onDelete={handleDeleteWorkflow}
+        onActivate={handleActivateWorkflow}
+        onPause={handlePauseWorkflow}
+      />
+    );
+  }
+  
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Workflows</h1>
+        <Button onClick={handleCreateWorkflow}>
+          <Plus className="h-4 w-4 mr-2" />
           Create Workflow
         </Button>
       </div>
-
-      {filteredWorkflows.length > 0 ? (
-        <div className="border rounded-md">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Trigger</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Last Run</TableHead>
-                <TableHead className="w-[80px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredWorkflows.map((workflow) => (
-                <TableRow key={workflow.id}>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{workflow.name}</div>
-                      {workflow.description && (
-                        <div className="text-sm text-muted-foreground">{workflow.description}</div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>{formatTriggerName(workflow.trigger)}</TableCell>
-                  <TableCell>{getStatusBadge(workflow.status)}</TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      {format(new Date(workflow.createdAt), 'MMM d, yyyy')}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      by {workflow.createdBy}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {workflow.lastRunAt ? (
-                      <div className="text-sm">
-                        {formatDistanceToNow(new Date(workflow.lastRunAt), { addSuffix: true })}
-                      </div>
-                    ) : (
-                      <span className="text-sm text-muted-foreground">Never</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Actions</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => onEditWorkflow(workflow.id)}>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDuplicateWorkflow(workflow.id)}>
-                          <Copy className="h-4 w-4 mr-2" />
-                          Duplicate
-                        </DropdownMenuItem>
-                        {workflow.status === "active" ? (
-                          <DropdownMenuItem onClick={() => onToggleWorkflowStatus(workflow.id, "inactive")}>
-                            <Pause className="h-4 w-4 mr-2" />
-                            Deactivate
-                          </DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem onClick={() => onToggleWorkflowStatus(workflow.id, "active")}>
-                            <Activity className="h-4 w-4 mr-2" />
-                            Activate
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => onDeleteWorkflow(workflow.id)} className="text-destructive">
-                          <Trash className="h-4 w-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center border rounded-md p-8 bg-muted/10">
-          <Activity className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-1">No workflows found</h3>
-          <p className="text-muted-foreground text-center mb-4 max-w-md">
-            {searchQuery 
-              ? "No workflows match your search criteria. Try different keywords or clear your search."
-              : "There are no workflows created yet. Start by creating a new workflow."}
-          </p>
-          <Button onClick={onCreateWorkflow}>
-            <PlusCircle className="h-4 w-4 mr-2" />
-            Create Workflow
-          </Button>
-        </div>
+      
+      <WorkflowFilters
+        onSearchChange={setSearchQuery}
+        onStatusFilterChange={setSelectedStatuses}
+        onReset={resetFilters}
+        searchValue={searchQuery}
+        selectedStatuses={selectedStatuses}
+      />
+      
+      <WorkflowGrid
+        workflows={filteredWorkflows}
+        onActivate={handleActivateWorkflow}
+        onPause={handlePauseWorkflow}
+        onEdit={handleEditWorkflow}
+        onDelete={handleDeleteWorkflow}
+        onView={handleViewWorkflow}
+      />
+      
+      <WorkflowFormDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        onSave={handleSaveWorkflow}
+        title="Create Workflow"
+      />
+      
+      {workflowToEdit && (
+        <WorkflowFormDialog
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          onSave={handleUpdateWorkflow}
+          initialData={workflowToEdit}
+          title="Edit Workflow"
+        />
       )}
     </div>
   );
