@@ -30,6 +30,7 @@ export interface SidebarItem {
   role?: string[];
 }
 
+// Base sidebar items that should appear for all users
 export const sidebarItems: SidebarItem[] = [
   {
     title: "Dashboard",
@@ -165,3 +166,8 @@ export const sidebarItems: SidebarItem[] = [
     ],
   },
 ];
+
+// Function to get all sidebar items
+export const getAllSidebarItems = () => {
+  return sidebarItems;
+};

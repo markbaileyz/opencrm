@@ -5,19 +5,7 @@ import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  SidebarItem,
-  baseSidebarItems,
-  medicalSidebarItems,
-  adminSidebarItems,
-  settingsSidebarItems,
-  adminSettingsItems,
-  patientSidebarItems,
-  doctorSidebarItems,
-  nurseSidebarItems,
-  communicationItems,
-  frontDeskItems
-} from "@/data/sidebarItems";
+import { SidebarItem, sidebarItems } from "@/data/sidebarItems";
 
 const MobileNavigationMenu = () => {
   const location = useLocation();
@@ -44,10 +32,55 @@ const MobileNavigationMenu = () => {
   // Filter items based on user role
   const filterItemsByRole = (items: SidebarItem[]) => {
     return items.filter(item => {
-      if (!item.roles) return true;
-      return hasRole(item.roles);
+      if (!item.role) return true;
+      return hasRole(item.role);
     });
   };
+
+  // Group sidebar items by their roles
+  const baseSidebarItems = sidebarItems.filter(item => !item.role);
+  const patientSidebarItems = sidebarItems.filter(item => 
+    item.role?.includes("patient") && 
+    !item.role?.includes("front-desk") && 
+    !item.role?.some(r => ["admin", "power-user"].includes(r))
+  );
+  const doctorSidebarItems = sidebarItems.filter(item => 
+    item.role?.includes("doctor") && 
+    !patientSidebarItems.includes(item)
+  );
+  const nurseSidebarItems = sidebarItems.filter(item => 
+    item.role?.includes("nurse") && 
+    !doctorSidebarItems.includes(item) && 
+    !patientSidebarItems.includes(item)
+  );
+  const frontDeskItems = sidebarItems.filter(item => 
+    item.role?.includes("front-desk") && 
+    !nurseSidebarItems.includes(item) && 
+    !doctorSidebarItems.includes(item) && 
+    !patientSidebarItems.includes(item)
+  );
+  const medicalSidebarItems = [...doctorSidebarItems, ...nurseSidebarItems];
+  const communicationItems = sidebarItems.filter(item => 
+    item.title === "Communications" || 
+    item.title === "Email" || 
+    item.title === "Call Tracking" ||
+    item.title === "Workflows"
+  );
+  const adminSidebarItems = sidebarItems.filter(item => 
+    (item.role?.includes("admin") || item.role?.includes("power-user")) && 
+    !frontDeskItems.includes(item) && 
+    !medicalSidebarItems.includes(item) && 
+    !patientSidebarItems.includes(item) &&
+    !communicationItems.includes(item)
+  );
+  const settingsSidebarItems = sidebarItems.filter(item => 
+    item.title === "Settings" || 
+    item.href === "/settings"
+  );
+  const adminSettingsItems = sidebarItems.filter(item => 
+    (item.href === "/admin-settings" || item.href === "/user-management") && 
+    item.role?.includes("admin")
+  );
   
   return (
     <div className="flex flex-col h-full">
@@ -71,7 +104,7 @@ const MobileNavigationMenu = () => {
               key={item.href}
               href={item.href}
               icon={item.icon}
-              label={item.label}
+              label={item.title}
               active={isActive(item.href)}
               onClick={closeMobileMenu}
             />
@@ -90,7 +123,7 @@ const MobileNavigationMenu = () => {
                   key={item.href}
                   href={item.href}
                   icon={item.icon}
-                  label={item.label}
+                  label={item.title}
                   active={isActive(item.href)}
                   onClick={closeMobileMenu}
                 />
@@ -111,7 +144,7 @@ const MobileNavigationMenu = () => {
                   key={item.href}
                   href={item.href}
                   icon={item.icon}
-                  label={item.label}
+                  label={item.title}
                   active={isActive(item.href)}
                   onClick={closeMobileMenu}
                 />
@@ -132,7 +165,7 @@ const MobileNavigationMenu = () => {
                   key={item.href}
                   href={item.href}
                   icon={item.icon}
-                  label={item.label}
+                  label={item.title}
                   active={isActive(item.href)}
                   onClick={closeMobileMenu}
                 />
@@ -153,7 +186,7 @@ const MobileNavigationMenu = () => {
                   key={item.href}
                   href={item.href}
                   icon={item.icon}
-                  label={item.label}
+                  label={item.title}
                   active={isActive(item.href)}
                   onClick={closeMobileMenu}
                 />
@@ -174,7 +207,7 @@ const MobileNavigationMenu = () => {
                   key={item.href}
                   href={item.href}
                   icon={item.icon}
-                  label={item.label}
+                  label={item.title}
                   active={isActive(item.href)}
                   onClick={closeMobileMenu}
                 />
@@ -195,7 +228,7 @@ const MobileNavigationMenu = () => {
                   key={item.href}
                   href={item.href}
                   icon={item.icon}
-                  label={item.label}
+                  label={item.title}
                   active={isActive(item.href)}
                   onClick={closeMobileMenu}
                 />
@@ -216,7 +249,7 @@ const MobileNavigationMenu = () => {
                   key={item.href}
                   href={item.href}
                   icon={item.icon}
-                  label={item.label}
+                  label={item.title}
                   active={isActive(item.href)}
                   onClick={closeMobileMenu}
                 />
@@ -234,7 +267,7 @@ const MobileNavigationMenu = () => {
               key={item.href}
               href={item.href}
               icon={item.icon}
-              label={item.label}
+              label={item.title}
               active={isActive(item.href)}
               onClick={closeMobileMenu}
             />
@@ -247,7 +280,7 @@ const MobileNavigationMenu = () => {
                   key={item.href}
                   href={item.href}
                   icon={item.icon}
-                  label={item.label}
+                  label={item.title}
                   active={isActive(item.href)}
                   onClick={closeMobileMenu}
                 />

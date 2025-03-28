@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { getAllSidebarItems } from "@/data/sidebarItems";
+import { sidebarItems } from "@/data/sidebarItems";
 import SidebarContent from "@/components/sidebar/SidebarContent";
 import SidebarToggle from "@/components/sidebar/SidebarToggle";
 import UserInfo from "@/components/sidebar/UserInfo";
@@ -19,8 +19,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     setIsSidebarOpen(!isSidebarOpen);
   };
   
-  const allSidebarItems = getAllSidebarItems();
-  
   return (
     <div className="flex h-screen">
       <SidebarToggle 
@@ -36,7 +34,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         )}
       >
         <UserInfo />
-        <SidebarContent sidebarItems={allSidebarItems} />
+        <SidebarContent sidebarItems={sidebarItems} />
         <Separator className="my-6" />
         <div className="p-4">
           <LogoutButton />

@@ -15,28 +15,28 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
   
   // Filter sidebar items based on user's role
   const filteredItems = sidebarItems.filter(item => {
-    if (!item.roles) return true;
-    return hasRole(item.roles);
+    if (!item.role) return true;
+    return hasRole(item.role);
   });
   
   // Group sidebar items by their roles to create logical sections
-  const baseSectionItems = filteredItems.filter(item => !item.roles);
+  const baseSectionItems = filteredItems.filter(item => !item.role);
   const patientSectionItems = filteredItems.filter(item => 
-    item.roles?.includes("patient") && 
-    !item.roles?.includes("front-desk") && 
-    !item.roles?.some(r => ["admin", "power-user"].includes(r))
+    item.role?.includes("patient") && 
+    !item.role?.includes("front-desk") && 
+    !item.role?.some(r => ["admin", "power-user"].includes(r))
   );
   const medicalSectionItems = filteredItems.filter(item => 
-    (item.roles?.includes("doctor") || item.roles?.includes("nurse")) && 
+    (item.role?.includes("doctor") || item.role?.includes("nurse")) && 
     !patientSectionItems.includes(item)
   );
   const frontDeskSectionItems = filteredItems.filter(item => 
-    item.roles?.includes("front-desk") && 
+    item.role?.includes("front-desk") && 
     !medicalSectionItems.includes(item) && 
     !patientSectionItems.includes(item)
   );
   const adminSectionItems = filteredItems.filter(item => 
-    (item.roles?.includes("admin") || item.roles?.includes("power-user")) && 
+    (item.role?.includes("admin") || item.role?.includes("power-user")) && 
     !frontDeskSectionItems.includes(item) && 
     !medicalSectionItems.includes(item) && 
     !patientSectionItems.includes(item)
@@ -56,12 +56,12 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
       <div className="space-y-1">
         {baseSectionItems.map((item) => (
           <SidebarLink
-            key={item.label}
+            key={item.title}
             href={item.href}
             isActive={isActive(item.href)}
           >
             {item.icon}
-            <span>{item.label}</span>
+            <span>{item.title}</span>
           </SidebarLink>
         ))}
       </div>
@@ -75,12 +75,12 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
           <div className="mt-2 space-y-1">
             {patientSectionItems.map((item) => (
               <SidebarLink
-                key={item.label}
+                key={item.title}
                 href={item.href}
                 isActive={isActive(item.href)}
               >
                 {item.icon}
-                <span>{item.label}</span>
+                <span>{item.title}</span>
               </SidebarLink>
             ))}
           </div>
@@ -96,12 +96,12 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
           <div className="mt-2 space-y-1">
             {medicalSectionItems.map((item) => (
               <SidebarLink
-                key={item.label}
+                key={item.title}
                 href={item.href}
                 isActive={isActive(item.href)}
               >
                 {item.icon}
-                <span>{item.label}</span>
+                <span>{item.title}</span>
               </SidebarLink>
             ))}
           </div>
@@ -117,12 +117,12 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
           <div className="mt-2 space-y-1">
             {frontDeskSectionItems.map((item) => (
               <SidebarLink
-                key={item.label}
+                key={item.title}
                 href={item.href}
                 isActive={isActive(item.href)}
               >
                 {item.icon}
-                <span>{item.label}</span>
+                <span>{item.title}</span>
               </SidebarLink>
             ))}
           </div>
@@ -138,12 +138,12 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
           <div className="mt-2 space-y-1">
             {adminSectionItems.map((item) => (
               <SidebarLink
-                key={item.label}
+                key={item.title}
                 href={item.href}
                 isActive={isActive(item.href)}
               >
                 {item.icon}
-                <span>{item.label}</span>
+                <span>{item.title}</span>
               </SidebarLink>
             ))}
           </div>

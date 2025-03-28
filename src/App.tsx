@@ -41,9 +41,9 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 // Import our new pages
 import CallTracking from "@/pages/CallTracking";
 import Workflows from "@/pages/Workflows";
+import Compliance from "@/pages/Compliance";
 
 import "./App.css";
-import { Compliance } from "./pages/Compliance";
 import ServiceWorkerManager from "./components/service-worker/ServiceWorkerManager";
 
 function App() {
