@@ -223,12 +223,16 @@ export const useVitalsData = (patientId?: string, timeRange: string = "week") =>
         const o2History = mockReadings.map(r => ({ date: r.date, value: r.oxygenSaturation }));
         const weightHistory = mockReadings.map(r => ({ date: r.date, value: r.weight }));
         
+        // Get systolic values for determining trend
+        const currentSystolic = Number(mockReadings[0].bloodPressure.split('/')[0]);
+        const previousSystolic = Number(mockReadings[1].bloodPressure.split('/')[0]);
+        
         // Mock vital data structure
         const mockVitals: VitalsData = {
           bloodPressure: {
             current: mockReadings[0].bloodPressure,
-            trend: mockReadings[0].bloodPressure.split('/')[0] < mockReadings[1].bloodPressure.split('/')[0] ? "down" : 
-                   mockReadings[0].bloodPressure.split('/')[0] > mockReadings[1].bloodPressure.split('/')[0] ? "up" : "stable",
+            trend: currentSystolic < previousSystolic ? "down" : 
+                   currentSystolic > previousSystolic ? "up" : "stable",
             history: bpHistory
           },
           heartRate: {
@@ -315,9 +319,13 @@ export const useVitalsData = (patientId?: string, timeRange: string = "week") =>
       const o2History = [{ date: newReading.date, value: newReading.oxygenSaturation }, ...(prev.oxygenSaturation.history || [])];
       const weightHistory = [{ date: newReading.date, value: newReading.weight }, ...(prev.weight.history || [])];
       
+      // Get systolic value for determining trend
+      const currentSystolic = Number(newReading.bloodPressure.split('/')[0]);
+      const previousSystolic = Number(prev.bloodPressure.current.split('/')[0]);
+      
       // Determine trends based on the two most recent readings
-      const bpTrend = systolic < prev.bloodPressure.current.split('/')[0] ? "down" : 
-                      systolic > prev.bloodPressure.current.split('/')[0] ? "up" : "stable";
+      const bpTrend = currentSystolic < previousSystolic ? "down" : 
+                      currentSystolic > previousSystolic ? "up" : "stable";
       const hrTrend = newReading.heartRate < prev.heartRate.current ? "down" : 
                       newReading.heartRate > prev.heartRate.current ? "up" : "stable";
       const tempTrend = newReading.temperature < prev.temperature.current ? "down" : 

@@ -121,8 +121,8 @@ const PatientVitals: React.FC<PatientVitalsProps> = ({ patientId }) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {vitals?.history?.length ? (
-              vitals.history.map((entry, index) => (
+            {vitals?.readings && vitals.readings.length > 0 ? (
+              vitals.readings.map((entry, index) => (
                 <div key={index} className="border-b pb-3 last:border-0 last:pb-0">
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center">
