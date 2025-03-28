@@ -14,7 +14,8 @@ export type WorkflowStepType =
   | "task" 
   | "wait" 
   | "condition" 
-  | "template";
+  | "template"
+  | "branch"; // Added new branch type for conditional flows
 
 export interface WorkflowStepConfig {
   [key: string]: any;
@@ -27,11 +28,39 @@ export interface WorkflowStepConfig {
   message?: string;
   description?: string;
   templateId?: string;
+  // New properties for branch conditions
+  conditions?: BranchCondition[];
+  defaultBranchId?: string;
 }
 
+// New type for branch conditions
+export interface BranchCondition {
+  id: string;
+  field: string;
+  operator: ConditionOperator;
+  value: string;
+  nextStepId: string;
+  description?: string;
+}
+
+// Condition operators for branch conditions
+export type ConditionOperator = 
+  | "equals" 
+  | "not_equals" 
+  | "contains" 
+  | "not_contains" 
+  | "greater_than" 
+  | "less_than"
+  | "is_empty"
+  | "is_not_empty"
+  | "starts_with"
+  | "ends_with";
+
 export interface WorkflowStep {
+  id: string; // Adding ID to each step for branch references
   type: WorkflowStepType;
   config: WorkflowStepConfig;
+  nextStepId?: string; // Optional next step ID for linear workflows
 }
 
 export interface Workflow {
@@ -45,4 +74,5 @@ export interface Workflow {
   updatedAt: string;
   lastRun?: string;
   createdBy: string;
+  version?: number; // For versioning support
 }

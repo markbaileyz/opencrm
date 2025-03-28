@@ -12,6 +12,8 @@ export interface WorkflowExecution {
   duration?: number; // Execution duration in milliseconds
   stepCount?: number; // Number of steps executed
   category?: string; // Workflow category
+  branchesUsed?: number; // Number of branches used in the execution
+  executionPath?: string[]; // Path of steps that were executed
 }
 
 export const useExecutionHistory = () => {
@@ -44,6 +46,8 @@ export const useExecutionHistory = () => {
       duration: execution.duration || Math.floor(Math.random() * 10000), // Random duration if not provided
       stepCount: execution.stepCount || Math.floor(Math.random() * 10) + 1, // Random step count if not provided
       category: execution.category || ["Email", "Task", "Notification", "Integration"][Math.floor(Math.random() * 4)], // Random category if not provided
+      branchesUsed: execution.branchesUsed || Math.floor(Math.random() * 3), // Random branches used
+      executionPath: execution.executionPath || generateRandomPath(execution.stepCount || 5)
     };
     
     setExecutionHistory(prev => {
@@ -102,6 +106,18 @@ export const useExecutionHistory = () => {
       return { date, count };
     });
 
+    // Calculate branch usage statistics
+    const branchUsageStats = {
+      totalBranchesUsed: executionHistory.reduce((sum, exec) => sum + (exec.branchesUsed || 0), 0),
+      averageBranchesPerWorkflow: executionHistory.length > 0 
+        ? executionHistory.reduce((sum, exec) => sum + (exec.branchesUsed || 0), 0) / executionHistory.length
+        : 0,
+      workflowsWithBranches: executionHistory.filter(exec => (exec.branchesUsed || 0) > 0).length,
+      percentageWithBranches: executionHistory.length > 0
+        ? (executionHistory.filter(exec => (exec.branchesUsed || 0) > 0).length / executionHistory.length) * 100
+        : 0
+    };
+
     return {
       totalExecutions,
       successfulExecutions,
@@ -110,29 +126,33 @@ export const useExecutionHistory = () => {
       averageDuration,
       categoryCounts,
       executionsPerDay,
-      topWorkflows: getTopWorkflows(executionHistory)
+      topWorkflows: getTopWorkflows(executionHistory),
+      branchUsageStats
     };
   }, [executionHistory]);
 
   // Helper function to get top workflows by execution count
   const getTopWorkflows = (history: WorkflowExecution[]) => {
-    const workflowCounts: Record<string, { count: number, successCount: number }> = {};
+    const workflowCounts: Record<string, { count: number, successCount: number, branchCount: number }> = {};
     
     history.forEach(exec => {
       if (!workflowCounts[exec.workflowName]) {
-        workflowCounts[exec.workflowName] = { count: 0, successCount: 0 };
+        workflowCounts[exec.workflowName] = { count: 0, successCount: 0, branchCount: 0 };
       }
       workflowCounts[exec.workflowName].count += 1;
       if (exec.success) {
         workflowCounts[exec.workflowName].successCount += 1;
       }
+      workflowCounts[exec.workflowName].branchCount += exec.branchesUsed || 0;
     });
     
     return Object.entries(workflowCounts)
-      .map(([name, { count, successCount }]) => ({
+      .map(([name, { count, successCount, branchCount }]) => ({
         name,
         count,
         successCount,
+        branchCount,
+        avgBranchesPerExecution: count > 0 ? branchCount / count : 0,
         successRate: count > 0 ? (successCount / count) * 100 : 0
       }))
       .sort((a, b) => b.count - a.count)
@@ -177,6 +197,8 @@ const generateSampleHistory = (): WorkflowExecution[] => {
     const workflowName = workflowNames[Math.floor(Math.random() * workflowNames.length)];
     const message = messages[Math.floor(Math.random() * messages.length)];
     const category = categories[Math.floor(Math.random() * categories.length)];
+    const stepCount = Math.floor(Math.random() * 10) + 1;
+    const branchesUsed = Math.floor(Math.random() * 3); // 0-2 branches used
     
     // Generate a timestamp within the last 30 days
     const date = new Date();
@@ -190,11 +212,26 @@ const generateSampleHistory = (): WorkflowExecution[] => {
       success,
       message,
       duration: Math.floor(Math.random() * 10000), // Random duration between 0-10000ms
-      stepCount: Math.floor(Math.random() * 10) + 1, // Random step count between 1-10
-      category
+      stepCount,
+      category,
+      branchesUsed,
+      executionPath: generateRandomPath(stepCount)
     });
   }
   
   // Sort by timestamp (newest first)
   return history.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+};
+
+// Generate a random execution path for sample data
+const generateRandomPath = (stepCount: number): string[] => {
+  const stepTypes = ["email", "sms", "task", "wait", "condition", "branch"];
+  const path: string[] = [];
+  
+  for (let i = 0; i < stepCount; i++) {
+    const stepType = stepTypes[Math.floor(Math.random() * stepTypes.length)];
+    path.push(`Step ${i + 1}: ${stepType}`);
+  }
+  
+  return path;
 };

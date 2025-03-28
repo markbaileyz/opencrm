@@ -1,113 +1,105 @@
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogFooter 
+} from "@/components/ui/dialog";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { WorkflowStep, WorkflowStepType } from "@/types/workflow";
 import StepFormFields from "./StepFormFields";
-import { isStepValid, getRelevantConfig } from "./utils";
+import { v4 as uuidv4 } from "uuid";
 
 interface AddStepFormProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onAddStep: (step: WorkflowStep) => void;
+  allSteps: WorkflowStep[];
 }
 
-interface StepConfigType {
-  subject: string;
-  content: string;
-  recipient: string;
-  delay: string;
-  condition: string;
-  assignee: string;
-  message: string;
-  templateId: string;
-}
-
-const initialStepConfig = {
-  subject: "",
-  content: "",
-  recipient: "patient",
-  delay: "0",
-  condition: "",
-  assignee: "",
-  message: "",
-  templateId: "",
-};
-
-const AddStepForm: React.FC<AddStepFormProps> = ({ onAddStep }) => {
+const AddStepForm: React.FC<AddStepFormProps> = ({
+  open,
+  onOpenChange,
+  onAddStep,
+  allSteps
+}) => {
   const [stepType, setStepType] = useState<WorkflowStepType>("email");
-  const [stepConfig, setStepConfig] = useState<StepConfigType>(initialStepConfig);
+  const [stepConfig, setStepConfig] = useState<any>({});
+
+  const handleStepTypeChange = (type: WorkflowStepType) => {
+    setStepType(type);
+    // Reset config when changing step type
+    setStepConfig({});
+  };
+
+  const handleConfigChange = (config: any) => {
+    setStepConfig(config);
+  };
 
   const handleAddStep = () => {
     const newStep: WorkflowStep = {
+      id: uuidv4(), // Generate unique ID for the step
       type: stepType,
-      config: {
-        ...getRelevantConfig(stepType, stepConfig)
-      }
+      config: stepConfig
     };
-    
     onAddStep(newStep);
-    resetStepForm();
-  };
-
-  const resetStepForm = () => {
+    onOpenChange(false);
+    // Reset form
     setStepType("email");
-    setStepConfig(initialStepConfig);
+    setStepConfig({});
   };
 
   return (
-    <Card>
-      <CardHeader className="py-3">
-        <CardTitle className="text-sm font-medium">Add New Step</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid gap-2">
-          <Label htmlFor="stepType">Step Type</Label>
-          <Select value={stepType} onValueChange={(value) => setStepType(value as WorkflowStepType)}>
-            <SelectTrigger id="stepType">
-              <SelectValue placeholder="Select step type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="email">Send Email</SelectItem>
-              <SelectItem value="sms">Send SMS</SelectItem>
-              <SelectItem value="task">Create Task</SelectItem>
-              <SelectItem value="wait">Wait Time</SelectItem>
-              <SelectItem value="condition">Condition</SelectItem>
-              <SelectItem value="template">Use Template</SelectItem>
-            </SelectContent>
-          </Select>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add Workflow Step</DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4 py-2">
+          <div>
+            <Label htmlFor="step-type">Step Type</Label>
+            <Select value={stepType} onValueChange={(value) => handleStepTypeChange(value as WorkflowStepType)}>
+              <SelectTrigger id="step-type">
+                <SelectValue placeholder="Select step type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="email">Send Email</SelectItem>
+                <SelectItem value="sms">Send SMS</SelectItem>
+                <SelectItem value="task">Create Task</SelectItem>
+                <SelectItem value="wait">Wait</SelectItem>
+                <SelectItem value="condition">Simple Condition</SelectItem>
+                <SelectItem value="template">Use Template</SelectItem>
+                <SelectItem value="branch">Conditional Branch</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <StepFormFields 
+            type={stepType} 
+            config={stepConfig} 
+            onChange={handleConfigChange}
+            allSteps={allSteps}
+            currentStepIndex={allSteps.length}
+          />
         </div>
         
-        <StepFormFields 
-          stepType={stepType} 
-          stepConfig={stepConfig} 
-          setStepConfig={setStepConfig} 
-        />
-      </CardContent>
-      <CardFooter>
-        <Button 
-          onClick={handleAddStep} 
-          disabled={!isStepValid(stepType, stepConfig)}
-          className="w-full"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Step
-        </Button>
-      </CardFooter>
-    </Card>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={handleAddStep}>Add Step</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

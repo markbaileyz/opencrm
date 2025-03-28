@@ -1,70 +1,70 @@
 
 import { Workflow, WorkflowStep } from "@/types/workflow";
 
-/**
- * Calculate the progress percentage of a workflow based on completed steps
- */
+// Calculate execution progress based on completed steps
 export const calculateProgress = (workflow: Workflow): number => {
-  if (workflow.steps.length === 0) return 0;
+  if (!workflow.steps || workflow.steps.length === 0) return 0;
   
-  // For this mock implementation, we'll generate a random progress
-  // In a real implementation, this would track actual step completion
-  const completedSteps = Math.floor(Math.random() * (workflow.steps.length + 1));
-  return Math.round((completedSteps / workflow.steps.length) * 100);
+  // For demo purposes, generate a random progress value
+  // In a real app, this would track actual execution progress
+  const randomProgress = Math.floor(Math.random() * 100);
+  return randomProgress;
 };
 
-/**
- * Generate a human-readable status message for a workflow execution
- */
-export const getExecutionStatusMessage = (workflow: Workflow): string => {
-  const progress = calculateProgress(workflow);
-  
-  if (progress === 0) return "Waiting to start";
-  if (progress === 100) return "Execution completed";
-  
-  // Determine which step is currently running
-  const currentStepIndex = Math.floor((workflow.steps.length * progress) / 100);
-  const currentStep = workflow.steps[currentStepIndex];
-  
-  return getStepExecutionMessage(currentStep, currentStepIndex);
-};
-
-/**
- * Get a message describing the current step execution
- */
-const getStepExecutionMessage = (step: WorkflowStep, index: number): string => {
-  const stepNumber = index + 1;
-  
-  switch (step.type) {
-    case "email":
-      return `Step ${stepNumber}: Sending email "${step.config.subject}"`;
-    case "sms":
-      return `Step ${stepNumber}: Sending SMS message`;
-    case "task":
-      return `Step ${stepNumber}: Creating task "${step.config.subject}"`;
-    case "wait":
-      return `Step ${stepNumber}: Waiting for ${step.config.delay} hours`;
-    case "condition":
-      return `Step ${stepNumber}: Evaluating condition`;
-    case "template":
-      return `Step ${stepNumber}: Applying template`;
-    default:
-      return `Step ${stepNumber}: Executing`;
+// Evaluate a branch condition with sample data
+export const evaluateCondition = (condition: string, data: any): boolean => {
+  try {
+    // Simple condition evaluator for demo purposes
+    // In a real app, this would be more sophisticated
+    const parts = condition.split(' ');
+    if (parts.length !== 3) return false;
+    
+    const [field, operator, value] = parts;
+    const fieldValue = field.split('.').reduce((obj, key) => obj?.[key], data);
+    
+    switch (operator) {
+      case '==':
+      case '===':
+      case 'equals':
+        return fieldValue == value;
+      case '!=':
+      case '!==':
+      case 'not_equals':
+        return fieldValue != value;
+      case '>':
+      case 'greater_than':
+        return fieldValue > parseFloat(value);
+      case '<':
+      case 'less_than':
+        return fieldValue < parseFloat(value);
+      case 'contains':
+        return String(fieldValue).includes(value);
+      case 'not_contains':
+        return !String(fieldValue).includes(value);
+      case 'starts_with':
+        return String(fieldValue).startsWith(value);
+      case 'ends_with':
+        return String(fieldValue).endsWith(value);
+      case 'is_empty':
+        return !fieldValue || fieldValue.length === 0;
+      case 'is_not_empty':
+        return !!fieldValue && fieldValue.length > 0;
+      default:
+        return false;
+    }
+  } catch (error) {
+    console.error("Error evaluating condition:", error);
+    return false;
   }
 };
 
-/**
- * Estimate the remaining time for a workflow execution
- */
-export const estimateRemainingTime = (workflow: Workflow): string => {
-  const progress = calculateProgress(workflow);
-  if (progress >= 100) return "Completed";
-  if (progress === 0) return "Not started";
+// Visualize workflow execution path (for analytics)
+export const visualizeExecutionPath = (workflow: Workflow): string[] => {
+  if (!workflow.steps || workflow.steps.length === 0) return [];
   
-  // For this mock implementation, we'll return a random time estimate
-  // In a real implementation, this would be based on actual metrics
-  const minutesRemaining = Math.floor(Math.random() * 60) + 1;
-  
-  if (minutesRemaining < 2) return "Less than a minute remaining";
-  return `About ${minutesRemaining} minutes remaining`;
+  // For demo purposes, return a simple execution path
+  // In a real app, this would track the actual execution path
+  return workflow.steps.map((step, index) => 
+    `Step ${index + 1}: ${step.type}`
+  );
 };
