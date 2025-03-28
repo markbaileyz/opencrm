@@ -1,287 +1,60 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
-import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "@/components/theme-provider";
-import InteractiveGuides from "@/components/guides/InteractiveGuides";
-
-// Import all the pages
-import Index from "@/pages/Index";
-import Login from "@/pages/Login";
-import Dashboard from "@/pages/Dashboard";
-import Patients from "@/pages/Patients";
-import PatientDetail from "@/pages/PatientDetail";
-import PatientVitalsPage from "@/pages/PatientVitalsPage";
-import MedicalRecordsPage from "@/pages/MedicalRecordsPage";
-import MedicationsPage from "@/pages/MedicationsPage";
-import PrescriptionsPage from "@/pages/PrescriptionsPage";
-import HealthTrackerPage from "@/pages/HealthTrackerPage";
-import Calendar from "@/pages/Calendar";
-import Email from "@/pages/Email";
-import Contacts from "@/pages/Contacts";
-import Deals from "@/pages/Deals";
-import Organizations from "@/pages/Organizations";
-import Reports from "@/pages/Reports";
-import Settings from "@/pages/Settings";
-import AdminSettings from "@/pages/AdminSettings";
-import UserManagement from "@/pages/UserManagement";
-import Roadmap from "@/pages/Roadmap";
-import DashboardRoadmap from "@/pages/DashboardRoadmap";
-import MindMap from "@/pages/MindMap";
-import HealthcareCRM from "@/pages/HealthcareCRM";
-import OpenCRMRoadmap from "@/pages/OpenCRMRoadmap";
-import FrontDesk from "@/pages/FrontDesk";
-import Office from "@/pages/Office";
-import PreCheckIn from "@/pages/PreCheckIn";
-import CheckInConfirmation from "@/pages/CheckInConfirmation";
-import KnowledgeBase from "@/pages/KnowledgeBase";
-import ChallengesSolutions from "@/pages/ChallengesSolutions";
-import NotFound from "@/pages/NotFound";
-import ProtectedRoute from "@/components/ProtectedRoute";
-
-// Import our new pages
-import CallTracking from "@/pages/CallTracking";
-import Workflows from "@/pages/Workflows";
-import Compliance from "@/pages/Compliance";
-import WorkflowAnalytics from "@/pages/WorkflowAnalytics";
-import OrganizationInsights from "@/pages/OrganizationInsights";
-import Guides from "@/pages/Guides";
-
-import "./App.css";
-import ServiceWorkerManager from "./components/service-worker/ServiceWorkerManager";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { GuideProvider } from "./contexts/GuideContext";
+import DashboardLayout from "./components/layout/DashboardLayout";
+import Dashboard from "./components/dashboard/Dashboard";
+import FloatingGuideButton from "./components/guides/FloatingGuideButton";
+import GuideViewer from "./components/guides/GuideViewer";
+import PatientsPage from "./components/patients/PatientsPage";
+import PatientDetailPage from "./components/patients/PatientDetailPage";
+import RoadmapPage from "./components/roadmap/RoadmapPage";
+import HealthcareCRMStrategies from "./components/healthcare-crm/HealthcareCRMStrategies";
+import KnowledgeBase from "./components/knowledge/KnowledgeBase";
+import ChallengesSolutions from "./components/knowledge/ChallengesSolutions";
+import GuideCatalog from "./components/knowledge/GuideCatalog";
+import SettingsPage from "./components/settings/SettingsPage";
+import OrganizationsPage from "./components/organizations/OrganizationsPage";
+import OrganizationDetailView from "./components/organizations/details/OrganizationDetailView";
+import DealsPage from "./components/deals/DealsPage";
+import OfficeManagementPage from "./components/office/OfficeManagementPage";
+import HealthTrackerDashboard from "./components/health-tracker/HealthTrackerDashboard";
+import CallTrackingDashboard from "./components/call-tracking/CallTrackingDashboard";
+import WorkflowAutomationPage from "./components/workflows/WorkflowAutomationPage";
+import WorkflowAnalyticsDashboard from "./components/workflows/execution/WorkflowAnalyticsDashboard";
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="ui-theme">
-      <InteractiveGuides>
-        <ServiceWorkerManager />
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Index />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/pre-check-in" element={<PreCheckIn />} />
-          <Route path="/check-in-confirmation" element={<CheckInConfirmation />} />
-          <Route path="/roadmap" element={<Roadmap />} />
-          <Route path="/mind-map" element={<MindMap />} />
-          <Route path="/healthcare-crm" element={<HealthcareCRM />} />
-          <Route path="/opencrm-roadmap" element={<OpenCRMRoadmap />} />
-          <Route path="/knowledge-base" element={<KnowledgeBase />} />
-          <Route path="/challenges-solutions" element={<ChallengesSolutions />} />
-
-          {/* Protected Routes - requires authentication */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/patients"
-            element={
-              <ProtectedRoute>
-                <Patients />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/patients/:patientId"
-            element={
-              <ProtectedRoute>
-                <PatientDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/patient-vitals"
-            element={
-              <ProtectedRoute>
-                <PatientVitalsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/medical-records"
-            element={
-              <ProtectedRoute>
-                <MedicalRecordsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/medications"
-            element={
-              <ProtectedRoute>
-                <MedicationsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/prescriptions"
-            element={
-              <ProtectedRoute>
-                <PrescriptionsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/health-tracker"
-            element={
-              <ProtectedRoute>
-                <HealthTrackerPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/calendar"
-            element={
-              <ProtectedRoute>
-                <Calendar />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/email"
-            element={
-              <ProtectedRoute>
-                <Email />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/contacts"
-            element={
-              <ProtectedRoute>
-                <Contacts />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/deals"
-            element={
-              <ProtectedRoute>
-                <Deals />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/organizations"
-            element={
-              <ProtectedRoute>
-                <Organizations />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports"
-            element={
-              <ProtectedRoute>
-                <Reports />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin-settings"
-            element={
-              <ProtectedRoute>
-                <AdminSettings />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/user-management"
-            element={
-              <ProtectedRoute>
-                <UserManagement />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard-roadmap"
-            element={
-              <ProtectedRoute>
-                <DashboardRoadmap />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/front-desk"
-            element={
-              <ProtectedRoute>
-                <FrontDesk />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/office"
-            element={
-              <ProtectedRoute>
-                <Office />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/compliance"
-            element={
-              <ProtectedRoute>
-                <Compliance />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/call-tracking"
-            element={
-              <ProtectedRoute>
-                <CallTracking />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/workflows"
-            element={
-              <ProtectedRoute>
-                <Workflows />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/workflow-analytics"
-            element={
-              <ProtectedRoute>
-                <WorkflowAnalytics />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/organization-insights"
-            element={
-              <ProtectedRoute>
-                <OrganizationInsights />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/guides"
-            element={
-              <ProtectedRoute>
-                <Guides />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* 404 Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Toaster />
-      </InteractiveGuides>
+    <ThemeProvider>
+      <GuideProvider>
+        <BrowserRouter>
+          {/* Floating Guide Button and Guide Viewer are placed outside the routes */}
+          <FloatingGuideButton />
+          <GuideViewer />
+          
+          <Routes>
+            <Route path="/" element={<DashboardLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="/patients" element={<PatientsPage />} />
+              <Route path="/patients/:id" element={<PatientDetailPage />} />
+              <Route path="/roadmap" element={<RoadmapPage />} />
+              <Route path="/healthcare-crm" element={<HealthcareCRMStrategies />} />
+              <Route path="/knowledge-base" element={<KnowledgeBase />} />
+              <Route path="/challenges" element={<ChallengesSolutions />} />
+              <Route path="/guides" element={<GuideCatalog />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/organizations" element={<OrganizationsPage />} />
+              <Route path="/organizations/:id" element={<OrganizationDetailView />} />
+              <Route path="/deals" element={<DealsPage />} />
+              <Route path="/office-management" element={<OfficeManagementPage />} />
+              <Route path="/health-tracker" element={<HealthTrackerDashboard />} />
+              <Route path="/call-tracking" element={<CallTrackingDashboard />} />
+              <Route path="/workflow-automation" element={<WorkflowAutomationPage />} />
+              <Route path="/workflow-analytics" element={<WorkflowAnalyticsDashboard />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </GuideProvider>
     </ThemeProvider>
   );
 }

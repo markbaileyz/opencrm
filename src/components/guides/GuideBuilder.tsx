@@ -1,17 +1,20 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useGuide } from "@/contexts/GuideContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { GuideStep } from "@/types/guide-context";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2, ChevronDown, ChevronUp, Save } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus, Trash2, MoveUp, MoveDown, AlertCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { GuideStep } from "@/types/guide-context";
 
 interface GuideBuilderProps {
   onClose: () => void;
@@ -19,292 +22,314 @@ interface GuideBuilderProps {
 }
 
 const GuideBuilder: React.FC<GuideBuilderProps> = ({ onClose, editGuideId }) => {
-  const { guides } = useGuide();
-  const initialGuide = editGuideId ? guides.find(g => g.id === editGuideId) : null;
-
-  const [guideName, setGuideName] = useState(initialGuide?.name || "");
-  const [guideDescription, setGuideDescription] = useState(initialGuide?.description || "");
-  const [guideCategory, setGuideCategory] = useState(initialGuide?.category || "workflows");
-  const [steps, setSteps] = useState<GuideStep[]>(initialGuide?.steps || []);
-  const [activeTab, setActiveTab] = useState("details");
-
+  const { guides, addGuide, updateGuide } = useGuide();
+  
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [steps, setSteps] = useState<GuideStep[]>([
+    { id: crypto.randomUUID(), title: "", content: "" }
+  ]);
+  const [error, setError] = useState("");
+  
   // Get unique categories from existing guides
-  const categories = Array.from(new Set(guides.map(guide => guide.category)));
-
+  const existingCategories = Array.from(new Set(guides.map(g => g.category)));
+  
+  useEffect(() => {
+    if (editGuideId) {
+      const guideToEdit = guides.find(g => g.id === editGuideId);
+      if (guideToEdit) {
+        setName(guideToEdit.name);
+        setDescription(guideToEdit.description);
+        setCategory(guideToEdit.category);
+        setSteps(guideToEdit.steps);
+      }
+    }
+  }, [editGuideId, guides]);
+  
+  const handleStepChange = (index: number, field: keyof GuideStep, value: any) => {
+    setSteps(prev => prev.map((step, i) => 
+      i === index ? { ...step, [field]: value } : step
+    ));
+  };
+  
   const addStep = () => {
-    const newStep: GuideStep = {
-      id: `step-${steps.length + 1}`,
-      title: "",
-      content: "",
-      position: "bottom"
-    };
-    setSteps([...steps, newStep]);
+    setSteps(prev => [...prev, { id: crypto.randomUUID(), title: "", content: "" }]);
   };
-
+  
   const removeStep = (index: number) => {
-    const newSteps = [...steps];
-    newSteps.splice(index, 1);
-    setSteps(newSteps);
-  };
-
-  const updateStep = (index: number, field: keyof GuideStep, value: string) => {
-    const newSteps = [...steps];
-    newSteps[index] = { ...newSteps[index], [field]: value };
-    setSteps(newSteps);
-  };
-
-  const moveStep = (index: number, direction: "up" | "down") => {
-    if (
-      (direction === "up" && index === 0) ||
-      (direction === "down" && index === steps.length - 1)
-    ) {
-      return;
+    if (steps.length > 1) {
+      setSteps(prev => prev.filter((_, i) => i !== index));
     }
-
-    const newSteps = [...steps];
-    const newIndex = direction === "up" ? index - 1 : index + 1;
-    const temp = newSteps[index];
-    newSteps[index] = newSteps[newIndex];
-    newSteps[newIndex] = temp;
-    setSteps(newSteps);
   };
-
-  const handleSave = () => {
+  
+  const moveStepUp = (index: number) => {
+    if (index > 0) {
+      setSteps(prev => {
+        const newSteps = [...prev];
+        [newSteps[index - 1], newSteps[index]] = [newSteps[index], newSteps[index - 1]];
+        return newSteps;
+      });
+    }
+  };
+  
+  const moveStepDown = (index: number) => {
+    if (index < steps.length - 1) {
+      setSteps(prev => {
+        const newSteps = [...prev];
+        [newSteps[index], newSteps[index + 1]] = [newSteps[index + 1], newSteps[index]];
+        return newSteps;
+      });
+    }
+  };
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
     // Validate inputs
-    if (!guideName) {
-      toast.error("Guide name is required");
+    if (!name.trim()) {
+      setError("Guide name is required");
       return;
     }
-
-    if (steps.length === 0) {
-      toast.error("Guide must have at least one step");
+    
+    if (!category.trim()) {
+      setError("Category is required");
       return;
     }
-
-    for (const step of steps) {
-      if (!step.title || !step.content) {
-        toast.error("All steps must have a title and content");
+    
+    // Validate steps
+    for (let i = 0; i < steps.length; i++) {
+      if (!steps[i].title.trim()) {
+        setError(`Step ${i + 1} title is required`);
+        return;
+      }
+      if (!steps[i].content.trim()) {
+        setError(`Step ${i + 1} content is required`);
         return;
       }
     }
-
-    // In a real app, you would save the guide to your backend
-    toast.success(
-      editGuideId ? "Guide updated successfully" : "Guide created successfully"
-    );
+    
+    setError("");
+    
+    if (editGuideId) {
+      updateGuide({
+        id: editGuideId,
+        name,
+        description,
+        category,
+        steps
+      });
+    } else {
+      addGuide({
+        name,
+        description,
+        category,
+        steps
+      });
+    }
     
     onClose();
   };
-
+  
   return (
-    <Card className="max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle>{editGuideId ? "Edit Guide" : "Create New Guide"}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-4">
-            <TabsTrigger value="details">Guide Details</TabsTrigger>
-            <TabsTrigger value="steps">Guide Steps ({steps.length})</TabsTrigger>
-            <TabsTrigger value="preview" disabled={steps.length === 0}>Preview</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="details">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="guideName">Guide Name</Label>
-                <Input
-                  id="guideName"
-                  value={guideName}
-                  onChange={(e) => setGuideName(e.target.value)}
-                  placeholder="Enter guide name"
-                  className="mt-1"
-                />
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <div className="bg-destructive/15 text-destructive p-3 rounded-md flex items-center gap-2">
+          <AlertCircle className="h-5 w-5" />
+          <p>{error}</p>
+        </div>
+      )}
+      
+      <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="name" className="text-right">
+            Guide Name
+          </Label>
+          <Input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="col-span-3"
+            placeholder="E.g., Getting Started with Dashboard"
+          />
+        </div>
+        
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="description" className="text-right">
+            Description
+          </Label>
+          <Textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="col-span-3"
+            placeholder="Brief description of what users will learn"
+          />
+        </div>
+        
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="category" className="text-right">
+            Category
+          </Label>
+          <div className="col-span-3 flex gap-2">
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {existingCategories.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
+                <SelectItem value="General">General</SelectItem>
+                <SelectItem value="Dashboard">Dashboard</SelectItem>
+                <SelectItem value="Patient Management">Patient Management</SelectItem>
+                <SelectItem value="Health Tracking">Health Tracking</SelectItem>
+                <SelectItem value="Reporting">Reporting</SelectItem>
+                <SelectItem value="Communication">Communication</SelectItem>
+                <SelectItem value="Settings">Settings</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            {!existingCategories.includes(category) && category && (
+              <div className="bg-primary/10 text-primary px-3 py-2 text-sm rounded flex items-center">
+                <span>New category</span>
               </div>
-
-              <div>
-                <Label htmlFor="guideDescription">Description</Label>
-                <Textarea
-                  id="guideDescription"
-                  value={guideDescription}
-                  onChange={(e) => setGuideDescription(e.target.value)}
-                  placeholder="Enter guide description"
-                  className="mt-1"
-                  rows={3}
-                />
+            )}
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-medium">Guide Steps</h3>
+          <Button type="button" variant="outline" size="sm" onClick={addStep}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Step
+          </Button>
+        </div>
+        
+        <div className="space-y-4">
+          {steps.map((step, index) => (
+            <div 
+              key={step.id} 
+              className={cn(
+                "border rounded-md p-4 space-y-4",
+                index === 0 ? "border-primary/50" : "border-border"
+              )}
+            >
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium">Step {index + 1}</h4>
+                <div className="flex items-center gap-1">
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => moveStepUp(index)}
+                    disabled={index === 0}
+                  >
+                    <MoveUp className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => moveStepDown(index)}
+                    disabled={index === steps.length - 1}
+                  >
+                    <MoveDown className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => removeStep(index)}
+                    disabled={steps.length === 1}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-
-              <div>
-                <Label htmlFor="guideCategory">Category</Label>
-                <Select value={guideCategory} onValueChange={setGuideCategory}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category} className="capitalize">
-                        {category}
-                      </SelectItem>
-                    ))}
-                    <SelectItem value="new">+ Add New Category</SelectItem>
-                  </SelectContent>
-                </Select>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor={`step-title-${index}`}>
+                    Step Title
+                  </Label>
+                  <Input
+                    id={`step-title-${index}`}
+                    value={step.title}
+                    onChange={(e) => handleStepChange(index, "title", e.target.value)}
+                    className="mt-1"
+                    placeholder="E.g., Navigate to Dashboard"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor={`step-content-${index}`}>
+                    Step Content
+                  </Label>
+                  <Textarea
+                    id={`step-content-${index}`}
+                    value={step.content}
+                    onChange={(e) => handleStepChange(index, "content", e.target.value)}
+                    className="mt-1"
+                    placeholder="Detailed instructions for this step"
+                    rows={3}
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor={`step-selector-${index}`}>
+                    Target Element (Optional)
+                  </Label>
+                  <Input
+                    id={`step-selector-${index}`}
+                    value={step.elementSelector || ""}
+                    onChange={(e) => handleStepChange(index, "elementSelector", e.target.value)}
+                    className="mt-1"
+                    placeholder="E.g., #dashboard-chart"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    CSS selector for the element to highlight
+                  </p>
+                </div>
+                
+                <div>
+                  <Label htmlFor={`step-position-${index}`}>
+                    Tooltip Position (Optional)
+                  </Label>
+                  <Select 
+                    value={step.position || "bottom"} 
+                    onValueChange={(value) => handleStepChange(index, "position", value)}
+                  >
+                    <SelectTrigger id={`step-position-${index}`}>
+                      <SelectValue placeholder="Select position" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="top">Top</SelectItem>
+                      <SelectItem value="right">Right</SelectItem>
+                      <SelectItem value="bottom">Bottom</SelectItem>
+                      <SelectItem value="left">Left</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
-          </TabsContent>
-
-          <TabsContent value="steps">
-            <div className="space-y-4">
-              {steps.map((step, index) => (
-                <Card key={index} className="p-4 relative">
-                  <div className="absolute top-2 right-2 flex space-x-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => moveStep(index, "up")}
-                      disabled={index === 0}
-                      className="h-7 w-7"
-                    >
-                      <ChevronUp className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => moveStep(index, "down")}
-                      disabled={index === steps.length - 1}
-                      className="h-7 w-7"
-                    >
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeStep(index)}
-                      className="h-7 w-7 text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <div className="space-y-3 mt-4">
-                    <Badge variant="outline">Step {index + 1}</Badge>
-
-                    <div>
-                      <Label htmlFor={`stepTitle-${index}`}>Title</Label>
-                      <Input
-                        id={`stepTitle-${index}`}
-                        value={step.title}
-                        onChange={(e) =>
-                          updateStep(index, "title", e.target.value)
-                        }
-                        placeholder="Step title"
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor={`stepContent-${index}`}>Content</Label>
-                      <Textarea
-                        id={`stepContent-${index}`}
-                        value={step.content}
-                        onChange={(e) =>
-                          updateStep(index, "content", e.target.value)
-                        }
-                        placeholder="Step content"
-                        className="mt-1"
-                        rows={3}
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor={`stepSelector-${index}`}>Element Selector (optional)</Label>
-                      <Input
-                        id={`stepSelector-${index}`}
-                        value={step.elementSelector || ""}
-                        onChange={(e) =>
-                          updateStep(index, "elementSelector", e.target.value)
-                        }
-                        placeholder="#element-id or .class-name"
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor={`stepPosition-${index}`}>Tooltip Position</Label>
-                      <Select
-                        value={step.position || "bottom"}
-                        onValueChange={(value) =>
-                          updateStep(index, "position", value)
-                        }
-                      >
-                        <SelectTrigger id={`stepPosition-${index}`} className="mt-1">
-                          <SelectValue placeholder="Select position" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="top">Top</SelectItem>
-                          <SelectItem value="right">Right</SelectItem>
-                          <SelectItem value="bottom">Bottom</SelectItem>
-                          <SelectItem value="left">Left</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-
-              <Button onClick={addStep} className="w-full">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Step
-              </Button>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="preview">
-            <div className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>{guideName || "Guide Preview"}</CardTitle>
-                  <p className="text-muted-foreground">{guideDescription}</p>
-                  {guideCategory && (
-                    <Badge className="mt-2 capitalize">{guideCategory}</Badge>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <h3 className="font-medium mb-2">Steps:</h3>
-                  <div className="space-y-2">
-                    {steps.map((step, index) => (
-                      <div key={index} className="border p-3 rounded-md">
-                        <Badge variant="outline" className="mb-2">
-                          Step {index + 1}
-                        </Badge>
-                        <h4 className="font-medium">{step.title || "Untitled Step"}</h4>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {step.content || "No content"}
-                        </p>
-                        {step.elementSelector && (
-                          <p className="text-xs mt-2">
-                            <span className="font-medium">Selector:</span> {step.elementSelector}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={onClose}>
+          ))}
+        </div>
+      </div>
+      
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="outline" onClick={onClose}>
           Cancel
         </Button>
-        <Button onClick={handleSave}>
-          <Save className="mr-2 h-4 w-4" />
+        <Button type="submit">
           {editGuideId ? "Update Guide" : "Create Guide"}
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </form>
   );
 };
 
