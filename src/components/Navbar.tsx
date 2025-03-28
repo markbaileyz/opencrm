@@ -49,8 +49,7 @@ const Navbar = ({ scrollToSection }: NavbarProps) => {
     };
   }, [isMobileMenuOpen]);
 
-  // Close mobile menu when route changes - removed this effect since we need the menu to stay open
-  // for navigating between section links
+  // Don't close menu on location change - sections are on same page
 
   const isActive = (path: string) => {
     return location.pathname === path;
