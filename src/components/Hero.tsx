@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { Headset, Stethoscope, Clipboard, BarChart, Star } from "lucide-react";
+import { Headset, Stethoscope, Clipboard, BarChart, Users, ClipboardCheck, Star, Shield } from "lucide-react";
 
 import MainHero from "./hero/MainHero";
 import StatsGrid from "./hero/StatsGrid";
@@ -58,32 +58,34 @@ const Hero = ({ scrollToSection }: HeroProps) => {
     }
   ];
   
-  // Partner logos - updated with correct paths that will work in production
+  // Partner logos
   const partnerLogos = [
-    "/logos/stark.svg",
-    "/logos/acme.svg",
-    "/logos/globex.svg",
-    "/logos/hooli.svg"
+    "/public/logos/stark.svg",
+    "/public/logos/acme.svg",
+    "/public/logos/globex.svg",
+    "/public/logos/hooli.svg"
   ];
 
   return (
-    <section className="overflow-hidden" id="home">
-      <div className="mx-auto">
+    <section className="pt-24 pb-16 md:pt-36 md:pb-24 overflow-hidden" id="home">
+      <div className="container mx-auto px-4 md:px-6">
         {/* Main Hero */}
         <MainHero scrollToSection={handleScrollToSection} />
         
         {/* Statistics */}
         <StatsGrid stats={statsData} />
         
-        {/* Industry Solutions Section */}
-        <TrustedBySection 
-          title="Explore Our Industry Solutions"
-          description="Specialized CRM solutions tailored for different industries with features designed to meet your unique needs"
-          logos={partnerLogos}
-        />
+        {/* Trusted By Section */}
+        <div className="mt-20">
+          <TrustedBySection 
+            title="Trusted by Leading Healthcare Providers"
+            description="Join thousands of healthcare organizations that rely on OpenCRM to deliver exceptional patient experiences and streamline operations."
+            logos={partnerLogos}
+          />
+        </div>
         
         {/* Perspective Sections */}
-        <div className="mt-32 space-y-32 container mx-auto px-4 md:px-6">
+        <div className="mt-32 space-y-32">
           {/* Admin's Perspective */}
           <PerspectiveSection
             title="Admin Dashboard"
@@ -141,7 +143,7 @@ const Hero = ({ scrollToSection }: HeroProps) => {
         </div>
 
         {/* Testimonials Preview */}
-        <div className="mt-32 container mx-auto px-4 md:px-6">
+        <div className="mt-32">
           <TestimonialsPreview
             title="What Healthcare Professionals Say"
             description="Hear from healthcare professionals who have transformed their practice with OpenCRM."
