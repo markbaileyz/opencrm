@@ -16,7 +16,6 @@ import UserManagement from "@/pages/UserManagement";
 const AdminRoutes: React.FC = () => {
   return (
     <>
-      {/* Admin Routes */}
       <Route path="/organizations" element={
         <ProtectedRoute allowedRoles={["admin", "power-user"]}>
           <Organizations />

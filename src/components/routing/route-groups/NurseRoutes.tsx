@@ -7,7 +7,6 @@ import PatientVitalsPage from "@/pages/PatientVitalsPage";
 const NurseRoutes: React.FC = () => {
   return (
     <>
-      {/* Nurse Routes */}
       <Route path="/patient-vitals" element={
         <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse"]}>
           <PatientVitalsPage />

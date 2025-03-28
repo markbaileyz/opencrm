@@ -9,7 +9,6 @@ import PlaceholderPage from "@/components/ui/placeholder-page";
 const PatientRoutes: React.FC = () => {
   return (
     <>
-      {/* Patient Routes */}
       <Route path="/medical-records" element={
         <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse", "patient"]}>
           <MedicalRecordsPage />

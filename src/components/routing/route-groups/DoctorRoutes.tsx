@@ -8,7 +8,6 @@ import PlaceholderPage from "@/components/ui/placeholder-page";
 const DoctorRoutes: React.FC = () => {
   return (
     <>
-      {/* Doctor Routes */}
       <Route path="/clinical-dashboard" element={
         <ProtectedRoute allowedRoles={["admin", "power-user", "doctor"]}>
           <PlaceholderPage title="Clinical Dashboard" description="Access your clinical metrics and patient data. Coming soon." />

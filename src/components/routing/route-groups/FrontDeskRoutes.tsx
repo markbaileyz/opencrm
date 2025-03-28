@@ -9,7 +9,6 @@ import PlaceholderPage from "@/components/ui/placeholder-page";
 const FrontDeskRoutes: React.FC = () => {
   return (
     <>
-      {/* Front Desk Routes */}
       <Route path="/patient-feedback" element={
         <ProtectedRoute allowedRoles={["admin", "power-user", "front-desk"]}>
           <PlaceholderPage title="Patient Feedback" description="View and manage patient feedback and surveys. Coming soon." />
