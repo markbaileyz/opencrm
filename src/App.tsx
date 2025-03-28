@@ -42,6 +42,7 @@ import CallTracking from "@/pages/CallTracking";
 import Workflows from "@/pages/Workflows";
 import Compliance from "@/pages/Compliance";
 import WorkflowAnalytics from "@/pages/WorkflowAnalytics";
+import OrganizationInsights from "@/pages/OrganizationInsights";
 
 import "./App.css";
 import ServiceWorkerManager from "./components/service-worker/ServiceWorkerManager";
@@ -232,7 +233,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* Add our new routes */}
         <Route
           path="/call-tracking"
           element={
@@ -254,6 +254,14 @@ function App() {
           element={
             <ProtectedRoute>
               <WorkflowAnalytics />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/organization-insights"
+          element={
+            <ProtectedRoute>
+              <OrganizationInsights />
             </ProtectedRoute>
           }
         />
