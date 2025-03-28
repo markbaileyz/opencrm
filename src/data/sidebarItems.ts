@@ -1,216 +1,167 @@
-import { 
-  LayoutDashboard, 
-  Users, 
-  Settings, 
+
+import {
+  LayoutDashboard,
+  Users,
   Calendar,
-  Mailbox,
-  Tags,
-  Building,
-  Lightbulb,
-  BarChart3,
-  HelpCircle,
-  BookOpen,
-  Shield,
-  FileLock,
-  UserCog,
-  ClipboardList,
+  Settings,
   FileText,
+  Mail,
+  User,
+  Building2,
+  BarChart2,
+  BadgeDollarSign,
   Stethoscope,
   Pill,
-  MessageSquare,
-  Star,
-  Award,
-  Clipboard,
-  HeartPulse
+  ClipboardList,
+  Activity,
+  Phone,
+  BookUser,
+  GanttChart,
+  Building,
+  ShieldCheck,
+  Workflow
 } from "lucide-react";
-import React from "react";
 
 export interface SidebarItem {
-  icon: React.ReactNode;
-  label: string;
+  title: string;
   href: string;
-  roles?: string[];
+  icon: any;
+  submenu?: SidebarItem[];
+  role?: string[];
 }
 
-export const baseSidebarItems: SidebarItem[] = [
+export const sidebarItems: SidebarItem[] = [
   {
-    icon: React.createElement(LayoutDashboard, { className: "h-5 w-5" }),
-    label: "Dashboard",
+    title: "Dashboard",
     href: "/dashboard",
+    icon: LayoutDashboard,
   },
-];
-
-export const medicalSidebarItems: SidebarItem[] = [
   {
-    icon: React.createElement(Users, { className: "h-5 w-5" }),
-    label: "Patients & Contacts",
+    title: "Patients",
     href: "/patients",
-    roles: ["admin", "power-user", "doctor", "nurse", "front-desk"],
+    icon: Users,
+    submenu: [
+      {
+        title: "Patient List",
+        href: "/patients",
+        icon: Users,
+      },
+      {
+        title: "Vitals",
+        href: "/patient-vitals",
+        icon: Activity,
+      },
+      {
+        title: "Medical Records",
+        href: "/medical-records",
+        icon: ClipboardList,
+      },
+      {
+        title: "Medications",
+        href: "/medications",
+        icon: Pill,
+      },
+      {
+        title: "Prescriptions",
+        href: "/prescriptions",
+        icon: FileText,
+      },
+      {
+        title: "Health Tracker",
+        href: "/health-tracker",
+        icon: Activity,
+      },
+    ],
   },
   {
-    icon: React.createElement(ClipboardList, { className: "h-5 w-5" }),
-    label: "Front Desk",
-    href: "/front-desk",
-    roles: ["admin", "power-user", "front-desk"],
-  },
-  {
-    icon: React.createElement(Calendar, { className: "h-5 w-5" }),
-    label: "Calendar",
+    title: "Calendar",
     href: "/calendar",
-    roles: ["admin", "power-user", "doctor", "nurse", "front-desk"],
+    icon: Calendar,
   },
   {
-    icon: React.createElement(Mailbox, { className: "h-5 w-5" }),
-    label: "Email",
+    title: "Communications",
     href: "/email",
-    roles: ["admin", "power-user", "doctor", "nurse", "front-desk", "patient"],
-  },
-];
-
-export const patientSidebarItems: SidebarItem[] = [
-  {
-    icon: React.createElement(FileText, { className: "h-5 w-5" }),
-    label: "Medical Records",
-    href: "/medical-records",
-    roles: ["admin", "power-user", "doctor", "nurse", "patient"],
-  },
-  {
-    icon: React.createElement(Pill, { className: "h-5 w-5" }),
-    label: "Medications",
-    href: "/medications",
-    roles: ["admin", "power-user", "doctor", "nurse", "patient"],
-  },
-  {
-    icon: React.createElement(HeartPulse, { className: "h-5 w-5" }),
-    label: "Health Tracker",
-    href: "/health-tracker",
-    roles: ["admin", "power-user", "doctor", "patient"],
-  },
-];
-
-export const doctorSidebarItems: SidebarItem[] = [
-  {
-    icon: React.createElement(Stethoscope, { className: "h-5 w-5" }),
-    label: "Clinical Dashboard",
-    href: "/clinical-dashboard",
-    roles: ["admin", "power-user", "doctor"],
+    icon: Mail,
+    submenu: [
+      {
+        title: "Email",
+        href: "/email",
+        icon: Mail,
+      },
+      {
+        title: "Call Tracking",
+        href: "/call-tracking",
+        icon: Phone,
+      },
+      {
+        title: "Workflows",
+        href: "/workflows",
+        icon: Workflow,
+      },
+    ],
   },
   {
-    icon: React.createElement(Clipboard, { className: "h-5 w-5" }),
-    label: "Prescriptions",
-    href: "/prescriptions",
-    roles: ["admin", "power-user", "doctor"],
-  },
-];
-
-export const nurseSidebarItems: SidebarItem[] = [
-  {
-    icon: React.createElement(Clipboard, { className: "h-5 w-5" }),
-    label: "Patient Vitals",
-    href: "/patient-vitals",
-    roles: ["admin", "power-user", "doctor", "nurse"],
-  },
-];
-
-export const communicationItems: SidebarItem[] = [
-  {
-    icon: React.createElement(MessageSquare, { className: "h-5 w-5" }),
-    label: "Secure Chat",
-    href: "/secure-chat",
-    roles: ["admin", "power-user", "doctor", "nurse", "front-desk", "patient"],
-  },
-];
-
-export const frontDeskItems: SidebarItem[] = [
-  {
-    icon: React.createElement(Star, { className: "h-5 w-5" }),
-    label: "Patient Feedback",
-    href: "/patient-feedback",
-    roles: ["admin", "power-user", "front-desk"],
+    title: "Contacts",
+    href: "/contacts",
+    icon: User,
   },
   {
-    icon: React.createElement(Award, { className: "h-5 w-5" }),
-    label: "Office Management",
-    href: "/office-management",
-    roles: ["admin", "power-user", "front-desk"],
-  },
-];
-
-export const adminSidebarItems: SidebarItem[] = [
-  {
-    icon: React.createElement(Building, { className: "h-5 w-5" }),
-    label: "Organizations",
-    href: "/organizations",
-    roles: ["admin", "power-user"],
-  },
-  {
-    icon: React.createElement(Tags, { className: "h-5 w-5" }),
-    label: "Deals",
+    title: "Deals",
     href: "/deals",
-    roles: ["admin", "power-user"],
+    icon: BadgeDollarSign,
   },
   {
-    icon: React.createElement(BarChart3, { className: "h-5 w-5" }),
-    label: "Reports",
+    title: "Organizations",
+    href: "/organizations",
+    icon: Building2,
+  },
+  {
+    title: "Front Desk",
+    href: "/front-desk",
+    icon: BookUser,
+  },
+  {
+    title: "Reports",
     href: "/reports",
-    roles: ["admin", "power-user"],
+    icon: BarChart2,
   },
   {
-    icon: React.createElement(Lightbulb, { className: "h-5 w-5" }),
-    label: "Roadmap",
-    href: "/dashboard-roadmap",
-    roles: ["admin", "power-user"],
-  },
-];
-
-export const settingsSidebarItems: SidebarItem[] = [
-  {
-    icon: React.createElement(HelpCircle, { className: "h-5 w-5" }),
-    label: "Knowledge Base",
-    href: "/knowledge-base",
+    title: "Office",
+    href: "/office",
+    icon: Building,
   },
   {
-    icon: React.createElement(BookOpen, { className: "h-5 w-5" }),
-    label: "Challenges & Solutions",
-    href: "/challenges-solutions",
-  },
-  {
-    icon: React.createElement(Settings, { className: "h-5 w-5" }),
-    label: "Settings",
-    href: "/settings",
-  },
-];
-
-export const adminSettingsItems: SidebarItem[] = [
-  {
-    icon: React.createElement(Shield, { className: "h-5 w-5" }),
-    label: "Admin Settings",
-    href: "/admin-settings",
-    roles: ["admin"],
-  },
-  {
-    icon: React.createElement(FileLock, { className: "h-5 w-5" }),
-    label: "Compliance",
+    title: "Compliance",
     href: "/compliance",
-    roles: ["admin", "power-user"],
+    icon: ShieldCheck,
   },
   {
-    icon: React.createElement(UserCog, { className: "h-5 w-5" }),
-    label: "User Management",
-    href: "/user-management",
-    roles: ["admin"],
+    title: "Roadmap",
+    href: "/dashboard-roadmap",
+    icon: GanttChart,
   },
-];
-
-export const getAllSidebarItems = () => [
-  ...baseSidebarItems,
-  ...medicalSidebarItems,
-  ...patientSidebarItems,
-  ...doctorSidebarItems,
-  ...nurseSidebarItems,
-  ...communicationItems,
-  ...frontDeskItems,
-  ...adminSidebarItems,
-  ...settingsSidebarItems,
-  ...adminSettingsItems
+  {
+    title: "Settings",
+    href: "/settings",
+    icon: Settings,
+    submenu: [
+      {
+        title: "User Settings",
+        href: "/settings",
+        icon: Settings,
+      },
+      {
+        title: "Admin Settings",
+        href: "/admin-settings",
+        icon: Settings,
+        role: ["admin"],
+      },
+      {
+        title: "User Management",
+        href: "/user-management",
+        icon: Users,
+        role: ["admin"],
+      },
+    ],
+  },
 ];
