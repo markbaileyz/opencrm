@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useOfficeResources } from '@/hooks/useOfficeResources';
+import { useOfficeResources } from '@/hooks/office/useOfficeResources';
 import { useSuppliesFilter } from './useSuppliesFilter';
 import SupplyFilters from './SupplyFilters';
 import SupplyList from './SupplyList';

@@ -9,7 +9,7 @@ import CommunicationsManagement from "@/components/office/CommunicationsManageme
 import SupplyManagementContainer from "@/components/office/supplies/SupplyManagementContainer";
 import StaffManagementContainer from "@/components/office/staff/StaffManagementContainer";
 import SchedulingContainer from "@/components/office/scheduling/SchedulingContainer";
-import { useOfficeResources } from "@/hooks/useOfficeResources";
+import { useOfficeResources } from '@/hooks/office/useOfficeResources';
 
 // Import the new components
 import OfficePageHeader from "@/components/office/OfficePageHeader";

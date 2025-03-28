@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Clock, CheckSquare, CalendarClock, AlertCircle } from "lucide-react";
-import { useOfficeResources } from '@/hooks/useOfficeResources';
+import { useOfficeResources } from '@/hooks/office/useOfficeResources';
 import { useToast } from '@/hooks/use-toast';
 import { ScheduledTask } from '@/types/office';
 

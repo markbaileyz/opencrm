@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useOfficeResources } from '@/hooks/useOfficeResources';
+import { useOfficeResources } from '@/hooks/office/useOfficeResources';
 import { Room } from '@/types/office';
 import RoomFilters from './rooms/RoomFilters';
 import RoomManagementGrid from './rooms/RoomManagementGrid';
