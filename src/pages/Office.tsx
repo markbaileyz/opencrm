@@ -1,3 +1,4 @@
+
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Calendar, CheckSquare, Package, FileText, MessageSquare, Users, Home, Clock } from "lucide-react";
 import RoomManagement from "@/components/office/RoomManagement";
-import SuppliesManagement from "@/components/office/SuppliesManagement";
+import SuppliesManagement from "@/components/office/supplies/SuppliesManagement";
 import ScheduledTasksManagement from "@/components/office/ScheduledTasksManagement";
 import CommunicationsManagement from "@/components/office/CommunicationsManagement";
 import { useOfficeResources } from "@/hooks/useOfficeResources";
