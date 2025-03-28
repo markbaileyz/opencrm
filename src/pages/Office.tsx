@@ -4,9 +4,14 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Calendar, CheckSquare, FileText, MessageSquare, Users } from "lucide-react";
+import { Calendar, CheckSquare, Package, FileText, MessageSquare, Users, Home } from "lucide-react";
+import RoomManagement from "@/components/office/RoomManagement";
+import SuppliesManagement from "@/components/office/SuppliesManagement";
+import { useOfficeResources } from "@/hooks/useOfficeResources";
 
 const Office = () => {
+  const { lowStockSupplies } = useOfficeResources();
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -22,7 +27,14 @@ const Office = () => {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="scheduling">Scheduling</TabsTrigger>
             <TabsTrigger value="tasks">Tasks</TabsTrigger>
-            <TabsTrigger value="resources">Resources</TabsTrigger>
+            <TabsTrigger value="resources">
+              Resources
+              {lowStockSupplies.length > 0 && (
+                <span className="ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {lowStockSupplies.length}
+                </span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="communications">Communications</TabsTrigger>
           </TabsList>
           
@@ -76,14 +88,14 @@ const Office = () => {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Unread Messages
+                    Supplies to Reorder
                   </CardTitle>
-                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                  <Package className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">5</div>
+                  <div className="text-2xl font-bold">{lowStockSupplies.length}</div>
                   <p className="text-xs text-muted-foreground">
-                    2 from patients, 3 internal
+                    {lowStockSupplies.length > 0 ? 'Items below minimum stock' : 'All supplies are stocked'}
                   </p>
                 </CardContent>
               </Card>
@@ -125,8 +137,8 @@ const Office = () => {
                     Send Message
                   </Button>
                   <Button className="w-full justify-start" variant="outline">
-                    <Users className="mr-2 h-4 w-4" />
-                    Staff Schedule
+                    <Home className="mr-2 h-4 w-4" />
+                    Room Status
                   </Button>
                 </CardContent>
               </Card>
@@ -165,20 +177,9 @@ const Office = () => {
             </Card>
           </TabsContent>
           
-          <TabsContent value="resources" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Office Resources</CardTitle>
-                <CardDescription>
-                  Manage office supplies and equipment
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[400px] flex items-center justify-center bg-muted/30 rounded-md">
-                  <p className="text-muted-foreground">Resource management system coming soon</p>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="resources" className="space-y-6">
+            <RoomManagement />
+            <SuppliesManagement />
           </TabsContent>
           
           <TabsContent value="communications" className="space-y-4">
