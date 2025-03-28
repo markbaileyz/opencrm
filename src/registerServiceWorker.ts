@@ -117,7 +117,8 @@ export const registerBackgroundSync = async (): Promise<boolean> => {
   if ('serviceWorker' in navigator && 'SyncManager' in window) {
     try {
       const registration = await navigator.serviceWorker.ready;
-      await registration.sync.register('sync-offline-data');
+      // Fix TypeScript error by using an interface augmentation to add the sync property
+      await (registration as ServiceWorkerRegistrationWithSync).sync.register('sync-offline-data');
       console.log('Background sync registered');
       return true;
     } catch (error) {
@@ -138,7 +139,7 @@ export const registerBackgroundSync = async (): Promise<boolean> => {
 export const addNetworkStatusListeners = (
   onlineCallback: () => void,
   offlineCallback: () => void
-): () => void => {
+): (() => void) => {
   window.addEventListener('online', onlineCallback);
   window.addEventListener('offline', offlineCallback);
   
@@ -148,3 +149,12 @@ export const addNetworkStatusListeners = (
     window.removeEventListener('offline', offlineCallback);
   };
 };
+
+// Add an interface augmentation for ServiceWorkerRegistration to include the sync property
+interface SyncManager {
+  register(tag: string): Promise<void>;
+}
+
+interface ServiceWorkerRegistrationWithSync extends ServiceWorkerRegistration {
+  sync: SyncManager;
+}

@@ -36,7 +36,7 @@ export function useOfflineState() {
     }
 
     return cleanup;
-  }, [pendingActions.length]);
+  }, [pendingActions.length, isOnline]);
 
   // Load offline data from localStorage on mount
   useEffect(() => {
