@@ -67,7 +67,10 @@ const PatientVitals: React.FC<PatientVitalsProps> = ({ patientId }) => {
           title="Heart Rate"
           value={vitals?.heartRate.current?.toString() || "N/A"}
           trend={vitals?.heartRate.trend}
-          history={vitals?.heartRate.history}
+          history={vitals?.heartRate.history?.map(item => ({
+            date: item.date,
+            value: item.value.toString()
+          }))}
           unit="bpm"
         />
         
@@ -75,7 +78,10 @@ const PatientVitals: React.FC<PatientVitalsProps> = ({ patientId }) => {
           title="Temperature"
           value={vitals?.temperature.current?.toString() || "N/A"}
           trend={vitals?.temperature.trend}
-          history={vitals?.temperature.history}
+          history={vitals?.temperature.history?.map(item => ({
+            date: item.date,
+            value: item.value.toString()
+          }))}
           unit="°F"
         />
       </div>
@@ -85,7 +91,10 @@ const PatientVitals: React.FC<PatientVitalsProps> = ({ patientId }) => {
           title="Respiratory Rate"
           value={vitals?.respiratoryRate.current?.toString() || "N/A"}
           trend={vitals?.respiratoryRate.trend}
-          history={vitals?.respiratoryRate.history}
+          history={vitals?.respiratoryRate.history?.map(item => ({
+            date: item.date,
+            value: item.value.toString()
+          }))}
           unit="breaths/min"
         />
         
@@ -93,7 +102,10 @@ const PatientVitals: React.FC<PatientVitalsProps> = ({ patientId }) => {
           title="Oxygen Saturation"
           value={vitals?.oxygenSaturation.current?.toString() || "N/A"}
           trend={vitals?.oxygenSaturation.trend}
-          history={vitals?.oxygenSaturation.history}
+          history={vitals?.oxygenSaturation.history?.map(item => ({
+            date: item.date,
+            value: item.value.toString()
+          }))}
           unit="%"
         />
         
@@ -101,7 +113,10 @@ const PatientVitals: React.FC<PatientVitalsProps> = ({ patientId }) => {
           title="Weight"
           value={vitals?.weight.current?.toString() || "N/A"}
           trend={vitals?.weight.trend}
-          history={vitals?.weight.history}
+          history={vitals?.weight.history?.map(item => ({
+            date: item.date,
+            value: item.value.toString()
+          }))}
           unit="kg"
         />
       </div>

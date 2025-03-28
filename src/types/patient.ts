@@ -35,7 +35,9 @@ export interface Patient {
   allergies?: string[];
   medications?: string[];
   notes?: string;
-  status: "active" | "inactive";
+  status: "active" | "inactive" | "pending";
+  avatarUrl?: string;
+  lastVisit?: string;
   documents?: PatientDocument[];
   appointments?: PatientAppointment[];
   insuranceHistory?: Insurance[];

@@ -1,42 +1,6 @@
 
 import { useState, useEffect } from "react";
-
-export interface Patient {
-  patientId: string;
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
-  age: number;
-  gender: string;
-  email: string;
-  phone: string;
-  address: string;
-  insurance: string;
-  status: "active" | "inactive" | "pending";
-  avatarUrl?: string;
-  lastVisit?: string;
-  upcomingAppointment?: {
-    date: string;
-    time: string;
-    reason: string;
-    provider: string;
-  };
-  medicalHistory?: {
-    condition: string;
-    status: string;
-    notes: string;
-  }[];
-  allergies?: string[];
-  medications?: string[];
-  flags?: {
-    type: string;
-    description: string;
-  }[];
-  recentActivity?: {
-    date: string;
-    description: string;
-  }[];
-}
+import { Patient } from "@/types/patient";
 
 export const usePatientData = (patientId: string | undefined) => {
   const [patient, setPatient] = useState<Patient | null>(null);
@@ -53,16 +17,18 @@ export const usePatientData = (patientId: string | undefined) => {
         
         // Demo data
         const mockPatient: Patient = {
-          patientId: patientId || "12345",
+          id: patientId || "12345",
           firstName: "Jane",
           lastName: "Smith",
           dateOfBirth: "1985-06-15",
           age: 38,
-          gender: "Female",
+          gender: "female",
           email: "jane.smith@example.com",
           phone: "(555) 123-4567",
           address: "123 Main St, Anytown, CA 94123",
-          insurance: "BlueCross HealthPlus",
+          insuranceProvider: "BlueCross HealthPlus",
+          policyNumber: "BC123456789",
+          coverageType: "Full Coverage",
           status: "active",
           lastVisit: "2023-11-10",
           upcomingAppointment: {

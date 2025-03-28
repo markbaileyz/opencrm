@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { 
@@ -32,6 +31,7 @@ import PatientDocuments from "@/components/patients/PatientDocuments";
 import PatientHeader from "@/components/patients/PatientHeader";
 import PatientAlerts from "@/components/patients/PatientAlerts";
 import { usePatientData } from "@/hooks/usePatientData";
+import { Patient as PatientType } from "@/types/patient";
 
 const PatientDetail: React.FC = () => {
   const { patientId } = useParams<{ patientId: string }>();
@@ -75,6 +75,9 @@ const PatientDetail: React.FC = () => {
     );
   }
 
+  // Ensuring the patient object conforms to the PatientType
+  const typedPatient = patient as unknown as PatientType;
+
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto">
       <Button 
@@ -85,8 +88,8 @@ const PatientDetail: React.FC = () => {
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Patients
       </Button>
 
-      <PatientHeader patient={patient} />
-      <PatientAlerts patient={patient} className="mt-6" />
+      <PatientHeader patient={typedPatient} />
+      <PatientAlerts patient={typedPatient} className="mt-6" />
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
         <TabsList className="w-full sm:w-auto border-b">
@@ -134,7 +137,7 @@ const PatientDetail: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-muted-foreground mb-1">Patient ID</h4>
-                    <p>{patient.patientId}</p>
+                    <p>{patient.id}</p>
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-muted-foreground mb-1">Phone</h4>
@@ -156,7 +159,7 @@ const PatientDetail: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-muted-foreground mb-1">Insurance</h4>
-                    <p>{patient.insurance}</p>
+                    <p>{patient.insuranceProvider}</p>
                   </div>
                 </div>
 
@@ -244,19 +247,19 @@ const PatientDetail: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="vitals" className="mt-6">
-          <PatientVitals patientId={patient.patientId} />
+          <PatientVitals patientId={patient.id} />
         </TabsContent>
 
         <TabsContent value="appointments" className="mt-6">
-          <PatientAppointments patientId={patient.patientId} />
+          <PatientAppointments patientId={patient.id} />
         </TabsContent>
 
         <TabsContent value="notes" className="mt-6">
-          <PatientNotes patientId={patient.patientId} />
+          <PatientNotes patientId={patient.id} />
         </TabsContent>
 
         <TabsContent value="documents" className="mt-6">
-          <PatientDocuments patientId={patient.patientId} />
+          <PatientDocuments patientId={patient.id} />
         </TabsContent>
       </Tabs>
     </div>
