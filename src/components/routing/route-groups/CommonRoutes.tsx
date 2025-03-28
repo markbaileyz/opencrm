@@ -4,6 +4,7 @@ import { Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Dashboard from "@/pages/Dashboard";
 import Patients from "@/pages/Patients";
+import PatientDetail from "@/pages/PatientDetail";
 import Calendar from "@/pages/Calendar";
 import Email from "@/pages/Email";
 import KnowledgeBasePage from "@/pages/KnowledgeBase";
@@ -29,6 +30,12 @@ export const CommonRoutes = (
     <Route path="/patients" element={
       <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse", "front-desk"]}>
         <Patients />
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patients/:patientId" element={
+      <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse", "front-desk"]}>
+        <PatientDetail />
       </ProtectedRoute>
     } />
     
