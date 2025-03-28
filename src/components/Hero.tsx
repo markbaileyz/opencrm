@@ -1,6 +1,7 @@
+
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { Headset, Stethoscope, Clipboard, BarChart, Users, ClipboardCheck, Star, Shield } from "lucide-react";
+import { Headset, Stethoscope, Clipboard, BarChart, Star } from "lucide-react";
 
 import MainHero from "./hero/MainHero";
 import StatsGrid from "./hero/StatsGrid";
@@ -74,7 +75,7 @@ const Hero = ({ scrollToSection }: HeroProps) => {
         {/* Statistics */}
         <StatsGrid stats={statsData} />
         
-        {/* Industry Solutions Section (formerly Trusted By) */}
+        {/* Industry Solutions Section */}
         <TrustedBySection 
           title="Explore Our Industry Solutions"
           description="Specialized CRM solutions tailored for different industries with features designed to meet your unique needs"

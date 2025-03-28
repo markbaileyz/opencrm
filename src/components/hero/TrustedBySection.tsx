@@ -1,9 +1,9 @@
 
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Users, Shield, Check, Calendar, Building, GraduationCap, Lightbulb } from "lucide-react";
+import { Users, Shield, Check, Calendar, Building, GraduationCap } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Card, CardContent } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 import ResponsiveImage from "@/components/ui/responsive-image";
 
 interface TrustedBySectionProps {
@@ -24,8 +24,7 @@ const TrustedBySection = ({ title, description, logos }: TrustedBySectionProps) 
         "Online pre-check-in",
         "HIPAA compliance"
       ],
-      isActive: true,
-      bgClass: "bg-[#0a1527]"
+      isActive: true
     },
     {
       title: "Real Estate CRM",
@@ -36,7 +35,7 @@ const TrustedBySection = ({ title, description, logos }: TrustedBySectionProps) 
         "Client matching",
         "Document management"
       ],
-      bgClass: "bg-[#101a30]/80"
+      isActive: false
     },
     {
       title: "Education CRM",
@@ -47,7 +46,7 @@ const TrustedBySection = ({ title, description, logos }: TrustedBySectionProps) 
         "Course scheduling",
         "Performance analytics"
       ],
-      bgClass: "bg-[#101a30]/80"
+      isActive: false
     },
     {
       title: "Event CRM",
@@ -58,12 +57,12 @@ const TrustedBySection = ({ title, description, logos }: TrustedBySectionProps) 
         "Venue coordination",
         "Ticket sales tracking"
       ],
-      bgClass: "bg-[#101a30]/80"
+      isActive: false
     }
   ];
 
   return (
-    <div className="py-16 md:py-24 relative bg-[#060d1a] overflow-hidden">
+    <div className="py-16 md:py-24 relative bg-[#0a1527] overflow-hidden">
       {/* Background decoration */}
       <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
@@ -93,59 +92,61 @@ const TrustedBySection = ({ title, description, logos }: TrustedBySectionProps) 
         {/* Industry solutions cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {industrySolutions.map((solution, index) => (
-            <Card 
+            <div 
               key={index} 
-              className={`${solution.bgClass} border-blue-500/20 text-white shadow-xl hover:shadow-blue-500/10 transition-all duration-300 hover:border-blue-500/30 relative overflow-hidden rounded-xl`}
+              className={`${solution.isActive ? "bg-[#0a1527] border-blue-500/20 hover:border-blue-500/30" : "bg-[#101a30]/80 border-blue-500/10 hover:border-blue-500/20"} border text-white rounded-xl p-6 shadow-xl hover:shadow-blue-500/10 transition-all duration-300 relative overflow-hidden`}
             >
-              <CardContent className="p-6">
-                <div className="flex justify-center mb-4 mt-2">
-                  <div className="p-3 bg-blue-900/30 rounded-full">
-                    {solution.icon}
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-center mb-1">{solution.title}</h3>
-                <p className="text-sm text-blue-200/70 text-center mb-4">{solution.subtitle}</p>
-                
-                <ul className="space-y-3">
-                  {solution.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-start">
-                      <Check className="h-4 w-4 text-blue-400 mr-2 mt-1 shrink-0" />
-                      <span className="text-white/80">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                
-                <div className="mt-6 flex justify-center">
-                  {solution.isActive ? (
-                    <span className="inline-flex items-center px-3 py-1 bg-blue-600/30 text-blue-300 text-sm rounded-full">
-                      Active
-                    </span>
-                  ) : (
-                    <button className="inline-flex items-center px-3 py-1 bg-blue-900/30 text-blue-300 text-sm rounded-full hover:bg-blue-900/50 transition-colors">
-                      Notify Me When Available
-                    </button>
-                  )}
-                </div>
-              </CardContent>
-              
               {solution.isActive && (
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-blue-300"></div>
               )}
-            </Card>
+              
+              <div className="flex justify-center mb-4">
+                <div className="p-3 bg-blue-900/30 rounded-full">
+                  {solution.icon}
+                </div>
+              </div>
+              
+              <h3 className="text-xl font-semibold text-center mb-1">{solution.title}</h3>
+              <p className="text-sm text-blue-200/70 text-center mb-4">{solution.subtitle}</p>
+              
+              <ul className="space-y-3 mb-6">
+                {solution.features.map((feature, featureIndex) => (
+                  <li key={featureIndex} className="flex items-start">
+                    <Check className="h-4 w-4 text-blue-400 mr-2 mt-1 shrink-0" />
+                    <span className="text-white/80">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <div className="flex justify-center">
+                {solution.isActive ? (
+                  <span className="inline-flex items-center px-3 py-1 bg-blue-600/30 text-blue-300 text-sm rounded-full">
+                    Active
+                  </span>
+                ) : (
+                  <button className="inline-flex items-center px-3 py-1 bg-blue-900/30 text-blue-300 text-sm rounded-full hover:bg-blue-900/50 transition-colors">
+                    Notify Me When Available
+                  </button>
+                )}
+              </div>
+            </div>
           ))}
         </div>
         
         {/* "Learn more" button */}
         <div className="flex justify-center mt-12">
-          <button className="group relative inline-flex items-center gap-1.5 rounded-lg bg-[#1a2a4a] hover:bg-[#1e305a] px-6 py-3 text-white shadow-md transition-all hover:-translate-y-1 hover:shadow-lg">
+          <Link 
+            to="/healthcare-crm" 
+            className="group relative inline-flex items-center gap-1.5 rounded-lg bg-[#1a2a4a] hover:bg-[#1e305a] px-6 py-3 text-white shadow-md transition-all hover:-translate-y-1 hover:shadow-lg"
+          >
             Learn More About Healthcare CRM
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
             </svg>
-          </button>
+          </Link>
         </div>
         
-        {/* Optional: Partner logos section at the bottom */}
+        {/* Partner logos section at the bottom */}
         <div className="mt-24">
           <div className="text-center mb-8">
             <h3 className="text-xl font-medium text-white mb-2">Trusted by Leading Organizations</h3>
