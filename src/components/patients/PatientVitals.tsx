@@ -5,6 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Activity, Plus, Calendar, ArrowUp, ArrowDown } from "lucide-react";
 import { useVitalsData } from "@/hooks/useVitalsData";
+import LoadingState from "@/components/patients/common/LoadingState";
+import ErrorState from "@/components/patients/common/ErrorState";
 
 interface PatientVitalsProps {
   patientId: string;
@@ -15,19 +17,11 @@ const PatientVitals: React.FC<PatientVitalsProps> = ({ patientId }) => {
   const [timeRange, setTimeRange] = useState("recent");
   
   if (isLoading) {
-    return <div className="flex justify-center p-8">Loading vitals data...</div>;
+    return <LoadingState />;
   }
   
   if (error) {
-    return (
-      <Card>
-        <CardContent className="pt-6">
-          <div className="text-center p-6">
-            <p className="text-destructive">Error loading vitals data</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <ErrorState message="Error loading vitals data" />;
   }
   
   return (
