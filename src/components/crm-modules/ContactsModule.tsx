@@ -22,6 +22,14 @@ const ContactsModule: React.FC = () => {
     clearFilters,
   } = useContacts();
 
+  const handleSelectContact = (contact: any) => {
+    setSelectedContactId(contact.id);
+  };
+
+  const handleFilter = (search: string, status: string[], priority: string[]) => {
+    filterContacts(search, status, priority);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -31,11 +39,23 @@ const ContactsModule: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <CreateContactButton onSave={addContact} />
+          <CreateContactButton onCreateContact={addContact} />
         </div>
       </div>
 
-      <ContactsFilter onFilter={filterContacts} onClear={clearFilters} />
+      <div className="mb-4">
+        <Card className="p-4">
+          <ContactsFilter 
+            filter=""
+            setFilter={(val) => handleFilter(val, [], [])}
+            statusFilter={[]}
+            toggleStatusFilter={() => {}}
+            priorityFilter={[]}
+            togglePriorityFilter={() => {}}
+            showFilters={true}
+          />
+        </Card>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="md:col-span-1">
@@ -49,9 +69,8 @@ const ContactsModule: React.FC = () => {
             <CardContent className="p-0">
               <ContactsList
                 contacts={filteredContacts}
-                isLoading={isLoading}
                 selectedContactId={selectedContact?.id}
-                onSelectContact={setSelectedContactId}
+                onSelectContact={handleSelectContact}
               />
             </CardContent>
           </Card>
@@ -63,7 +82,7 @@ const ContactsModule: React.FC = () => {
               contact={selectedContact}
               onUpdateContact={updateContact}
               onDeleteContact={deleteContact}
-              onAddActivity={addActivity}
+              onAddActivity={(type, description) => addActivity(selectedContact.id, type, description)}
             />
           ) : (
             <Card className="h-full flex items-center justify-center p-6">

@@ -1,187 +1,171 @@
 
 import React from "react";
 import { CRMModule } from "@/types/crm-modules";
-import { Building, Utensils, Home, Tooth, Users, CalendarClock, FileText, Mail, Phone, CreditCard } from "lucide-react";
-import HealthcareCRMModule from "@/components/crm-modules/HealthcareCRMModule";
-import RealEstateCRMModule from "@/components/crm-modules/RealEstateCRMModule";
-import RestaurantCRMModule from "@/components/crm-modules/RestaurantCRMModule";
+import { Users, Calendar, Phone, Mail, FileText, Building, Home, Utensils, DollarSign, Calculator } from "lucide-react";
+
+// Components
 import ContactsModule from "@/components/crm-modules/ContactsModule";
 import CalendarModule from "@/components/crm-modules/CalendarModule";
-import DocumentsModule from "@/components/crm-modules/DocumentsModule";
-import EmailModule from "@/components/crm-modules/EmailModule";
 import CallTrackingModule from "@/components/crm-modules/CallTrackingModule";
+import EmailModule from "@/components/crm-modules/EmailModule";
+import DocumentsModule from "@/components/crm-modules/DocumentsModule";
+import RealEstateCRMModule from "@/components/crm-modules/RealEstateCRMModule";
+import RestaurantCRMModule from "@/components/crm-modules/RestaurantCRMModule";
+import HealthcareCRMModule from "@/components/crm-modules/HealthcareCRMModule";
 import BillingModule from "@/components/crm-modules/BillingModule";
 
-// Core modules
-export const CORE_MODULES: CRMModule[] = [
+// List of available CRM modules
+export const ALL_MODULES: CRMModule[] = [
   {
     id: "contacts",
-    name: "Contacts",
-    description: "Manage your customer contacts and leads",
+    name: "Contacts Management",
+    description: "Store and manage all your contacts and leads",
     icon: Users,
     price: 9.99,
     component: ContactsModule,
     features: [
-      "Contact database", 
+      "Contact database",
       "Lead tracking",
-      "Contact organization",
-      "Import/export contacts"
+      "Activity history",
+      "Follow-up reminders",
+      "Contact tagging"
     ]
   },
   {
     id: "calendar",
     name: "Calendar & Scheduling",
-    description: "Schedule and manage appointments",
-    icon: CalendarClock,
-    price: 9.99,
+    description: "Manage appointments and scheduling",
+    icon: Calendar,
+    price: 7.99,
     component: CalendarModule,
     features: [
       "Appointment scheduling",
-      "Calendar view",
+      "Calendar views",
       "Reminders",
-      "Recurring appointments"
-    ]
-  },
-  {
-    id: "documents",
-    name: "Documents",
-    description: "Store and manage documents",
-    icon: FileText,
-    price: 7.99,
-    component: DocumentsModule,
-    features: [
-      "Document storage",
-      "File sharing",
-      "Document templates",
-      "Version control"
-    ]
-  },
-  {
-    id: "email",
-    name: "Email Integration",
-    description: "Send and receive emails within the CRM",
-    icon: Mail,
-    price: 5.99,
-    component: EmailModule,
-    features: [
-      "Email sending/receiving",
-      "Email templates",
-      "Email tracking",
-      "Email campaigns"
+      "Recurring appointments",
+      "Availability management"
     ]
   },
   {
     id: "call-tracking",
     name: "Call Tracking",
-    description: "Track and record calls with customers",
+    description: "Log and manage phone calls with clients",
     icon: Phone,
-    price: 6.99,
+    price: 5.99,
     component: CallTrackingModule,
     features: [
       "Call logging",
+      "Call notes",
       "Call recording",
       "Call analytics",
-      "Call notes"
-    ]
+      "Follow-up scheduling"
+    ],
+    dependencies: ["contacts"]
   },
   {
-    id: "billing",
-    name: "Billing & Payments",
-    description: "Manage billing and receive payments",
-    icon: CreditCard,
-    price: 12.99,
-    component: BillingModule,
+    id: "email",
+    name: "Email Integration",
+    description: "Send and track emails within the CRM",
+    icon: Mail,
+    price: 6.99,
+    component: EmailModule,
     features: [
-      "Invoice generation",
-      "Payment processing",
-      "Subscription management",
-      "Payment reminders"
-    ]
-  }
-];
-
-// Industry-specific modules
-export const INDUSTRY_MODULES: CRMModule[] = [
-  {
-    id: "healthcare",
-    name: "Healthcare CRM",
-    description: "Specialized tools for dental and healthcare practices",
-    icon: Tooth,
-    price: 24.99,
-    component: HealthcareCRMModule,
-    features: [
-      "Patient records",
-      "Treatment plans",
-      "Medical history",
-      "Insurance verification",
-      "HIPAA compliance",
-      "Patient portal"
+      "Email sending",
+      "Email templates",
+      "Email tracking",
+      "Email scheduling",
+      "Automated follow-ups"
     ],
-    dependencies: ["contacts", "calendar", "documents"]
+    dependencies: ["contacts"]
+  },
+  {
+    id: "documents",
+    name: "Document Management",
+    description: "Store and manage client documents",
+    icon: FileText,
+    price: 4.99,
+    component: DocumentsModule,
+    features: [
+      "Document storage",
+      "Document sharing",
+      "Version control",
+      "Document templates",
+      "E-signatures"
+    ]
   },
   {
     id: "real-estate",
     name: "Real Estate CRM",
-    description: "Tools for property management and client check-in",
+    description: "Specialized tools for real estate businesses",
     icon: Home,
-    price: 19.99,
+    price: 12.99,
     component: RealEstateCRMModule,
     features: [
       "Property listings",
-      "Client check-in",
-      "Showing scheduling",
-      "Property matching",
-      "Transaction tracking",
-      "Commission management"
+      "Client matching",
+      "Showing schedule",
+      "Transaction management",
+      "Market analytics"
     ],
     dependencies: ["contacts", "calendar"]
   },
   {
     id: "restaurant",
     name: "Restaurant CRM",
-    description: "Order management and customer tracking for restaurants",
+    description: "Specialized tools for restaurants",
     icon: Utensils,
-    price: 17.99,
+    price: 12.99,
     component: RestaurantCRMModule,
     features: [
-      "Order management",
-      "Table reservations",
-      "Menu management",
+      "Reservation management",
+      "Order history",
       "Customer preferences",
       "Loyalty program",
-      "Online ordering"
+      "Menu management"
+    ],
+    dependencies: ["contacts"]
+  },
+  {
+    id: "healthcare",
+    name: "Healthcare CRM",
+    description: "Specialized tools for healthcare providers",
+    icon: Users,
+    price: 14.99,
+    component: HealthcareCRMModule,
+    features: [
+      "Patient records",
+      "Appointment scheduling",
+      "Treatment plans",
+      "Insurance verification",
+      "HIPAA compliance"
     ],
     dependencies: ["contacts", "calendar"]
   },
   {
-    id: "basic",
-    name: "Basic CRM",
-    description: "Simple customer relationship management for any business",
-    icon: Building,
-    price: 14.99,
-    component: ContactsModule,
+    id: "billing",
+    name: "Billing & Invoicing",
+    description: "Generate and manage invoices and payments",
+    icon: DollarSign,
+    price: 8.99,
+    component: BillingModule,
     features: [
-      "Contact management",
-      "Task tracking",
-      "Basic reporting",
-      "Notes and activities",
-      "Simple pipeline"
-    ],
-    dependencies: ["contacts"]
+      "Invoice generation",
+      "Payment tracking",
+      "Recurring billing",
+      "Payment reminders",
+      "Financial reporting"
+    ]
   }
 ];
 
-// All modules combined
-export const ALL_MODULES = [...CORE_MODULES, ...INDUSTRY_MODULES];
-
 // Helper function to get a module by ID
-export const getModuleById = (moduleId: string): CRMModule | undefined => {
-  return ALL_MODULES.find(module => module.id === moduleId);
+export const getModuleById = (id: string): CRMModule | undefined => {
+  return ALL_MODULES.find(module => module.id === id);
 };
 
-// Calculate price based on selected modules
-export const calculatePrice = (moduleIds: string[]): number => {
-  return moduleIds.reduce((total, moduleId) => {
+// Helper to calculate price based on active modules
+export const calculatePrice = (activeModuleIds: string[]): number => {
+  return activeModuleIds.reduce((total, moduleId) => {
     const module = getModuleById(moduleId);
     return total + (module?.price || 0);
   }, 0);

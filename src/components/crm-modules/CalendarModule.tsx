@@ -1,13 +1,8 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import CalendarView from "@/components/calendar/CalendarView";
-import CalendarHeader from "@/components/calendar/CalendarHeader";
-import { useCalendar } from "@/hooks/useCalendar";
 
 const CalendarModule: React.FC = () => {
-  const calendar = useCalendar();
-  
   return (
     <div className="space-y-4">
       <div>
@@ -17,12 +12,14 @@ const CalendarModule: React.FC = () => {
       
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle>
-            <CalendarHeader />
-          </CardTitle>
+          <CardTitle>Calendar</CardTitle>
         </CardHeader>
         <CardContent>
-          <CalendarView />
+          <div className="flex items-center justify-center min-h-[400px]">
+            <p className="text-muted-foreground">
+              Calendar functionality is being implemented. You'll be able to manage your appointments and schedule here.
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
