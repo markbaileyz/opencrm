@@ -43,7 +43,10 @@ const CallVolumeMetric: React.FC<CallVolumeMetricProps> = ({
             <span className="text-xs text-muted-foreground">Missed calls</span>
             <span className="text-xs font-medium">{missedCalls} ({missedPercentage}%)</span>
           </div>
-          <Progress value={missedPercentage} className="h-1" variant={missedPercentage > 20 ? "destructive" : "default"} />
+          <Progress 
+            value={missedPercentage} 
+            className={`h-1 ${missedPercentage > 20 ? "bg-red-100" : ""}`}
+          />
         </div>
       </CardContent>
     </Card>

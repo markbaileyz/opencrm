@@ -1,14 +1,13 @@
 
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
+import React, { useState, useEffect } from "react";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle,
+  DialogFooter
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,278 +18,144 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { CalendarIcon, Clock } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { CallRecord } from "@/types/call";
 
 interface CallFormProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSave: (call: Partial<CallRecord>) => void;
-  initialData?: Partial<CallRecord>;
-  title?: string;
+  onClose: () => void;
+  onSave: (call: CallRecord) => void;
+  initialData: CallRecord | null;
 }
 
-const CallForm: React.FC<CallFormProps> = ({
-  open,
-  onOpenChange,
-  onSave,
-  initialData,
-  title = "Log Call"
+const CallForm: React.FC<CallFormProps> = ({ 
+  open, 
+  onClose, 
+  onSave, 
+  initialData 
 }) => {
-  const [callData, setCallData] = useState<Partial<CallRecord>>(
-    initialData || {
-      type: "outgoing",
-      timestamp: new Date().toISOString(),
-      duration: 0
-    }
-  );
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [type, setType] = useState<"incoming" | "outgoing" | "missed">("incoming");
+  const [duration, setDuration] = useState<number>(0);
+  const [notes, setNotes] = useState("");
   
-  const [date, setDate] = useState<Date | undefined>(
-    initialData?.timestamp ? new Date(initialData.timestamp) : new Date()
-  );
-  
-  const [timeHours, setTimeHours] = useState<string>(
-    initialData?.timestamp 
-      ? format(new Date(initialData.timestamp), 'HH') 
-      : format(new Date(), 'HH')
-  );
-  
-  const [timeMinutes, setTimeMinutes] = useState<string>(
-    initialData?.timestamp 
-      ? format(new Date(initialData.timestamp), 'mm') 
-      : format(new Date(), 'mm')
-  );
-  
-  const handleChange = (field: string, value: any) => {
-    setCallData({
-      ...callData,
-      [field]: value
-    });
-  };
-  
-  const handleTimeChange = () => {
-    if (date && timeHours && timeMinutes) {
-      const newDate = new Date(date);
-      newDate.setHours(parseInt(timeHours, 10), parseInt(timeMinutes, 10));
-      setCallData({
-        ...callData,
-        timestamp: newDate.toISOString()
-      });
-    }
-  };
-  
-  const handleSave = () => {
-    if (date && timeHours && timeMinutes) {
-      const newDate = new Date(date);
-      newDate.setHours(parseInt(timeHours, 10), parseInt(timeMinutes, 10));
-      onSave({
-        ...callData,
-        timestamp: newDate.toISOString()
-      });
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name);
+      setPhone(initialData.phone);
+      setType(initialData.type);
+      setDuration(initialData.duration);
+      setNotes(initialData.notes || "");
     } else {
-      onSave(callData);
+      setName("");
+      setPhone("");
+      setType("incoming");
+      setDuration(0);
+      setNotes("");
     }
+  }, [initialData]);
+  
+  const handleSubmit = () => {
+    const callData: CallRecord = {
+      id: initialData?.id || "",
+      name,
+      phone,
+      type,
+      duration,
+      notes,
+      date: initialData?.date || new Date().toISOString()
+    };
+    
+    onSave(callData);
   };
-
+  
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>
-            Record details about the call for tracking and follow-up.
-          </DialogDescription>
+          <DialogTitle>{initialData ? "Edit Call" : "Add Call"}</DialogTitle>
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="callType" className="text-right">
-              Type
+            <Label htmlFor="name" className="text-right">
+              Name
             </Label>
-            <Select
-              value={callData.type}
-              onValueChange={(value) => handleChange("type", value)}
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="col-span-3"
+              placeholder="Contact name"
+            />
+          </div>
+          
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="phone" className="text-right">
+              Phone
+            </Label>
+            <Input
+              id="phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="col-span-3"
+              placeholder="Phone number"
+            />
+          </div>
+          
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="type" className="text-right">
+              Call Type
+            </Label>
+            <Select 
+              value={type} 
+              onValueChange={(value) => setType(value as "incoming" | "outgoing" | "missed")}
             >
-              <SelectTrigger id="callType" className="col-span-3">
-                <SelectValue placeholder="Select call type" />
+              <SelectTrigger id="type" className="col-span-3">
+                <SelectValue placeholder="Call type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="incoming">Incoming</SelectItem>
                 <SelectItem value="outgoing">Outgoing</SelectItem>
                 <SelectItem value="missed">Missed</SelectItem>
-                <SelectItem value="scheduled">Scheduled</SelectItem>
               </SelectContent>
             </Select>
           </div>
           
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="contactName" className="text-right">
-              Contact Name
-            </Label>
-            <Input
-              id="contactName"
-              value={callData.contactName || ""}
-              onChange={(e) => handleChange("contactName", e.target.value)}
-              className="col-span-3"
-            />
-          </div>
-          
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="phoneNumber" className="text-right">
-              Phone Number
-            </Label>
-            <Input
-              id="phoneNumber"
-              value={callData.phoneNumber || ""}
-              onChange={(e) => handleChange("phoneNumber", e.target.value)}
-              className="col-span-3"
-            />
-          </div>
-          
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="date" className="text-right">
-              Date
-            </Label>
-            <div className="col-span-3">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !date && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={(newDate) => {
-                      setDate(newDate);
-                      if (newDate) {
-                        handleTimeChange();
-                      }
-                    }}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="time" className="text-right">
-              Time
-            </Label>
-            <div className="col-span-3 flex gap-2 items-center">
-              <Input
-                id="timeHours"
-                value={timeHours}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === "" || /^[0-9]{1,2}$/.test(value)) {
-                    const numValue = parseInt(value || "0", 10);
-                    if (numValue >= 0 && numValue <= 23) {
-                      setTimeHours(value.padStart(2, "0"));
-                      handleTimeChange();
-                    }
-                  }
-                }}
-                className="w-16 text-center"
-                placeholder="HH"
-                maxLength={2}
-              />
-              <span>:</span>
-              <Input
-                id="timeMinutes"
-                value={timeMinutes}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === "" || /^[0-9]{1,2}$/.test(value)) {
-                    const numValue = parseInt(value || "0", 10);
-                    if (numValue >= 0 && numValue <= 59) {
-                      setTimeMinutes(value.padStart(2, "0"));
-                      handleTimeChange();
-                    }
-                  }
-                }}
-                className="w-16 text-center"
-                placeholder="MM"
-                maxLength={2}
-              />
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="duration" className="text-right">
-              Duration (sec)
+              Duration (s)
             </Label>
             <Input
               id="duration"
               type="number"
-              value={callData.duration || 0}
-              onChange={(e) => handleChange("duration", parseInt(e.target.value, 10) || 0)}
+              value={duration}
+              onChange={(e) => setDuration(Number(e.target.value))}
               className="col-span-3"
-              min="0"
+              placeholder="Call duration in seconds"
+              min={0}
+              disabled={type === "missed"}
             />
           </div>
           
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="purpose" className="text-right">
-              Purpose
-            </Label>
-            <Input
-              id="purpose"
-              value={callData.purpose || ""}
-              onChange={(e) => handleChange("purpose", e.target.value)}
-              className="col-span-3"
-            />
-          </div>
-          
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="patientName" className="text-right">
-              Patient Name
-            </Label>
-            <Input
-              id="patientName"
-              value={callData.patientName || ""}
-              onChange={(e) => handleChange("patientName", e.target.value)}
-              className="col-span-3"
-            />
-          </div>
-          
-          <div className="grid grid-cols-4 items-start gap-4">
-            <Label htmlFor="notes" className="text-right pt-2">
+            <Label htmlFor="notes" className="text-right">
               Notes
             </Label>
             <Textarea
               id="notes"
-              value={callData.notes || ""}
-              onChange={(e) => handleChange("notes", e.target.value)}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               className="col-span-3"
+              placeholder="Call notes"
               rows={4}
             />
           </div>
         </div>
         
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave}>Save Call</Button>
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button onClick={handleSubmit}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
