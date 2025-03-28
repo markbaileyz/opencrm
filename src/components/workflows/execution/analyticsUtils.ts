@@ -35,6 +35,8 @@ export const calculateAnalyticsData = (executionHistory: WorkflowExecution[]): A
   const totalExecutions = executionHistory.length;
   const successfulExecutions = executionHistory.filter(exec => exec.success).length;
   const successRate = totalExecutions > 0 ? (successfulExecutions / totalExecutions) * 100 : 0;
+  const failedExecutions = totalExecutions - successfulExecutions;
+  const failureRate = totalExecutions > 0 ? (failedExecutions / totalExecutions) * 100 : 0;
 
   // Calculate average duration
   const executionsWithDuration = executionHistory.filter(exec => exec.duration);
@@ -76,12 +78,21 @@ export const calculateAnalyticsData = (executionHistory: WorkflowExecution[]): A
       : 0
   };
 
+  // Generate mock trends (in a real app, these would be calculated by comparing with previous periods)
+  const successRateTrend = Math.floor(Math.random() * 10) - 5; // Between -5 and +5
+  const executionsTrend = Math.floor(Math.random() * 20); // Between 0 and 20
+  const executionTimeTrend = Math.floor(Math.random() * 10) - 5; // Between -5 and +5
+
   return {
     totalExecutions,
     successfulExecutions,
-    failedExecutions: totalExecutions - successfulExecutions,
+    failedExecutions,
     successRate,
-    averageDuration,
+    successRateTrend,  // Added missing property
+    failureRate,       // Added missing property
+    executionsTrend,   // Added missing property
+    avgExecutionTime: averageDuration / 1000, // Convert ms to seconds
+    executionTimeTrend, // Added missing property
     categoryCounts,
     executionsPerDay,
     topWorkflows: getTopWorkflows(executionHistory),
