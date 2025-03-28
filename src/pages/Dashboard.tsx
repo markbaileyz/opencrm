@@ -15,6 +15,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import OfflineBanner from "@/components/ui/offline-banner";
 import WorkflowExecutionMonitor from "@/components/workflows/execution/WorkflowExecutionMonitor";
 import WorkflowActivityMonitor from "@/components/workflows/execution/analytics/WorkflowActivityMonitor";
+import HealthcareWorkflowsPreview from "@/components/dashboard/HealthcareWorkflowsPreview";
 import { useOfflineState } from "@/hooks/use-offline-state";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { OrganizationsProvider } from "@/context/OrganizationsContext";
@@ -102,6 +103,8 @@ const Dashboard = () => {
           
           <MobileDashboard />
           
+          <HealthcareWorkflowsPreview />
+          
           <WorkflowExecutionMonitor
             workflows={adaptedWorkflows}
             onActivate={handleActivateWorkflow}
@@ -181,6 +184,7 @@ const Dashboard = () => {
           
           <div className="lg:col-span-1 space-y-6">
             <NotificationCenter />
+            <HealthcareWorkflowsPreview />
             <AppointmentList />
             <MessageList />
           </div>

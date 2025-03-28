@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useWorkflows } from "./hooks/useWorkflows";
 import WorkflowGrid from "./WorkflowGrid";
 import WorkflowFilters from "./WorkflowFilters";
@@ -11,6 +11,9 @@ import WorkflowListHeader from "./WorkflowListHeader";
 import WorkflowError from "./WorkflowError";
 import { WorkflowNotFoundView } from "./actions/WorkflowActions";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Plus, FileText } from "lucide-react";
+import HealthcareTemplatesDialog from "./templates/HealthcareTemplatesDialog";
 
 const WorkflowList: React.FC = () => {
   const {
@@ -43,6 +46,9 @@ const WorkflowList: React.FC = () => {
     setIsTemplatesDialogOpen,
     retryLoadWorkflows,
   } = useWorkflows();
+  
+  // New state for healthcare templates dialog
+  const [isHealthcareTemplatesOpen, setIsHealthcareTemplatesOpen] = useState(false);
   
   // If a workflow is selected, show its details
   if (selectedWorkflowId) {
@@ -84,6 +90,18 @@ const WorkflowList: React.FC = () => {
       {saveError && (
         <WorkflowError error={saveError} />
       )}
+      
+      {/* New healthcare templates button */}
+      <div className="flex justify-end">
+        <Button 
+          variant="outline" 
+          onClick={() => setIsHealthcareTemplatesOpen(true)}
+          className="flex items-center gap-2"
+        >
+          <FileText className="h-4 w-4" />
+          Healthcare Templates
+        </Button>
+      </div>
       
       <WorkflowFilters
         onSearchChange={(value) => updateFilters({ searchQuery: value })}
@@ -134,6 +152,13 @@ const WorkflowList: React.FC = () => {
       <WorkflowTemplates
         open={isTemplatesDialogOpen}
         onOpenChange={setIsTemplatesDialogOpen}
+        onUseTemplate={handleUseTemplate}
+      />
+      
+      {/* Healthcare templates dialog */}
+      <HealthcareTemplatesDialog
+        open={isHealthcareTemplatesOpen}
+        onOpenChange={setIsHealthcareTemplatesOpen}
         onUseTemplate={handleUseTemplate}
       />
     </div>
