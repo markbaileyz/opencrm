@@ -1,20 +1,35 @@
 
 import { WorkflowExecution } from "../../types/executionHistory";
+import { addDays, subDays, format, parseISO, startOfDay } from "date-fns";
 
-// Calculate executions per day for the last 7 days
+// Calculate daily execution counts
 export const calculateDailyExecutions = (executionHistory: WorkflowExecution[]) => {
+  // Create an array of the last 7 days
+  const today = new Date();
   const last7Days = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    return date.toISOString().split('T')[0];
-  }).reverse();
-
-  const executionsPerDay = last7Days.map(date => {
-    const count = executionHistory.filter(exec => 
-      exec.timestamp.split('T')[0] === date
-    ).length;
-    return { date, count };
+    const date = subDays(today, 6 - i);
+    return format(date, "yyyy-MM-dd");
   });
+
+  // Initialize counts with 0 for each day
+  const dailyCounts = last7Days.reduce((acc, date) => {
+    acc[date] = 0;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Count executions per day
+  executionHistory.forEach(execution => {
+    const executionDate = format(parseISO(execution.timestamp), "yyyy-MM-dd");
+    if (dailyCounts[executionDate] !== undefined) {
+      dailyCounts[executionDate]++;
+    }
+  });
+
+  // Format for chart display
+  const executionsPerDay = Object.entries(dailyCounts).map(([date, count]) => ({
+    date,
+    count
+  }));
 
   return { executionsPerDay };
 };

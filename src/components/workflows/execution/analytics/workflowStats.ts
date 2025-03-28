@@ -1,30 +1,39 @@
 
 import { WorkflowExecution } from "../../types/executionHistory";
 
-// Helper function to get top workflows by execution count
-export const getTopWorkflows = (history: WorkflowExecution[]) => {
-  const workflowCounts: Record<string, { count: number, successCount: number, branchCount: number }> = {};
-  
-  history.forEach(exec => {
-    if (!workflowCounts[exec.workflowName]) {
-      workflowCounts[exec.workflowName] = { count: 0, successCount: 0, branchCount: 0 };
+// Get top workflows by execution count
+export const getTopWorkflows = (executionHistory: WorkflowExecution[]) => {
+  // Group executions by workflow
+  const workflowGroups = executionHistory.reduce((groups, execution) => {
+    const workflowId = execution.workflowId;
+    if (!groups[workflowId]) {
+      groups[workflowId] = {
+        workflowId,
+        name: execution.workflowName,
+        executions: [],
+        category: execution.category || "Uncategorized"
+      };
     }
-    workflowCounts[exec.workflowName].count += 1;
-    if (exec.success) {
-      workflowCounts[exec.workflowName].successCount += 1;
-    }
-    workflowCounts[exec.workflowName].branchCount += exec.branchesUsed || 0;
+    groups[workflowId].executions.push(execution);
+    return groups;
+  }, {} as Record<string, { workflowId: string; name: string; executions: WorkflowExecution[]; category: string }>);
+
+  // Convert to array and calculate metrics
+  const workflowStats = Object.values(workflowGroups).map(workflow => {
+    const totalExecutions = workflow.executions.length;
+    const successfulExecutions = workflow.executions.filter(e => e.success).length;
+    
+    return {
+      workflowId: workflow.workflowId,
+      name: workflow.name,
+      category: workflow.category,
+      count: totalExecutions,
+      successCount: successfulExecutions,
+      successRate: Math.round((successfulExecutions / totalExecutions) * 100),
+      avgTime: workflow.executions.reduce((sum, e) => sum + (e.duration || 0), 0) / totalExecutions / 1000, // in seconds
+    };
   });
-  
-  return Object.entries(workflowCounts)
-    .map(([name, { count, successCount, branchCount }]) => ({
-      name,
-      count,
-      successCount,
-      branchCount,
-      avgBranchesPerExecution: count > 0 ? branchCount / count : 0,
-      successRate: count > 0 ? (successCount / count) * 100 : 0
-    }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5); // Top 5 workflows
+
+  // Sort by execution count (descending)
+  return workflowStats.sort((a, b) => b.count - a.count);
 };

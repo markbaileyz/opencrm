@@ -6,13 +6,22 @@ import { Route, Routes } from "react-router-dom";
 import WorkflowDetail from "@/components/workflows/WorkflowDetailView";
 import { useWorkflows } from "@/components/workflows/hooks/useWorkflows";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, BarChart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const WorkflowsPage = () => {
   return (
     <DashboardLayout>
       <div className="container mx-auto p-4">
+        <div className="flex justify-end mb-4">
+          <Link to="/workflow-analytics">
+            <Button variant="outline" className="flex items-center gap-2">
+              <BarChart className="h-4 w-4" />
+              Analytics Dashboard
+            </Button>
+          </Link>
+        </div>
         <Routes>
           <Route path="/" element={<WorkflowList />} />
           <Route path="/detail/:id" element={<WorkflowDetailRoute />} />

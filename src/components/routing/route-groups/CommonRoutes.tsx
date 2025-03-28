@@ -11,6 +11,7 @@ import KnowledgeBasePage from "@/pages/KnowledgeBase";
 import ChallengesSolutionsPage from "@/pages/ChallengesSolutions";
 import Settings from "@/pages/Settings";
 import Login from "@/pages/Login";
+import WorkflowAnalyticsPage from "@/pages/WorkflowAnalytics";
 import { useAuth } from "@/context/AuthContext";
 
 // Helper component to handle auth state
@@ -66,6 +67,12 @@ export const CommonRoutes = (
     <Route path="/settings" element={
       <ProtectedRoute>
         <Settings />
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/workflow-analytics" element={
+      <ProtectedRoute>
+        <WorkflowAnalyticsPage />
       </ProtectedRoute>
     } />
     

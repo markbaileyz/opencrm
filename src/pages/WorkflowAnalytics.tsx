@@ -1,14 +1,16 @@
 
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import WorkflowAnalyticsDashboard from "@/components/workflows/analytics/WorkflowAnalyticsDashboard";
+import WorkflowAnalyticsDashboard from "@/components/workflows/execution/analytics/WorkflowAnalyticsDashboard";
 
-const WorkflowAnalytics = () => {
+const WorkflowAnalyticsPage = () => {
   return (
     <DashboardLayout>
-      <WorkflowAnalyticsDashboard />
+      <div className="container mx-auto p-4">
+        <WorkflowAnalyticsDashboard />
+      </div>
     </DashboardLayout>
   );
 };
 
-export default WorkflowAnalytics;
+export default WorkflowAnalyticsPage;

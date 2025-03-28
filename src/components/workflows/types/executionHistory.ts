@@ -4,35 +4,37 @@ export interface WorkflowExecution {
   workflowId: string;
   workflowName: string;
   timestamp: string;
+  duration: number; // in milliseconds
   success: boolean;
-  message: string;
-  duration?: number; // Execution duration in milliseconds
-  stepCount?: number; // Number of steps executed
-  category?: string; // Workflow category
-  branchesUsed?: number; // Number of branches used in the execution
-  executionPath?: string[]; // Path of steps that were executed
+  stepCount?: number;
+  category?: string;
+  errorMessage?: string;
+  triggeredBy?: string;
+  completedSteps?: number;
+  branchesUsed?: number;
 }
 
 export interface AnalyticsData {
-  totalExecutions: number;
-  successfulExecutions: number;
-  failedExecutions: number;
   successRate: number;
-  averageDuration: number;
+  successRateTrend: number;
+  failureRate: number;
+  totalExecutions: number;
+  executionsTrend: number;
+  avgExecutionTime: number;
+  executionTimeTrend: number;
   categoryCounts: Record<string, number>;
-  executionsPerDay: { date: string; count: number }[];
-  topWorkflows: {
+  executionsPerDay: Array<{ date: string; count: number }>;
+  topWorkflows: Array<{
     name: string;
     count: number;
     successCount: number;
     branchCount: number;
     avgBranchesPerExecution: number;
     successRate: number;
-  }[];
+  }>;
   branchUsageStats: {
-    totalBranchesUsed: number;
-    averageBranchesPerWorkflow: number;
-    workflowsWithBranches: number;
-    percentageWithBranches: number;
+    totalBranches: number;
+    avgBranchesPerWorkflow: number;
+    mostUsedBranch: string;
   };
 }
