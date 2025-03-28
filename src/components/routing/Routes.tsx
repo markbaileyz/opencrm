@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Routes as RouterRoutes } from "react-router-dom";
+import { Routes as RouterRoutes, Route } from "react-router-dom";
 import { PublicRoutes } from "./route-groups/PublicRoutes";
 import { CommonRoutes } from "./route-groups/CommonRoutes";
 import { PatientRoutes } from "./route-groups/PatientRoutes";
