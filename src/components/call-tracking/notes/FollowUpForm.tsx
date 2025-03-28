@@ -1,75 +1,106 @@
 
 import React, { useState } from "react";
+import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface FollowUpFormProps {
-  initialDate?: string;
-  initialNotes?: string;
+  isOpen: boolean;
+  onClose: () => void;
   onSave: (date: string, notes: string) => void;
-  onCancel: () => void;
+  initialDate?: Date;
+  initialNotes?: string;
 }
 
-const FollowUpForm: React.FC<FollowUpFormProps> = ({ 
-  initialDate = "", 
-  initialNotes = "", 
-  onSave, 
-  onCancel 
+const FollowUpForm: React.FC<FollowUpFormProps> = ({
+  isOpen,
+  onClose,
+  onSave,
+  initialDate,
+  initialNotes = ""
 }) => {
-  const { toast } = useToast();
-  const [followUpDate, setFollowUpDate] = useState(initialDate);
-  const [followUpNotes, setFollowUpNotes] = useState(initialNotes);
-
-  const handleSubmit = () => {
-    if (!followUpDate) {
-      toast({
-        title: "Date required",
-        description: "Please select a follow-up date.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    onSave(followUpDate, followUpNotes);
+  const [date, setDate] = useState<Date | undefined>(initialDate);
+  const [notes, setNotes] = useState<string>(initialNotes);
+  
+  const handleSave = () => {
+    if (!date) return;
+    onSave(format(date, "yyyy-MM-dd"), notes);
   };
-
+  
   return (
-    <div className="space-y-3">
-      <div>
-        <Label htmlFor="followUpDate">Follow-up Date</Label>
-        <Input
-          id="followUpDate"
-          type="date"
-          value={followUpDate}
-          onChange={(e) => setFollowUpDate(e.target.value)}
-          className="mt-1"
-        />
-      </div>
-      <div>
-        <Label htmlFor="followUpNotes">Follow-up Notes (Optional)</Label>
-        <Textarea
-          id="followUpNotes"
-          value={followUpNotes}
-          onChange={(e) => setFollowUpNotes(e.target.value)}
-          placeholder="Add notes for the follow-up..."
-          className="mt-1"
-        />
-      </div>
-      <div className="flex gap-2">
-        <Button onClick={handleSubmit}>
-          Schedule Follow-up
-        </Button>
-        <Button 
-          variant="ghost" 
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>
-      </div>
-    </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Schedule Follow-up</DialogTitle>
+          <DialogDescription>
+            Set a date and notes for the follow-up action.
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">Date</label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+          
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">Notes</label>
+            <Textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Add notes about the follow-up action..."
+              rows={4}
+            />
+          </div>
+        </div>
+        
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave} disabled={!date}>
+            Save Follow-up
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

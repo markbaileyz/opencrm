@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import CallTrackingList from "@/components/call-tracking/CallTrackingList";
@@ -25,7 +24,9 @@ const sampleCalls: CallRecord[] = [
       date: "2023-05-03",
       status: "pending",
       notes: "Call to confirm appointment details"
-    }
+    },
+    createdBy: "admin",
+    createdAt: "2023-05-01T09:30:00Z"
   },
   {
     id: "call-2",
@@ -36,7 +37,9 @@ const sampleCalls: CallRecord[] = [
     duration: 180,
     purpose: "Prescription refill inquiry",
     notes: "Called to discuss prescription refill options",
-    patientName: "Sarah Johnson"
+    patientName: "Sarah Johnson",
+    createdBy: "admin",
+    createdAt: "2023-05-01T11:15:00Z"
   },
   {
     id: "call-3",
@@ -46,7 +49,9 @@ const sampleCalls: CallRecord[] = [
     timestamp: new Date("2023-05-02T13:45:00").toISOString(),
     duration: 0,
     purpose: "Unknown",
-    patientName: "Michael Davis"
+    patientName: "Michael Davis",
+    createdBy: "admin",
+    createdAt: "2023-05-02T13:45:00Z"
   },
   {
     id: "call-4",
@@ -57,7 +62,9 @@ const sampleCalls: CallRecord[] = [
     duration: 240,
     purpose: "Billing inquiry",
     notes: "Patient had questions about recent invoice",
-    patientName: "Emma Wilson"
+    patientName: "Emma Wilson",
+    createdBy: "admin",
+    createdAt: "2023-05-02T15:30:00Z"
   },
   {
     id: "call-5",
@@ -73,7 +80,9 @@ const sampleCalls: CallRecord[] = [
       date: "2023-05-10",
       status: "pending",
       notes: "Schedule follow-up appointment based on test results"
-    }
+    },
+    createdBy: "admin",
+    createdAt: "2023-05-03T10:00:00Z"
   },
   {
     id: "call-6",
@@ -84,7 +93,9 @@ const sampleCalls: CallRecord[] = [
     duration: 0,
     purpose: "Initial consultation",
     notes: "Scheduled call for new patient consultation",
-    patientName: "Jennifer Lee"
+    patientName: "Jennifer Lee",
+    createdBy: "admin",
+    createdAt: "2023-05-03T10:30:00Z"
   }
 ];
 
