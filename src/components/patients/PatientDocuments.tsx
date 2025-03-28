@@ -14,7 +14,6 @@ import {
   Paperclip,
   File,
   FileImage,
-  FilePdf,
   MoreVertical
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -72,7 +71,7 @@ const PatientDocuments: React.FC<PatientDocumentsProps> = ({ patientId }) => {
       case "image/png":
         return <FileImage className="h-4 w-4 text-blue-500" />;
       case "application/pdf":
-        return <FilePdf className="h-4 w-4 text-red-500" />;
+        return <FileText className="h-4 w-4 text-red-500" />;
       default:
         return <File className="h-4 w-4 text-gray-500" />;
     }
@@ -270,7 +269,7 @@ const PatientDocuments: React.FC<PatientDocumentsProps> = ({ patientId }) => {
               />
             ) : (
               <div className="text-center p-10">
-                <FilePdf className="h-20 w-20 mx-auto mb-4 text-red-500" />
+                <FileText className="h-20 w-20 mx-auto mb-4 text-red-500" />
                 <p className="text-lg font-medium mb-2">{previewDocument?.name}</p>
                 <p className="text-sm text-muted-foreground mb-6">
                   {previewDocument?.size} • Uploaded on {previewDocument?.date}
