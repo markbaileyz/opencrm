@@ -23,9 +23,13 @@ interface Interaction {
 
 interface OrganizationInteractionHistoryProps {
   organizationId: string;
+  expanded?: boolean;
 }
 
-const OrganizationInteractionHistory: React.FC<OrganizationInteractionHistoryProps> = ({ organizationId }) => {
+const OrganizationInteractionHistory: React.FC<OrganizationInteractionHistoryProps> = ({ 
+  organizationId,
+  expanded = false 
+}) => {
   // Mock interactions data - in a real app this would come from an API
   const interactions: Interaction[] = [
     {
@@ -108,32 +112,34 @@ const OrganizationInteractionHistory: React.FC<OrganizationInteractionHistoryPro
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Input 
-            placeholder="Search interactions..." 
-            className="max-w-sm"
-            icon={<Search className="h-4 w-4" />}
-          />
-          <Select defaultValue="all">
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="email">Emails</SelectItem>
-              <SelectItem value="call">Calls</SelectItem>
-              <SelectItem value="meeting">Meetings</SelectItem>
-              <SelectItem value="note">Notes</SelectItem>
-              <SelectItem value="message">Messages</SelectItem>
-            </SelectContent>
-          </Select>
+      {expanded && (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Input 
+              placeholder="Search interactions..." 
+              className="max-w-sm"
+              icon={<Search className="h-4 w-4" />}
+            />
+            <Select defaultValue="all">
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="email">Emails</SelectItem>
+                <SelectItem value="call">Calls</SelectItem>
+                <SelectItem value="meeting">Meetings</SelectItem>
+                <SelectItem value="note">Notes</SelectItem>
+                <SelectItem value="message">Messages</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button size="sm" className="gap-1">
+            <ArrowDownUp className="h-3.5 w-3.5" />
+            <span>Sort</span>
+          </Button>
         </div>
-        <Button size="sm" className="gap-1">
-          <ArrowDownUp className="h-3.5 w-3.5" />
-          <span>Sort</span>
-        </Button>
-      </div>
+      )}
       
       <div className="space-y-3">
         {interactions.map(interaction => (
@@ -169,9 +175,11 @@ const OrganizationInteractionHistory: React.FC<OrganizationInteractionHistoryPro
         ))}
       </div>
       
-      <div className="flex justify-center mt-4">
-        <Button variant="outline" className="w-full">Load More</Button>
-      </div>
+      {expanded && (
+        <div className="flex justify-center mt-4">
+          <Button variant="outline" className="w-full">Load More</Button>
+        </div>
+      )}
     </div>
   );
 };

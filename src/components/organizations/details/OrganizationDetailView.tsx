@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -42,7 +42,7 @@ const OrganizationDetailView = () => {
         </Button>
       </div>
       
-      <OrganizationHealthIndicator />
+      <OrganizationHealthIndicator organizationId={organization.id} />
       
       <Separator />
       
@@ -84,7 +84,7 @@ const OrganizationDetailView = () => {
             <p className="text-sm text-muted-foreground">{organization.description}</p>
           </div>
           
-          <OrganizationInteractionHistory />
+          <OrganizationInteractionHistory organizationId={organization.id} />
         </TabsContent>
         
         <TabsContent value="contacts" className="mt-6">
@@ -100,7 +100,10 @@ const OrganizationDetailView = () => {
         </TabsContent>
         
         <TabsContent value="interactions" className="mt-6">
-          <OrganizationInteractionHistory expanded={true} />
+          <OrganizationInteractionHistory 
+            organizationId={organization.id} 
+            expanded={true} 
+          />
         </TabsContent>
       </Tabs>
     </div>
