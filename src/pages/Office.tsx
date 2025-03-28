@@ -1,3 +1,4 @@
+
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import ScheduledTasksManagement from "@/components/office/ScheduledTasksManageme
 import CommunicationsManagement from "@/components/office/CommunicationsManagement";
 import { useOfficeResources } from "@/hooks/useOfficeResources";
 import SupplyManagementContainer from "@/components/office/supplies/SupplyManagementContainer";
+import StaffManagementContainer from "@/components/office/staff/StaffManagementContainer";
 
 const Office = () => {
   const { lowStockSupplies, overdueTasks } = useOfficeResources();
@@ -43,6 +45,9 @@ const Office = () => {
                   {lowStockSupplies.length}
                 </span>
               )}
+            </TabsTrigger>
+            <TabsTrigger value="staff">
+              Staff
             </TabsTrigger>
             <TabsTrigger value="communications">Communications</TabsTrigger>
           </TabsList>
@@ -178,6 +183,10 @@ const Office = () => {
             <RoomManagement />
             <SuppliesManagement />
             <SupplyManagementContainer />
+          </TabsContent>
+          
+          <TabsContent value="staff" className="space-y-4">
+            <StaffManagementContainer />
           </TabsContent>
           
           <TabsContent value="communications" className="space-y-4">

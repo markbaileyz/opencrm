@@ -34,6 +34,28 @@ export interface ScheduledTask {
   category: "cleaning" | "maintenance" | "ordering" | "administrative" | "other";
 }
 
+export interface StaffMember {
+  id: string;
+  name: string;
+  role: "doctor" | "nurse" | "receptionist" | "admin" | "technician" | "other";
+  department: "primary-care" | "pediatrics" | "cardiology" | "neurology" | "front-desk" | "administration" | "other";
+  status: "active" | "on-leave" | "part-time" | "inactive";
+  availability: {
+    monday: string;
+    tuesday: string;
+    wednesday: string;
+    thursday: string;
+    friday: string;
+    saturday: string;
+    sunday: string;
+  };
+  contact: {
+    email: string;
+    phone: string;
+  };
+  specialty?: string;
+}
+
 export interface OfficeSettings {
   businessName: string;
   address: string;
@@ -51,4 +73,5 @@ export interface OfficeSettings {
   rooms: Room[];
   supplies: SupplyItem[];
   scheduledTasks: ScheduledTask[];
+  staff: StaffMember[];
 }
