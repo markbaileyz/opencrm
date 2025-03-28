@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -42,6 +41,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import CallTracking from "@/pages/CallTracking";
 import Workflows from "@/pages/Workflows";
 import Compliance from "@/pages/Compliance";
+import WorkflowAnalytics from "@/pages/WorkflowAnalytics";
 
 import "./App.css";
 import ServiceWorkerManager from "./components/service-worker/ServiceWorkerManager";
@@ -246,6 +246,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Workflows />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/workflow-analytics"
+          element={
+            <ProtectedRoute>
+              <WorkflowAnalytics />
             </ProtectedRoute>
           }
         />

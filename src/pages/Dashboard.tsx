@@ -20,6 +20,9 @@ import { OrganizationsProvider } from "@/context/OrganizationsContext";
 import { useWorkflows } from "@/components/workflows/hooks/useWorkflows";
 import { useToast } from "@/hooks/use-toast";
 import { useExecutionHistory } from "@/components/workflows/hooks/useExecutionHistory";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { BarChart3 } from "lucide-react";
 
 const Dashboard = () => {
   const { isOnline, pendingActions, isSyncing, processPendingActions } = useOfflineState();
@@ -107,6 +110,16 @@ const Dashboard = () => {
             onPause={handlePauseWorkflow}
             onViewDetails={handleViewDetails}
           />
+          
+          {/* Add analytics link for mobile */}
+          <div className="flex justify-end">
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/workflow-analytics" className="flex items-center gap-1">
+                <BarChart3 className="h-4 w-4" />
+                <span>Workflow Analytics</span>
+              </Link>
+            </Button>
+          </div>
         </div>
       </DashboardLayout>
     );
