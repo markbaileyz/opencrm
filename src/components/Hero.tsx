@@ -58,12 +58,12 @@ const Hero = ({ scrollToSection }: HeroProps) => {
     }
   ];
   
-  // Partner logos
+  // Partner logos - Fixed paths by removing "/public" prefix
   const partnerLogos = [
-    "/public/logos/stark.svg",
-    "/public/logos/acme.svg",
-    "/public/logos/globex.svg",
-    "/public/logos/hooli.svg"
+    "/logos/stark.svg",
+    "/logos/acme.svg",
+    "/logos/globex.svg",
+    "/logos/hooli.svg"
   ];
 
   return (
