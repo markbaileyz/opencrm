@@ -4,13 +4,14 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Calendar, CheckSquare, Package, FileText, MessageSquare, Users, Home } from "lucide-react";
+import { Calendar, CheckSquare, Package, FileText, MessageSquare, Users, Home, Clock } from "lucide-react";
 import RoomManagement from "@/components/office/RoomManagement";
 import SuppliesManagement from "@/components/office/SuppliesManagement";
+import ScheduledTasksManagement from "@/components/office/ScheduledTasksManagement";
 import { useOfficeResources } from "@/hooks/useOfficeResources";
 
 const Office = () => {
-  const { lowStockSupplies } = useOfficeResources();
+  const { lowStockSupplies, overdueTasks } = useOfficeResources();
 
   return (
     <DashboardLayout>
@@ -26,7 +27,14 @@ const Office = () => {
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="scheduling">Scheduling</TabsTrigger>
-            <TabsTrigger value="tasks">Tasks</TabsTrigger>
+            <TabsTrigger value="tasks">
+              Tasks
+              {overdueTasks && overdueTasks.length > 0 && (
+                <span className="ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {overdueTasks.length}
+                </span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="resources">
               Resources
               {lowStockSupplies.length > 0 && (
@@ -63,9 +71,9 @@ const Office = () => {
                   <CheckSquare className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">8</div>
+                  <div className="text-2xl font-bold">{overdueTasks ? overdueTasks.length : 0}</div>
                   <p className="text-xs text-muted-foreground">
-                    3 are high priority
+                    {overdueTasks && overdueTasks.length > 0 ? 'Overdue tasks need attention' : 'No overdue tasks'}
                   </p>
                 </CardContent>
               </Card>
@@ -162,19 +170,7 @@ const Office = () => {
           </TabsContent>
           
           <TabsContent value="tasks" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Office Tasks</CardTitle>
-                <CardDescription>
-                  Manage daily tasks and workflows
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[400px] flex items-center justify-center bg-muted/30 rounded-md">
-                  <p className="text-muted-foreground">Task management system coming soon</p>
-                </div>
-              </CardContent>
-            </Card>
+            <ScheduledTasksManagement />
           </TabsContent>
           
           <TabsContent value="resources" className="space-y-6">
