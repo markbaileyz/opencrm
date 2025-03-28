@@ -1,3 +1,4 @@
+
 /// <reference lib="webworker" />
 import { VERSION } from './version';
 
@@ -79,6 +80,37 @@ sw.addEventListener('message', (event) => {
     event.ports[0].postMessage({
       version: APP_VERSION
     });
+  } else if (event.data && event.data.type === 'SKIP_WAITING') {
+    // This will activate the waiting service worker
+    sw.skipWaiting();
+  }
+});
+
+// Background sync event handler
+sw.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-offline-data') {
+    event.waitUntil(
+      // This would normally process queued actions stored in IndexedDB
+      // For simplicity, we're just logging the event
+      (async () => {
+        console.log('[Service Worker] Processing background sync');
+        
+        // Simulate processing time
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        console.log('[Service Worker] Background sync completed');
+        
+        // This would normally post a message back to the client
+        // to notify that sync has completed
+        const clients = await sw.clients.matchAll();
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'SYNC_COMPLETED',
+            timestamp: Date.now()
+          });
+        });
+      })()
+    );
   }
 });
 

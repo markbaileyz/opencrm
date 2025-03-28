@@ -108,3 +108,43 @@ const checkVersion = (registration: ServiceWorkerRegistration) => {
     );
   }
 };
+
+/**
+ * Register for background sync if available
+ * @returns {Promise<boolean>} Whether registration was successful
+ */
+export const registerBackgroundSync = async (): Promise<boolean> => {
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      await registration.sync.register('sync-offline-data');
+      console.log('Background sync registered');
+      return true;
+    } catch (error) {
+      console.error('Background sync registration failed:', error);
+      return false;
+    }
+  }
+  console.log('Background sync not supported');
+  return false;
+};
+
+/**
+ * Add event listeners for online/offline events
+ * @param onlineCallback Function to call when online status changes to online
+ * @param offlineCallback Function to call when online status changes to offline
+ * @returns Cleanup function to remove event listeners
+ */
+export const addNetworkStatusListeners = (
+  onlineCallback: () => void,
+  offlineCallback: () => void
+): () => void => {
+  window.addEventListener('online', onlineCallback);
+  window.addEventListener('offline', offlineCallback);
+  
+  // Return a cleanup function
+  return () => {
+    window.removeEventListener('online', onlineCallback);
+    window.removeEventListener('offline', offlineCallback);
+  };
+};
