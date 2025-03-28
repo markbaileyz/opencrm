@@ -1,9 +1,8 @@
-
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { GuideProvider } from "./contexts/GuideContext";
-import DashboardLayout from "./components/layout/DashboardLayout";
+import DashboardLayout from "./components/DashboardLayout";
 import Dashboard from "./components/dashboard/Dashboard";
 import FloatingGuideButton from "./components/guides/FloatingGuideButton";
 import GuideViewer from "./components/guides/GuideViewer";
