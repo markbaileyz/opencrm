@@ -1,274 +1,256 @@
 
 import React, { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import CallTrackingList from "@/components/calls/CallTrackingList";
-import CallForm from "@/components/calls/CallForm";
-import { CallRecord } from "@/types/callTracking";
-import { Button } from "@/components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import CallTrackingList from "@/components/call-tracking/CallTrackingList";
+import CallDetailsView from "@/components/call-tracking/CallDetailsView";
+import CallLogForm from "@/components/call-tracking/CallLogForm";
+import CallAnalyticsDashboard from "@/components/call-tracking/analytics/CallAnalyticsDashboard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CallRecord } from "@/types/call";
 import { useToast } from "@/hooks/use-toast";
-import { format, addDays, subDays, subWeeks } from "date-fns";
-import { 
-  Phone, 
-  PhoneMissed, 
-  Timer, 
-  BarChart2, 
-  Users,
-  Calendar
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-// Mock data - in a real app, this would come from an API
-const mockCallRecords: CallRecord[] = [
+// Sample data - this would typically come from an API
+const sampleCalls: CallRecord[] = [
   {
-    id: "1",
-    patientId: "P12345",
-    direction: "inbound",
-    status: "completed",
-    priority: "normal",
-    timestamp: format(subDays(new Date(), 1), "yyyy-MM-dd'T'10:30:00"),
-    duration: 124,
-    notes: "Patient called with questions about their medication schedule.",
-    staffMember: "Dr. Sarah Johnson",
-    tags: ["medication", "question"]
+    id: "call-1",
+    type: "incoming",
+    contactName: "John Smith",
+    phoneNumber: "(555) 123-4567",
+    timestamp: new Date("2023-05-01T09:30:00").toISOString(),
+    duration: 320, // in seconds
+    purpose: "Appointment scheduling",
+    notes: "Patient wanted to reschedule their appointment for next week",
+    patientName: "John Smith",
+    followUp: {
+      date: "2023-05-03",
+      status: "pending",
+      notes: "Call to confirm appointment details"
+    }
   },
   {
-    id: "2",
-    patientId: "P67890",
-    direction: "outbound",
-    status: "completed",
-    priority: "normal",
-    timestamp: format(subDays(new Date(), 2), "yyyy-MM-dd'T'14:15:00"),
-    duration: 305,
-    notes: "Called to confirm upcoming appointment. Patient confirmed they will attend.",
-    staffMember: "Nurse Mike Reynolds",
-    followUpRequired: true,
-    followUpDate: format(addDays(new Date(), 5), "yyyy-MM-dd"),
-    tags: ["appointment", "confirmation"]
+    id: "call-2",
+    type: "outgoing",
+    contactName: "Sarah Johnson",
+    phoneNumber: "(555) 234-5678",
+    timestamp: new Date("2023-05-01T11:15:00").toISOString(),
+    duration: 180,
+    purpose: "Prescription refill inquiry",
+    notes: "Called to discuss prescription refill options",
+    patientName: "Sarah Johnson"
   },
   {
-    id: "3",
-    patientId: "P54321",
-    direction: "inbound",
-    status: "missed",
-    priority: "urgent",
-    timestamp: format(subDays(new Date(), 2), "yyyy-MM-dd'T'09:05:00"),
-    tags: ["missed", "urgent"]
+    id: "call-3",
+    type: "missed",
+    contactName: "Michael Davis",
+    phoneNumber: "(555) 345-6789",
+    timestamp: new Date("2023-05-02T13:45:00").toISOString(),
+    duration: 0,
+    purpose: "Unknown",
+    patientName: "Michael Davis"
   },
   {
-    id: "4",
-    patientId: "P24680",
-    direction: "outbound",
-    status: "scheduled",
-    priority: "follow-up",
-    timestamp: format(addDays(new Date(), 1), "yyyy-MM-dd'T'11:00:00"),
-    notes: "Scheduled follow-up call to discuss lab results.",
-    staffMember: "Dr. James Wilson",
-    tags: ["lab results", "follow-up"]
+    id: "call-4",
+    type: "incoming",
+    contactName: "Emma Wilson",
+    phoneNumber: "(555) 456-7890",
+    timestamp: new Date("2023-05-02T15:30:00").toISOString(),
+    duration: 240,
+    purpose: "Billing inquiry",
+    notes: "Patient had questions about recent invoice",
+    patientName: "Emma Wilson"
   },
   {
-    id: "5",
-    patientId: "P13579",
-    direction: "inbound",
-    status: "completed",
-    priority: "normal",
-    timestamp: format(new Date(), "yyyy-MM-dd'T'08:45:00"),
-    duration: 178,
-    notes: "Patient reporting new symptoms. Advised to come in for check-up tomorrow.",
-    staffMember: "Dr. Emma Thompson",
-    followUpRequired: true,
-    followUpDate: format(addDays(new Date(), 1), "yyyy-MM-dd"),
-    tags: ["symptoms", "check-up"]
+    id: "call-5",
+    type: "outgoing",
+    contactName: "Robert Brown",
+    phoneNumber: "(555) 567-8901",
+    timestamp: new Date("2023-05-03T10:00:00").toISOString(),
+    duration: 420,
+    purpose: "Test results discussion",
+    notes: "Called to discuss recent lab results",
+    patientName: "Robert Brown",
+    followUp: {
+      date: "2023-05-10",
+      status: "pending",
+      notes: "Schedule follow-up appointment based on test results"
+    }
+  },
+  {
+    id: "call-6",
+    type: "scheduled",
+    contactName: "Jennifer Lee",
+    phoneNumber: "(555) 678-9012",
+    timestamp: new Date("2023-05-05T14:00:00").toISOString(),
+    duration: 0,
+    purpose: "Initial consultation",
+    notes: "Scheduled call for new patient consultation",
+    patientName: "Jennifer Lee"
   }
 ];
 
-const CallTracking: React.FC = () => {
-  const [calls, setCalls] = useState<CallRecord[]>(mockCallRecords);
-  const [selectedCallId, setSelectedCallId] = useState<string | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingCall, setEditingCall] = useState<CallRecord | undefined>(undefined);
+const CallTracking = () => {
   const { toast } = useToast();
+  const [calls, setCalls] = useState<CallRecord[]>(sampleCalls);
+  const [selectedCallId, setSelectedCallId] = useState<string | null>(null);
+  const [isCreateCallOpen, setIsCreateCallOpen] = useState(false);
+  const [isEditCallOpen, setIsEditCallOpen] = useState(false);
+  const [callToEdit, setCallToEdit] = useState<CallRecord | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("list");
 
-  const handleAddCall = () => {
-    setEditingCall(undefined);
-    setIsFormOpen(true);
+  const handleViewCallDetails = (callId: string) => {
+    setSelectedCallId(callId);
   };
 
-  const handleViewCall = (callId: string) => {
+  const handleBackToList = () => {
+    setSelectedCallId(null);
+  };
+
+  const handleCreateCall = () => {
+    setIsCreateCallOpen(true);
+  };
+
+  const handleEditCall = (callId: string) => {
     const call = calls.find(c => c.id === callId);
     if (call) {
-      setEditingCall(call);
-      setIsFormOpen(true);
+      setCallToEdit(call);
+      setIsEditCallOpen(true);
     }
   };
 
-  const handleSaveCall = (callData: Partial<CallRecord>) => {
-    if (callData.id) {
-      // Update existing call
-      setCalls(prevCalls => 
-        prevCalls.map(call => 
-          call.id === callData.id ? { ...call, ...callData } as CallRecord : call
-        )
-      );
-      toast({
-        title: "Call updated",
-        description: "Call record has been updated successfully.",
-      });
-    } else {
-      // Create new call
-      const newCall: CallRecord = {
-        id: `call-${Date.now()}`,
-        ...callData as Omit<CallRecord, 'id'>
-      } as CallRecord;
-      
-      setCalls(prevCalls => [newCall, ...prevCalls]);
-      toast({
-        title: "Call logged",
-        description: "New call has been recorded successfully.",
-      });
+  const handleDeleteCall = (callId: string) => {
+    setCalls(prev => prev.filter(call => call.id !== callId));
+    toast({
+      title: "Call Deleted",
+      description: "The call record has been deleted successfully",
+    });
+    
+    if (selectedCallId === callId) {
+      setSelectedCallId(null);
     }
   };
 
-  // Calculate call statistics
-  const totalCalls = calls.length;
-  const inboundCalls = calls.filter(call => call.direction === "inbound").length;
-  const outboundCalls = calls.filter(call => call.direction === "outbound").length;
-  const missedCalls = calls.filter(call => call.status === "missed").length;
-  const scheduledCalls = calls.filter(call => call.status === "scheduled").length;
-  
-  const completedCalls = calls.filter(call => call.status === "completed");
-  const totalDuration = completedCalls.reduce((sum, call) => sum + (call.duration || 0), 0);
-  const averageDuration = completedCalls.length > 0 
-    ? Math.round(totalDuration / completedCalls.length) 
-    : 0;
+  const handleSaveCall = (call: Omit<CallRecord, "id">) => {
+    const newCall: CallRecord = {
+      ...call,
+      id: `call-${Date.now()}`,
+    };
+    
+    setCalls(prev => [newCall, ...prev]);
+    setIsCreateCallOpen(false);
+    
+    toast({
+      title: "Call Logged",
+      description: "The call has been logged successfully",
+    });
+  };
 
-  const formatDuration = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  const handleUpdateCall = (updatedCall: CallRecord) => {
+    setCalls(prev => prev.map(call => 
+      call.id === updatedCall.id ? updatedCall : call
+    ));
+    
+    setIsEditCallOpen(false);
+    setCallToEdit(null);
+    
+    toast({
+      title: "Call Updated",
+      description: "The call record has been updated successfully",
+    });
+  };
+
+  const handleScheduleFollowUp = (callId: string, date: string, notes: string) => {
+    setCalls(prev => prev.map(call => 
+      call.id === callId 
+        ? { 
+            ...call, 
+            followUp: { 
+              date, 
+              notes, 
+              status: "pending" 
+            } 
+          } 
+        : call
+    ));
+    
+    toast({
+      title: "Follow-up Scheduled",
+      description: "A follow-up has been scheduled successfully",
+    });
+  };
+
+  const handleCompleteFollowUp = (callId: string) => {
+    setCalls(prev => prev.map(call => 
+      call.id === callId && call.followUp 
+        ? { 
+            ...call, 
+            followUp: { 
+              ...call.followUp, 
+              status: "completed" 
+            } 
+          } 
+        : call
+    ));
+    
+    toast({
+      title: "Follow-up Completed",
+      description: "The follow-up has been marked as completed",
+    });
   };
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Call Tracking</h1>
-          <p className="text-muted-foreground">
-            Manage and track patient calls and follow-ups
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Calls</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center">
-                <span className="text-2xl font-bold">{totalCalls}</span>
-                <Phone className="h-5 w-5 text-primary" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Missed Calls</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center">
-                <span className="text-2xl font-bold">{missedCalls}</span>
-                <PhoneMissed className="h-5 w-5 text-destructive" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Avg. Call Duration</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center">
-                <span className="text-2xl font-bold">{formatDuration(averageDuration)}</span>
-                <Timer className="h-5 w-5 text-amber-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Scheduled Calls</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center">
-                <span className="text-2xl font-bold">{scheduledCalls}</span>
-                <Calendar className="h-5 w-5 text-blue-500" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Tabs defaultValue="all">
+      <div className="container mx-auto p-4 space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-4">
-            <TabsTrigger value="all">All Calls</TabsTrigger>
-            <TabsTrigger value="inbound">Inbound ({inboundCalls})</TabsTrigger>
-            <TabsTrigger value="outbound">Outbound ({outboundCalls})</TabsTrigger>
-            <TabsTrigger value="missed">Missed ({missedCalls})</TabsTrigger>
-            <TabsTrigger value="scheduled">Scheduled ({scheduledCalls})</TabsTrigger>
+            <TabsTrigger value="list">Call Log</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="all">
-            <CallTrackingList 
-              calls={calls} 
-              onAddCall={handleAddCall} 
-              onViewCall={handleViewCall} 
-            />
+          
+          <TabsContent value="list">
+            {selectedCallId ? (
+              <CallDetailsView
+                callId={selectedCallId}
+                calls={calls}
+                onBack={handleBackToList}
+                onDeleteCall={handleDeleteCall}
+                onEditCall={handleEditCall}
+                onScheduleFollowUp={handleScheduleFollowUp}
+                onCompleteFollowUp={handleCompleteFollowUp}
+              />
+            ) : (
+              <CallTrackingList
+                calls={calls}
+                onViewCallDetails={handleViewCallDetails}
+                onCreateCall={handleCreateCall}
+                onDeleteCall={handleDeleteCall}
+                onEditCall={handleEditCall}
+              />
+            )}
           </TabsContent>
-
-          <TabsContent value="inbound">
-            <CallTrackingList 
-              calls={calls.filter(call => call.direction === "inbound")} 
-              onAddCall={handleAddCall} 
-              onViewCall={handleViewCall} 
-            />
-          </TabsContent>
-
-          <TabsContent value="outbound">
-            <CallTrackingList 
-              calls={calls.filter(call => call.direction === "outbound")} 
-              onAddCall={handleAddCall} 
-              onViewCall={handleViewCall} 
-            />
-          </TabsContent>
-
-          <TabsContent value="missed">
-            <CallTrackingList 
-              calls={calls.filter(call => call.status === "missed")} 
-              onAddCall={handleAddCall} 
-              onViewCall={handleViewCall} 
-            />
-          </TabsContent>
-
-          <TabsContent value="scheduled">
-            <CallTrackingList 
-              calls={calls.filter(call => call.status === "scheduled")} 
-              onAddCall={handleAddCall} 
-              onViewCall={handleViewCall} 
-            />
+          
+          <TabsContent value="analytics">
+            <CallAnalyticsDashboard calls={calls} />
           </TabsContent>
         </Tabs>
-
-        <CallForm 
-          open={isFormOpen}
-          onOpenChange={setIsFormOpen}
+        
+        <CallLogForm
+          isOpen={isCreateCallOpen}
+          onClose={() => setIsCreateCallOpen(false)}
           onSave={handleSaveCall}
-          initialData={editingCall}
         />
+        
+        {callToEdit && (
+          <CallLogForm
+            isOpen={isEditCallOpen}
+            onClose={() => {
+              setIsEditCallOpen(false);
+              setCallToEdit(null);
+            }}
+            onSave={(callData) => handleUpdateCall({ ...callData, id: callToEdit.id })}
+            initialData={callToEdit}
+            isEditing
+          />
+        )}
       </div>
     </DashboardLayout>
   );
