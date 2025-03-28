@@ -10,6 +10,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import HealthcareWorkflowTemplates from "./HealthcareWorkflowTemplates";
 import TemplatePreview from "./TemplatePreview";
+import BranchPatternSelector from "./BranchPatternSelector";
 
 interface HealthcareTemplatesDialogProps {
   open: boolean;
@@ -24,6 +25,7 @@ const HealthcareTemplatesDialog: React.FC<HealthcareTemplatesDialogProps> = ({
 }) => {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [currentTab, setCurrentTab] = useState("healthcare");
 
   const handleUseTemplate = (templateId: string) => {
     setSelectedTemplateId(templateId);
@@ -46,14 +48,19 @@ const HealthcareTemplatesDialog: React.FC<HealthcareTemplatesDialogProps> = ({
             </DialogDescription>
           </DialogHeader>
           
-          <Tabs defaultValue="healthcare" className="mt-4">
+          <Tabs value={currentTab} onValueChange={setCurrentTab} className="mt-4">
             <TabsList className="mb-4">
               <TabsTrigger value="healthcare">Healthcare Templates</TabsTrigger>
+              <TabsTrigger value="branch-patterns">Branch Patterns</TabsTrigger>
               <TabsTrigger value="general">General Templates</TabsTrigger>
             </TabsList>
             
             <TabsContent value="healthcare" className="mt-0">
               <HealthcareWorkflowTemplates onUseTemplate={handleUseTemplate} />
+            </TabsContent>
+            
+            <TabsContent value="branch-patterns" className="mt-0">
+              <BranchPatternSelector onUseTemplate={handleUseTemplate} />
             </TabsContent>
             
             <TabsContent value="general" className="mt-0">

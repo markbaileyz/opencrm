@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Plus, FileText } from "lucide-react";
 import HealthcareTemplatesDialog from "./templates/HealthcareTemplatesDialog";
+import { templateToWorkflow } from "./templates/templateUtils";
 
 const WorkflowList: React.FC = () => {
   const {
@@ -50,6 +51,14 @@ const WorkflowList: React.FC = () => {
   // New state for healthcare templates dialog
   const [isHealthcareTemplatesOpen, setIsHealthcareTemplatesOpen] = useState(false);
   
+  // Handle healthcare template selection
+  const handleUseHealthcareTemplate = (templateId: string) => {
+    // Convert template to workflow data
+    const workflowData = templateToWorkflow(templateId);
+    // Use the existing handleUseTemplate function with the converted data
+    handleUseTemplate(workflowData);
+  };
+
   // If a workflow is selected, show its details
   if (selectedWorkflowId) {
     const selectedWorkflow = workflows.find(w => w.id === selectedWorkflowId);
@@ -152,14 +161,14 @@ const WorkflowList: React.FC = () => {
       <WorkflowTemplates
         open={isTemplatesDialogOpen}
         onOpenChange={setIsTemplatesDialogOpen}
-        onUseTemplate={handleUseTemplate}
+        onUseTemplate={(templateId) => handleUseTemplate(templateToWorkflow(templateId))}
       />
       
       {/* Healthcare templates dialog */}
       <HealthcareTemplatesDialog
         open={isHealthcareTemplatesOpen}
         onOpenChange={setIsHealthcareTemplatesOpen}
-        onUseTemplate={handleUseTemplate}
+        onUseTemplate={handleUseHealthcareTemplate}
       />
     </div>
   );
