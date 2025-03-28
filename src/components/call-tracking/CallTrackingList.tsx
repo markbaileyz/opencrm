@@ -9,10 +9,8 @@ import {
   TableCell 
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Search, 
   PlusCircle, 
   MoreHorizontal, 
   Phone,
@@ -28,8 +26,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { format, formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow, isAfter, isBefore } from "date-fns";
 import { CallRecord } from "@/types/call";
+import CallFilters from "./CallFilters";
 
 interface CallTrackingListProps {
   calls: CallRecord[];
@@ -47,19 +46,45 @@ const CallTrackingList: React.FC<CallTrackingListProps> = ({
   onEditCall,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [dateRange, setDateRange] = useState<{from?: Date; to?: Date}>({});
   
   const filteredCalls = calls.filter((call) => {
-    if (!searchQuery) return true;
-    
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      call.contactName.toLowerCase().includes(searchLower) ||
-      call.patientName?.toLowerCase().includes(searchLower) ||
+    // Search filter
+    const searchMatches = !searchQuery ? true : (
+      call.contactName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      call.patientName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       call.phoneNumber.includes(searchQuery) ||
-      call.purpose?.toLowerCase().includes(searchLower) ||
-      call.notes?.toLowerCase().includes(searchLower)
+      call.purpose?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      call.notes?.toLowerCase().includes(searchQuery.toLowerCase())
     );
+    
+    // Type filter
+    const typeMatches = selectedTypes.length === 0 || selectedTypes.includes(call.type);
+    
+    // Date range filter
+    let dateMatches = true;
+    const callDate = new Date(call.timestamp);
+    
+    if (dateRange.from) {
+      dateMatches = dateMatches && isAfter(callDate, dateRange.from);
+    }
+    
+    if (dateRange.to) {
+      // Add one day to include the end date fully
+      const endDate = new Date(dateRange.to);
+      endDate.setDate(endDate.getDate() + 1);
+      dateMatches = dateMatches && isBefore(callDate, endDate);
+    }
+    
+    return searchMatches && typeMatches && dateMatches;
   });
+
+  const resetFilters = () => {
+    setSearchQuery("");
+    setSelectedTypes([]);
+    setDateRange({});
+  };
 
   const getCallTypeBadge = (type: string) => {
     switch (type) {
@@ -92,20 +117,22 @@ const CallTrackingList: React.FC<CallTrackingListProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <div className="relative w-64">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search calls..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8"
-          />
-        </div>
+        <div className="text-2xl font-bold">Call Log</div>
         <Button onClick={onCreateCall}>
           <PlusCircle className="h-4 w-4 mr-2" />
           Log Call
         </Button>
       </div>
+
+      <CallFilters
+        onSearchChange={setSearchQuery}
+        onTypeFilterChange={setSelectedTypes}
+        onDateRangeChange={setDateRange}
+        onReset={resetFilters}
+        searchQuery={searchQuery}
+        selectedTypes={selectedTypes}
+        dateRange={dateRange}
+      />
 
       {filteredCalls.length > 0 ? (
         <div className="border rounded-md">
@@ -186,8 +213,8 @@ const CallTrackingList: React.FC<CallTrackingListProps> = ({
           <Phone className="h-12 w-12 text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium mb-1">No calls found</h3>
           <p className="text-muted-foreground text-center mb-4 max-w-md">
-            {searchQuery 
-              ? "No calls match your search criteria. Try different keywords or clear your search."
+            {searchQuery || selectedTypes.length > 0 || dateRange.from || dateRange.to 
+              ? "No calls match your filter criteria. Try different filters or clear your search."
               : "There are no calls recorded yet. Start by logging a new call."}
           </p>
           <Button onClick={onCreateCall}>
