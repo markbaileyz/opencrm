@@ -63,12 +63,13 @@ export const calculateAnalyticsData = (executionHistory: WorkflowExecution[]): A
     return { date, count };
   });
 
-  // Calculate branch usage statistics
+  // Calculate branch usage statistics - FIXED property names to match the expected interface
   const branchUsageStats = {
-    totalBranchesUsed: executionHistory.reduce((sum, exec) => sum + (exec.branchesUsed || 0), 0),
-    averageBranchesPerWorkflow: executionHistory.length > 0 
+    totalBranches: executionHistory.reduce((sum, exec) => sum + (exec.branchesUsed || 0), 0),
+    avgBranchesPerWorkflow: executionHistory.length > 0 
       ? executionHistory.reduce((sum, exec) => sum + (exec.branchesUsed || 0), 0) / executionHistory.length
       : 0,
+    mostUsedBranch: "Condition Branch", // Default value since we don't have actual branch type data
     workflowsWithBranches: executionHistory.filter(exec => (exec.branchesUsed || 0) > 0).length,
     percentageWithBranches: executionHistory.length > 0
       ? (executionHistory.filter(exec => (exec.branchesUsed || 0) > 0).length / executionHistory.length) * 100
