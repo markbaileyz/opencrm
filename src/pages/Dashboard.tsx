@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import StatsGrid from "@/components/dashboard/StatsGrid";
 import ActivityChart from "@/components/dashboard/ActivityChart";
@@ -19,11 +19,13 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { OrganizationsProvider } from "@/context/OrganizationsContext";
 import { useWorkflows } from "@/components/workflows/hooks/useWorkflows";
 import { useToast } from "@/hooks/use-toast";
+import { useExecutionHistory } from "@/components/workflows/hooks/useExecutionHistory";
 
 const Dashboard = () => {
   const { isOnline, pendingActions, isSyncing, processPendingActions } = useOfflineState();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const { toast } = useToast();
+  const { addExecutionRecord } = useExecutionHistory();
   
   // Get workflows data for the execution monitor
   const { 
@@ -43,6 +45,30 @@ const Dashboard = () => {
     { name: "Jun", value: 58 },
     { name: "Jul", value: 80 }
   ];
+  
+  // Show welcome notification on dashboard load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      toast({
+        title: "Welcome to Workflow Monitor",
+        description: "You'll receive real-time notifications for workflow events here.",
+        variant: "info"
+      });
+      
+      // Add a sample execution record to demonstrate the functionality
+      if (workflows.length > 0) {
+        const workflow = workflows[0];
+        addExecutionRecord({
+          workflowId: workflow.id,
+          workflowName: workflow.name,
+          success: true,
+          message: "Workflow monitoring activated"
+        });
+      }
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, [toast, workflows, addExecutionRecord]);
   
   // Function to handle view workflow details with toast notification
   const handleViewDetails = (id: string) => {

@@ -6,18 +6,23 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Pause, Eye, RotateCcw } from "lucide-react";
 import { calculateProgress } from "./utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface WorkflowExecutionCardProps {
   workflow: Workflow;
   onPause: (id: string) => void;
   onViewDetails: (id: string) => void;
+  onRestart?: (id: string) => void;
 }
 
 const WorkflowExecutionCard: React.FC<WorkflowExecutionCardProps> = ({
   workflow,
   onPause,
-  onViewDetails
+  onViewDetails,
+  onRestart
 }) => {
+  const { toast } = useToast();
+  
   // Calculate execution progress based on steps
   const progress = calculateProgress(workflow);
   
@@ -25,6 +30,28 @@ const WorkflowExecutionCard: React.FC<WorkflowExecutionCardProps> = ({
   const lastRunTime = workflow.lastRun 
     ? new Date(workflow.lastRun).toLocaleString()
     : "Not run yet";
+  
+  // Handle pause with notification
+  const handlePause = () => {
+    toast({
+      title: "Workflow Paused",
+      description: `"${workflow.name}" has been paused.`,
+      variant: "info"
+    });
+    onPause(workflow.id);
+  };
+  
+  // Handle restart with notification
+  const handleRestart = () => {
+    if (onRestart) {
+      toast({
+        title: "Workflow Restarted",
+        description: `"${workflow.name}" is now running.`,
+        variant: "success"
+      });
+      onRestart(workflow.id);
+    }
+  };
   
   return (
     <Card className="border-l-4 border-l-primary">
@@ -49,9 +76,14 @@ const WorkflowExecutionCard: React.FC<WorkflowExecutionCardProps> = ({
           </div>
           
           <div className="col-span-2 flex items-center justify-end space-x-2">
-            <Button variant="outline" size="icon" onClick={() => onPause(workflow.id)}>
+            <Button variant="outline" size="icon" onClick={handlePause}>
               <Pause className="h-4 w-4" />
             </Button>
+            {onRestart && (
+              <Button variant="outline" size="icon" onClick={handleRestart}>
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            )}
             <Button variant="outline" size="icon" onClick={() => onViewDetails(workflow.id)}>
               <Eye className="h-4 w-4" />
             </Button>

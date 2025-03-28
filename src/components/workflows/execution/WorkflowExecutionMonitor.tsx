@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { useExecutionHistory } from "../hooks/useExecutionHistory";
 import WorkflowExecutionEmpty from "./WorkflowExecutionEmpty";
 import WorkflowExecutionHistory from "./WorkflowExecutionHistory";
 import WorkflowExecutionCard from "./WorkflowExecutionCard";
+import { useToast } from "@/hooks/use-toast";
 
 interface WorkflowExecutionMonitorProps {
   workflows: Workflow[];
@@ -27,14 +28,81 @@ const WorkflowExecutionMonitor: React.FC<WorkflowExecutionMonitorProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<"active" | "history">("active");
   const [filterStatus, setFilterStatus] = useState<WorkflowStatus | "all">("all");
+  const { toast } = useToast();
   
-  const { executionHistory, clearHistory } = useExecutionHistory();
+  const { executionHistory, clearHistory, addExecutionRecord } = useExecutionHistory();
   
   const activeWorkflows = workflows.filter(w => w.status === "active");
   
   const filteredWorkflows = filterStatus === "all" 
     ? activeWorkflows 
     : activeWorkflows.filter(w => w.status === filterStatus);
+
+  // Simulate workflow events for demo purposes
+  useEffect(() => {
+    const simulateWorkflowEvent = () => {
+      if (activeWorkflows.length > 0) {
+        const randomWorkflow = activeWorkflows[Math.floor(Math.random() * activeWorkflows.length)];
+        const events = [
+          { type: "step_complete", success: true, message: "Email notification sent successfully" },
+          { type: "step_complete", success: true, message: "Task created for follow-up" },
+          { type: "warning", success: true, message: "Waiting for external system response" },
+          { type: "error", success: false, message: "Failed to connect to external API" }
+        ];
+        
+        const randomEvent = events[Math.floor(Math.random() * events.length)];
+        
+        // Add to execution history
+        addExecutionRecord({
+          workflowId: randomWorkflow.id,
+          workflowName: randomWorkflow.name,
+          success: randomEvent.success,
+          message: randomEvent.message
+        });
+        
+        // Show toast notification based on event type
+        if (randomEvent.type === "error") {
+          toast({
+            title: "Workflow Error",
+            description: `${randomWorkflow.name}: ${randomEvent.message}`,
+            variant: "destructive"
+          });
+        } else if (randomEvent.type === "warning") {
+          toast({
+            title: "Workflow Warning",
+            description: `${randomWorkflow.name}: ${randomEvent.message}`,
+            variant: "warning"
+          });
+        } else {
+          toast({
+            title: "Workflow Update",
+            description: `${randomWorkflow.name}: ${randomEvent.message}`,
+            variant: "success"
+          });
+        }
+      }
+    };
+    
+    // Simulate events every 30 seconds if there are active workflows
+    if (activeWorkflows.length > 0) {
+      const timer = setTimeout(simulateWorkflowEvent, 30000);
+      return () => clearTimeout(timer);
+    }
+  }, [activeWorkflows, addExecutionRecord, toast]);
+  
+  // Handle restart workflow
+  const handleRestartWorkflow = (id: string) => {
+    // Simulate restarting the workflow
+    addExecutionRecord({
+      workflowId: id,
+      workflowName: workflows.find(w => w.id === id)?.name || "Unknown workflow",
+      success: true,
+      message: "Workflow restarted successfully"
+    });
+    
+    // Ensure the workflow is active
+    onActivate(id);
+  };
   
   return (
     <Card className="shadow-md">
@@ -83,6 +151,7 @@ const WorkflowExecutionMonitor: React.FC<WorkflowExecutionMonitorProps> = ({
                     workflow={workflow}
                     onPause={onPause}
                     onViewDetails={onViewDetails}
+                    onRestart={handleRestartWorkflow}
                   />
                 ))}
               </div>

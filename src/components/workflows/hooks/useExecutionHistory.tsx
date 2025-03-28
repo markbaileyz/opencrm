@@ -1,5 +1,6 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export interface WorkflowExecution {
   id: string;
@@ -12,6 +13,7 @@ export interface WorkflowExecution {
 
 export const useExecutionHistory = () => {
   const [executionHistory, setExecutionHistory] = useState<WorkflowExecution[]>([]);
+  const { toast } = useToast();
 
   // On initial load, fetch history from localStorage
   useEffect(() => {
@@ -31,7 +33,7 @@ export const useExecutionHistory = () => {
   }, []);
 
   // Add a new execution record to history
-  const addExecutionRecord = (execution: Omit<WorkflowExecution, "id" | "timestamp">) => {
+  const addExecutionRecord = useCallback((execution: Omit<WorkflowExecution, "id" | "timestamp">) => {
     const newRecord: WorkflowExecution = {
       ...execution,
       id: `exec-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
@@ -43,13 +45,22 @@ export const useExecutionHistory = () => {
       localStorage.setItem("workflow-execution-history", JSON.stringify(updated));
       return updated;
     });
-  };
+    
+    // Show notification based on execution success/failure
+    toast({
+      title: execution.success ? "Workflow Step Completed" : "Workflow Error",
+      description: `${execution.workflowName}: ${execution.message}`,
+      variant: execution.success ? "success" : "destructive",
+    });
+    
+    return newRecord;
+  }, [toast]);
 
   // Clear the execution history
-  const clearHistory = () => {
+  const clearHistory = useCallback(() => {
     setExecutionHistory([]);
     localStorage.removeItem("workflow-execution-history");
-  };
+  }, []);
 
   return {
     executionHistory,

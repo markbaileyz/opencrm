@@ -5,6 +5,7 @@ import { Trash2, Calendar, CheckCircle, XCircle } from "lucide-react";
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { WorkflowExecution } from "../hooks/useExecutionHistory";
+import { useToast } from "@/hooks/use-toast";
 
 interface WorkflowExecutionHistoryProps {
   history: WorkflowExecution[];
@@ -15,6 +16,17 @@ const WorkflowExecutionHistory: React.FC<WorkflowExecutionHistoryProps> = ({
   history,
   onClear
 }) => {
+  const { toast } = useToast();
+
+  const handleClear = () => {
+    toast({
+      title: "History Cleared",
+      description: "Workflow execution history has been cleared.",
+      variant: "info"
+    });
+    onClear();
+  };
+
   if (history.length === 0) {
     return (
       <div className="text-center py-8">
@@ -27,7 +39,7 @@ const WorkflowExecutionHistory: React.FC<WorkflowExecutionHistoryProps> = ({
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-sm font-medium">Recent Executions</h3>
-        <Button variant="outline" size="sm" onClick={onClear}>
+        <Button variant="outline" size="sm" onClick={handleClear}>
           <Trash2 className="h-4 w-4 mr-2" />
           Clear History
         </Button>
