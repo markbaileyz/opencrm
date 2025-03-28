@@ -66,25 +66,23 @@ const Hero = ({ scrollToSection }: HeroProps) => {
   ];
 
   return (
-    <section className="pt-24 pb-16 md:pt-36 md:pb-24 overflow-hidden" id="home">
-      <div className="container mx-auto px-4 md:px-6">
+    <section className="overflow-hidden" id="home">
+      <div className="mx-auto">
         {/* Main Hero */}
         <MainHero scrollToSection={handleScrollToSection} />
         
         {/* Statistics */}
         <StatsGrid stats={statsData} />
         
-        {/* Trusted By Section */}
-        <div className="mt-20">
-          <TrustedBySection 
-            title="Trusted by Leading Healthcare Providers"
-            description="Join thousands of healthcare organizations that rely on OpenCRM to deliver exceptional patient experiences and streamline operations."
-            logos={partnerLogos}
-          />
-        </div>
+        {/* Industry Solutions Section (formerly Trusted By) */}
+        <TrustedBySection 
+          title="Explore Our Industry Solutions"
+          description="Specialized CRM solutions tailored for different industries with features designed to meet your unique needs"
+          logos={partnerLogos}
+        />
         
         {/* Perspective Sections */}
-        <div className="mt-32 space-y-32">
+        <div className="mt-32 space-y-32 container mx-auto px-4 md:px-6">
           {/* Admin's Perspective */}
           <PerspectiveSection
             title="Admin Dashboard"
@@ -142,7 +140,7 @@ const Hero = ({ scrollToSection }: HeroProps) => {
         </div>
 
         {/* Testimonials Preview */}
-        <div className="mt-32">
+        <div className="mt-32 container mx-auto px-4 md:px-6">
           <TestimonialsPreview
             title="What Healthcare Professionals Say"
             description="Hear from healthcare professionals who have transformed their practice with OpenCRM."
