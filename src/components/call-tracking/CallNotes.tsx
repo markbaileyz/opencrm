@@ -9,7 +9,7 @@ import FollowUpSection from "./notes/FollowUpSection";
 interface CallNotesProps {
   call: CallRecord;
   onUpdate: (callId: string, updates: Partial<CallRecord>) => void;
-  onScheduleFollowUp?: (callId: string, date: string) => void;
+  onScheduleFollowUp?: (callId: string, date: string, notes: string) => void;
 }
 
 const CallNotes: React.FC<CallNotesProps> = ({ 
@@ -37,7 +37,7 @@ const CallNotes: React.FC<CallNotesProps> = ({
     onUpdate(callId, { followUp });
     
     if (onScheduleFollowUp) {
-      onScheduleFollowUp(callId, date);
+      onScheduleFollowUp(callId, date, notes);
     }
     
     toast({
