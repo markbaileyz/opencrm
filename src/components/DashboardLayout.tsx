@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, ReactNode } from "react";
 import { Outlet } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -12,7 +12,11 @@ import MobileBottomNav from "@/components/ui/mobile-bottom-nav";
 import { useIsMobile } from "@/hooks/use-mobile";
 import VersionDisplay from "@/components/common/VersionDisplay";
 
-const DashboardLayout: React.FC = () => {
+interface DashboardLayoutProps {
+  children?: ReactNode;
+}
+
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
   
@@ -44,7 +48,7 @@ const DashboardLayout: React.FC = () => {
       </aside>
 
       <div className="flex-1 p-6 overflow-auto pb-16 md:pb-6">
-        <Outlet />
+        {children || <Outlet />}
       </div>
       
       {isMobile && <MobileBottomNav />}

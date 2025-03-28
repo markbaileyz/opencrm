@@ -22,7 +22,7 @@ import OfficeManagementPage from "./pages/Office";
 import HealthTrackerDashboard from "./components/health-tracker/HealthTrackerDashboard";
 import CallTrackingDashboard from "./pages/CallTracking";
 import WorkflowAutomationPage from "./pages/Workflows";
-import WorkflowAnalyticsDashboard from "./components/workflows/execution/WorkflowAnalyticsDashboard";
+import WorkflowAnalyticsDashboard from "./components/workflows/analytics/WorkflowAnalyticsDashboard";
 
 function App() {
   return (

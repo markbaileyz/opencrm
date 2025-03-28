@@ -1,14 +1,12 @@
 
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import WorkflowAnalyticsDashboard from "@/components/workflows/execution/analytics/WorkflowAnalyticsDashboard";
+import WorkflowAnalyticsDashboard from "@/components/workflows/analytics/WorkflowAnalyticsDashboard";
 
-const WorkflowAnalyticsPage = () => {
+const WorkflowAnalyticsPage: React.FC = () => {
   return (
     <DashboardLayout>
-      <div className="container mx-auto p-4">
-        <WorkflowAnalyticsDashboard />
-      </div>
+      <WorkflowAnalyticsDashboard />
     </DashboardLayout>
   );
 };
