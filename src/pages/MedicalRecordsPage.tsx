@@ -1,141 +1,109 @@
 
-import React from "react";
-import { ArrowLeft, FileText, Plus, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FileCheck, ChartBar, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import MedicalRecordsList from "@/components/medical-records/MedicalRecordsList";
+import MedicalRecordsStats from "@/components/medical-records/MedicalRecordsStats";
+import MedicalRecordsFilter from "@/components/medical-records/MedicalRecordsFilter";
+import { sampleMedicalRecords, getMedicalRecordStats } from "@/data/medicalRecordsData";
+import { MedicalRecordFilter } from "@/types/medicalRecord";
 
-const MedicalRecordsPage = () => {
-  const navigate = useNavigate();
+const MedicalRecordsPage: React.FC = () => {
+  const [activeFilter, setActiveFilter] = useState<MedicalRecordFilter>({});
+  const stats = getMedicalRecordStats();
 
-  const handleBack = () => {
-    navigate("/dashboard");
-  };
+  const filteredRecords = sampleMedicalRecords.filter(record => {
+    // Filter by record type
+    if (activeFilter.recordType && activeFilter.recordType.length > 0) {
+      if (!activeFilter.recordType.includes(record.recordType)) {
+        return false;
+      }
+    }
+    
+    // Filter by status
+    if (activeFilter.status && activeFilter.status.length > 0) {
+      if (!activeFilter.status.includes(record.status)) {
+        return false;
+      }
+    }
+    
+    // Filter by provider
+    if (activeFilter.provider && activeFilter.provider.length > 0) {
+      if (!activeFilter.provider.includes(record.provider)) {
+        return false;
+      }
+    }
+    
+    // Filter by date range
+    if (activeFilter.dateRange) {
+      const recordDate = new Date(record.date);
+      const fromDate = new Date(activeFilter.dateRange.from);
+      const toDate = new Date(activeFilter.dateRange.to);
+      
+      if (recordDate < fromDate || recordDate > toDate) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto p-4 space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" onClick={handleBack} size="sm">
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              Back to Dashboard
-            </Button>
-            <h1 className="text-2xl font-bold">Medical Records</h1>
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Medical Records</h1>
+            <p className="text-muted-foreground">
+              View and manage patient medical records
+            </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
-              <Search className="h-4 w-4 mr-1" />
-              Advanced Search
-            </Button>
-            <Button size="sm">
-              <Plus className="h-4 w-4 mr-1" />
-              Add Record
+            <MedicalRecordsFilter onFilterChange={setActiveFilter} />
+            <Button className="flex items-center gap-2">
+              <FileCheck className="h-4 w-4" />
+              <span>Add New Record</span>
             </Button>
           </div>
         </div>
 
-        <div className="relative">
-          <Input 
-            placeholder="Search medical records..." 
-            className="max-w-md"
-            icon={<Search className="h-4 w-4 text-muted-foreground" />}
-          />
-        </div>
-
-        <Tabs defaultValue="recent">
-          <TabsList>
-            <TabsTrigger value="recent">Recent Records</TabsTrigger>
-            <TabsTrigger value="all">All Records</TabsTrigger>
-            <TabsTrigger value="shared">Shared With Me</TabsTrigger>
+        <Tabs defaultValue="records" className="w-full">
+          <TabsList className="flex">
+            <TabsTrigger value="records" className="flex items-center gap-2">
+              <FileCheck className="h-4 w-4" />
+              <span>Records</span>
+            </TabsTrigger>
+            <TabsTrigger value="stats" className="flex items-center gap-2">
+              <ChartBar className="h-4 w-4" />
+              <span>Statistics</span>
+            </TabsTrigger>
+            <TabsTrigger value="patients" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              <span>Patient Selection</span>
+            </TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="recent" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[1, 2, 3, 4, 5].map((item) => (
-                <RecordCard 
-                  key={item}
-                  title={`Medical Examination ${item}`}
-                  date={new Date(2024, 3, item * 5).toLocaleDateString()}
-                  type="Examination"
-                  doctor="Dr. Smith"
-                />
-              ))}
-            </div>
+
+          <TabsContent value="records" className="mt-6">
+            <MedicalRecordsList records={filteredRecords} />
           </TabsContent>
-          
-          <TabsContent value="all" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-                <RecordCard 
-                  key={item}
-                  title={`Medical Record ${item}`}
-                  date={new Date(2024, item % 3, item * 3).toLocaleDateString()}
-                  type={item % 2 === 0 ? "Lab Results" : "Examination"}
-                  doctor={item % 3 === 0 ? "Dr. Johnson" : "Dr. Williams"}
-                />
-              ))}
-            </div>
+
+          <TabsContent value="stats" className="mt-6">
+            <MedicalRecordsStats stats={stats} />
           </TabsContent>
-          
-          <TabsContent value="shared" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <RecordCard 
-                title="Referral Letter"
-                date="04/10/2024"
-                type="Referral"
-                doctor="Dr. Adams"
-              />
-              <RecordCard 
-                title="Specialist Consultation"
-                date="03/28/2024"
-                type="Consultation"
-                doctor="Dr. Chen"
-              />
+
+          <TabsContent value="patients" className="mt-6">
+            <div className="text-center py-8">
+              <h3 className="text-lg font-medium mb-2">Patient Selection Coming Soon</h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                This feature will allow you to select specific patients to view their medical records.
+              </p>
             </div>
           </TabsContent>
         </Tabs>
       </div>
     </DashboardLayout>
-  );
-};
-
-interface RecordCardProps {
-  title: string;
-  date: string;
-  type: string;
-  doctor: string;
-}
-
-const RecordCard: React.FC<RecordCardProps> = ({ title, date, type, doctor }) => {
-  return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-lg">{title}</CardTitle>
-          <FileText className="h-5 w-5 text-muted-foreground" />
-        </div>
-        <CardDescription>Added on {date}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-1 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Type:</span>
-            <span>{type}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Doctor:</span>
-            <span>{doctor}</span>
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter className="pt-2">
-        <Button variant="outline" size="sm" className="w-full">View Details</Button>
-      </CardFooter>
-    </Card>
   );
 };
 
