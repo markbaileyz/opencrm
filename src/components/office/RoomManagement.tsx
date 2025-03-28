@@ -3,14 +3,16 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Check, Home, Search, Users } from "lucide-react";
-import { Room } from '@/types/office';
+import { Input } from "@/components/ui/input";
+import { Search, Home, Users } from "lucide-react";
 import { useOfficeResources } from '@/hooks/useOfficeResources';
+import { useToast } from '@/hooks/use-toast';
+import { Room } from '@/types/office';
 
 const RoomManagement: React.FC = () => {
   const { rooms, roomTypes, roomStatuses, updateRoomStatus, loading } = useOfficeResources();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -23,25 +25,31 @@ const RoomManagement: React.FC = () => {
     return matchesSearch && matchesType && matchesStatus;
   });
 
-  const getRoomTypeDisplay = (type: Room['type']) => {
-    switch (type) {
-      case 'waiting': return 'Waiting Room';
-      case 'appointment': return 'Appointment Room';
-      case 'office': return 'Office';
-      case 'restroom': return 'Restroom';
-      case 'break': return 'Break Room';
-      default: return 'Other';
+  const handleUpdateStatus = (roomId: string, status: Room['status']) => {
+    updateRoomStatus(roomId, status);
+    toast({
+      title: "Room Status Updated",
+      description: "The room status has been updated successfully."
+    });
+  };
+
+  const getStatusColor = (status: Room['status']) => {
+    switch (status) {
+      case 'available':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'occupied':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+      case 'maintenance':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      case 'reserved':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
     }
   };
 
-  const getStatusBadgeColor = (status: Room['status']) => {
-    switch (status) {
-      case 'available': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-      case 'occupied': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
-      case 'maintenance': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-      case 'reserved': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
-    }
+  const getTypeDisplay = (type: string) => {
+    return type.charAt(0).toUpperCase() + type.slice(1);
   };
 
   return (
@@ -49,7 +57,7 @@ const RoomManagement: React.FC = () => {
       <CardHeader>
         <CardTitle className="text-xl">Room Management</CardTitle>
         <CardDescription>
-          Manage office rooms and their availability
+          Monitor and manage office rooms and spaces
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -66,13 +74,13 @@ const RoomManagement: React.FC = () => {
           <div className="flex gap-2 flex-col sm:flex-row">
             <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Room type" />
+                <SelectValue placeholder="Room Type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
                 {roomTypes.map(type => (
                   <SelectItem key={type} value={type}>
-                    {getRoomTypeDisplay(type)}
+                    {getTypeDisplay(type)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -105,61 +113,53 @@ const RoomManagement: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredRooms.map((room) => (
-              <Card key={room.id} className="overflow-hidden">
-                <div className={`h-2 ${
-                  room.status === 'available' ? 'bg-green-500' :
-                  room.status === 'occupied' ? 'bg-blue-500' :
-                  room.status === 'maintenance' ? 'bg-yellow-500' : 
-                  'bg-purple-500'
-                }`} />
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-lg">{room.name}</CardTitle>
-                    <Badge variant="outline" className={getStatusBadgeColor(room.status)}>
+            {filteredRooms.map(room => (
+              <Card key={room.id} className="overflow-hidden border-t-4" style={{
+                borderTopColor: room.status === 'available' ? 'hsl(var(--success))' :
+                                room.status === 'occupied' ? 'hsl(var(--primary))' :
+                                room.status === 'maintenance' ? 'hsl(var(--warning))' :
+                                'hsl(var(--secondary))'
+              }}>
+                <CardContent className="p-4">
+                  <div className="flex justify-between mb-2">
+                    <h3 className="font-medium">{room.name}</h3>
+                    <Badge variant="outline" className={getStatusColor(room.status)}>
                       {room.status.charAt(0).toUpperCase() + room.status.slice(1)}
                     </Badge>
                   </div>
-                  <CardDescription>{getRoomTypeDisplay(room.type)}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center mb-2">
-                    <Users className="h-4 w-4 text-muted-foreground mr-1" />
-                    <span className="text-sm">Capacity: {room.capacity}</span>
-                  </div>
                   
-                  {room.equipment && room.equipment.length > 0 && (
-                    <div className="mb-4">
-                      <p className="text-sm font-medium mb-1">Equipment:</p>
-                      <div className="flex flex-wrap gap-1">
-                        {room.equipment.map((item, i) => (
-                          <Badge key={i} variant="secondary" className="text-xs">
-                            {item}
-                          </Badge>
-                        ))}
-                      </div>
+                  <div className="mt-2 space-y-2">
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Users className="h-4 w-4 mr-1" />
+                      <span>Capacity: {room.capacity}</span>
                     </div>
-                  )}
-                  
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    <Button 
-                      variant={room.status === 'available' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => updateRoomStatus(room.id, 'available')}
-                      className="flex-1"
-                    >
-                      {room.status === 'available' && <Check className="h-3 w-3 mr-1" />}
-                      Available
-                    </Button>
-                    <Button 
-                      variant={room.status === 'occupied' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => updateRoomStatus(room.id, 'occupied')}
-                      className="flex-1"
-                    >
-                      {room.status === 'occupied' && <Check className="h-3 w-3 mr-1" />}
-                      Occupied
-                    </Button>
+                    
+                    <div className="text-sm">
+                      <span className="font-medium">Type: </span>
+                      <span className="capitalize">{room.type}</span>
+                    </div>
+                    
+                    {room.equipment && room.equipment.length > 0 && (
+                      <div className="text-sm">
+                        <span className="font-medium">Equipment: </span>
+                        <span>{room.equipment.join(', ')}</span>
+                      </div>
+                    )}
+                    
+                    <div className="flex justify-between items-center mt-4 pt-2 border-t">
+                      <span className="text-sm text-muted-foreground">Change status:</span>
+                      <Select value={room.status} onValueChange={(status) => handleUpdateStatus(room.id, status as Room['status'])}>
+                        <SelectTrigger className="w-[120px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="available">Available</SelectItem>
+                          <SelectItem value="occupied">Occupied</SelectItem>
+                          <SelectItem value="maintenance">Maintenance</SelectItem>
+                          <SelectItem value="reserved">Reserved</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
