@@ -97,6 +97,39 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
           >
             Roadmap
           </NavLink>
+          <NavLink 
+            href="/front-desk" 
+            active={isActive("/front-desk")} 
+            onClick={() => {
+              closeMobileMenu();
+              navigate("/front-desk");
+            }}
+            className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
+          >
+            Front Desk
+          </NavLink>
+          <NavLink 
+            href="/office" 
+            active={isActive("/office")} 
+            onClick={() => {
+              closeMobileMenu();
+              navigate("/office");
+            }}
+            className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
+          >
+            Office
+          </NavLink>
+          <NavLink 
+            href="/compliance" 
+            active={isActive("/compliance")} 
+            onClick={() => {
+              closeMobileMenu();
+              navigate("/compliance");
+            }}
+            className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
+          >
+            Compliance
+          </NavLink>
         </div>
         
         <div className="mt-auto py-6 border-t">
