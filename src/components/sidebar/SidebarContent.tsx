@@ -50,6 +50,17 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
   const showFrontDeskSection = user?.role === "front-desk" || user?.role === "admin" || user?.role === "power-user";
   const showAdminSection = user?.role === "admin" || user?.role === "power-user";
   
+  // Helper function to render icon components properly
+  const renderIcon = (IconComponent: any) => {
+    // Check if IconComponent is a valid React element
+    if (React.isValidElement(IconComponent)) {
+      return IconComponent;
+    }
+    // Create an instance of the icon component
+    const Icon = IconComponent;
+    return <Icon size={20} />;
+  };
+  
   return (
     <nav className="space-y-6">
       {/* Base section */}
@@ -60,7 +71,7 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
             href={item.href}
             isActive={isActive(item.href)}
           >
-            {item.icon}
+            {renderIcon(item.icon)}
             <span>{item.title}</span>
           </SidebarLink>
         ))}
@@ -79,7 +90,7 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
                 href={item.href}
                 isActive={isActive(item.href)}
               >
-                {item.icon}
+                {renderIcon(item.icon)}
                 <span>{item.title}</span>
               </SidebarLink>
             ))}
@@ -100,7 +111,7 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
                 href={item.href}
                 isActive={isActive(item.href)}
               >
-                {item.icon}
+                {renderIcon(item.icon)}
                 <span>{item.title}</span>
               </SidebarLink>
             ))}
@@ -121,7 +132,7 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
                 href={item.href}
                 isActive={isActive(item.href)}
               >
-                {item.icon}
+                {renderIcon(item.icon)}
                 <span>{item.title}</span>
               </SidebarLink>
             ))}
@@ -142,7 +153,7 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
                 href={item.href}
                 isActive={isActive(item.href)}
               >
-                {item.icon}
+                {renderIcon(item.icon)}
                 <span>{item.title}</span>
               </SidebarLink>
             ))}
