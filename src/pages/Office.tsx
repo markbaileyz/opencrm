@@ -1,4 +1,3 @@
-
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +9,7 @@ import SuppliesManagement from "@/components/office/supplies/SuppliesManagement"
 import ScheduledTasksManagement from "@/components/office/ScheduledTasksManagement";
 import CommunicationsManagement from "@/components/office/CommunicationsManagement";
 import { useOfficeResources } from "@/hooks/useOfficeResources";
+import SupplyManagementContainer from "@/components/office/supplies/SupplyManagementContainer";
 
 const Office = () => {
   const { lowStockSupplies, overdueTasks } = useOfficeResources();
@@ -177,6 +177,7 @@ const Office = () => {
           <TabsContent value="resources" className="space-y-6">
             <RoomManagement />
             <SuppliesManagement />
+            <SupplyManagementContainer />
           </TabsContent>
           
           <TabsContent value="communications" className="space-y-4">
