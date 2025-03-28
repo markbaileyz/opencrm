@@ -190,7 +190,11 @@ const VitalsTabContent: React.FC = () => {
             vitalRecords[0]?.systolic < vitalRecords[1]?.systolic ? "down" : 
             vitalRecords[0]?.systolic > vitalRecords[1]?.systolic ? "up" : "neutral"
           }
-          description="Last recorded today"
+          trendDirection={
+            vitalRecords[0]?.systolic < vitalRecords[1]?.systolic ? "down" : 
+            vitalRecords[0]?.systolic > vitalRecords[1]?.systolic ? "up" : "neutral"
+          }
+          lastUpdated="Last recorded today"
         />
         
         <VitalCard 
@@ -202,7 +206,11 @@ const VitalsTabContent: React.FC = () => {
             vitalRecords[0]?.heartRate < vitalRecords[1]?.heartRate ? "down" : 
             vitalRecords[0]?.heartRate > vitalRecords[1]?.heartRate ? "up" : "neutral"
           }
-          description="Last recorded today"
+          trendDirection={
+            vitalRecords[0]?.heartRate < vitalRecords[1]?.heartRate ? "down" : 
+            vitalRecords[0]?.heartRate > vitalRecords[1]?.heartRate ? "up" : "neutral"
+          }
+          lastUpdated="Last recorded today"
         />
         
         <VitalCard 
@@ -214,7 +222,11 @@ const VitalsTabContent: React.FC = () => {
             (vitalRecords[0]?.temperature || 0) < (vitalRecords[1]?.temperature || 0) ? "down" : 
             (vitalRecords[0]?.temperature || 0) > (vitalRecords[1]?.temperature || 0) ? "up" : "neutral"
           }
-          description="Last recorded today"
+          trendDirection={
+            (vitalRecords[0]?.temperature || 0) < (vitalRecords[1]?.temperature || 0) ? "down" : 
+            (vitalRecords[0]?.temperature || 0) > (vitalRecords[1]?.temperature || 0) ? "up" : "neutral"
+          }
+          lastUpdated="Last recorded today"
         />
         
         <VitalCard 
@@ -226,7 +238,11 @@ const VitalsTabContent: React.FC = () => {
             (vitalRecords[0]?.oxygenSaturation || 0) < (vitalRecords[1]?.oxygenSaturation || 0) ? "down" : 
             (vitalRecords[0]?.oxygenSaturation || 0) > (vitalRecords[1]?.oxygenSaturation || 0) ? "up" : "neutral"
           }
-          description="Last recorded today"
+          trendDirection={
+            (vitalRecords[0]?.oxygenSaturation || 0) < (vitalRecords[1]?.oxygenSaturation || 0) ? "down" : 
+            (vitalRecords[0]?.oxygenSaturation || 0) > (vitalRecords[1]?.oxygenSaturation || 0) ? "up" : "neutral"
+          }
+          lastUpdated="Last recorded today"
         />
       </div>
       
