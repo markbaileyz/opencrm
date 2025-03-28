@@ -13,72 +13,21 @@ import {
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
-import { Gauge, BarChart3, Calendar, ArrowUpRight, TrendingUp, Activity } from "lucide-react";
+import { Gauge, BarChart3, Calendar, TrendingUp, Activity } from "lucide-react";
 import MetricCard from "./MetricCard";
 import TopWorkflowsChart from "./TopWorkflowsChart";
 import DailyExecutionsChart from "./DailyExecutionsChart";
 import CategoriesPieChart from "./CategoriesPieChart";
 import RecentExecutionsTable from "./RecentExecutionsTable";
+import WorkflowActivityMonitor from "./WorkflowActivityMonitor";
 import { useWorkflowAnalytics } from "../../hooks/useWorkflowAnalytics";
 import { Skeleton } from "@/components/ui/skeleton";
-
-// Mock data for execution history
-const mockExecutionHistory = [
-  { 
-    id: "exec1", 
-    workflowId: "wf-1", 
-    workflowName: "New Patient Onboarding", 
-    timestamp: new Date().toISOString(),
-    duration: 3200, 
-    success: true,
-    stepCount: 5,
-    category: "Patient"
-  },
-  { 
-    id: "exec2", 
-    workflowId: "wf-2", 
-    workflowName: "Appointment Follow-up", 
-    timestamp: new Date(Date.now() - 3600000).toISOString(),
-    duration: 1800, 
-    success: true,
-    stepCount: 3,
-    category: "Appointment"
-  },
-  { 
-    id: "exec3", 
-    workflowId: "wf-3", 
-    workflowName: "Medication Renewal", 
-    timestamp: new Date(Date.now() - 7200000).toISOString(),
-    duration: 2500, 
-    success: false,
-    stepCount: 4,
-    category: "Medication"
-  },
-  { 
-    id: "exec4", 
-    workflowId: "wf-1", 
-    workflowName: "New Patient Onboarding", 
-    timestamp: new Date(Date.now() - 86400000).toISOString(),
-    duration: 3000, 
-    success: true,
-    stepCount: 5,
-    category: "Patient"
-  },
-  { 
-    id: "exec5", 
-    workflowId: "wf-4", 
-    workflowName: "Lab Results Notification", 
-    timestamp: new Date(Date.now() - 172800000).toISOString(),
-    duration: 1200, 
-    success: true,
-    stepCount: 2,
-    category: "Labs"
-  }
-];
+import { useExecutionHistory } from "../../hooks/useExecutionHistory";
 
 const WorkflowAnalyticsDashboard: React.FC = () => {
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('week');
   const { isLoading, performanceData, categoryData, executionTimelineData, summaryMetrics } = useWorkflowAnalytics(timeRange);
+  const { executionHistory } = useExecutionHistory();
   
   const handleTimeRangeChange = (value: string) => {
     setTimeRange(value as 'week' | 'month' | 'quarter' | 'year');
@@ -182,22 +131,12 @@ const WorkflowAnalyticsDashboard: React.FC = () => {
               acc[item.name] = item.value;
               return acc;
             }, {} as Record<string, number>)} />
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance Trends</CardTitle>
-                <CardDescription>Success rate over time</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px] flex items-center justify-center">
-                  <p className="text-muted-foreground">Detailed performance trends will appear here</p>
-                </div>
-              </CardContent>
-            </Card>
+            <WorkflowActivityMonitor />
           </>
         )}
       </div>
 
-      <RecentExecutionsTable executionHistory={mockExecutionHistory} />
+      <RecentExecutionsTable executionHistory={executionHistory} />
     </div>
   );
 };

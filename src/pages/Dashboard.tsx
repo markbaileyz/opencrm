@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import StatsGrid from "@/components/dashboard/StatsGrid";
@@ -64,7 +65,8 @@ const Dashboard = () => {
           workflowName: workflow.name,
           success: true,
           message: "Workflow monitoring activated",
-          duration: 1500
+          duration: 1500,
+          timestamp: new Date().toISOString()
         });
       }
     }, 1500);
