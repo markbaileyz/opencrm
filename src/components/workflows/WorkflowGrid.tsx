@@ -2,6 +2,7 @@
 import React from "react";
 import { Workflow } from "@/types/workflow";
 import WorkflowCard from "./WorkflowCard";
+import WorkflowEmptyState from "./WorkflowEmptyState";
 
 interface WorkflowGridProps {
   workflows: Workflow[];
@@ -21,11 +22,7 @@ const WorkflowGrid: React.FC<WorkflowGridProps> = ({
   onView
 }) => {
   if (workflows.length === 0) {
-    return (
-      <div className="text-center p-8">
-        <p className="text-muted-foreground">No workflows found.</p>
-      </div>
-    );
+    return <WorkflowEmptyState />;
   }
 
   return (
