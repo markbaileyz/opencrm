@@ -14,6 +14,31 @@ import KnowledgeBasePage from "./pages/KnowledgeBase";
 import ChallengesSolutionsPage from "./pages/ChallengesSolutions";
 import Guides from "./pages/Guides";
 import HealthcareCRM from "./pages/HealthcareCRM";
+import { Card, CardContent } from "./components/ui/card";
+
+// Create a placeholder component for the patient-feedback route
+const PatientFeedbackPage = () => (
+  <div className="container mx-auto py-6">
+    <h1 className="text-3xl font-bold mb-6">Patient Feedback</h1>
+    <Card>
+      <CardContent className="p-6">
+        <p className="text-muted-foreground">
+          View and manage patient feedback and surveys. This feature is coming soon.
+        </p>
+      </CardContent>
+    </Card>
+  </div>
+);
+
+// Create a placeholder component for the 404 page
+const NotFoundPage = () => (
+  <div className="container mx-auto py-6 text-center">
+    <h1 className="text-4xl font-bold mb-6">Page Not Found</h1>
+    <p className="text-muted-foreground mb-6">
+      The page you're looking for doesn't exist or has been moved.
+    </p>
+  </div>
+);
 
 function App() {
   return (
@@ -33,6 +58,10 @@ function App() {
             <Route path="knowledge-base" element={<KnowledgeBasePage />} />
             <Route path="challenges" element={<ChallengesSolutionsPage />} />
             <Route path="guides" element={<Guides />} />
+            <Route path="patient-feedback" element={<PatientFeedbackPage />} />
+            
+            {/* Add a catch-all route for 404 errors */}
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
       </GuideProvider>
