@@ -35,22 +35,22 @@ function App() {
         <Routes>
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
-            <Route path="/patients" element={<PatientsPage />} />
-            <Route path="/patients/:id" element={<PatientDetailPage />} />
-            <Route path="/roadmap" element={<RoadmapPage />} />
-            <Route path="/healthcare-crm" element={<HealthcareCRMStrategies />} />
-            <Route path="/knowledge-base" element={<KnowledgeBase />} />
-            <Route path="/challenges" element={<ChallengesSolutions />} />
-            <Route path="/guides" element={<GuideCatalog />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/organizations" element={<OrganizationsPage />} />
-            <Route path="/organizations/:id" element={<OrganizationDetailView />} />
-            <Route path="/deals" element={<DealsPage />} />
-            <Route path="/office-management" element={<OfficeManagementPage />} />
-            <Route path="/health-tracker" element={<HealthTrackerDashboard />} />
-            <Route path="/call-tracking" element={<CallTrackingDashboard />} />
-            <Route path="/workflow-automation" element={<WorkflowAutomationPage />} />
-            <Route path="/workflow-analytics" element={<WorkflowAnalyticsDashboard />} />
+            <Route path="patients" element={<PatientsPage />} />
+            <Route path="patients/:id" element={<PatientDetailPage />} />
+            <Route path="roadmap" element={<RoadmapPage />} />
+            <Route path="healthcare-crm" element={<HealthcareCRMStrategies />} />
+            <Route path="knowledge-base" element={<KnowledgeBase />} />
+            <Route path="challenges" element={<ChallengesSolutions />} />
+            <Route path="guides" element={<GuideCatalog />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="organizations" element={<OrganizationsPage />} />
+            <Route path="organizations/:id" element={<OrganizationDetailView />} />
+            <Route path="deals" element={<DealsPage />} />
+            <Route path="office-management" element={<OfficeManagementPage />} />
+            <Route path="health-tracker" element={<HealthTrackerDashboard />} />
+            <Route path="call-tracking" element={<CallTrackingDashboard />} />
+            <Route path="workflow-automation" element={<WorkflowAutomationPage />} />
+            <Route path="workflow-analytics" element={<WorkflowAnalyticsDashboard />} />
           </Route>
         </Routes>
       </GuideProvider>
