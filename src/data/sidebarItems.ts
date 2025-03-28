@@ -25,7 +25,7 @@ import {
 export interface SidebarItem {
   title: string;
   href: string;
-  icon: React.ReactNode;
+  icon: any; // Using 'any' to allow the icon component reference
   submenu?: SidebarItem[];
   role?: string[];
 }
@@ -35,132 +35,132 @@ export const sidebarItems: SidebarItem[] = [
   {
     title: "Dashboard",
     href: "/dashboard",
-    icon: <LayoutDashboard size={20} />,
+    icon: LayoutDashboard,
   },
   {
     title: "Patients",
     href: "/patients",
-    icon: <Users size={20} />,
+    icon: Users,
     submenu: [
       {
         title: "Patient List",
         href: "/patients",
-        icon: <Users size={20} />,
+        icon: Users,
       },
       {
         title: "Vitals",
         href: "/patient-vitals",
-        icon: <Activity size={20} />,
+        icon: Activity,
       },
       {
         title: "Medical Records",
         href: "/medical-records",
-        icon: <ClipboardList size={20} />,
+        icon: ClipboardList,
       },
       {
         title: "Medications",
         href: "/medications",
-        icon: <Pill size={20} />,
+        icon: Pill,
       },
       {
         title: "Prescriptions",
         href: "/prescriptions",
-        icon: <FileText size={20} />,
+        icon: FileText,
       },
       {
         title: "Health Tracker",
         href: "/health-tracker",
-        icon: <Activity size={20} />,
+        icon: Activity,
       },
     ],
   },
   {
     title: "Calendar",
     href: "/calendar",
-    icon: <Calendar size={20} />,
+    icon: Calendar,
   },
   {
     title: "Communications",
     href: "/email",
-    icon: <Mail size={20} />,
+    icon: Mail,
     submenu: [
       {
         title: "Email",
         href: "/email",
-        icon: <Mail size={20} />,
+        icon: Mail,
       },
       {
         title: "Call Tracking",
         href: "/call-tracking",
-        icon: <Phone size={20} />,
+        icon: Phone,
       },
       {
         title: "Workflows",
         href: "/workflows",
-        icon: <Workflow size={20} />,
+        icon: Workflow,
       },
     ],
   },
   {
     title: "Contacts",
     href: "/contacts",
-    icon: <User size={20} />,
+    icon: User,
   },
   {
     title: "Deals",
     href: "/deals",
-    icon: <BadgeDollarSign size={20} />,
+    icon: BadgeDollarSign,
   },
   {
     title: "Organizations",
     href: "/organizations",
-    icon: <Building2 size={20} />,
+    icon: Building2,
   },
   {
     title: "Front Desk",
     href: "/front-desk",
-    icon: <BookUser size={20} />,
+    icon: BookUser,
   },
   {
     title: "Reports",
     href: "/reports",
-    icon: <BarChart2 size={20} />,
+    icon: BarChart2,
   },
   {
     title: "Office",
     href: "/office",
-    icon: <Building size={20} />,
+    icon: Building,
   },
   {
     title: "Compliance",
     href: "/compliance",
-    icon: <ShieldCheck size={20} />,
+    icon: ShieldCheck,
   },
   {
     title: "Roadmap",
     href: "/dashboard-roadmap",
-    icon: <GanttChart size={20} />,
+    icon: GanttChart,
   },
   {
     title: "Settings",
     href: "/settings",
-    icon: <Settings size={20} />,
+    icon: Settings,
     submenu: [
       {
         title: "User Settings",
         href: "/settings",
-        icon: <Settings size={20} />,
+        icon: Settings,
       },
       {
         title: "Admin Settings",
         href: "/admin-settings",
-        icon: <Settings size={20} />,
+        icon: Settings,
         role: ["admin"],
       },
       {
         title: "User Management",
         href: "/user-management",
-        icon: <Users size={20} />,
+        icon: Users,
         role: ["admin"],
       },
     ],
