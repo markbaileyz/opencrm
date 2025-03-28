@@ -25,7 +25,7 @@ export const patientSchema = z.object({
   allergies: z.array(z.string()).optional(),
   medications: z.array(z.string()).optional(),
   notes: z.string().optional(),
-  status: z.enum(["active", "inactive"]),
+  status: z.enum(["active", "inactive", "pending"]), // Updated to include "pending"
 });
 
 export type PatientFormValues = z.infer<typeof patientSchema>;

@@ -16,11 +16,30 @@ export interface Insurance {
   deductible?: string;
 }
 
+export interface MedicalHistoryItem {
+  condition: string;
+  status: string;
+  notes?: string;
+}
+
+export interface ActivityItem {
+  date: string;
+  description: string;
+}
+
+export interface UpcomingAppointment {
+  date: string;
+  time: string;
+  reason: string;
+  provider: string;
+}
+
 export interface Patient {
   id: string;
   firstName: string;
   lastName: string;
   dateOfBirth: string;
+  age?: number; // Added age as optional
   gender: "male" | "female" | "other" | "prefer-not-to-say";
   email: string;
   phone: string;
@@ -35,13 +54,17 @@ export interface Patient {
   allergies?: string[];
   medications?: string[];
   notes?: string;
-  status: "active" | "inactive" | "pending";
+  status: "active" | "inactive" | "pending"; // Updated to include "pending"
   avatarUrl?: string;
   lastVisit?: string;
   documents?: PatientDocument[];
   appointments?: PatientAppointment[];
   insuranceHistory?: Insurance[];
   tasks?: PatientTask[];
+  // Add the missing properties used in PatientDetail.tsx
+  medicalHistory?: MedicalHistoryItem[];
+  upcomingAppointment?: UpcomingAppointment;
+  recentActivity?: ActivityItem[];
   // New fields for document uploads
   documentUploads?: {
     insuranceCardFront?: string;

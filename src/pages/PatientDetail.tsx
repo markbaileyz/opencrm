@@ -75,8 +75,8 @@ const PatientDetail: React.FC = () => {
     );
   }
 
-  // Ensuring the patient object conforms to the PatientType
-  const typedPatient = patient as unknown as PatientType;
+  // Ensuring the patient object has all required fields for rendering
+  const typedPatient = patient as PatientType;
 
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto">
@@ -129,7 +129,7 @@ const PatientDetail: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-muted-foreground mb-1">Date of Birth</h4>
-                    <p>{patient.dateOfBirth} ({patient.age} years)</p>
+                    <p>{patient.dateOfBirth} {patient.age ? `(${patient.age} years)` : ''}</p>
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-muted-foreground mb-1">Gender</h4>

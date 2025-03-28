@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Patient } from "@/types/patient";
+import { Patient, MedicalHistoryItem, ActivityItem } from "@/types/patient";
 
 export const usePatientData = (patientId: string | undefined) => {
   const [patient, setPatient] = useState<Patient | null>(null);
@@ -51,12 +51,6 @@ export const usePatientData = (patientId: string | undefined) => {
           ],
           allergies: ["Penicillin", "Peanuts"],
           medications: ["Lisinopril 10mg", "Metformin 500mg", "Vitamin D 1000IU"],
-          flags: [
-            {
-              type: "Alert",
-              description: "Requires 30 minutes for checking vitals before appointment"
-            }
-          ],
           recentActivity: [
             {
               date: "2024-04-05",
