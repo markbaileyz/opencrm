@@ -1,78 +1,16 @@
 
-import {
-  LayoutDashboard,
-  Users,
-  Calendar,
-  Settings,
-  FileText,
-  Mail,
-  User,
-  Building2,
-  BarChart2,
-  BadgeDollarSign,
-  Stethoscope,
-  Pill,
-  ClipboardList,
-  Activity,
-  Phone,
-  BookUser,
-  GanttChart,
-  Building,
-  ShieldCheck,
-  Workflow
-} from "lucide-react";
+import { Home, Users, Calendar, FileText, Settings, Building2, DollarSign, BriefcaseMedical, Activity, Phone, GitBranch } from "lucide-react";
 
-export interface SidebarItem {
-  title: string;
-  href: string;
-  icon: any;
-  submenu?: SidebarItem[];
-  role?: string[];
-}
-
-// Base sidebar items that should appear for all users
-export const sidebarItems: SidebarItem[] = [
+export const sidebarItems = [
   {
     title: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
+    href: "/",
+    icon: Home,
   },
   {
     title: "Patients",
     href: "/patients",
     icon: Users,
-    submenu: [
-      {
-        title: "Patient List",
-        href: "/patients",
-        icon: Users,
-      },
-      {
-        title: "Vitals",
-        href: "/patient-vitals",
-        icon: Activity,
-      },
-      {
-        title: "Medical Records",
-        href: "/medical-records",
-        icon: ClipboardList,
-      },
-      {
-        title: "Medications",
-        href: "/medications",
-        icon: Pill,
-      },
-      {
-        title: "Prescriptions",
-        href: "/prescriptions",
-        icon: FileText,
-      },
-      {
-        title: "Health Tracker",
-        href: "/health-tracker",
-        icon: Activity,
-      },
-    ],
   },
   {
     title: "Calendar",
@@ -80,36 +18,9 @@ export const sidebarItems: SidebarItem[] = [
     icon: Calendar,
   },
   {
-    title: "Communications",
-    href: "/email",
-    icon: Mail,
-    submenu: [
-      {
-        title: "Email",
-        href: "/email",
-        icon: Mail,
-      },
-      {
-        title: "Call Tracking",
-        href: "/call-tracking",
-        icon: Phone,
-      },
-      {
-        title: "Workflows",
-        href: "/workflows",
-        icon: Workflow,
-      },
-    ],
-  },
-  {
-    title: "Contacts",
-    href: "/contacts",
-    icon: User,
-  },
-  {
-    title: "Deals",
-    href: "/deals",
-    icon: BadgeDollarSign,
+    title: "Knowledge Base",
+    href: "/knowledge-base",
+    icon: FileText,
   },
   {
     title: "Organizations",
@@ -117,57 +28,33 @@ export const sidebarItems: SidebarItem[] = [
     icon: Building2,
   },
   {
-    title: "Front Desk",
-    href: "/front-desk",
-    icon: BookUser,
+    title: "Deals",
+    href: "/deals",
+    icon: DollarSign,
   },
   {
-    title: "Reports",
-    href: "/reports",
-    icon: BarChart2,
+    title: "Office Management",
+    href: "/office-management",
+    icon: BriefcaseMedical,
   },
   {
-    title: "Office",
-    href: "/office",
-    icon: Building,
+    title: "Health Tracker",
+    href: "/health-tracker",
+    icon: Activity,
   },
   {
-    title: "Compliance",
-    href: "/compliance",
-    icon: ShieldCheck,
+    title: "Call Tracking",
+    href: "/call-tracking",
+    icon: Phone,
   },
   {
-    title: "Roadmap",
-    href: "/dashboard-roadmap",
-    icon: GanttChart,
+    title: "Workflow Automation",
+    href: "/workflow-automation",
+    icon: GitBranch,
   },
   {
     title: "Settings",
     href: "/settings",
     icon: Settings,
-    submenu: [
-      {
-        title: "User Settings",
-        href: "/settings",
-        icon: Settings,
-      },
-      {
-        title: "Admin Settings",
-        href: "/admin-settings",
-        icon: Settings,
-        role: ["admin"],
-      },
-      {
-        title: "User Management",
-        href: "/user-management",
-        icon: Users,
-        role: ["admin"],
-      },
-    ],
-  },
+  }
 ];
-
-// Function to get all sidebar items
-export const getAllSidebarItems = () => {
-  return sidebarItems;
-};

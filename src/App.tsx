@@ -2,12 +2,12 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { GuideProvider } from "./contexts/GuideContext";
-import DashboardLayout from "./components/DashboardLayout";
+import MainLayout from "./components/layout/MainLayout";
 import Dashboard from "./components/dashboard/Dashboard";
 import FloatingGuideButton from "./components/guides/FloatingGuideButton";
 import GuideViewer from "./components/guides/GuideViewer";
-import PatientsPage from "./components/patients/PatientsPage";
-import PatientDetailPage from "./components/patients/PatientDetailPage";
+import PatientsPage from "./pages/Patients";
+import PatientDetailPage from "./pages/PatientDetail";
 import RoadmapPage from "./components/roadmap/RoadmapPage";
 import HealthcareCRMStrategies from "./components/healthcare-crm/HealthcareCRMStrategies";
 import KnowledgeBase from "./components/knowledge/KnowledgeBase";
@@ -32,7 +32,7 @@ function App() {
         <GuideViewer />
         
         <Routes>
-          <Route path="/" element={<DashboardLayout />}>
+          <Route path="/" element={<MainLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="patients" element={<PatientsPage />} />
             <Route path="patients/:id" element={<PatientDetailPage />} />
