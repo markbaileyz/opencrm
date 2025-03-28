@@ -2,11 +2,12 @@
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import WorkflowList from "@/components/workflows/WorkflowList";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import WorkflowDetail from "@/components/workflows/WorkflowDetailView";
 import { useWorkflows } from "@/components/workflows/hooks/useWorkflows";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, BarChart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 const WorkflowsPage = () => {
