@@ -1,6 +1,5 @@
-
 import React, { useState } from "react";
-import { Workflow } from "@/types/workflow";
+import { Workflow, WorkflowStatus } from "@/types/workflow";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -9,6 +8,7 @@ import WorkflowGrid from "./WorkflowGrid";
 import WorkflowFilters from "./WorkflowFilters";
 import WorkflowFormDialog from "./WorkflowFormDialog";
 import WorkflowDetailView from "./WorkflowDetailView";
+import WorkflowTemplates from "./WorkflowTemplates";
 
 // Sample data (this would typically come from an API/database)
 const initialWorkflows: Workflow[] = [
@@ -142,13 +142,18 @@ const WorkflowList: React.FC = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [workflowToEdit, setWorkflowToEdit] = useState<Workflow | null>(null);
+  const [isTemplatesDialogOpen, setIsTemplatesDialogOpen] = useState(false);
   
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<WorkflowStatus[]>([]);
   
   const handleCreateWorkflow = () => {
     setIsCreateDialogOpen(true);
+  };
+
+  const handleOpenTemplates = () => {
+    setIsTemplatesDialogOpen(true);
   };
   
   const handleSaveWorkflow = (workflowData: Omit<Workflow, "id">) => {
@@ -163,6 +168,24 @@ const WorkflowList: React.FC = () => {
     toast({
       title: "Workflow Created",
       description: "The workflow has been created successfully.",
+    });
+  };
+
+  const handleUseTemplate = (template: Omit<Workflow, "id">) => {
+    const newWorkflow: Workflow = {
+      ...template,
+      id: `workflow-${uuidv4()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: "current-user",
+    };
+    
+    setWorkflows(prev => [newWorkflow, ...prev]);
+    setIsTemplatesDialogOpen(false);
+    
+    toast({
+      title: "Template Applied",
+      description: "The workflow template has been applied successfully.",
     });
   };
   
@@ -295,10 +318,15 @@ const WorkflowList: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Workflows</h1>
-        <Button onClick={handleCreateWorkflow}>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Workflow
-        </Button>
+        <div className="flex space-x-2">
+          <Button onClick={handleOpenTemplates} variant="outline">
+            Use Template
+          </Button>
+          <Button onClick={handleCreateWorkflow}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create Workflow
+          </Button>
+        </div>
       </div>
       
       <WorkflowFilters
@@ -334,6 +362,12 @@ const WorkflowList: React.FC = () => {
           title="Edit Workflow"
         />
       )}
+
+      <WorkflowTemplates
+        open={isTemplatesDialogOpen}
+        onOpenChange={setIsTemplatesDialogOpen}
+        onUseTemplate={handleUseTemplate}
+      />
     </div>
   );
 };
