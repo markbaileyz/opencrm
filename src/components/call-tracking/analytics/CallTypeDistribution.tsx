@@ -1,53 +1,63 @@
 
 import React from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { CallRecord } from "@/types/call";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { PhoneIncoming, PhoneOutgoing } from "lucide-react";
 
 interface CallTypeDistributionProps {
-  calls: CallRecord[];
+  inboundPercentage: number;
+  outboundPercentage: number;
 }
 
-const CallTypeDistribution: React.FC<CallTypeDistributionProps> = ({ calls }) => {
-  // Calculate call type distribution
-  const incoming = calls.filter(call => call.type === "incoming").length;
-  const outgoing = calls.filter(call => call.type === "outgoing").length;
-  const missed = calls.filter(call => call.type === "missed").length;
-  const scheduled = calls.filter(call => call.type === "scheduled").length;
-  
-  const data = [
-    { name: "Incoming", value: incoming, color: "#22c55e" },
-    { name: "Outgoing", value: outgoing, color: "#3b82f6" },
-    { name: "Missed", value: missed, color: "#ef4444" },
-    { name: "Scheduled", value: scheduled, color: "#a855f7" }
-  ].filter(item => item.value > 0);
-  
-  if (data.length === 0) {
-    return <div className="flex items-center justify-center h-64 text-muted-foreground">No call data available</div>;
-  }
-  
+const CallTypeDistribution: React.FC<CallTypeDistributionProps> = ({
+  inboundPercentage,
+  outboundPercentage
+}) => {
   return (
-    <div className="w-full h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            outerRadius={80}
-            fill="#8884d8"
-            dataKey="value"
-            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Pie>
-          <Tooltip formatter={(value) => [`${value} calls`, 'Count']} />
-          <Legend />
-        </PieChart>
-      </ResponsiveContainer>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Call Type Distribution</CardTitle>
+        <CardDescription>Inbound vs. outbound calls</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="flex items-center">
+            <div className="flex items-center gap-2 w-24">
+              <PhoneIncoming className="h-4 w-4 text-blue-500" />
+              <span className="text-sm font-medium">Inbound</span>
+            </div>
+            <div className="w-full">
+              <div className="h-3 rounded-full bg-muted overflow-hidden">
+                <div 
+                  className="h-full rounded-full bg-blue-500" 
+                  style={{ width: `${inboundPercentage}%` }} 
+                />
+              </div>
+            </div>
+            <div className="w-12 text-right font-medium text-sm">
+              {inboundPercentage}%
+            </div>
+          </div>
+          
+          <div className="flex items-center">
+            <div className="flex items-center gap-2 w-24">
+              <PhoneOutgoing className="h-4 w-4 text-green-500" />
+              <span className="text-sm font-medium">Outbound</span>
+            </div>
+            <div className="w-full">
+              <div className="h-3 rounded-full bg-muted overflow-hidden">
+                <div 
+                  className="h-full rounded-full bg-green-500" 
+                  style={{ width: `${outboundPercentage}%` }} 
+                />
+              </div>
+            </div>
+            <div className="w-12 text-right font-medium text-sm">
+              {outboundPercentage}%
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
