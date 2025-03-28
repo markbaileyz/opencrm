@@ -7,6 +7,8 @@ import SidebarContent from "@/components/sidebar/SidebarContent";
 import SidebarToggle from "@/components/sidebar/SidebarToggle";
 import UserInfo from "@/components/sidebar/UserInfo";
 import LogoutButton from "@/components/sidebar/LogoutButton";
+import MobileBottomNav from "@/components/ui/mobile-bottom-nav";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -14,6 +16,7 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -41,9 +44,11 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         </div>
       </aside>
 
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 p-6 overflow-auto pb-16 md:pb-6">
         {children}
       </div>
+      
+      {isMobile && <MobileBottomNav />}
     </div>
   );
 };
