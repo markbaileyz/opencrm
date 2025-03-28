@@ -9,6 +9,9 @@ export interface WorkflowExecution {
   timestamp: string;
   success: boolean;
   message: string;
+  duration?: number; // Execution duration in milliseconds
+  stepCount?: number; // Number of steps executed
+  category?: string; // Workflow category
 }
 
 export const useExecutionHistory = () => {
@@ -38,6 +41,9 @@ export const useExecutionHistory = () => {
       ...execution,
       id: `exec-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       timestamp: new Date().toISOString(),
+      duration: execution.duration || Math.floor(Math.random() * 10000), // Random duration if not provided
+      stepCount: execution.stepCount || Math.floor(Math.random() * 10) + 1, // Random step count if not provided
+      category: execution.category || ["Email", "Task", "Notification", "Integration"][Math.floor(Math.random() * 4)], // Random category if not provided
     };
     
     setExecutionHistory(prev => {
@@ -62,10 +68,82 @@ export const useExecutionHistory = () => {
     localStorage.removeItem("workflow-execution-history");
   }, []);
 
+  // Get analytics data from execution history
+  const getAnalyticsData = useCallback(() => {
+    // Calculate success rate
+    const totalExecutions = executionHistory.length;
+    const successfulExecutions = executionHistory.filter(exec => exec.success).length;
+    const successRate = totalExecutions > 0 ? (successfulExecutions / totalExecutions) * 100 : 0;
+
+    // Calculate average duration
+    const executionsWithDuration = executionHistory.filter(exec => exec.duration);
+    const averageDuration = executionsWithDuration.length > 0 
+      ? executionsWithDuration.reduce((sum, exec) => sum + (exec.duration || 0), 0) / executionsWithDuration.length 
+      : 0;
+
+    // Get workflow categories count
+    const categoryCounts: Record<string, number> = {};
+    executionHistory.forEach(exec => {
+      const category = exec.category || "Uncategorized";
+      categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+    });
+
+    // Calculate executions per day for the last 7 days
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      return date.toISOString().split('T')[0];
+    }).reverse();
+
+    const executionsPerDay = last7Days.map(date => {
+      const count = executionHistory.filter(exec => 
+        exec.timestamp.split('T')[0] === date
+      ).length;
+      return { date, count };
+    });
+
+    return {
+      totalExecutions,
+      successfulExecutions,
+      failedExecutions: totalExecutions - successfulExecutions,
+      successRate,
+      averageDuration,
+      categoryCounts,
+      executionsPerDay,
+      topWorkflows: getTopWorkflows(executionHistory)
+    };
+  }, [executionHistory]);
+
+  // Helper function to get top workflows by execution count
+  const getTopWorkflows = (history: WorkflowExecution[]) => {
+    const workflowCounts: Record<string, { count: number, successCount: number }> = {};
+    
+    history.forEach(exec => {
+      if (!workflowCounts[exec.workflowName]) {
+        workflowCounts[exec.workflowName] = { count: 0, successCount: 0 };
+      }
+      workflowCounts[exec.workflowName].count += 1;
+      if (exec.success) {
+        workflowCounts[exec.workflowName].successCount += 1;
+      }
+    });
+    
+    return Object.entries(workflowCounts)
+      .map(([name, { count, successCount }]) => ({
+        name,
+        count,
+        successCount,
+        successRate: count > 0 ? (successCount / count) * 100 : 0
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5); // Top 5 workflows
+  };
+
   return {
     executionHistory,
     addExecutionRecord,
-    clearHistory
+    clearHistory,
+    getAnalyticsData
   };
 };
 
@@ -90,12 +168,15 @@ const generateSampleHistory = (): WorkflowExecution[] => {
     "Workflow paused by user"
   ];
   
+  const categories = ["Email", "Task", "Notification", "Integration"];
+  
   const history: WorkflowExecution[] = [];
   
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 30; i++) {
     const success = Math.random() > 0.3; // 70% success rate
     const workflowName = workflowNames[Math.floor(Math.random() * workflowNames.length)];
     const message = messages[Math.floor(Math.random() * messages.length)];
+    const category = categories[Math.floor(Math.random() * categories.length)];
     
     // Generate a timestamp within the last 30 days
     const date = new Date();
@@ -107,7 +188,10 @@ const generateSampleHistory = (): WorkflowExecution[] => {
       workflowName,
       timestamp: date.toISOString(),
       success,
-      message
+      message,
+      duration: Math.floor(Math.random() * 10000), // Random duration between 0-10000ms
+      stepCount: Math.floor(Math.random() * 10) + 1, // Random step count between 1-10
+      category
     });
   }
   

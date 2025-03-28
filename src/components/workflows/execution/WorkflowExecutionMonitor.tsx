@@ -5,12 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Workflow, WorkflowStatus } from "@/types/workflow";
-import { Play, Pause, RotateCcw, AlertCircle, CheckCircle, Clock, Filter } from "lucide-react";
+import { Play, Pause, RotateCcw, AlertCircle, CheckCircle, Clock, Filter, BarChart } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useExecutionHistory } from "../hooks/useExecutionHistory";
 import WorkflowExecutionEmpty from "./WorkflowExecutionEmpty";
 import WorkflowExecutionHistory from "./WorkflowExecutionHistory";
 import WorkflowExecutionCard from "./WorkflowExecutionCard";
+import WorkflowAnalytics from "./WorkflowAnalytics";
 import { useToast } from "@/hooks/use-toast";
 
 interface WorkflowExecutionMonitorProps {
@@ -26,11 +27,12 @@ const WorkflowExecutionMonitor: React.FC<WorkflowExecutionMonitorProps> = ({
   onPause,
   onViewDetails
 }) => {
-  const [activeTab, setActiveTab] = useState<"active" | "history">("active");
+  const [activeTab, setActiveTab] = useState<"active" | "history" | "analytics">("active");
   const [filterStatus, setFilterStatus] = useState<WorkflowStatus | "all">("all");
   const { toast } = useToast();
   
-  const { executionHistory, clearHistory, addExecutionRecord } = useExecutionHistory();
+  const { executionHistory, clearHistory, addExecutionRecord, getAnalyticsData } = useExecutionHistory();
+  const analyticsData = getAnalyticsData();
   
   const activeWorkflows = workflows.filter(w => w.status === "active");
   
@@ -122,7 +124,7 @@ const WorkflowExecutionMonitor: React.FC<WorkflowExecutionMonitorProps> = ({
       </CardHeader>
       
       <CardContent>
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "active" | "history")}>
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "active" | "history" | "analytics")}>
           <TabsList className="mb-4">
             <TabsTrigger value="active" className="flex items-center">
               <Play className="h-4 w-4 mr-2" />
@@ -137,6 +139,10 @@ const WorkflowExecutionMonitor: React.FC<WorkflowExecutionMonitorProps> = ({
               {executionHistory.length > 0 && (
                 <Badge variant="secondary" className="ml-2">{executionHistory.length}</Badge>
               )}
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center">
+              <BarChart className="h-4 w-4 mr-2" />
+              Analytics
             </TabsTrigger>
           </TabsList>
           
@@ -162,6 +168,13 @@ const WorkflowExecutionMonitor: React.FC<WorkflowExecutionMonitorProps> = ({
             <WorkflowExecutionHistory 
               history={executionHistory}
               onClear={clearHistory}
+            />
+          </TabsContent>
+          
+          <TabsContent value="analytics" className="m-0">
+            <WorkflowAnalytics 
+              executionHistory={executionHistory}
+              analyticsData={analyticsData}
             />
           </TabsContent>
         </Tabs>
