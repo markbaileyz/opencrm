@@ -1,6 +1,6 @@
 
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { GuideProvider } from "./contexts/GuideContext";
 import DashboardLayout from "./components/DashboardLayout";
@@ -28,33 +28,31 @@ function App() {
   return (
     <ThemeProvider>
       <GuideProvider>
-        <BrowserRouter>
-          {/* Floating Guide Button and Guide Viewer are placed outside the routes */}
-          <FloatingGuideButton />
-          <GuideViewer />
-          
-          <Routes>
-            <Route path="/" element={<DashboardLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="/patients" element={<PatientsPage />} />
-              <Route path="/patients/:id" element={<PatientDetailPage />} />
-              <Route path="/roadmap" element={<RoadmapPage />} />
-              <Route path="/healthcare-crm" element={<HealthcareCRMStrategies />} />
-              <Route path="/knowledge-base" element={<KnowledgeBase />} />
-              <Route path="/challenges" element={<ChallengesSolutions />} />
-              <Route path="/guides" element={<GuideCatalog />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/organizations" element={<OrganizationsPage />} />
-              <Route path="/organizations/:id" element={<OrganizationDetailView />} />
-              <Route path="/deals" element={<DealsPage />} />
-              <Route path="/office-management" element={<OfficeManagementPage />} />
-              <Route path="/health-tracker" element={<HealthTrackerDashboard />} />
-              <Route path="/call-tracking" element={<CallTrackingDashboard />} />
-              <Route path="/workflow-automation" element={<WorkflowAutomationPage />} />
-              <Route path="/workflow-analytics" element={<WorkflowAnalyticsDashboard />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
+        {/* Floating Guide Button and Guide Viewer are placed outside the routes */}
+        <FloatingGuideButton />
+        <GuideViewer />
+        
+        <Routes>
+          <Route path="/" element={<DashboardLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="/patients" element={<PatientsPage />} />
+            <Route path="/patients/:id" element={<PatientDetailPage />} />
+            <Route path="/roadmap" element={<RoadmapPage />} />
+            <Route path="/healthcare-crm" element={<HealthcareCRMStrategies />} />
+            <Route path="/knowledge-base" element={<KnowledgeBase />} />
+            <Route path="/challenges" element={<ChallengesSolutions />} />
+            <Route path="/guides" element={<GuideCatalog />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/organizations" element={<OrganizationsPage />} />
+            <Route path="/organizations/:id" element={<OrganizationDetailView />} />
+            <Route path="/deals" element={<DealsPage />} />
+            <Route path="/office-management" element={<OfficeManagementPage />} />
+            <Route path="/health-tracker" element={<HealthTrackerDashboard />} />
+            <Route path="/call-tracking" element={<CallTrackingDashboard />} />
+            <Route path="/workflow-automation" element={<WorkflowAutomationPage />} />
+            <Route path="/workflow-analytics" element={<WorkflowAnalyticsDashboard />} />
+          </Route>
+        </Routes>
       </GuideProvider>
     </ThemeProvider>
   );
