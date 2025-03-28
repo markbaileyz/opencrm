@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Tabs,
@@ -34,10 +33,27 @@ const WorkflowAnalyticsDashboard: React.FC = () => {
   };
 
   // Transform timeline data to match the expected format for DailyExecutionsChart
-  const transformedTimelineData = executionTimelineData.map(item => ({
-    date: item.date,
-    count: item.executions
-  }));
+  const transformedTimelineData = executionTimelineData.map(item => {
+    let validDate = item.date;
+    
+    if (!/^\d{4}-\d{2}-\d{2}/.test(item.date)) {
+      const now = new Date();
+      const dayIndex = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(item.date);
+      
+      if (dayIndex !== -1) {
+        const day = new Date();
+        day.setDate(day.getDate() - (day.getDay() - dayIndex + 7) % 7);
+        validDate = format(day, 'yyyy-MM-dd');
+      } else {
+        validDate = format(now, 'yyyy-MM-dd');
+      }
+    }
+    
+    return {
+      date: validDate,
+      count: item.executions
+    };
+  });
 
   return (
     <div className="space-y-6">

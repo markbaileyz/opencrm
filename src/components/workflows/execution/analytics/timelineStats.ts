@@ -8,7 +8,7 @@ export const calculateDailyExecutions = (executionHistory: WorkflowExecution[]) 
   const today = new Date();
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = subDays(today, 6 - i);
-    return format(date, "yyyy-MM-dd");
+    return format(date, "yyyy-MM-dd"); // Use ISO format (YYYY-MM-DD)
   });
 
   // Initialize counts with 0 for each day
@@ -19,9 +19,13 @@ export const calculateDailyExecutions = (executionHistory: WorkflowExecution[]) 
 
   // Count executions per day
   executionHistory.forEach(execution => {
-    const executionDate = format(parseISO(execution.timestamp), "yyyy-MM-dd");
-    if (dailyCounts[executionDate] !== undefined) {
-      dailyCounts[executionDate]++;
+    try {
+      const executionDate = format(parseISO(execution.timestamp), "yyyy-MM-dd");
+      if (dailyCounts[executionDate] !== undefined) {
+        dailyCounts[executionDate]++;
+      }
+    } catch (err) {
+      console.error("Error processing execution date:", execution.timestamp, err);
     }
   });
 

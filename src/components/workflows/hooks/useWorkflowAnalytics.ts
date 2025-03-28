@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { format } from 'date-fns';
 
 // Types for the data returned by the hook
 interface PerformanceDataPoint {
@@ -77,19 +78,40 @@ export function useWorkflowAnalytics(timeRange: 'week' | 'month' | 'quarter' | '
     const perfData: PerformanceDataPoint[] = [];
     const numPoints = range === 'week' ? 7 : range === 'month' ? 30 : range === 'quarter' ? 13 : 12;
     
+    // Get current date for reference
+    const today = new Date();
+    
     for (let i = 0; i < numPoints; i++) {
       const successCount = Math.floor(Math.random() * 30) + 20;
       const failureCount = Math.floor(Math.random() * 10);
       const total = successCount + failureCount;
       
+      // Create proper ISO date strings
+      let dateString: string;
+      
+      if (range === 'week') {
+        // For week view, use ISO dates for the last 7 days
+        const day = new Date();
+        day.setDate(today.getDate() - (6 - i));
+        dateString = format(day, 'yyyy-MM-dd');
+      } else if (range === 'month') {
+        // For month view, use ISO dates for the last 30 days
+        const day = new Date();
+        day.setDate(today.getDate() - (numPoints - 1 - i));
+        dateString = format(day, 'yyyy-MM-dd');
+      } else if (range === 'quarter') {
+        // For quarter view, use ISO dates for weeks
+        const day = new Date();
+        day.setDate(today.getDate() - (numPoints - 1 - i) * 7);
+        dateString = format(day, 'yyyy-MM-dd');
+      } else {
+        // For year view, use ISO dates for months
+        const day = new Date(today.getFullYear(), today.getMonth() - (11 - i), 1);
+        dateString = format(day, 'yyyy-MM-dd');
+      }
+      
       perfData.push({
-        date: range === 'week' 
-          ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i % 7]
-          : range === 'month' 
-            ? `Day ${i + 1}`
-            : range === 'quarter' 
-              ? `Week ${i + 1}`
-              : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i],
+        date: dateString,
         successCount,
         failureCount,
         successRate: Math.round((successCount / total) * 100)
