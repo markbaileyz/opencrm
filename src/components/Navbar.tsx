@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import DesktopNav from "./navbar/DesktopNav";
 import MobileNav from "./navbar/MobileNav";
 import { cn } from "@/lib/utils";
@@ -114,11 +114,7 @@ const Navbar = ({ scrollToSection }: NavbarProps) => {
             onClick={toggleMobileMenu}
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
-            {isMobileMenuOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
+            <Menu className="h-5 w-5" />
           </button>
         </div>
       </div>

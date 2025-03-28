@@ -44,9 +44,6 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
     >
       <nav className="container mx-auto px-4 flex flex-col h-full">
         <div className="flex items-center justify-between py-4 border-b">
-          <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
-            OpenCRM
-          </h2>
           <ThemeToggle />
         </div>
         
