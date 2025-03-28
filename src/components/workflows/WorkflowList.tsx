@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useWorkflows } from "./hooks/useWorkflows";
 import WorkflowGrid from "./WorkflowGrid";
@@ -160,10 +161,10 @@ const WorkflowList: React.FC = () => {
       <WorkflowTemplates
         open={isTemplatesDialogOpen}
         onOpenChange={setIsTemplatesDialogOpen}
-        onUseTemplate={(templateId) => handleUseTemplate(templateToWorkflow(templateId))}
+        onUseTemplate={handleUseTemplate}
       />
       
-      {/* Healthcare templates dialog */}
+      {/* Healthcare templates dialog - Fix the onUseTemplate prop */}
       <HealthcareTemplatesDialog
         open={isHealthcareTemplatesOpen}
         onOpenChange={setIsHealthcareTemplatesOpen}
