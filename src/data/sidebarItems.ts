@@ -25,7 +25,7 @@ import {
 export interface SidebarItem {
   title: string;
   href: string;
-  icon: any; // Using 'any' to allow the icon component reference
+  icon: any;
   submenu?: SidebarItem[];
   role?: string[];
 }

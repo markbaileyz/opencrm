@@ -50,27 +50,20 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
   const showFrontDeskSection = user?.role === "front-desk" || user?.role === "admin" || user?.role === "power-user";
   const showAdminSection = user?.role === "admin" || user?.role === "power-user";
   
-  const renderSidebarItem = (item: SidebarItem) => {
-    // Create an instance of the icon component with the size prop
-    const IconComponent = item.icon;
-    
-    return (
-      <SidebarLink
-        key={item.title}
-        href={item.href}
-        isActive={isActive(item.href)}
-      >
-        <IconComponent size={20} />
-        <span>{item.title}</span>
-      </SidebarLink>
-    );
-  };
-  
   return (
     <nav className="space-y-6">
       {/* Base section */}
       <div className="space-y-1">
-        {baseSectionItems.map(renderSidebarItem)}
+        {baseSectionItems.map((item) => (
+          <SidebarLink
+            key={item.title}
+            href={item.href}
+            isActive={isActive(item.href)}
+          >
+            {item.icon}
+            <span>{item.title}</span>
+          </SidebarLink>
+        ))}
       </div>
       
       {/* Patient section */}
@@ -80,7 +73,16 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
             Patient
           </h3>
           <div className="mt-2 space-y-1">
-            {patientSectionItems.map(renderSidebarItem)}
+            {patientSectionItems.map((item) => (
+              <SidebarLink
+                key={item.title}
+                href={item.href}
+                isActive={isActive(item.href)}
+              >
+                {item.icon}
+                <span>{item.title}</span>
+              </SidebarLink>
+            ))}
           </div>
         </div>
       )}
@@ -92,7 +94,16 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
             Medical
           </h3>
           <div className="mt-2 space-y-1">
-            {medicalSectionItems.map(renderSidebarItem)}
+            {medicalSectionItems.map((item) => (
+              <SidebarLink
+                key={item.title}
+                href={item.href}
+                isActive={isActive(item.href)}
+              >
+                {item.icon}
+                <span>{item.title}</span>
+              </SidebarLink>
+            ))}
           </div>
         </div>
       )}
@@ -104,7 +115,16 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
             Front Desk
           </h3>
           <div className="mt-2 space-y-1">
-            {frontDeskSectionItems.map(renderSidebarItem)}
+            {frontDeskSectionItems.map((item) => (
+              <SidebarLink
+                key={item.title}
+                href={item.href}
+                isActive={isActive(item.href)}
+              >
+                {item.icon}
+                <span>{item.title}</span>
+              </SidebarLink>
+            ))}
           </div>
         </div>
       )}
@@ -116,7 +136,16 @@ const SidebarContent = ({ sidebarItems }: SidebarContentProps) => {
             Admin
           </h3>
           <div className="mt-2 space-y-1">
-            {adminSectionItems.map(renderSidebarItem)}
+            {adminSectionItems.map((item) => (
+              <SidebarLink
+                key={item.title}
+                href={item.href}
+                isActive={isActive(item.href)}
+              >
+                {item.icon}
+                <span>{item.title}</span>
+              </SidebarLink>
+            ))}
           </div>
         </div>
       )}
