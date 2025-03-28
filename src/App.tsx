@@ -16,7 +16,16 @@ import Guides from "./pages/Guides";
 import HealthcareCRM from "./pages/HealthcareCRM";
 import { Card, CardContent } from "./components/ui/card";
 
-// Create a placeholder component for the patient-feedback route
+// Create placeholder components for routes that don't have pages yet
+const NotFoundPage = () => (
+  <div className="container mx-auto py-6 text-center">
+    <h1 className="text-4xl font-bold mb-6">Page Not Found</h1>
+    <p className="text-muted-foreground mb-6">
+      The page you're looking for doesn't exist or has been moved.
+    </p>
+  </div>
+);
+
 const PatientFeedbackPage = () => (
   <div className="container mx-auto py-6">
     <h1 className="text-3xl font-bold mb-6">Patient Feedback</h1>
@@ -27,16 +36,6 @@ const PatientFeedbackPage = () => (
         </p>
       </CardContent>
     </Card>
-  </div>
-);
-
-// Create a placeholder component for the 404 page
-const NotFoundPage = () => (
-  <div className="container mx-auto py-6 text-center">
-    <h1 className="text-4xl font-bold mb-6">Page Not Found</h1>
-    <p className="text-muted-foreground mb-6">
-      The page you're looking for doesn't exist or has been moved.
-    </p>
   </div>
 );
 
