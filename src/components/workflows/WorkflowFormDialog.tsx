@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { WorkflowStep, Workflow, WorkflowTrigger, WorkflowStatus } from "@/types/workflow";
-import WorkflowStepBuilder from "./WorkflowStepBuilder";
+import WorkflowStepBuilder from "./step-builder/WorkflowStepBuilder";
 
 interface WorkflowFormDialogProps {
   open: boolean;
