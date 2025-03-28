@@ -26,6 +26,7 @@ interface FollowUpFormProps {
   onSave: (date: string, notes: string) => void;
   initialDate?: Date;
   initialNotes?: string;
+  onCancel?: () => void; // Added the missing prop
 }
 
 const FollowUpForm: React.FC<FollowUpFormProps> = ({
@@ -33,7 +34,8 @@ const FollowUpForm: React.FC<FollowUpFormProps> = ({
   onClose,
   onSave,
   initialDate,
-  initialNotes = ""
+  initialNotes = "",
+  onCancel, // Include the new prop in the component
 }) => {
   const [date, setDate] = useState<Date | undefined>(initialDate);
   const [notes, setNotes] = useState<string>(initialNotes);
@@ -41,6 +43,15 @@ const FollowUpForm: React.FC<FollowUpFormProps> = ({
   const handleSave = () => {
     if (!date) return;
     onSave(format(date, "yyyy-MM-dd"), notes);
+  };
+  
+  const handleCancel = () => {
+    // Use onCancel if provided, otherwise use onClose
+    if (onCancel) {
+      onCancel();
+    } else {
+      onClose();
+    }
   };
   
   return (
@@ -92,7 +103,7 @@ const FollowUpForm: React.FC<FollowUpFormProps> = ({
         </div>
         
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
           <Button onClick={handleSave} disabled={!date}>
