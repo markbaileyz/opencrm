@@ -2,7 +2,7 @@
 import React from "react";
 import { useOfflineState } from "@/hooks/use-offline-state";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip } from "@/components/ui/tooltip";
 import { WifiOff, Wifi, RefreshCw, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -80,47 +80,48 @@ const OfflineStatusIndicator: React.FC<OfflineStatusIndicatorProps> = ({
     );
   }
 
+  // Tooltip content
+  const tooltipContent = (
+    <div className="text-xs">
+      <p>{isOnline ? 'Online' : 'Offline'}</p>
+      {pendingActions > 0 && (
+        <p>{pendingActions} pending {pendingActions === 1 ? 'action' : 'actions'}</p>
+      )}
+      {isSyncing && <p>Syncing...</p>}
+      <p className="text-muted-foreground">Last sync: {lastSyncText}</p>
+    </div>
+  );
+
   // Simple indicator for navbar/status bar
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className={`relative ${className}`}
-            onClick={isOnline ? processPendingActions : forceSyncAttempt}
-            disabled={isSyncing}
-          >
-            {isOnline ? (
-              <Wifi className={`h-4 w-4 ${isSyncing ? 'text-amber-500' : 'text-green-500'}`} />
-            ) : (
-              <WifiOff className="h-4 w-4 text-amber-500" />
-            )}
-            
-            {pendingActions > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                {pendingActions > 9 ? '9+' : pendingActions}
-              </span>
-            )}
-            
-            {isSyncing && (
-              <span className="absolute -bottom-1 -right-1 bg-amber-500 text-white text-xs rounded-full w-2 h-2"></span>
-            )}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <div className="text-xs">
-            <p>{isOnline ? 'Online' : 'Offline'}</p>
-            {pendingActions > 0 && (
-              <p>{pendingActions} pending {pendingActions === 1 ? 'action' : 'actions'}</p>
-            )}
-            {isSyncing && <p>Syncing...</p>}
-            <p className="text-muted-foreground">Last sync: {lastSyncText}</p>
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip 
+      content={tooltipContent}
+      position="bottom"
+    >
+      <Button
+        variant="ghost"
+        size="icon"
+        className={`relative ${className}`}
+        onClick={isOnline ? processPendingActions : forceSyncAttempt}
+        disabled={isSyncing}
+      >
+        {isOnline ? (
+          <Wifi className={`h-4 w-4 ${isSyncing ? 'text-amber-500' : 'text-green-500'}`} />
+        ) : (
+          <WifiOff className="h-4 w-4 text-amber-500" />
+        )}
+        
+        {pendingActions > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+            {pendingActions > 9 ? '9+' : pendingActions}
+          </span>
+        )}
+        
+        {isSyncing && (
+          <span className="absolute -bottom-1 -right-1 bg-amber-500 text-white text-xs rounded-full w-2 h-2"></span>
+        )}
+      </Button>
+    </Tooltip>
   );
 };
 
