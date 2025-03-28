@@ -30,7 +30,6 @@ const Dashboard = () => {
   const { toast } = useToast();
   const { addExecutionRecord } = useExecutionHistory();
   
-  // Get workflows data for the execution monitor
   const { 
     workflows, 
     handleActivateWorkflow, 
@@ -38,10 +37,8 @@ const Dashboard = () => {
     handleViewWorkflow 
   } = useWorkflows();
   
-  // Convert workflows to the format expected by WorkflowExecutionMonitor
   const adaptedWorkflows = adaptWorkflowsForMonitor(workflows);
   
-  // Mock sample data for activity chart
   const activityData = [
     { name: "Jan", value: 30 },
     { name: "Feb", value: 40 },
@@ -52,7 +49,6 @@ const Dashboard = () => {
     { name: "Jul", value: 80 }
   ];
   
-  // Show welcome notification on dashboard load
   useEffect(() => {
     const timer = setTimeout(() => {
       toast({
@@ -61,14 +57,14 @@ const Dashboard = () => {
         variant: "info"
       });
       
-      // Add a sample execution record to demonstrate the functionality
       if (workflows.length > 0) {
         const workflow = workflows[0];
         addExecutionRecord({
           workflowId: workflow.id,
           workflowName: workflow.name,
           success: true,
-          message: "Workflow monitoring activated"
+          message: "Workflow monitoring activated",
+          duration: 1500
         });
       }
     }, 1500);
@@ -76,7 +72,6 @@ const Dashboard = () => {
     return () => clearTimeout(timer);
   }, [toast, workflows, addExecutionRecord]);
   
-  // Function to handle view workflow details with toast notification
   const handleViewDetails = (id: string) => {
     toast({
       title: "Viewing workflow details",
@@ -85,7 +80,6 @@ const Dashboard = () => {
     handleViewWorkflow(id);
   };
   
-  // Assuming user is admin for now - this should be from authentication context
   const isAdmin = true;
   
   if (isMobile) {
@@ -94,7 +88,6 @@ const Dashboard = () => {
         <div className="container mx-auto py-4 space-y-6">
           <DashboardHeader isAdmin={isAdmin} />
           
-          {/* Show offline banner if needed */}
           {(!isOnline || pendingActions > 0) && (
             <OfflineBanner 
               isOnline={isOnline} 
@@ -106,7 +99,6 @@ const Dashboard = () => {
           
           <MobileDashboard />
           
-          {/* Add mobile workflow execution monitor */}
           <WorkflowExecutionMonitor
             workflows={adaptedWorkflows}
             onActivate={handleActivateWorkflow}
@@ -114,7 +106,6 @@ const Dashboard = () => {
             onViewDetails={handleViewDetails}
           />
           
-          {/* Add analytics link for mobile */}
           <div className="flex justify-end">
             <Button variant="outline" size="sm" asChild>
               <Link to="/workflow-analytics" className="flex items-center gap-1">
@@ -133,7 +124,6 @@ const Dashboard = () => {
       <div className="container mx-auto py-6">
         <DashboardHeader isAdmin={isAdmin} />
         
-        {/* Show offline banner if needed - only shown here if not already in App.tsx */}
         {(!isOnline || pendingActions > 0) && (
           <OfflineBanner 
             isOnline={isOnline} 
@@ -152,7 +142,6 @@ const Dashboard = () => {
             </div>
             <SalesPipeline />
             
-            {/* Add workflow execution monitor */}
             <WorkflowExecutionMonitor
               workflows={adaptedWorkflows}
               onActivate={handleActivateWorkflow}

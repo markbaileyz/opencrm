@@ -22,10 +22,9 @@ export const calculateAnalyticsData = (executionHistory: WorkflowExecution[]): A
   const { categoryCounts } = calculateCategoryStats(executionHistory);
   const { executionsPerDay } = calculateDailyExecutions(executionHistory);
   const { branchUsageStats } = calculateBranchStats(executionHistory);
-  const topWorkflowsData = getTopWorkflows(executionHistory);
   
   // Transform the topWorkflows to match the expected format
-  const topWorkflows = topWorkflowsData.map(workflow => ({
+  const topWorkflows = getTopWorkflows(executionHistory).map(workflow => ({
     name: workflow.name,
     count: workflow.count,
     successCount: workflow.successCount,
@@ -47,9 +46,9 @@ export const calculateAnalyticsData = (executionHistory: WorkflowExecution[]): A
     executionsPerDay,
     topWorkflows,
     branchUsageStats: {
-      totalBranches: branchUsageStats.totalBranchesUsed || 0,
-      avgBranchesPerWorkflow: branchUsageStats.averageBranchesPerWorkflow || 0,
-      mostUsedBranch: "Condition Branch" // Default value
+      totalBranches: branchUsageStats.totalBranches || 0,
+      avgBranchesPerWorkflow: branchUsageStats.avgBranchesPerWorkflow || 0,
+      mostUsedBranch: branchUsageStats.mostUsedBranch || "Condition Branch" // Default value
     },
     // Add additional fields for compatibility
     failedExecutions: executionHistory.length - executionHistory.filter(e => e.success).length,
