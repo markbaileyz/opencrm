@@ -13,13 +13,26 @@ import OrganizationInsights from "@/components/dashboard/OrganizationInsights";
 import NotificationCenter from "@/components/dashboard/NotificationCenter";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import OfflineBanner from "@/components/ui/offline-banner";
+import WorkflowExecutionMonitor from "@/components/workflows/execution/WorkflowExecutionMonitor";
 import { useOfflineState } from "@/hooks/use-offline-state";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { OrganizationsProvider } from "@/context/OrganizationsContext";
+import { useWorkflows } from "@/components/workflows/hooks/useWorkflows";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const { isOnline, pendingActions, isSyncing, processPendingActions } = useOfflineState();
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const { toast } = useToast();
+  
+  // Get workflows data for the execution monitor
+  const { 
+    workflows, 
+    handleActivateWorkflow, 
+    handlePauseWorkflow, 
+    handleViewWorkflow 
+  } = useWorkflows();
+  
   // Mock sample data for activity chart
   const activityData = [
     { name: "Jan", value: 30 },
@@ -30,6 +43,16 @@ const Dashboard = () => {
     { name: "Jun", value: 58 },
     { name: "Jul", value: 80 }
   ];
+  
+  // Function to handle view workflow details with toast notification
+  const handleViewDetails = (id: string) => {
+    toast({
+      title: "Viewing workflow details",
+      description: "Redirecting to workflow details page"
+    });
+    handleViewWorkflow(id);
+  };
+  
   // Assuming user is admin for now - this should be from authentication context
   const isAdmin = true;
   
@@ -50,6 +73,14 @@ const Dashboard = () => {
           )}
           
           <MobileDashboard />
+          
+          {/* Add mobile workflow execution monitor */}
+          <WorkflowExecutionMonitor
+            workflows={workflows}
+            onActivate={handleActivateWorkflow}
+            onPause={handlePauseWorkflow}
+            onViewDetails={handleViewDetails}
+          />
         </div>
       </DashboardLayout>
     );
@@ -78,6 +109,14 @@ const Dashboard = () => {
               <KeyMetrics />
             </div>
             <SalesPipeline />
+            
+            {/* Add workflow execution monitor */}
+            <WorkflowExecutionMonitor
+              workflows={workflows}
+              onActivate={handleActivateWorkflow}
+              onPause={handlePauseWorkflow}
+              onViewDetails={handleViewDetails}
+            />
           </div>
           
           <div className="lg:col-span-1 space-y-6">
