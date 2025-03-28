@@ -1,20 +1,14 @@
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import DashboardLayout from "@/components/DashboardLayout";
+import KnowledgeBase from "@/components/knowledge/KnowledgeBase";
 
-const KnowledgeBase = () => {
+const KnowledgeBasePage = () => {
   return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-3xl font-bold mb-6">Knowledge Base</h1>
-      <Card>
-        <CardContent className="p-6">
-          <p className="text-muted-foreground">
-            Access articles, FAQs, and guides to help you use the platform effectively.
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+    <DashboardLayout>
+      <KnowledgeBase />
+    </DashboardLayout>
   );
 };
 
-export default KnowledgeBase;
+export default KnowledgeBasePage;

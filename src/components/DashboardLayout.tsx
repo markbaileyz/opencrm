@@ -10,10 +10,9 @@ import LogoutButton from "@/components/sidebar/LogoutButton";
 import MobileBottomNav from "@/components/ui/mobile-bottom-nav";
 import { useIsMobile } from "@/hooks/use-mobile";
 import VersionDisplay from "@/components/common/VersionDisplay";
-import { Outlet } from "react-router-dom";
 
 interface DashboardLayoutProps {
-  children?: React.ReactNode;
+  children: React.ReactNode;
 }
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
@@ -48,7 +47,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       </aside>
 
       <div className="flex-1 p-6 overflow-auto pb-16 md:pb-6">
-        {children || <Outlet />}
+        {children}
       </div>
       
       {isMobile && <MobileBottomNav />}

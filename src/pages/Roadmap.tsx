@@ -1,72 +1,140 @@
 
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "react-router-dom";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import CRMFeaturesList from "@/components/CRMFeaturesList";
+import { Toaster } from "@/components/ui/toaster";
+import { FilterType } from "@/components/roadmap/FeatureFilters";
+import { SortType } from "@/components/CRMFeaturesList";
+import { ButtonCustom } from "@/components/ui/button-custom";
 
-const Roadmap = ({ isDashboard = false }) => {
-  const [activeTab, setActiveTab] = useState("recent");
+// Import refactored components
+import RoadmapHeader from "@/components/roadmap/RoadmapHeader";
+import StrategicPlan from "@/components/roadmap/StrategicPlan";
+import RoadmapCTA from "@/components/roadmap/RoadmapCTA";
+import ScrollToTopButton from "@/components/roadmap/ScrollToTopButton";
+
+interface RoadmapProps {
+  isDashboard?: boolean;
+}
+
+const Roadmap: React.FC<RoadmapProps> = ({ isDashboard = false }) => {
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [activeSort, setActiveSort] = useState<SortType>("popular");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   
-  return (
-    <div className="container mx-auto py-6 space-y-8">
-      <div className="text-center max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4">Healthcare CRM Roadmap</h1>
-        <p className="text-muted-foreground">
-          Our development roadmap outlines upcoming features and improvements planned for our healthcare CRM platform.
-        </p>
+  const scrollToFeatures = () => {
+    document.getElementById('features-list')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  // If this is being rendered inside the dashboard, skip the navbar and footer
+  if (isDashboard) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <main className="flex-1">
+          <RoadmapHeader 
+            showFilters={showFilters}
+            setShowFilters={setShowFilters}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            showSearch={showSearch}
+            setShowSearch={setShowSearch}
+            activeFilter={activeFilter}
+            setActiveFilter={setActiveFilter}
+            activeSort={activeSort}
+            setActiveSort={setActiveSort}
+            scrollToFeatures={scrollToFeatures}
+          />
+          
+          <div className="container mx-auto px-4 py-6">
+            <div className="flex justify-end mb-8">
+              <Link to="/mind-map">
+                <ButtonCustom variant="outline">
+                  View Mind Map
+                </ButtonCustom>
+              </Link>
+            </div>
+          </div>
+          
+          <StrategicPlan />
+          
+          <div id="features-list">
+            <CRMFeaturesList 
+              searchQuery={searchQuery} 
+              filterType={activeFilter}
+              sortOption={activeSort}
+              categoryFilter={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+            />
+          </div>
+          
+          <RoadmapCTA />
+          
+          <ScrollToTopButton scrollToTop={scrollToTop} />
+        </main>
+        
+        <Toaster />
       </div>
+    );
+  }
+  
+  // Original Roadmap for public route with Navbar and Footer
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
       
-      <Tabs defaultValue="recent" className="w-full" onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto">
-          <TabsTrigger value="recent">Recent Releases</TabsTrigger>
-          <TabsTrigger value="current">Current Sprint</TabsTrigger>
-          <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-        </TabsList>
+      <main className="flex-1">
+        <RoadmapHeader 
+          showFilters={showFilters}
+          setShowFilters={setShowFilters}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          showSearch={showSearch}
+          setShowSearch={setShowSearch}
+          activeFilter={activeFilter}
+          setActiveFilter={setActiveFilter}
+          activeSort={activeSort}
+          setActiveSort={setActiveSort}
+          scrollToFeatures={scrollToFeatures}
+        />
         
-        <TabsContent value="recent" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((item) => (
-              <Card key={item} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="text-xs bg-green-100 text-green-800 rounded-full px-2 py-1 inline-block mb-3">Released</div>
-                  <h3 className="text-lg font-medium mb-2">Patient Portal Improvements</h3>
-                  <p className="text-muted-foreground text-sm mb-4">Enhanced patient profile views and medical history visualization.</p>
-                  <div className="text-xs text-muted-foreground">Released: 2 weeks ago</div>
-                </CardContent>
-              </Card>
-            ))}
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex justify-end mb-8">
+            <Link to="/mind-map">
+              <ButtonCustom variant="outline">
+                View Mind Map
+              </ButtonCustom>
+            </Link>
           </div>
-        </TabsContent>
+        </div>
         
-        <TabsContent value="current" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4].map((item) => (
-              <Card key={item} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="text-xs bg-blue-100 text-blue-800 rounded-full px-2 py-1 inline-block mb-3">In Progress</div>
-                  <h3 className="text-lg font-medium mb-2">Telehealth Integration</h3>
-                  <p className="text-muted-foreground text-sm mb-4">Integrating video conferencing directly into the patient records system.</p>
-                  <div className="text-xs text-muted-foreground">Expected: Next month</div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
+        <StrategicPlan />
         
-        <TabsContent value="upcoming" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5].map((item) => (
-              <Card key={item} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="text-xs bg-amber-100 text-amber-800 rounded-full px-2 py-1 inline-block mb-3">Planned</div>
-                  <h3 className="text-lg font-medium mb-2">AI-Powered Analytics</h3>
-                  <p className="text-muted-foreground text-sm mb-4">Predictive analytics for patient outcomes and treatment recommendations.</p>
-                  <div className="text-xs text-muted-foreground">Planned: Q3 2023</div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+        <div id="features-list">
+          <CRMFeaturesList 
+            searchQuery={searchQuery} 
+            filterType={activeFilter}
+            sortOption={activeSort}
+            categoryFilter={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+          />
+        </div>
+        
+        <RoadmapCTA />
+        
+        <ScrollToTopButton scrollToTop={scrollToTop} />
+      </main>
+      
+      <Footer />
+      <Toaster />
     </div>
   );
 };

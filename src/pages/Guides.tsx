@@ -1,19 +1,25 @@
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import DashboardLayout from "@/components/DashboardLayout";
+import VideoTutorials from "@/components/guides/VideoTutorials";
+import CommunityForums from "@/components/guides/CommunityForums";
+import GuidesHeader from "@/components/guides/GuidesHeader";
+import GuideCardsGrid from "@/components/guides/GuideCardsGrid";
+import AllGuidesSection from "@/components/guides/AllGuidesSection";
+import DocumentationSection from "@/components/guides/DocumentationSection";
 
 const Guides = () => {
   return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-3xl font-bold mb-6">Guides</h1>
-      <Card>
-        <CardContent className="p-6">
-          <p className="text-muted-foreground">
-            View helpful guides and tutorials for using the platform. This feature is coming soon.
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+    <DashboardLayout>
+      <div className="space-y-6">
+        <GuidesHeader />
+        <GuideCardsGrid />
+        <VideoTutorials />
+        <CommunityForums />
+        <AllGuidesSection />
+        <DocumentationSection />
+      </div>
+    </DashboardLayout>
   );
 };
 
