@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { Headset, Stethoscope, Clipboard, BarChart, Users, ClipboardCheck, Star, Shield } from "lucide-react";
@@ -58,12 +57,12 @@ const Hero = ({ scrollToSection }: HeroProps) => {
     }
   ];
   
-  // Partner logos
+  // Partner logos - updated with correct paths that will work in production
   const partnerLogos = [
-    "/public/logos/stark.svg",
-    "/public/logos/acme.svg",
-    "/public/logos/globex.svg",
-    "/public/logos/hooli.svg"
+    "/logos/stark.svg",
+    "/logos/acme.svg",
+    "/logos/globex.svg",
+    "/logos/hooli.svg"
   ];
 
   return (
