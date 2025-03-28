@@ -21,6 +21,8 @@ export interface CallRecord {
     type: 'appointment' | 'patient' | 'organization' | 'deal';
     name: string;
   }>;
+  tags?: string[]; // Add missing tags property
+  recordingUrl?: string; // Add missing recordingUrl property
   createdBy: string;
   createdAt: string;
 }
