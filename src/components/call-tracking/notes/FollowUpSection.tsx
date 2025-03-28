@@ -28,6 +28,10 @@ const FollowUpSection: React.FC<FollowUpSectionProps> = ({
     onCompleteFollowUp(call.id);
   };
 
+  const handleCancelFollowUp = () => {
+    setIsAddingFollowUp(false);
+  };
+
   return (
     <div className="space-y-2">
       <h3 className="font-medium">Follow-up</h3>
@@ -41,8 +45,10 @@ const FollowUpSection: React.FC<FollowUpSectionProps> = ({
         />
       ) : isAddingFollowUp ? (
         <FollowUpForm
+          isOpen={isAddingFollowUp}
+          onClose={() => setIsAddingFollowUp(false)}
           onSave={handleSaveFollowUp}
-          onCancel={() => setIsAddingFollowUp(false)}
+          onCancel={handleCancelFollowUp}
         />
       ) : (
         <div className="flex">
