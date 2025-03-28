@@ -1,207 +1,282 @@
 
 import React, { useState } from "react";
+import { 
+  Popover, 
+  PopoverContent, 
+  PopoverTrigger 
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Label } from "@/components/ui/label";
-import { Calendar as CalendarIcon, Filter, Check } from "lucide-react";
+import { Check, ChevronsUpDown, Filter, X } from "lucide-react";
+import { 
+  Command, 
+  CommandEmpty, 
+  CommandGroup, 
+  CommandInput, 
+  CommandItem, 
+  CommandList, 
+  CommandSeparator 
+} from "@/components/ui/command";
 import { Calendar } from "@/components/ui/calendar";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 import { MedicalRecordFilter } from "@/types/medicalRecord";
 
-interface MedicalRecordsFilterProps {
-  onFilterChange: (filters: MedicalRecordFilter) => void;
-}
-
 const recordTypes = [
-  { id: "visit", label: "Office Visit" },
-  { id: "lab", label: "Lab Results" },
-  { id: "imaging", label: "Imaging" },
-  { id: "procedure", label: "Procedure" },
-  { id: "vaccination", label: "Vaccination" },
-  { id: "allergy", label: "Allergy" },
-  { id: "diagnosis", label: "Diagnosis" },
-  { id: "note", label: "Clinical Note" },
+  { value: "visit", label: "Visit" },
+  { value: "lab", label: "Lab Test" },
+  { value: "imaging", label: "Imaging" },
+  { value: "procedure", label: "Procedure" },
+  { value: "vaccination", label: "Vaccination" },
+  { value: "allergy", label: "Allergy" },
+  { value: "diagnosis", label: "Diagnosis" },
+  { value: "note", label: "Note" }
 ];
 
 const statuses = [
-  { id: "draft", label: "Draft" },
-  { id: "final", label: "Final" },
-  { id: "amended", label: "Amended" },
+  { value: "draft", label: "Draft" },
+  { value: "final", label: "Final" },
+  { value: "amended", label: "Amended" }
 ];
 
 const providers = [
-  { id: "dr-smith", label: "Dr. Smith" },
-  { id: "dr-johnson", label: "Dr. Johnson" },
-  { id: "dr-patel", label: "Dr. Patel" },
-  { id: "dr-williams", label: "Dr. Williams" },
+  { value: "Dr. Smith", label: "Dr. Smith" },
+  { value: "Dr. Johnson", label: "Dr. Johnson" },
+  { value: "Dr. Williams", label: "Dr. Williams" },
+  { value: "Dr. Davis", label: "Dr. Davis" },
+  { value: "Dr. Miller", label: "Dr. Miller" }
 ];
 
-const MedicalRecordsFilter: React.FC<MedicalRecordsFilterProps> = ({ onFilterChange }) => {
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
-  const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
-  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({});
+interface MedicalRecordsFilterProps {
+  onFilterChange: (filter: MedicalRecordFilter) => void;
+}
 
-  const handleApplyFilters = () => {
-    onFilterChange({
-      recordType: selectedTypes.length > 0 ? selectedTypes : undefined,
-      status: selectedStatuses.length > 0 ? selectedStatuses : undefined,
-      provider: selectedProviders.length > 0 ? selectedProviders.map(p => {
-        const found = providers.find(provider => provider.id === p);
-        return found ? found.label : p;
-      }) : undefined,
-      dateRange: dateRange.from && dateRange.to ? {
-        from: dateRange.from.toISOString(),
-        to: dateRange.to.toISOString(),
-      } : undefined,
+const MedicalRecordsFilter: React.FC<MedicalRecordsFilterProps> = ({ onFilterChange }) => {
+  const [open, setOpen] = useState(false);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from: undefined,
+    to: undefined
+  });
+
+  const handleTypeSelect = (value: string) => {
+    setSelectedTypes(prev => {
+      const newSelection = prev.includes(value) 
+        ? prev.filter(item => item !== value)
+        : [...prev, value];
+      
+      updateFilters({
+        recordType: newSelection.length > 0 ? newSelection : undefined,
+      });
+      
+      return newSelection;
     });
   };
 
-  const handleResetFilters = () => {
+  const handleProviderSelect = (value: string) => {
+    setSelectedProviders(prev => {
+      const newSelection = prev.includes(value) 
+        ? prev.filter(item => item !== value)
+        : [...prev, value];
+      
+      updateFilters({
+        provider: newSelection.length > 0 ? newSelection : undefined,
+      });
+      
+      return newSelection;
+    });
+  };
+
+  const handleStatusSelect = (value: string) => {
+    setSelectedStatuses(prev => {
+      const newSelection = prev.includes(value) 
+        ? prev.filter(item => item !== value)
+        : [...prev, value];
+      
+      updateFilters({
+        status: newSelection.length > 0 ? newSelection : undefined,
+      });
+      
+      return newSelection;
+    });
+  };
+
+  const handleDateSelect = (range: { from: Date; to: Date }) => {
+    setDateRange(range);
+    
+    if (range.from && range.to) {
+      updateFilters({
+        dateRange: { 
+          from: format(range.from, 'yyyy-MM-dd'), 
+          to: format(range.to, 'yyyy-MM-dd') 
+        },
+      });
+    }
+  };
+
+  const updateFilters = (partialFilter: Partial<MedicalRecordFilter>) => {
+    const filter: MedicalRecordFilter = {};
+    
+    if (selectedTypes.length > 0) {
+      filter.recordType = selectedTypes;
+    }
+    
+    if (selectedProviders.length > 0) {
+      filter.provider = selectedProviders;
+    }
+    
+    if (selectedStatuses.length > 0) {
+      filter.status = selectedStatuses;
+    }
+    
+    if (dateRange.from && dateRange.to) {
+      filter.dateRange = {
+        from: format(dateRange.from, 'yyyy-MM-dd'),
+        to: format(dateRange.to, 'yyyy-MM-dd')
+      };
+    }
+    
+    // Apply partial filter updates
+    Object.assign(filter, partialFilter);
+    
+    onFilterChange(filter);
+  };
+
+  const clearFilters = () => {
     setSelectedTypes([]);
-    setSelectedStatuses([]);
     setSelectedProviders([]);
-    setDateRange({});
+    setSelectedStatuses([]);
+    setDateRange({ from: undefined, to: undefined });
     onFilterChange({});
   };
 
+  const hasActiveFilters = selectedTypes.length > 0 || 
+    selectedProviders.length > 0 || 
+    selectedStatuses.length > 0 || 
+    (dateRange.from && dateRange.to);
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 gap-1">
-          <Filter className="h-3.5 w-3.5" />
+        <Button 
+          variant="outline" 
+          className={cn(
+            "flex items-center gap-1",
+            hasActiveFilters && "bg-primary/10 border-primary/20"
+          )}
+        >
+          <Filter className="h-4 w-4" />
           <span>Filter</span>
-          {(selectedTypes.length > 0 || selectedStatuses.length > 0 || selectedProviders.length > 0 || dateRange.from) && (
-            <span className="ml-1 rounded-full bg-primary w-2 h-2" />
+          {hasActiveFilters && (
+            <Badge variant="secondary" className="ml-1 h-5 px-1">
+              {selectedTypes.length + selectedProviders.length + selectedStatuses.length + (dateRange.from && dateRange.to ? 1 : 0)}
+            </Badge>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[350px] p-0" align="end">
-        <Card className="border-0 shadow-none">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">Filter Records</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-xs font-medium">Record Type</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {recordTypes.map((type) => (
-                  <div key={type.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`type-${type.id}`}
-                      checked={selectedTypes.includes(type.id)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedTypes([...selectedTypes, type.id]);
-                        } else {
-                          setSelectedTypes(selectedTypes.filter((id) => id !== type.id));
-                        }
-                      }}
-                    />
-                    <Label htmlFor={`type-${type.id}`} className="text-xs">
-                      {type.label}
-                    </Label>
-                  </div>
-                ))}
+      <PopoverContent className="w-[350px] p-0" align="start">
+        <Command>
+          <CommandInput placeholder="Search filters..." />
+          <CommandList>
+            <CommandEmpty>No results found.</CommandEmpty>
+            
+            <CommandGroup heading="Record Type">
+              {recordTypes.map((type) => (
+                <CommandItem 
+                  key={type.value}
+                  onSelect={() => handleTypeSelect(type.value)}
+                  className="flex items-center justify-between"
+                >
+                  <span>{type.label}</span>
+                  {selectedTypes.includes(type.value) && (
+                    <Check className="h-4 w-4" />
+                  )}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+            
+            <CommandSeparator />
+            
+            <CommandGroup heading="Provider">
+              {providers.map((provider) => (
+                <CommandItem 
+                  key={provider.value}
+                  onSelect={() => handleProviderSelect(provider.value)}
+                  className="flex items-center justify-between"
+                >
+                  <span>{provider.label}</span>
+                  {selectedProviders.includes(provider.value) && (
+                    <Check className="h-4 w-4" />
+                  )}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+            
+            <CommandSeparator />
+            
+            <CommandGroup heading="Status">
+              {statuses.map((status) => (
+                <CommandItem 
+                  key={status.value}
+                  onSelect={() => handleStatusSelect(status.value)}
+                  className="flex items-center justify-between"
+                >
+                  <span>{status.label}</span>
+                  {selectedStatuses.includes(status.value) && (
+                    <Check className="h-4 w-4" />
+                  )}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+            
+            <CommandSeparator />
+            
+            <CommandGroup heading="Date Range">
+              <div className="p-2">
+                <Calendar
+                  mode="range"
+                  selected={{
+                    from: dateRange.from || new Date(),
+                    to: dateRange.to || new Date(),
+                  }}
+                  onSelect={(range) => {
+                    if (range?.from && range?.to) {
+                      handleDateSelect(range as { from: Date; to: Date });
+                    }
+                  }}
+                  numberOfMonths={1}
+                  defaultMonth={new Date()}
+                />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-medium">Status</Label>
-              <div className="flex flex-wrap gap-2">
-                {statuses.map((status) => (
-                  <div key={status.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`status-${status.id}`}
-                      checked={selectedStatuses.includes(status.id)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedStatuses([...selectedStatuses, status.id]);
-                        } else {
-                          setSelectedStatuses(selectedStatuses.filter((id) => id !== status.id));
-                        }
-                      }}
-                    />
-                    <Label htmlFor={`status-${status.id}`} className="text-xs">
-                      {status.label}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-medium">Provider</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {providers.map((provider) => (
-                  <div key={provider.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`provider-${provider.id}`}
-                      checked={selectedProviders.includes(provider.id)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedProviders([...selectedProviders, provider.id]);
-                        } else {
-                          setSelectedProviders(selectedProviders.filter((id) => id !== provider.id));
-                        }
-                      }}
-                    />
-                    <Label htmlFor={`provider-${provider.id}`} className="text-xs">
-                      {provider.label}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-medium">Date Range</Label>
-              <div className="grid gap-2">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={`w-full justify-start text-left font-normal ${
-                        !dateRange.from && !dateRange.to ? "text-muted-foreground" : ""
-                      }`}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateRange.from ? (
-                        dateRange.to ? (
-                          <>
-                            {dateRange.from.toLocaleDateString()} - {dateRange.to.toLocaleDateString()}
-                          </>
-                        ) : (
-                          dateRange.from.toLocaleDateString()
-                        )
-                      ) : (
-                        <span>Select date range</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="range"
-                      selected={dateRange}
-                      onSelect={setDateRange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between border-t px-6 py-4">
-            <Button variant="outline" size="sm" onClick={handleResetFilters}>
-              Reset
+            </CommandGroup>
+          </CommandList>
+          
+          <div className="border-t p-2 flex justify-between">
+            <Button
+              variant="outline" 
+              size="sm"
+              onClick={clearFilters}
+              disabled={!hasActiveFilters}
+              className="flex items-center gap-1"
+            >
+              <X className="h-3 w-3" />
+              <span>Clear</span>
             </Button>
-            <Button size="sm" onClick={handleApplyFilters} className="gap-1">
-              <Check className="h-3.5 w-3.5" />
-              Apply Filters
+            <Button
+              size="sm"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-1"
+            >
+              <span>Apply</span>
+              <ChevronsUpDown className="h-3 w-3" />
             </Button>
-          </CardFooter>
-        </Card>
+          </div>
+        </Command>
       </PopoverContent>
     </Popover>
   );

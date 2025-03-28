@@ -4,7 +4,7 @@ import { Route } from "react-router-dom";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import MedicalRecordsPage from "@/pages/MedicalRecordsPage";
 import HealthTrackerPage from "@/pages/HealthTrackerPage";
-import PlaceholderPage from "@/components/ui/placeholder-page";
+import MedicationsPage from "@/pages/MedicationsPage";
 
 export const PatientRoutes = (
   <>
@@ -16,7 +16,7 @@ export const PatientRoutes = (
     
     <Route path="/medications" element={
       <ProtectedRoute allowedRoles={["admin", "power-user", "doctor", "nurse", "patient"]}>
-        <PlaceholderPage title="Medications" description="Your medications will be displayed here soon. We're currently developing this feature." />
+        <MedicationsPage />
       </ProtectedRoute>
     } />
     
