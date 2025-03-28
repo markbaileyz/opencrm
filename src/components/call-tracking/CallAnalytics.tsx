@@ -225,7 +225,10 @@ const CallAnalytics: React.FC<CallAnalyticsProps> = ({ calls, dateRange }) => {
                     />
                     <YAxis />
                     <Tooltip
-                      formatter={(value, name) => [value, name.charAt(0).toUpperCase() + name.slice(1)]}
+                      formatter={(value, name) => {
+                        const nameStr = typeof name === 'string' ? name : String(name);
+                        return [value, nameStr.charAt(0).toUpperCase() + nameStr.slice(1)];
+                      }}
                       labelFormatter={(label) => {
                         const date = new Date(label);
                         return date.toLocaleDateString();

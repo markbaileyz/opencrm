@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Calendar as CalendarIcon, Search, SlidersHorizontal, X } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
+import { DateRange } from "react-day-picker";
 import {
   Select,
   SelectContent,
@@ -64,6 +65,19 @@ const CallFilters: React.FC<CallFiltersProps> = ({
   // Format date for display
   const formatDate = (date?: Date) => {
     return date ? date.toLocaleDateString() : '';
+  };
+
+  // Convert our date range to the format expected by the Calendar
+  const calendarDateRange: DateRange = {
+    from: dateRange.from || new Date(),
+    to: dateRange.to,
+  };
+
+  // Handle date selection from the Calendar
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    // Convert to our interface format
+    onDateRangeChange(range || {});
+    if (range?.to) setIsCalendarOpen(false);
   };
 
   return (
@@ -135,12 +149,10 @@ const CallFilters: React.FC<CallFiltersProps> = ({
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="range"
-                        selected={dateRange}
-                        onSelect={(range) => {
-                          onDateRangeChange(range || {});
-                          if (range?.to) setIsCalendarOpen(false);
-                        }}
+                        selected={dateRange.from ? calendarDateRange : undefined}
+                        onSelect={handleDateRangeChange}
                         initialFocus
+                        className="p-3 pointer-events-auto"
                       />
                     </PopoverContent>
                   </Popover>
