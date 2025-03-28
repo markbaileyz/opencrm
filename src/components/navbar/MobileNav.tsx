@@ -6,6 +6,7 @@ import NavLink from "./NavLink";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { X } from "lucide-react";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -29,11 +30,6 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
     }
   };
   
-  const handleNavigate = (path: string) => {
-    closeMobileMenu();
-    navigate(path, { replace: true });
-  };
-  
   return (
     <motion.div 
       className="md:hidden fixed top-[60px] left-0 right-0 bottom-0 z-40 bg-background/95 backdrop-blur-sm overflow-y-auto"
@@ -44,6 +40,13 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
     >
       <nav className="container mx-auto px-4 flex flex-col h-full">
         <div className="flex items-center justify-between py-4 border-b">
+          <button 
+            onClick={closeMobileMenu}
+            className="p-2 rounded-md hover:bg-muted"
+            aria-label="Close menu"
+          >
+            <X className="h-5 w-5" />
+          </button>
           <ThemeToggle />
         </div>
         
@@ -59,10 +62,7 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
           <NavLink 
             href="/#features" 
             active={location.pathname === "/" && location.hash === "#features"} 
-            onClick={() => {
-              closeMobileMenu();
-              scrollToSection("features");
-            }}
+            onClick={() => scrollToSection("features")}
             className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
           >
             Features
@@ -70,10 +70,7 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
           <NavLink 
             href="/#pricing" 
             active={location.pathname === "/" && location.hash === "#pricing"} 
-            onClick={() => {
-              closeMobileMenu();
-              scrollToSection("pricing");
-            }}
+            onClick={() => scrollToSection("pricing")}
             className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
           >
             Pricing
@@ -81,7 +78,10 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
           <NavLink 
             href="/healthcare-crm" 
             active={isActive("/healthcare-crm")} 
-            onClick={() => handleNavigate("/healthcare-crm")}
+            onClick={() => {
+              closeMobileMenu();
+              navigate("/healthcare-crm");
+            }}
             className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
           >
             Healthcare CRM
@@ -89,7 +89,10 @@ const MobileNav = ({ isOpen, isActive, scrollToSection, closeMobileMenu }: Mobil
           <NavLink 
             href="/roadmap" 
             active={isActive("/roadmap")} 
-            onClick={() => handleNavigate("/roadmap")}
+            onClick={() => {
+              closeMobileMenu();
+              navigate("/roadmap");
+            }}
             className="text-lg font-medium py-4 px-2 rounded-md hover:bg-muted/50 transition-colors"
           >
             Roadmap

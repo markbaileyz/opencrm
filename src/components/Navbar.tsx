@@ -49,17 +49,15 @@ const Navbar = ({ scrollToSection }: NavbarProps) => {
     };
   }, [isMobileMenuOpen]);
 
-  // Close mobile menu when route changes
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [location.pathname, location.hash]);
+  // Close mobile menu when route changes - removed this effect since we need the menu to stay open
+  // for navigating between section links
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
   const handleScrollToSection = (sectionId: string) => {
-    setIsMobileMenuOpen(false);
+    // Don't close the mobile menu here, so users can click multiple sections
     
     if (scrollToSection) {
       scrollToSection(sectionId);
@@ -90,6 +88,15 @@ const Navbar = ({ scrollToSection }: NavbarProps) => {
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
+  const handleHomeClick = () => {
+    if (location.pathname !== '/') {
+      navigate('/', { replace: true });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    closeMobileMenu();
+  };
+
   return (
     <header
       className={cn(
@@ -100,7 +107,7 @@ const Navbar = ({ scrollToSection }: NavbarProps) => {
       )}
     >
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
-        <Link to="/" className="flex items-center z-50" onClick={() => setIsMobileMenuOpen(false)}>
+        <Link to="/" className="flex items-center z-50" onClick={handleHomeClick}>
           <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
             OpenCRM
           </span>
