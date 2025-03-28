@@ -9,6 +9,7 @@ import { useGuide } from "@/contexts/GuideContext";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Video, MessageSquare, FileText, HelpCircle } from "lucide-react";
 import VideoTutorials from "@/components/guides/VideoTutorials";
+import CommunityForums from "@/components/guides/CommunityForums";
 
 const Guides = () => {
   const { guides, startGuide } = useGuide();
@@ -103,16 +104,31 @@ const Guides = () => {
               <p className="text-sm text-muted-foreground mb-4">
                 Join discussions, ask questions, and share your knowledge with the community.
               </p>
-              <div className="text-sm text-center py-6 border border-dashed rounded-md">
-                <p className="text-muted-foreground">Community forums coming soon</p>
+              <div className="grid gap-2">
+                <Button variant="outline" className="justify-start">
+                  <span className="mr-auto">General Discussion</span>
+                  <Badge variant="secondary">24</Badge>
+                </Button>
+                <Button variant="outline" className="justify-start">
+                  <span className="mr-auto">Feature Requests</span>
+                  <Badge variant="secondary">15</Badge>
+                </Button>
+                <Button variant="outline" className="justify-start">
+                  <span className="mr-auto">Help & Support</span>
+                  <Badge variant="secondary">32</Badge>
+                </Button>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Add the VideoTutorials component */}
+        {/* Video Tutorials Section */}
         <VideoTutorials />
 
+        {/* Community Forums Section */}
+        <CommunityForums />
+
+        {/* All Guides Section */}
         <Card>
           <CardHeader>
             <CardTitle>All Guides</CardTitle>
@@ -200,6 +216,7 @@ const Guides = () => {
           </CardContent>
         </Card>
 
+        {/* Documentation Section */}
         <Card>
           <CardHeader>
             <CardTitle>Documentation</CardTitle>
