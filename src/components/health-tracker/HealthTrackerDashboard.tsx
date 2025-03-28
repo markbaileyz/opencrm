@@ -1,18 +1,27 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Plus, HeartPulse, Utensils, Dumbbell, MoonStar } from "lucide-react";
+import { Plus, HeartPulse, Utensils, Dumbbell, MoonStar, BarChart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import VitalsTabContent from "./VitalsTabContent";
 import NutritionTabContent from "./NutritionTabContent";
 import ActivityTabContent from "./ActivityTabContent";
 import SleepTabContent from "./SleepTabContent";
 import HealthSummaryCard from "./HealthSummaryCard";
+import HealthTrendsChart from "./HealthTrendsChart";
+import HealthMetricsComparison from "./HealthMetricsComparison";
 
-const HealthTrackerDashboard: React.FC = () => {
+interface HealthTrackerDashboardProps {
+  timeRange?: string;
+}
+
+const HealthTrackerDashboard: React.FC<HealthTrackerDashboardProps> = ({ 
+  timeRange = "week" 
+}) => {
   const { toast } = useToast();
+  const [selectedMetric, setSelectedMetric] = useState<"bloodPressure" | "heartRate" | "temperature" | "oxygenSaturation" | "glucoseLevel">("bloodPressure");
   
   const handleRecordNew = (type: string) => {
     toast({
@@ -71,18 +80,38 @@ const HealthTrackerDashboard: React.FC = () => {
         </Card>
       </div>
       
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <HealthTrendsChart metricType={selectedMetric} timeRange={timeRange} />
+        <HealthMetricsComparison timeRange={timeRange} />
+      </div>
+      
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-xl">Health Tracking</CardTitle>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Record
-            </Button>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <CardTitle className="text-xl">Health Tracking</CardTitle>
+              <CardDescription>
+                Track and monitor your health metrics over time
+              </CardDescription>
+            </div>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Tabs 
+                value={selectedMetric} 
+                onValueChange={(value) => setSelectedMetric(value as any)}
+                className="w-full sm:w-auto"
+              >
+                <TabsList className="grid grid-cols-3 w-full sm:w-auto">
+                  <TabsTrigger value="bloodPressure">BP</TabsTrigger>
+                  <TabsTrigger value="heartRate">HR</TabsTrigger>
+                  <TabsTrigger value="temperature">Temp</TabsTrigger>
+                </TabsList>
+              </Tabs>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Record
+              </Button>
+            </div>
           </div>
-          <CardDescription>
-            Track and monitor your health metrics over time
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="vitals" className="w-full">

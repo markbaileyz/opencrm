@@ -11,7 +11,7 @@ const HealthTrackerPage: React.FC = () => {
     <DashboardLayout>
       <div className="space-y-6">
         <HealthTrackerHeader timeRange={timeRange} setTimeRange={setTimeRange} />
-        <HealthTrackerDashboard />
+        <HealthTrackerDashboard timeRange={timeRange} />
       </div>
     </DashboardLayout>
   );
