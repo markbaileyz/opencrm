@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { Guide } from "../types/guide-context";
 import { sampleGuides } from "../data/sample-guides";
+import { v4 as uuidv4 } from "uuid";
+import { toast } from "sonner";
 
 export const useGuideProvider = () => {
   const [guides, setGuides] = useState<Guide[]>(sampleGuides);
@@ -44,11 +46,59 @@ export const useGuideProvider = () => {
     }
   };
 
-  // Load guides from API or localStorage in a real implementation
+  // New functions for guide management
+  const addGuide = (guide: Omit<Guide, "id">) => {
+    const newGuide: Guide = {
+      ...guide,
+      id: uuidv4(),
+    };
+    setGuides(prev => [...prev, newGuide]);
+    toast.success("Guide created successfully");
+    return newGuide.id;
+  };
+
+  const updateGuide = (updatedGuide: Guide) => {
+    setGuides(prev => 
+      prev.map(guide => 
+        guide.id === updatedGuide.id ? updatedGuide : guide
+      )
+    );
+    
+    // If the current guide is being updated, update it as well
+    if (currentGuide && currentGuide.id === updatedGuide.id) {
+      setCurrentGuide(updatedGuide);
+    }
+    
+    toast.success("Guide updated successfully");
+  };
+
+  const deleteGuide = (guideId: string) => {
+    setGuides(prev => prev.filter(guide => guide.id !== guideId));
+    
+    // If the current guide is being deleted, stop the guide
+    if (currentGuide && currentGuide.id === guideId) {
+      stopGuide();
+    }
+    
+    toast.success("Guide deleted successfully");
+  };
+
+  // Load guides from localStorage on initial load
   useEffect(() => {
-    // In a real app, we'd fetch guides from an API
-    // For now, we're using the sampleGuides defined above
+    const savedGuides = localStorage.getItem("guides");
+    if (savedGuides) {
+      try {
+        setGuides(JSON.parse(savedGuides));
+      } catch (error) {
+        console.error("Failed to parse saved guides:", error);
+      }
+    }
   }, []);
+
+  // Save guides to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("guides", JSON.stringify(guides));
+  }, [guides]);
 
   return {
     guides,
@@ -60,5 +110,8 @@ export const useGuideProvider = () => {
     nextStep,
     prevStep,
     skipToStep,
+    addGuide,
+    updateGuide,
+    deleteGuide
   };
 };

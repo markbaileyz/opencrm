@@ -25,4 +25,7 @@ export interface GuideContextType {
   nextStep: () => void;
   prevStep: () => void;
   skipToStep: (index: number) => void;
+  addGuide: (guide: Omit<Guide, "id">) => string;
+  updateGuide: (guide: Guide) => void;
+  deleteGuide: (guideId: string) => void;
 }
