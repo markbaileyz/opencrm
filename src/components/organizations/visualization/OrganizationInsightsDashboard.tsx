@@ -5,20 +5,28 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Building2, Network, BarChart3, Activity, Users, TrendingUp } from "lucide-react";
 import { useOrganizations } from "@/context/OrganizationsContext";
 import OrganizationNetworkGraph from './OrganizationNetworkGraph';
-import { OrganizationSizeDistribution, OrganizationTypeChart } from '@/components/organizations';
+import OrganizationSizeDistribution from "@/components/organizations/OrganizationSizeDistribution";
+import OrganizationTypeChart from "@/components/organizations/OrganizationTypeChart";
 
 const OrganizationInsightsDashboard: React.FC = () => {
   const { organizations } = useOrganizations();
   
   // Calculate organization metrics
   const totalOrganizations = organizations.length;
-  const activeOrganizations = organizations.filter(org => org.status === 'active').length;
-  const totalEmployees = organizations.reduce((sum, org) => sum + (org.employees || 0), 0);
+  const activeOrganizations = organizations.filter(org => org.status === "Active").length;
+  const totalEmployees = organizations.reduce((sum, org) => {
+    // Use a default value for employees if not defined
+    const employeeCount = org.size === "Small" ? 10 : 
+                         org.size === "Medium" ? 50 : 
+                         org.size === "Large" ? 200 : 
+                         org.size === "Enterprise" ? 500 : 0;
+    return sum + employeeCount;
+  }, 0);
   const avgDeals = Math.round(Math.random() * 15) + 5; // Mock data
   
-  // Industries distribution
+  // Industries distribution based on types
   const industries = organizations.reduce((acc, org) => {
-    const industry = org.industry || 'Other';
+    const industry = org.type || 'Other'; // Use type as a proxy for industry
     acc[industry] = (acc[industry] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);

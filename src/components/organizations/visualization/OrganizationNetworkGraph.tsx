@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -77,12 +78,21 @@ const OrganizationNetworkGraph: React.FC = () => {
   const relationships = generateRelationships();
   
   // Convert organizations to graph nodes
-  const nodes: Node[] = organizations.map(org => ({
-    id: org.id,
-    name: org.name,
-    size: 10 + (org.employees ? Math.min(org.employees / 100, 20) : 10),
-    category: org.industry || "Other"
-  }));
+  const nodes: Node[] = organizations.map(org => {
+    // Calculate node size based on organization size
+    let nodeSize = 10; // Default size
+    if (org.size === "Small") nodeSize = 8;
+    else if (org.size === "Medium") nodeSize = 12;
+    else if (org.size === "Large") nodeSize = 16;
+    else if (org.size === "Enterprise") nodeSize = 20;
+    
+    return {
+      id: org.id,
+      name: org.name,
+      size: nodeSize,
+      category: org.type || "Other" // Use type as a proxy for category/industry
+    };
+  });
   
   const filteredRelationships = relationships.filter(rel => {
     if (relationshipFilter !== "all" && rel.type !== relationshipFilter) return false;
