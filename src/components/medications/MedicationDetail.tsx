@@ -1,13 +1,16 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import MedicationHeader from "./detail/MedicationHeader";
 import MedicationOverview from "./detail/MedicationOverview";
 import MedicationInteractions from "./detail/MedicationInteractions";
 import MedicationHistory from "./detail/MedicationHistory";
 import MedicationDocuments from "./detail/MedicationDocuments";
 import MedicationFooter from "./detail/MedicationFooter";
+import PrescriptionFormDialog from "./prescriptions/PrescriptionFormDialog";
 
 interface MedicationDetailProps {
   medication: {
@@ -34,6 +37,8 @@ interface MedicationDetailProps {
 }
 
 const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose }) => {
+  const [isPrescriptionDialogOpen, setIsPrescriptionDialogOpen] = useState(false);
+  
   // Transform interactions data to match the expected format in MedicationInteractions
   const formattedInteractions = medication.interactions?.map(interaction => ({
     medications: [interaction.medication], // Convert single medication string to an array
@@ -49,6 +54,17 @@ const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose
       <MedicationHeader medication={medication} onClose={onClose} />
       
       <CardContent>
+        <div className="flex justify-end mb-4">
+          <Button 
+            onClick={() => setIsPrescriptionDialogOpen(true)}
+            size="sm"
+            className="flex items-center gap-1"
+          >
+            <Plus className="h-4 w-4" />
+            New Prescription
+          </Button>
+        </div>
+        
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -84,6 +100,11 @@ const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose
       </CardContent>
       
       <MedicationFooter />
+      
+      <PrescriptionFormDialog 
+        open={isPrescriptionDialogOpen} 
+        onOpenChange={setIsPrescriptionDialogOpen} 
+      />
     </Card>
   );
 };
