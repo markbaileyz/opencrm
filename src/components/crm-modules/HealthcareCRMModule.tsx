@@ -7,6 +7,7 @@ import ReferralTrackingPanel from "./referrals/ReferralTrackingPanel";
 import PatientEngagementMetrics from "./metrics/PatientEngagementMetrics";
 import PatientManagementPanel from "./patients/PatientManagementPanel";
 import AppointmentSchedulingPanel from "./appointments/AppointmentSchedulingPanel";
+import TreatmentPlansPanel from "./treatments/TreatmentPlansPanel";
 
 const HealthcareCRMModule: React.FC = () => {
   return (
@@ -57,14 +58,7 @@ const HealthcareCRMModule: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="treatments" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Treatment Plans</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Treatment plans interface will be displayed here.</p>
-            </CardContent>
-          </Card>
+          <TreatmentPlansPanel />
         </TabsContent>
         
         <TabsContent value="referrals" className="mt-4">
