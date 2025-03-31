@@ -47,7 +47,7 @@ const RefillStatusBadge: React.FC<RefillStatusBadgeProps> = ({ status }) => {
         };
       case "denied":
         return {
-          label: "Destructive",
+          label: "Denied",
           variant: "destructive" as const,
           icon: <AlertCircle className="h-3 w-3 mr-1" />,
         };

@@ -1,25 +1,15 @@
-
 import React, { useState } from "react";
 import {
   Table,
   TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { MoreHorizontal, FileText, RefreshCw } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { DateRange } from "react-day-picker";
 import RefillRequestDialog from "./RefillRequestDialog";
-import RefillStatusBadge, { RefillStatus } from "./RefillStatusBadge";
+import { RefillStatus } from "./RefillStatusBadge";
+import PrescriptionTableHeader from "./PrescriptionTableHeader";
+import PrescriptionTableRow from "./PrescriptionTableRow";
+import EmptyPrescriptionState from "./EmptyPrescriptionState";
+import { usePrescriptionFilters, Prescription } from "./hooks/usePrescriptionFilters";
 
 // Mock data for prescriptions - enhanced with refill information
 const MOCK_PRESCRIPTIONS = [
@@ -135,7 +125,7 @@ const MOCK_PRESCRIPTIONS = [
     lastFilled: new Date(2024, 9, 15),
     refillStatus: "cancelled",
   },
-];
+] as Prescription[];
 
 interface PrescriptionHistoryTableProps {
   status: "active" | "expired" | "all";
@@ -151,38 +141,14 @@ const PrescriptionHistoryTable: React.FC<PrescriptionHistoryTableProps> = ({
   medicationFilter,
 }) => {
   const [refillDialogOpen, setRefillDialogOpen] = useState(false);
-  const [selectedPrescription, setSelectedPrescription] = useState<any>(null);
+  const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null);
 
-  // Filter prescriptions based on props
-  const filteredPrescriptions = MOCK_PRESCRIPTIONS.filter((prescription) => {
-    // Filter by status
-    if (status !== "all" && prescription.status !== status) {
-      return false;
-    }
-
-    // Filter by search query
-    if (
-      searchQuery &&
-      !prescription.medicationName.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !prescription.id.toLowerCase().includes(searchQuery.toLowerCase())
-    ) {
-      return false;
-    }
-
-    // Filter by date range
-    if (dateRange?.from && prescription.prescribedDate < dateRange.from) {
-      return false;
-    }
-    if (dateRange?.to && prescription.prescribedDate > dateRange.to) {
-      return false;
-    }
-
-    // Filter by medication
-    if (medicationFilter && prescription.medicationName !== medicationFilter) {
-      return false;
-    }
-
-    return true;
+  const { filteredPrescriptions } = usePrescriptionFilters({
+    prescriptions: MOCK_PRESCRIPTIONS,
+    status,
+    searchQuery,
+    dateRange,
+    medicationFilter,
   });
 
   const formatDate = (date: Date) => {
@@ -193,7 +159,7 @@ const PrescriptionHistoryTable: React.FC<PrescriptionHistoryTableProps> = ({
     });
   };
 
-  const handleRefillRequest = (prescription: any) => {
+  const handleRefillRequest = (prescription: Prescription) => {
     setSelectedPrescription(prescription);
     setRefillDialogOpen(true);
   };
@@ -202,75 +168,18 @@ const PrescriptionHistoryTable: React.FC<PrescriptionHistoryTableProps> = ({
     <>
       <div className="border rounded-md">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Medication</TableHead>
-              <TableHead>Rx Number</TableHead>
-              <TableHead>Dosage</TableHead>
-              <TableHead>Prescribed</TableHead>
-              <TableHead>Expires</TableHead>
-              <TableHead>Refills</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Refill Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
+          <PrescriptionTableHeader />
           <TableBody>
             {filteredPrescriptions.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
-                  No prescriptions found matching your criteria
-                </TableCell>
-              </TableRow>
+              <EmptyPrescriptionState />
             ) : (
               filteredPrescriptions.map((prescription) => (
-                <TableRow key={prescription.id}>
-                  <TableCell className="font-medium">{prescription.medicationName}</TableCell>
-                  <TableCell>{prescription.id}</TableCell>
-                  <TableCell>{`${prescription.dosage}, ${prescription.frequency}`}</TableCell>
-                  <TableCell>{formatDate(prescription.prescribedDate)}</TableCell>
-                  <TableCell>{formatDate(prescription.expiryDate)}</TableCell>
-                  <TableCell>{prescription.refillsRemaining}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={prescription.status === "active" ? "default" : "secondary"}
-                    >
-                      {prescription.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <RefillStatusBadge status={prescription.refillStatus as RefillStatus} />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem className="flex items-center">
-                          <FileText className="mr-2 h-4 w-4" />
-                          View Details
-                        </DropdownMenuItem>
-                        {prescription.status === "active" && 
-                         (prescription.refillsRemaining > 0 || !prescription.refillStatus) && 
-                         prescription.refillStatus !== "pending" &&
-                         prescription.refillStatus !== "approved" &&
-                         prescription.refillStatus !== "processing" && (
-                          <DropdownMenuItem 
-                            className="flex items-center"
-                            onClick={() => handleRefillRequest(prescription)}
-                          >
-                            <RefreshCw className="mr-2 h-4 w-4" />
-                            Request Refill
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
+                <PrescriptionTableRow
+                  key={prescription.id}
+                  prescription={prescription}
+                  onRefillRequest={handleRefillRequest}
+                  formatDate={formatDate}
+                />
               ))
             )}
           </TableBody>
