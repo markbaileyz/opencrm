@@ -6,9 +6,9 @@
 
 export const VERSION = {
   major: 1,
-  minor: 0,
+  minor: 1,
   patch: 0,
-  build: 1,
+  build: 21,
   toString: function() {
     return `${this.major}.${this.minor}.${this.patch} (${this.build})`;
   }
@@ -18,6 +18,17 @@ export const VERSION = {
  * Version history for changelog
  */
 export const VERSION_HISTORY = [
+  {
+    version: "1.1.0",
+    date: "2023-08-25",
+    changes: [
+      "Enhanced roadmap with progress tracking",
+      "Improved version display",
+      "Added workflow analytics dashboard",
+      "Implemented compliance reporting",
+      "Enhanced healthcare CRM strategies"
+    ]
+  },
   {
     version: "1.0.0",
     date: "2023-06-14",
