@@ -143,6 +143,7 @@ interface PrescriptionHistoryTableProps {
   searchQuery: string;
   dateRange: DateRange | undefined;
   medicationFilter: string | null;
+  actionButton?: (prescription: any) => React.ReactNode;
 }
 
 const PrescriptionHistoryTable: React.FC<PrescriptionHistoryTableProps> = ({
@@ -150,6 +151,7 @@ const PrescriptionHistoryTable: React.FC<PrescriptionHistoryTableProps> = ({
   searchQuery,
   dateRange,
   medicationFilter,
+  actionButton,
 }) => {
   const [refillDialogOpen, setRefillDialogOpen] = useState(false);
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
@@ -216,6 +218,7 @@ const PrescriptionHistoryTable: React.FC<PrescriptionHistoryTableProps> = ({
                   onRefillRequest={handleRefillRequest}
                   onApprovalRequest={handleApprovalRequest}
                   formatDate={formatDate}
+                  actionButton={actionButton ? actionButton(prescription) : undefined}
                 />
               ))
             )}

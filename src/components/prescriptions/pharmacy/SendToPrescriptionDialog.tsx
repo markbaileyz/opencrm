@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Dialog,
@@ -189,7 +188,7 @@ const SendToPrescriptionDialog: React.FC<SendToPrescriptionDialogProps> = ({
           )}
           
           {selectedPharmacy && !selectedPharmacy.isIntegrated && (
-            <Alert variant="warning" className="bg-amber-50 text-amber-800 border-amber-200">
+            <Alert variant="destructive" className="bg-amber-50 text-amber-800 border-amber-200">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Non-Integrated Pharmacy</AlertTitle>
               <AlertDescription>
@@ -232,7 +231,7 @@ const SendToPrescriptionDialog: React.FC<SendToPrescriptionDialogProps> = ({
           </div>
           
           {communicationMethod === "electronic" && selectedPharmacy?.isIntegrated && (
-            <Alert variant="default" className="bg-blue-50 text-blue-800 border-blue-200">
+            <Alert className="bg-blue-50 text-blue-800 border-blue-200">
               <Info className="h-4 w-4" />
               <AlertDescription>
                 The prescription will be sent electronically directly to the pharmacy system. 
