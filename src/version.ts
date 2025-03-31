@@ -7,8 +7,8 @@
 export const VERSION = {
   major: 1,
   minor: 1,
-  patch: 2,
-  build: 23,
+  patch: 3,
+  build: 24,
   toString: function() {
     return `${this.major}.${this.minor}.${this.patch} (${this.build})`;
   }
@@ -18,6 +18,17 @@ export const VERSION = {
  * Version history for changelog
  */
 export const VERSION_HISTORY = [
+  {
+    version: "1.1.3",
+    date: "2024-04-15",
+    changes: [
+      "Advanced patient vitals visualization with historical data",
+      "Implemented anomaly detection in vitals readings",
+      "Added statistical analysis for patient vitals",
+      "Enhanced mobile health tracking experience",
+      "Improved healthcare-specific features foundation"
+    ]
+  },
   {
     version: "1.1.2",
     date: "2024-04-12",
@@ -96,24 +107,24 @@ export const ROADMAP_STATUS = {
       "Mobile Responsiveness",
       "Healthcare-Specific Features"
     ],
-    focusArea: "Mobile Responsiveness",
+    focusArea: "Healthcare-Specific Features",
     tasks: [
-      "Add offline capabilities for mobile users",
-      "Implement progressive web app features",
-      "Create mobile-specific navigation patterns",
-      "Optimize image and asset loading for mobile networks"
+      "Implement advanced patient vitals graphing",
+      "Develop anomaly detection for vital signs",
+      "Create statistical analysis for patient baselines",
+      "Build medication-patient relationship system"
     ],
     percentage: {
       "Content Development": 85,
       "Mobile Responsiveness": 80,
-      "Healthcare-Specific Features": 25
+      "Healthcare-Specific Features": 35
     }
   },
   nextSteps: [
-    "Complete Mobile Responsiveness enhancements",
-    "Expand Healthcare-Specific Features",
-    "Finish Content Development section",
-    "Begin Organizations Module Extensions",
-    "Enhance Patient Vitals tracking with graphing capabilities"
+    "Continue Healthcare-Specific Features development",
+    "Implement Medication Management system",
+    "Create Role-Based Views for healthcare providers",
+    "Enhance Patient Documentation System",
+    "Complete Mobile Responsiveness enhancements"
   ]
 };
