@@ -146,6 +146,7 @@ const VitalsInteractiveChart: React.FC<VitalsInteractiveChartProps> = ({
   const handleMouseUp = () => {
     setIsSelecting(false);
     if (customStartIndex !== null && customEndIndex !== null) {
+      // Perform any additional actions needed when selection is complete
     } else {
       setCustomStartIndex(null);
       setCustomEndIndex(null);
