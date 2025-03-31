@@ -35,6 +35,8 @@ export interface MedicationInteraction {
   severity: "low" | "medium" | "high";
   description: string;
   recommendation: string;
+  mechanism?: string;
+  evidence?: string;
 }
 
 // Sample current medications
@@ -158,24 +160,33 @@ export const medicationInteractions: MedicationInteraction[] = [
     medications: ["Lisinopril", "Potassium supplements"],
     severity: "high",
     description: "Combining these medications can lead to dangerously high potassium levels (hyperkalemia).",
-    recommendation: "Avoid combination or monitor potassium levels closely."
+    recommendation: "Avoid combination or monitor potassium levels closely.",
+    mechanism: "ACE inhibitors like Lisinopril decrease aldosterone production, reducing potassium excretion.",
+    evidence: "Multiple clinical studies have shown increased risk of hyperkalemia when combining these medications."
   },
   {
     medications: ["Lisinopril", "Ibuprofen"],
     severity: "medium",
     description: "NSAIDs like Ibuprofen may reduce the blood pressure-lowering effects of Lisinopril.",
-    recommendation: "Consider acetaminophen instead of ibuprofen when possible."
+    recommendation: "Consider acetaminophen instead of ibuprofen when possible.",
+    mechanism: "NSAIDs inhibit prostaglandin synthesis which can counteract the effects of ACE inhibitors.",
+    evidence: "Case-control studies indicate a modest reduction in blood pressure control."
   },
   {
     medications: ["Metformin", "Contrast dyes"],
     severity: "high",
     description: "Contrast dyes used in certain imaging procedures can increase the risk of kidney problems and lactic acidosis when taking Metformin.",
-    recommendation: "Temporarily stop Metformin before and after imaging procedures with contrast."
+    recommendation: "Temporarily stop Metformin before and after imaging procedures with contrast.",
+    mechanism: "Contrast materials can cause acute kidney injury in some patients, potentially leading to metformin accumulation and lactic acidosis.",
+    evidence: "FDA and EMA guidelines recommend temporary discontinuation of metformin when using contrast agents."
   },
   {
     medications: ["Atorvastatin", "Grapefruit juice"],
     severity: "medium",
     description: "Grapefruit juice can increase the concentration of Atorvastatin in the bloodstream, potentially increasing side effects.",
-    recommendation: "Avoid consuming grapefruit or its juice while taking Atorvastatin."
+    recommendation: "Avoid consuming grapefruit or its juice while taking Atorvastatin.",
+    mechanism: "Grapefruit contains compounds that inhibit CYP3A4 enzymes responsible for Atorvastatin metabolism.",
+    evidence: "Pharmacokinetic studies show increased statin levels up to 200% when combined with grapefruit juice."
   }
 ];
+

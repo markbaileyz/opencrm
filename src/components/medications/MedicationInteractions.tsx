@@ -5,12 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, CheckCircle, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import InteractionCard from "./detail/interactions/InteractionCard";
 
 interface Interaction {
   medications: string[];
   severity: "low" | "medium" | "high";
   description: string;
   recommendation: string;
+  mechanism?: string;
+  evidence?: string;
 }
 
 interface MedicationInteractionsProps {
@@ -36,19 +39,6 @@ const MedicationInteractions: React.FC<MedicationInteractionsProps> = ({
   
   const handleCheck = () => {
     setCheckComplete(true);
-  };
-  
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case "high":
-        return "bg-red-100 text-red-800 border-red-300";
-      case "medium":
-        return "bg-amber-100 text-amber-800 border-amber-300";
-      case "low":
-        return "bg-blue-100 text-blue-800 border-blue-300";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-300";
-    }
   };
   
   return (
@@ -83,20 +73,15 @@ const MedicationInteractions: React.FC<MedicationInteractionsProps> = ({
           filteredInteractions.length > 0 ? (
             <div className="space-y-3">
               {filteredInteractions.map((interaction, index) => (
-                <div 
-                  key={index} 
-                  className={`border p-3 rounded-md ${getSeverityColor(interaction.severity)}`}
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <AlertTriangle className="h-4 w-4" />
-                    <span className="font-medium">{interaction.medications.join(" + ")}</span>
-                    <Badge variant="outline" className={getSeverityColor(interaction.severity)}>
-                      {interaction.severity} severity
-                    </Badge>
-                  </div>
-                  <p className="text-sm mb-2">{interaction.description}</p>
-                  <p className="text-sm font-medium">Recommendation: {interaction.recommendation}</p>
-                </div>
+                <InteractionCard
+                  key={index}
+                  medications={interaction.medications}
+                  severity={interaction.severity}
+                  description={interaction.description}
+                  recommendation={interaction.recommendation}
+                  mechanism={interaction.mechanism}
+                  evidence={interaction.evidence}
+                />
               ))}
             </div>
           ) : (

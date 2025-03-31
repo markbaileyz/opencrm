@@ -1,115 +1,108 @@
 
 import React, { useState } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, ChevronDown, ChevronUp, AlertCircle, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { Tooltip } from "@/components/ui/tooltip";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface InteractionCardProps {
-  interaction: {
-    medication: string;
-    severity: "low" | "medium" | "high";
-    description: string;
-    mechanism?: string;
-    recommendation?: string;
-  };
-  isExpanded: boolean;
-  onToggle: () => void;
+  medications: string[];
+  severity: "low" | "medium" | "high";
+  description: string;
+  recommendation: string;
+  mechanism?: string;
+  evidence?: string;
 }
 
-const InteractionCard: React.FC<InteractionCardProps> = ({ 
-  interaction, 
-  isExpanded, 
-  onToggle 
+const InteractionCard: React.FC<InteractionCardProps> = ({
+  medications,
+  severity,
+  description,
+  recommendation,
+  mechanism = "Not specified",
+  evidence = "No specific studies cited"
 }) => {
-  const getSeverityColor = (severity: string) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const getSeverityIcon = () => {
     switch (severity) {
       case "high":
-        return "bg-red-100 text-red-800";
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
       case "medium":
-        return "bg-amber-100 text-amber-800";
+        return <AlertTriangle className="h-4 w-4 text-amber-500" />;
       case "low":
-        return "bg-blue-100 text-blue-800";
+        return <Info className="h-4 w-4 text-blue-500" />;
       default:
-        return "bg-gray-100 text-gray-800";
+        return <Info className="h-4 w-4 text-blue-500" />;
     }
   };
   
-  const getSeverityIcon = (severity: string) => {
+  const getSeverityColor = () => {
     switch (severity) {
       case "high":
-        return <AlertTriangle className="h-5 w-5 text-red-500" />;
+        return "border-red-200 bg-red-50 dark:bg-red-900/20";
       case "medium":
-        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+        return "border-amber-200 bg-amber-50 dark:bg-amber-900/20";
       case "low":
-        return <AlertTriangle className="h-5 w-5 text-blue-500" />;
+        return "border-blue-200 bg-blue-50 dark:bg-blue-900/20";
       default:
-        return <AlertTriangle className="h-5 w-5 text-gray-500" />;
+        return "border-gray-200 bg-gray-50 dark:bg-gray-900/20";
     }
   };
   
+  const getSeverityBadge = () => {
+    switch (severity) {
+      case "high":
+        return <Badge variant="destructive">High severity</Badge>;
+      case "medium":
+        return <Badge variant="warning">Medium severity</Badge>;
+      case "low":
+        return <Badge variant="primary">Low severity</Badge>;
+      default:
+        return <Badge variant="outline">Unknown severity</Badge>;
+    }
+  };
+
   return (
-    <Collapsible
-      open={isExpanded}
-      onOpenChange={onToggle}
-      className="border rounded-md overflow-hidden"
-    >
-      <CollapsibleTrigger className="w-full p-3 flex items-center justify-between bg-muted/30 hover:bg-muted/50 transition-colors">
-        <div className="flex items-center gap-3">
-          {getSeverityIcon(interaction.severity)}
-          <div>
-            <div className="flex items-center gap-2">
-              <p className="font-medium">{interaction.medication}</p>
-              <Badge className={getSeverityColor(interaction.severity)}>
-                {interaction.severity} severity
-              </Badge>
-            </div>
-            <p className="text-sm text-muted-foreground text-left">
-              {interaction.description.substring(0, 60)}...
-            </p>
+    <div className={`border rounded-md ${getSeverityColor()} overflow-hidden`}>
+      <div className="p-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            {getSeverityIcon()}
+            <h4 className="font-medium">{medications.join(" + ")}</h4>
+            {getSeverityBadge()}
           </div>
-        </div>
-        <Button variant="ghost" size="sm">
-          {isExpanded ? "Less" : "More"}
-        </Button>
-      </CollapsibleTrigger>
-      
-      <CollapsibleContent className="p-4 pt-2 border-t bg-muted/10">
-        <div className="space-y-4">
-          <div>
-            <h4 className="text-sm font-medium mb-1">Full Description</h4>
-            <p className="text-sm">{interaction.description}</p>
-          </div>
-          
-          {interaction.mechanism && (
-            <div>
-              <h4 className="text-sm font-medium mb-1">Mechanism of Interaction</h4>
-              <p className="text-sm">{interaction.mechanism}</p>
-            </div>
-          )}
-          
-          {interaction.recommendation && (
-            <div>
-              <h4 className="text-sm font-medium mb-1">Recommendations</h4>
-              <p className="text-sm">{interaction.recommendation}</p>
-            </div>
-          )}
-          
-          <div className="pt-2">
-            <Tooltip content="Contact prescriber about this interaction">
-              <Button size="sm">
-                Contact Prescriber
+          <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                {isOpen ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+                <span className="sr-only">Toggle details</span>
               </Button>
-            </Tooltip>
-          </div>
+            </CollapsibleTrigger>
+          </Collapsible>
         </div>
-      </CollapsibleContent>
-    </Collapsible>
+        
+        <p className="text-sm mb-2">{description}</p>
+        <p className="text-sm font-medium">Recommendation: {recommendation}</p>
+        
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+          <CollapsibleContent className="mt-2 pt-2 border-t border-dashed border-gray-200 dark:border-gray-700">
+            <div className="space-y-2 text-sm">
+              <div>
+                <span className="font-medium">Mechanism:</span> {mechanism}
+              </div>
+              <div>
+                <span className="font-medium">Evidence:</span> {evidence}
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+    </div>
   );
 };
 
