@@ -10,6 +10,8 @@ import MedicationInteractions from "./detail/MedicationInteractions";
 import MedicationHistory from "./detail/MedicationHistory";
 import MedicationDocuments from "./detail/MedicationDocuments";
 import MedicationFooter from "./detail/MedicationFooter";
+import MedicationSchedule from "./detail/MedicationSchedule";
+import RefillReminder from "./detail/RefillReminder";
 import PrescriptionFormDialog from "./prescriptions/PrescriptionFormDialog";
 
 interface MedicationDetailProps {
@@ -66,8 +68,9 @@ const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose
         </div>
         
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="schedule">Schedule</TabsTrigger>
             <TabsTrigger value="interactions">
               Interactions
               {medication.interactions && medication.interactions.some(i => i.severity === "high") && (
@@ -80,6 +83,18 @@ const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose
           
           <TabsContent value="overview" className="mt-4">
             <MedicationOverview medication={medication} />
+          </TabsContent>
+          
+          <TabsContent value="schedule" className="mt-4 space-y-4">
+            <MedicationSchedule 
+              medicationName={medication.name}
+              schedule={medication.schedule}
+            />
+            <RefillReminder 
+              medicationName={medication.name}
+              refills={medication.refills}
+              expiryDate={medication.endDate}
+            />
           </TabsContent>
           
           <TabsContent value="interactions" className="mt-4">
