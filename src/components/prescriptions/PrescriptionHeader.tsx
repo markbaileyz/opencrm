@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ArrowLeft, FileText, FilePlus } from "lucide-react";
+import { ArrowLeft, FileText, FilePlus, Pill } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -9,6 +9,10 @@ const PrescriptionHeader: React.FC = () => {
 
   const handleBack = () => {
     navigate("/dashboard");
+  };
+  
+  const handlePharmacyIntegration = () => {
+    navigate("/pharmacy-integration");
   };
 
   return (
@@ -21,6 +25,10 @@ const PrescriptionHeader: React.FC = () => {
         <h1 className="text-2xl font-bold">Prescriptions</h1>
       </div>
       <div className="flex gap-2">
+        <Button variant="outline" size="sm" onClick={handlePharmacyIntegration}>
+          <Pill className="h-4 w-4 mr-1" />
+          Pharmacy Integration
+        </Button>
         <Button variant="outline" size="sm">
           <FileText className="h-4 w-4 mr-1" />
           Export

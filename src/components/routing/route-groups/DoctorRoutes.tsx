@@ -4,6 +4,7 @@ import { Route } from "react-router-dom";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PrescriptionsPage from "@/pages/PrescriptionsPage";
 import PlaceholderPage from "@/components/ui/placeholder-page";
+import PharmacyPage from "@/components/prescriptions/pharmacy/PharmacyPage";
 
 export const DoctorRoutes = (
   <>
@@ -16,6 +17,12 @@ export const DoctorRoutes = (
     <Route path="/prescriptions" element={
       <ProtectedRoute allowedRoles={["admin", "power-user", "doctor"]}>
         <PrescriptionsPage />
+      </ProtectedRoute>
+    } />
+
+    <Route path="/pharmacy-integration" element={
+      <ProtectedRoute allowedRoles={["admin", "power-user", "doctor"]}>
+        <PharmacyPage />
       </ProtectedRoute>
     } />
   </>
