@@ -2,22 +2,33 @@
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DashboardLayout from "@/components/DashboardLayout";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 import PrescriptionHeader from "@/components/prescriptions/PrescriptionHeader";
 import PrescriptionFilters from "@/components/prescriptions/PrescriptionFilters";
 import ActivePrescriptionsTab from "@/components/prescriptions/ActivePrescriptionsTab";
 import PrescriptionHistoryTab from "@/components/prescriptions/PrescriptionHistoryTab";
 import PrescriptionTemplatesTab from "@/components/prescriptions/PrescriptionTemplatesTab";
+import EnhancedPrescriptionDialog from "@/components/prescriptions/enhanced/EnhancedPrescriptionDialog";
 
 const PrescriptionsPage = () => {
   const [patientFilter, setPatientFilter] = useState("all");
   const [timeRange, setTimeRange] = useState("current");
   const [medicationType, setMedicationType] = useState("all");
+  const [isPrescriptionDialogOpen, setIsPrescriptionDialogOpen] = useState(false);
 
   return (
     <DashboardLayout>
       <div className="container mx-auto p-4 space-y-6">
-        <PrescriptionHeader />
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <PrescriptionHeader />
+          
+          <Button onClick={() => setIsPrescriptionDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Prescription
+          </Button>
+        </div>
 
         <PrescriptionFilters 
           patientFilter={patientFilter}
@@ -48,6 +59,11 @@ const PrescriptionsPage = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <EnhancedPrescriptionDialog 
+        open={isPrescriptionDialogOpen}
+        onOpenChange={setIsPrescriptionDialogOpen}
+      />
     </DashboardLayout>
   );
 };
