@@ -1,7 +1,7 @@
 
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { CalendarView } from "@/components/calendar/CalendarView";
+import CalendarView from "@/components/calendar/CalendarView";
 
 const Calendar = () => {
   return (
