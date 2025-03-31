@@ -2,7 +2,8 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, Users, Calendar, ClipboardList, DollarSign } from "lucide-react";
+import { Activity, Users, Calendar, ClipboardList, DollarSign, ArrowUpRightFromSquare } from "lucide-react";
+import ReferralTrackingPanel from "./referrals/ReferralTrackingPanel";
 
 const HealthcareCRMModule: React.FC = () => {
   return (
@@ -13,7 +14,7 @@ const HealthcareCRMModule: React.FC = () => {
       </div>
       
       <Tabs defaultValue="patients">
-        <TabsList className="grid grid-cols-5 w-full">
+        <TabsList className="grid grid-cols-6 w-full">
           <TabsTrigger value="patients">
             <Users className="h-4 w-4 mr-2" />
             Patients
@@ -25,6 +26,10 @@ const HealthcareCRMModule: React.FC = () => {
           <TabsTrigger value="treatments">
             <Activity className="h-4 w-4 mr-2" />
             Treatments
+          </TabsTrigger>
+          <TabsTrigger value="referrals">
+            <ArrowUpRightFromSquare className="h-4 w-4 mr-2" />
+            Referrals
           </TabsTrigger>
           <TabsTrigger value="records">
             <ClipboardList className="h-4 w-4 mr-2" />
@@ -67,6 +72,10 @@ const HealthcareCRMModule: React.FC = () => {
               <p>Treatment plans interface will be displayed here.</p>
             </CardContent>
           </Card>
+        </TabsContent>
+        
+        <TabsContent value="referrals" className="mt-4">
+          <ReferralTrackingPanel />
         </TabsContent>
         
         <TabsContent value="records" className="mt-4">
