@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon, Filter, Search } from "lucide-react";
 import PrescriptionHistoryTable from "./PrescriptionHistoryTable";
 import PrescriptionHistoryFilters from "./PrescriptionHistoryFilters";
+import { DateRange } from "react-day-picker";
 
 interface PrescriptionHistoryViewProps {
   patientId?: string;
@@ -21,10 +22,7 @@ const PrescriptionHistoryView: React.FC<PrescriptionHistoryViewProps> = ({ patie
   const [activeTab, setActiveTab] = useState<"active" | "expired" | "all">("active");
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [dateRange, setDateRange] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
   });
@@ -47,7 +45,7 @@ const PrescriptionHistoryView: React.FC<PrescriptionHistoryViewProps> = ({ patie
             <PopoverTrigger asChild>
               <Button variant="outline" className="flex gap-2">
                 <CalendarIcon className="h-4 w-4" />
-                {dateRange.from ? (
+                {dateRange?.from ? (
                   dateRange.to ? (
                     <>
                       {format(dateRange.from, "LLL dd, y")} -{" "}

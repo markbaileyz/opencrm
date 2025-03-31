@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Table,
@@ -17,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DateRange } from "react-day-picker";
 
 // Mock data for prescriptions
 const MOCK_PRESCRIPTIONS = [
@@ -129,10 +129,7 @@ const MOCK_PRESCRIPTIONS = [
 interface PrescriptionHistoryTableProps {
   status: "active" | "expired" | "all";
   searchQuery: string;
-  dateRange: {
-    from: Date | undefined;
-    to: Date | undefined;
-  };
+  dateRange: DateRange | undefined;
   medicationFilter: string | null;
 }
 
@@ -159,10 +156,10 @@ const PrescriptionHistoryTable: React.FC<PrescriptionHistoryTableProps> = ({
     }
 
     // Filter by date range
-    if (dateRange.from && prescription.prescribedDate < dateRange.from) {
+    if (dateRange?.from && prescription.prescribedDate < dateRange.from) {
       return false;
     }
-    if (dateRange.to && prescription.prescribedDate > dateRange.to) {
+    if (dateRange?.to && prescription.prescribedDate > dateRange.to) {
       return false;
     }
 
