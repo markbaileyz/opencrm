@@ -15,20 +15,18 @@ interface ModuleSelectorProps {
 const ModuleSelector: React.FC<ModuleSelectorProps> = ({ modules, className }) => {
   const { isModuleActive, addModule, removeModule } = useCRM();
   
-  const getCategoryColor = (category: string): string => {
-    switch (category) {
-      case "base":
-        return "bg-blue-100 text-blue-800";
-      case "healthcare":
-        return "bg-green-100 text-green-800";
-      case "real-estate":
-        return "bg-orange-100 text-orange-800";
-      case "business":
-        return "bg-purple-100 text-purple-800";
-      case "restaurant":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+  const getCategoryColor = (moduleId: string): string => {
+    // Determine category by moduleId pattern since it's not in the type
+    if (moduleId.includes("healthcare")) {
+      return "bg-green-100 text-green-800";
+    } else if (moduleId.includes("real-estate")) {
+      return "bg-orange-100 text-orange-800";
+    } else if (moduleId.includes("restaurant")) {
+      return "bg-red-100 text-red-800";
+    } else if (moduleId === "billing" || moduleId === "call-tracking" || moduleId === "email") {
+      return "bg-purple-100 text-purple-800";
+    } else {
+      return "bg-blue-100 text-blue-800";
     }
   };
   
@@ -71,8 +69,12 @@ const ModuleSelector: React.FC<ModuleSelectorProps> = ({ modules, className }) =
                   <CardTitle className="text-lg">{module.name}</CardTitle>
                   <CardDescription>{module.description}</CardDescription>
                 </div>
-                <Badge variant="outline" className={getCategoryColor(module.category)}>
-                  {module.category}
+                <Badge variant="outline" className={getCategoryColor(module.id)}>
+                  {module.id.includes("healthcare") ? "healthcare" : 
+                   module.id.includes("real-estate") ? "real-estate" : 
+                   module.id.includes("restaurant") ? "restaurant" :
+                   module.id === "billing" || module.id === "call-tracking" || module.id === "email" ? "business" : 
+                   "base"}
                 </Badge>
               </div>
             </CardHeader>

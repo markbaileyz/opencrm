@@ -89,6 +89,23 @@ const CRMDashboard: React.FC = () => {
   const { getActiveModules, modules } = useCRM();
   const activeModules = getActiveModules();
   
+  // Helper function to filter modules by type/category
+  const filterModulesByType = (type: string) => {
+    if (type === "healthcare") {
+      return modules.filter(m => m.id.includes("healthcare") || m.id === "health");
+    } else if (type === "real-estate") {
+      return modules.filter(m => m.id.includes("real-estate"));
+    } else if (type === "business") {
+      return modules.filter(m => 
+        m.id === "billing" || 
+        m.id === "call-tracking" || 
+        m.id === "email" || 
+        m.id === "documents"
+      );
+    }
+    return modules;
+  };
+  
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -136,21 +153,21 @@ const CRMDashboard: React.FC = () => {
         
         <TabsContent value="business" className="mt-6">
           <ModuleSelector 
-            modules={modules.filter(m => m.category === "business")}
+            modules={filterModulesByType("business")}
             className="grid grid-cols-1 md:grid-cols-3 gap-4" 
           />
         </TabsContent>
         
         <TabsContent value="healthcare" className="mt-6">
           <ModuleSelector 
-            modules={modules.filter(m => m.category === "healthcare")}
+            modules={filterModulesByType("healthcare")}
             className="grid grid-cols-1 md:grid-cols-3 gap-4" 
           />
         </TabsContent>
         
         <TabsContent value="real-estate" className="mt-6">
           <ModuleSelector 
-            modules={modules.filter(m => m.category === "real-estate")}
+            modules={filterModulesByType("real-estate")}
             className="grid grid-cols-1 md:grid-cols-3 gap-4" 
           />
         </TabsContent>
