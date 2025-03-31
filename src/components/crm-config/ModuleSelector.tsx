@@ -3,140 +3,125 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
+import { Check, Plus, X } from "lucide-react";
 import { useCRM } from "@/contexts/CRMContext";
-import { CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
-import { toast } from "sonner";
+import { CRMModule } from "@/types/crm-modules";
 
-const ModuleSelector: React.FC = () => {
-  const { modules, addModule, removeModule, isModuleActive, getTotalPrice } = useCRM();
+interface ModuleSelectorProps {
+  modules: CRMModule[];
+  className?: string;
+}
+
+const ModuleSelector: React.FC<ModuleSelectorProps> = ({ modules, className }) => {
+  const { isModuleActive, addModule, removeModule } = useCRM();
   
-  const handleToggleModule = (moduleId: string, isActive: boolean) => {
-    if (isActive) {
-      try {
-        removeModule(moduleId);
-        toast.success("Module removed successfully");
-      } catch (error) {
-        toast.error("Failed to remove module. It might be required by other active modules.");
-      }
-    } else {
-      addModule(moduleId);
-      toast.success("Module added successfully");
+  const getCategoryColor = (category: string): string => {
+    switch (category) {
+      case "base":
+        return "bg-blue-100 text-blue-800";
+      case "healthcare":
+        return "bg-green-100 text-green-800";
+      case "real-estate":
+        return "bg-orange-100 text-orange-800";
+      case "business":
+        return "bg-purple-100 text-purple-800";
+      case "restaurant":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
   
-  const totalPrice = getTotalPrice();
-  
-  // Check if a module can be removed (not a dependency for another active module)
-  const canRemoveModule = (moduleId: string) => {
-    // This is a simplified version. In a real implementation, 
-    // you'd check if any active module depends on this one
-    return true;
+  const renderDependencies = (module: CRMModule) => {
+    if (!module.dependencies || module.dependencies.length === 0) return null;
+    
+    return (
+      <div className="mt-2 text-xs text-muted-foreground">
+        <div className="font-medium mb-1">Dependencies:</div>
+        <div className="flex flex-wrap gap-1">
+          {module.dependencies.map((depId) => {
+            const dep = modules.find(m => m.id === depId);
+            if (!dep) return null;
+            
+            return (
+              <Badge 
+                key={depId} 
+                variant="outline" 
+                className={`${isModuleActive(depId) ? "bg-green-50" : "bg-red-50"}`}
+              >
+                {dep.name}
+              </Badge>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
   
   return (
-    <div className="container mx-auto py-6 px-4">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <div className="flex items-center space-x-2 mb-1">
-            <Button asChild variant="outline" size="sm">
-              <Link to="/crm">
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                Back to Dashboard
-              </Link>
-            </Button>
-          </div>
-          <h1 className="text-2xl font-bold">Configure Your CRM</h1>
-          <p className="text-muted-foreground">Customize your CRM by adding or removing modules</p>
-        </div>
+    <div className={className}>
+      {modules.map((module) => {
+        const active = isModuleActive(module.id);
         
-        <Card className="w-auto">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Monthly Subscription</p>
-                <p className="text-2xl font-bold">${totalPrice.toFixed(2)}</p>
-              </div>
-              <Button size="sm">Update Billing</Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {modules.map((module) => {
-          const isActive = isModuleActive(module.id);
-          const ModuleIcon = module.icon;
-          
-          return (
-            <Card 
-              key={module.id} 
-              className={`overflow-hidden transition-all ${
-                isActive ? "border-primary shadow-md" : ""
-              }`}
-            >
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className={`p-1.5 rounded-md ${isActive ? "bg-primary/20" : "bg-muted"}`}>
-                      <ModuleIcon className="h-5 w-5" />
-                    </div>
-                    <CardTitle className="text-lg">{module.name}</CardTitle>
-                  </div>
-                  <Badge variant={isActive ? "default" : "outline"}>
-                    {isActive ? "Active" : "Inactive"}
-                  </Badge>
+        return (
+          <Card key={module.id} className={active ? "border-primary" : ""}>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="text-lg">{module.name}</CardTitle>
+                  <CardDescription>{module.description}</CardDescription>
                 </div>
-                <CardDescription>{module.description}</CardDescription>
-              </CardHeader>
-              
-              <CardContent className="pb-3">
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">Features:</div>
-                  <ul className="space-y-1">
-                    {module.features.map((feature, index) => (
-                      <li key={index} className="flex items-start text-sm">
-                        <CheckCircle className="h-4 w-4 text-primary mr-2 mt-0.5 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                <Badge variant="outline" className={getCategoryColor(module.category)}>
+                  {module.category}
+                </Badge>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="text-sm pb-2">
+              <div className="space-y-2">
+                <div>
+                  <span className="font-medium">Price:</span> ${module.price.toFixed(2)}/month
                 </div>
                 
-                {module.dependencies && module.dependencies.length > 0 && (
-                  <div className="mt-4 text-sm">
-                    <div className="font-medium mb-1">Required Modules:</div>
-                    <div className="flex flex-wrap gap-1">
-                      {module.dependencies.map((depId) => {
-                        const depModule = modules.find(m => m.id === depId);
-                        return depModule ? (
-                          <Badge key={depId} variant="outline">
-                            {depModule.name}
-                          </Badge>
-                        ) : null;
-                      })}
-                    </div>
+                {module.features && (
+                  <div>
+                    <div className="font-medium mb-1">Features:</div>
+                    <ul className="list-disc pl-4 space-y-1">
+                      {module.features.map((feature, index) => (
+                        <li key={index} className="text-xs">{feature}</li>
+                      ))}
+                    </ul>
                   </div>
                 )}
-              </CardContent>
-              
-              <CardFooter className="bg-muted/50 flex items-center justify-between">
-                <div className="text-sm font-medium">
-                  ${module.price.toFixed(2)}/month
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm">{isActive ? "Enabled" : "Disabled"}</span>
-                  <Switch 
-                    checked={isActive}
-                    onCheckedChange={() => handleToggleModule(module.id, isActive)}
-                  />
-                </div>
-              </CardFooter>
-            </Card>
-          );
-        })}
-      </div>
+                
+                {renderDependencies(module)}
+              </div>
+            </CardContent>
+            
+            <CardFooter>
+              {active ? (
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={() => removeModule(module.id)}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Remove
+                </Button>
+              ) : (
+                <Button 
+                  variant="default" 
+                  className="w-full" 
+                  onClick={() => addModule(module.id)}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add
+                </Button>
+              )}
+            </CardFooter>
+          </Card>
+        );
+      })}
     </div>
   );
 };
