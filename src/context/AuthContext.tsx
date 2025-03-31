@@ -1,108 +1,116 @@
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from 'react';
 
-// Enhanced User interface with expanded roles
 interface User {
+  uid: string;
+  displayName: string;
   email: string;
-  displayName?: string;
   photoURL?: string;
-  role: "admin" | "power-user" | "doctor" | "nurse" | "patient" | "front-desk";
+  roles: string[];
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (user: User) => void;
-  logout: () => void;
-  updateProfile: (profileData: Partial<User>) => void;
-  uploadProfileImage: (file: File) => Promise<string>;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
   hasRole: (roles: string | string[]) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
-  login: () => {},
-  logout: () => {},
-  updateProfile: () => {},
-  uploadProfileImage: async () => "",
+  isLoading: true,
+  login: async () => {},
+  logout: async () => {},
   hasRole: () => false,
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    // Check for existing user in localStorage on component mount
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        setIsAuthenticated(true);
-      } catch (error) {
-        console.error("Failed to parse stored user:", error);
-        localStorage.removeItem("user");
+  // Mock authentication state - in a real app this would use a proper auth system
+  const [user, setUser] = useState<User | null>({
+    uid: '123',
+    displayName: 'Dr. Jane Smith',
+    email: 'jane.smith@example.com',
+    photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane',
+    roles: ['doctor', 'admin'],
+  });
+  
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
+    
+    try {
+      // Mock login logic
+      if (email === 'admin@example.com' && password === 'password') {
+        setUser({
+          uid: '123',
+          displayName: 'Admin User',
+          email: 'admin@example.com',
+          photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin',
+          roles: ['admin'],
+        });
+      } else if (email === 'doctor@example.com' && password === 'password') {
+        setUser({
+          uid: '456',
+          displayName: 'Dr. Jane Smith',
+          email: 'doctor@example.com',
+          photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane',
+          roles: ['doctor'],
+        });
+      } else if (email === 'nurse@example.com' && password === 'password') {
+        setUser({
+          uid: '789',
+          displayName: 'Nurse Johnson',
+          email: 'nurse@example.com',
+          photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Johnson',
+          roles: ['nurse'],
+        });
+      } else {
+        throw new Error('Invalid credentials');
       }
-    }
-  }, []);
-
-  const login = (userData: User) => {
-    setUser(userData);
-    setIsAuthenticated(true);
-    localStorage.setItem("user", JSON.stringify(userData));
-  };
-
-  const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem("user");
-  };
-
-  const updateProfile = (profileData: Partial<User>) => {
-    if (user) {
-      const updatedUser = { ...user, ...profileData };
-      setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  const uploadProfileImage = async (file: File): Promise<string> => {
-    // In a real application, this would upload to a secure HIPAA-compliant storage
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const photoURL = e.target?.result as string;
-        if (user) {
-          updateProfile({ photoURL });
-        }
-        resolve(photoURL);
-      };
-      reader.readAsDataURL(file);
-    });
+  
+  const logout = async () => {
+    setIsLoading(true);
+    // Mock logout logic
+    try {
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  // Role-based authorization helper
-  const hasRole = (roles: string | string[]): boolean => {
+  
+  const hasRole = (roles: string | string[]) => {
     if (!user) return false;
     
-    const rolesToCheck = Array.isArray(roles) ? roles : [roles];
-    return rolesToCheck.includes(user.role);
+    const userRoles = user.roles || [];
+    
+    if (typeof roles === 'string') {
+      return userRoles.includes(roles);
+    }
+    
+    return roles.some(role => userRoles.includes(role));
   };
-
+  
+  const value = {
+    user,
+    isAuthenticated: !!user,
+    isLoading,
+    login,
+    logout,
+    hasRole,
+  };
+  
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAuthenticated, 
-      login, 
-      logout, 
-      updateProfile, 
-      uploadProfileImage,
-      hasRole
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

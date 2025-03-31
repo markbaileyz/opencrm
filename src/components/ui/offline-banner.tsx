@@ -1,111 +1,73 @@
 
-import React from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { WifiOff, Wifi, AlertCircle, RefreshCw, Clock } from "lucide-react";
+import { AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatDistanceToNow } from "date-fns";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
 
 interface OfflineBannerProps {
   isOnline: boolean;
-  pendingActions?: number;
-  isSyncing?: boolean; 
-  lastSyncTimestamp?: number | null;
+  pendingActions: number;
+  isSyncing?: boolean;
   onTryReconnect?: () => void;
   className?: string;
 }
 
-/**
- * Banner that displays when the user is offline
- * and shows pending actions that will sync when back online
- */
 const OfflineBanner = ({
   isOnline,
-  pendingActions = 0,
+  pendingActions,
   isSyncing = false,
-  lastSyncTimestamp = null,
   onTryReconnect,
   className,
 }: OfflineBannerProps) => {
-  if (isOnline && pendingActions === 0 && !isSyncing) {
-    return null;
-  }
+  if (isOnline && pendingActions === 0) return null;
 
-  // Format the last sync time
-  const lastSyncText = lastSyncTimestamp 
-    ? formatDistanceToNow(new Date(lastSyncTimestamp), { addSuffix: true })
-    : "Never synced";
+  const isOffline = !isOnline;
+  const hasPendingActions = pendingActions > 0;
 
-  if (!isOnline) {
-    return (
-      <Alert variant="destructive" className={className}>
-        <WifiOff className="h-4 w-4" />
-        <AlertTitle>You are offline</AlertTitle>
+  return (
+    <Alert
+      variant={isOffline ? "destructive" : "default"}
+      className={cn(className)}
+    >
+      <AlertCircle className="h-4 w-4" />
+      <div className="flex-1">
+        <div className="flex justify-between items-center">
+          <AlertTitle>
+            {isOffline
+              ? "You are offline"
+              : hasPendingActions
+              ? `${pendingActions} pending ${pendingActions === 1 ? "change" : "changes"}`
+              : ""}
+          </AlertTitle>
+          {isOnline && hasPendingActions && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onTryReconnect}
+              disabled={isSyncing}
+              className="h-8"
+            >
+              {isSyncing ? (
+                <>
+                  <RefreshCw className="h-3 w-3 mr-2 animate-spin" />
+                  Syncing...
+                </>
+              ) : (
+                "Sync now"
+              )}
+            </Button>
+          )}
+        </div>
         <AlertDescription>
-          <div className="space-y-2">
-            <p>
-              Some features may be limited. Changes will be saved and synchronized when you're back online.
-            </p>
-            {pendingActions > 0 && (
-              <div className="text-sm font-medium flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {pendingActions} {pendingActions === 1 ? 'action' : 'actions'} pending synchronization
-              </div>
-            )}
-            <div className="text-xs text-slate-200 flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              Last sync: {lastSyncText}
-            </div>
-            {onTryReconnect && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="mt-2 bg-destructive/10 hover:bg-destructive/20 text-destructive"
-                onClick={onTryReconnect}
-              >
-                <RefreshCw className="h-4 w-4 mr-2" /> Try to reconnect
-              </Button>
-            )}
-          </div>
+          {isOffline
+            ? "Changes will be saved locally and synced when you're back online."
+            : hasPendingActions
+            ? "Changes made while offline will be synchronized."
+            : ""}
         </AlertDescription>
-      </Alert>
-    );
-  }
-
-  if (isSyncing || pendingActions > 0) {
-    return (
-      <Alert className={className}>
-        {isSyncing ? (
-          <RefreshCw className="h-4 w-4 animate-spin" />
-        ) : (
-          <AlertCircle className="h-4 w-4" />
-        )}
-        <AlertTitle>{isSyncing ? "Synchronizing" : "Pending changes"}</AlertTitle>
-        <AlertDescription>
-          <div className="space-y-1">
-            <p>
-              {pendingActions} {pendingActions === 1 ? 'change' : 'changes'} {isSyncing ? 'being synchronized...' : 'waiting to be synchronized'}
-            </p>
-            <div className="text-xs text-muted-foreground flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              Last sync: {lastSyncText}
-            </div>
-            {!isSyncing && onTryReconnect && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-1"
-                onClick={onTryReconnect}
-              >
-                <RefreshCw className="h-3 w-3 mr-1" /> Sync now
-              </Button>
-            )}
-          </div>
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
-  return null;
+      </div>
+    </Alert>
+  );
 };
 
 export default OfflineBanner;

@@ -1,17 +1,16 @@
 
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import ResponsiveContainer from "@/components/ui/responsive-container";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import MobileFrontDesk from "@/components/front-desk/MobileFrontDesk";
 import DesktopFrontDesk from "@/components/front-desk/DesktopFrontDesk";
 
 const FrontDesk = () => {
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  
   return (
     <DashboardLayout>
-      <ResponsiveContainer
-        mobileView={<MobileFrontDesk />}
-        desktopView={<DesktopFrontDesk />}
-      />
+      {isMobile ? <MobileFrontDesk /> : <DesktopFrontDesk />}
     </DashboardLayout>
   );
 };

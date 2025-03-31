@@ -1,41 +1,26 @@
 
-import { Workflow as WorkflowType } from "@/types/workflow";
-import { Workflow as MonitorWorkflow } from "@/components/workflows/execution/WorkflowExecutionMonitor";
+import { Workflow } from "../hooks/useWorkflows";
 
-/**
- * Adapts the Workflow type from our domain model to the type expected by the WorkflowExecutionMonitor
- */
-export const adaptWorkflowsForMonitor = (workflows: WorkflowType[]): MonitorWorkflow[] => {
+// Define the shape of workflow for the monitor component
+export interface MonitorWorkflow {
+  id: string;
+  name: string;
+  description: string;
+  status: "active" | "paused" | "error";
+  type: string;
+  lastExecution?: string;
+  successRate: number;
+}
+
+// Adapter to transform workflows for the monitor
+export const adaptWorkflowsForMonitor = (workflows: Workflow[]): MonitorWorkflow[] => {
   return workflows.map(workflow => ({
     id: workflow.id,
     name: workflow.name,
     description: workflow.description,
-    active: workflow.status === "active",
-    lastExecuted: workflow.lastRun,
-    nextExecution: "", // Can be calculated based on trigger type if needed
-    category: getCategoryFromWorkflow(workflow),
+    status: workflow.isActive ? "active" : "paused",
+    type: workflow.type,
+    lastExecution: new Date(Date.now() - Math.floor(Math.random() * 86400000)).toISOString(),
+    successRate: workflow.executionRate,
   }));
-};
-
-/**
- * Helper function to determine a category based on workflow properties
- */
-const getCategoryFromWorkflow = (workflow: WorkflowType): string => {
-  // Determine category based on workflow trigger or other properties
-  switch (workflow.trigger) {
-    case "new_patient":
-      return "Patient Onboarding";
-    case "appointment_scheduled":
-      return "Appointment Management";
-    case "appointment_completed":
-      return "Follow-up";
-    case "form_submission":
-      return "Forms Processing";
-    case "scheduled":
-      return "Scheduled Tasks";
-    case "manual":
-      return "Manual Workflows";
-    default:
-      return "Other";
-  }
 };

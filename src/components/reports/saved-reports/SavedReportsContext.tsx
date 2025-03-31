@@ -1,39 +1,41 @@
-import React, { createContext, useState, ReactNode, useMemo } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { SavedReport } from "./types";
 
-interface SavedReportsContextProps {
-  reports: SavedReport[];
-  filteredReports: SavedReport[];
-  filterText: string;
-  setFilterText: (text: string) => void;
-  showFavoritesOnly: boolean;
-  setShowFavoritesOnly: (show: boolean) => void;
-  showScheduledOnly: boolean;
-  setShowScheduledOnly: (show: boolean) => void;
-  clearFilters: () => void;
-  showScheduleForm: string | null;
-  setShowScheduleForm: (id: string | null) => void;
-  emailReportId: string | null;
-  setEmailReportId: (id: string | null) => void;
-  handleRunReport: (id: string) => void;
-  handleToggleFavorite: (id: string) => void;
-  handleDeleteReport: (id: string) => void;
-  handleScheduleReport: (reportId: string, email: string, frequency: string) => void;
-  handleCancelSchedule: (reportId: string) => void;
-  handleEmailReport: (reportId: string, email: string) => void;
+import React, { createContext, useState } from "react";
+
+// Define the report types
+interface Report {
+  id: number;
+  name: string;
+  description: string;
+  type: "sales" | "marketing" | "finance" | "appointments" | "patients" | "activity" | "conversion";
+  createdAt: string;
+  lastRun?: string;
+  schedule?: {
+    frequency: "daily" | "weekly" | "monthly";
+    nextRun: string;
+  };
+  isFavorite: boolean;
 }
 
-export const SavedReportsContext = createContext<SavedReportsContextProps>({
+// Define the context interface
+interface SavedReportsContextType {
+  reports: Report[];
+  filteredReports: Report[];
+  showScheduleForm: number | null;
+  setShowScheduleForm: (id: number | null) => void;
+  emailReportId: number | null;
+  setEmailReportId: (id: number | null) => void;
+  handleRunReport: (id: number) => void;
+  handleToggleFavorite: (id: number) => void;
+  handleDeleteReport: (id: number) => void;
+  handleCancelSchedule: (id: number) => void;
+  handleScheduleReport: (id: number, frequency: "daily" | "weekly" | "monthly") => void;
+  handleEmailReport: (id: number, email: string, message: string) => void;
+}
+
+// Create the context
+export const SavedReportsContext = createContext<SavedReportsContextType>({
   reports: [],
   filteredReports: [],
-  filterText: "",
-  setFilterText: () => {},
-  showFavoritesOnly: false,
-  setShowFavoritesOnly: () => {},
-  showScheduledOnly: false,
-  setShowScheduledOnly: () => {},
-  clearFilters: () => {},
   showScheduleForm: null,
   setShowScheduleForm: () => {},
   emailReportId: null,
@@ -41,261 +43,161 @@ export const SavedReportsContext = createContext<SavedReportsContextProps>({
   handleRunReport: () => {},
   handleToggleFavorite: () => {},
   handleDeleteReport: () => {},
-  handleScheduleReport: () => {},
   handleCancelSchedule: () => {},
-  handleEmailReport: () => {},
+  handleScheduleReport: () => {},
+  handleEmailReport: () => {}
 });
 
-interface SavedReportsProviderProps {
-  children: ReactNode;
-}
-
-export const SavedReportsProvider: React.FC<SavedReportsProviderProps> = ({ children }) => {
-  const [reports, setReports] = useState<SavedReport[]>([
+// Create the provider component
+export const SavedReportsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Sample reports data
+  const [reports, setReports] = useState<Report[]>([
     {
-      id: "1",
-      name: "Monthly Sales Performance",
-      type: "sales",
-      createdAt: "2023-12-15",
-      lastRun: "2024-04-05",
-      isFavorite: true,
-      schedule: {
-        frequency: "monthly",
-        email: "team@example.com",
-        lastSent: "2024-04-01"
-      }
+      id: 1,
+      name: "Monthly Patient Visits",
+      description: "Overview of patient visits by department",
+      type: "patients",
+      createdAt: "2023-08-15",
+      lastRun: "2023-09-01",
+      isFavorite: true
     },
     {
-      id: "2",
-      name: "Q1 Lead Source Analysis",
-      type: "conversion",
-      createdAt: "2024-01-10",
-      lastRun: "2024-04-01",
+      id: 2,
+      name: "Appointment Conversion Rate",
+      description: "Analysis of appointment bookings and completions",
+      type: "appointments",
+      createdAt: "2023-07-22",
+      lastRun: "2023-08-22",
+      schedule: {
+        frequency: "monthly",
+        nextRun: "2023-10-22"
+      },
       isFavorite: false
     },
     {
-      id: "3",
-      name: "Weekly Contact Activity",
+      id: 3,
+      name: "Daily Activity Summary",
+      description: "Summary of user actions and system events",
       type: "activity",
-      createdAt: "2024-02-22",
-      lastRun: "2024-04-10",
-      isFavorite: true,
+      createdAt: "2023-09-05",
+      isFavorite: true
+    },
+    {
+      id: 4,
+      name: "Marketing Campaign Results",
+      description: "Performance metrics for email campaigns",
+      type: "marketing",
+      createdAt: "2023-08-10",
+      lastRun: "2023-09-10",
+      isFavorite: false
+    },
+    {
+      id: 5,
+      name: "Sales Funnel Analysis",
+      description: "Conversion metrics across the sales pipeline",
+      type: "sales",
+      createdAt: "2023-09-01",
+      lastRun: "2023-09-15",
       schedule: {
         frequency: "weekly",
-        email: "marketing@example.com",
-        lastSent: "2024-04-08"
-      }
-    },
-    {
-      id: "4",
-      name: "Deal Conversion Rates",
-      type: "conversion",
-      createdAt: "2024-03-05",
-      lastRun: "2024-04-07",
-      isFavorite: false,
-      schedule: {
-        frequency: "bi-weekly",
-        email: "sales@example.com",
-        lastSent: "2024-04-05"
-      }
-    },
-    {
-      id: "5",
-      name: "Customer Retention Analysis",
-      type: "sales",
-      createdAt: "2024-02-10",
-      lastRun: "2024-04-03",
+        nextRun: "2023-09-22"
+      },
       isFavorite: true
     }
   ]);
   
-  const [showScheduleForm, setShowScheduleForm] = useState<string | null>(null);
-  const [emailReportId, setEmailReportId] = useState<string | null>(null);
-  const [filterText, setFilterText] = useState("");
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  const [showScheduledOnly, setShowScheduledOnly] = useState(false);
-  const { toast } = useToast();
-
-  const filteredReports = useMemo(() => {
-    return reports.filter(report => {
-      const matchesText = filterText === "" || 
-        report.name.toLowerCase().includes(filterText.toLowerCase()) ||
-        report.type.toLowerCase().includes(filterText.toLowerCase());
-      
-      const matchesFavorite = !showFavoritesOnly || report.isFavorite;
-      const matchesScheduled = !showScheduledOnly || !!report.schedule;
-      
-      return matchesText && matchesFavorite && matchesScheduled;
-    });
-  }, [reports, filterText, showFavoritesOnly, showScheduledOnly]);
-
-  const clearFilters = () => {
-    setFilterText("");
-    setShowFavoritesOnly(false);
-    setShowScheduledOnly(false);
-  };
-
-  const handleRunReport = (id: string) => {
-    console.log("Running report", id);
-    
-    setReports(prevReports => 
-      prevReports.map(report => 
+  const [filteredReports, setFilteredReports] = useState<Report[]>(reports);
+  const [showScheduleForm, setShowScheduleForm] = useState<number | null>(null);
+  const [emailReportId, setEmailReportId] = useState<number | null>(null);
+  
+  const handleRunReport = (id: number) => {
+    console.log(`Running report ${id}`);
+    setReports(prev => 
+      prev.map(report => 
         report.id === id 
           ? { ...report, lastRun: new Date().toISOString().split('T')[0] } 
           : report
       )
     );
-    
-    toast({
-      title: "Report running",
-      description: "Your report is being generated. This may take a moment.",
-    });
   };
-
-  const handleToggleFavorite = (id: string) => {
-    console.log("Toggling favorite for report", id);
-    
-    setReports(prevReports => 
-      prevReports.map(report => 
+  
+  const handleToggleFavorite = (id: number) => {
+    setReports(prev => 
+      prev.map(report => 
         report.id === id 
           ? { ...report, isFavorite: !report.isFavorite } 
           : report
       )
     );
-    
-    const report = reports.find(r => r.id === id);
-    if (report) {
-      toast({
-        title: report.isFavorite ? "Removed from favorites" : "Added to favorites",
-        description: `"${report.name}" has been ${report.isFavorite ? "removed from" : "added to"} your favorites.`,
-      });
-    }
   };
-
-  const handleDeleteReport = (id: string) => {
-    console.log("Deleting report", id);
-    
-    const reportToDelete = reports.find(r => r.id === id);
-    if (!reportToDelete) return;
-    
-    setReports(prevReports => prevReports.filter(report => report.id !== id));
-    
-    toast({
-      title: "Report deleted",
-      description: `"${reportToDelete.name}" has been permanently deleted.`,
-      variant: "destructive",
-    });
+  
+  const handleDeleteReport = (id: number) => {
+    setReports(prev => prev.filter(report => report.id !== id));
   };
-
-  const handleScheduleReport = (reportId: string, email: string, frequency: string) => {
-    if (!email) {
-      toast({
-        title: "Email required",
-        description: "Please enter an email address to schedule this report.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    console.log("Scheduling report", {
-      reportId,
-      email,
-      frequency
-    });
-    
-    setReports(prevReports => 
-      prevReports.map(report => 
-        report.id === reportId 
-          ? { 
-              ...report, 
-              schedule: {
-                frequency,
-                email,
-                lastSent: new Date().toISOString().split('T')[0]
-              }
-            } 
-          : report
-      )
-    );
-    
-    toast({
-      title: "Report scheduled",
-      description: `This report will be sent ${frequency} to ${email}`,
-    });
-    
-    setShowScheduleForm(null);
-  };
-
-  const handleCancelSchedule = (reportId: string) => {
-    setReports(prevReports => 
-      prevReports.map(report => 
-        report.id === reportId 
+  
+  const handleCancelSchedule = (id: number) => {
+    setReports(prev => 
+      prev.map(report => 
+        report.id === id 
           ? { ...report, schedule: undefined } 
           : report
       )
     );
-    
-    toast({
-      title: "Schedule cancelled",
-      description: "The report schedule has been cancelled.",
-    });
   };
-
-  const handleEmailReport = (reportId: string, email: string) => {
-    if (!email) {
-      toast({
-        title: "Email required",
-        description: "Please enter an email address to send this report.",
-        variant: "destructive",
-      });
-      return;
+  
+  const handleScheduleReport = (id: number, frequency: "daily" | "weekly" | "monthly") => {
+    // Calculate next run date based on frequency
+    const now = new Date();
+    let nextRun = new Date();
+    
+    if (frequency === "daily") {
+      nextRun.setDate(now.getDate() + 1);
+    } else if (frequency === "weekly") {
+      nextRun.setDate(now.getDate() + 7);
+    } else {
+      nextRun.setMonth(now.getMonth() + 1);
     }
     
-    console.log("Emailing report", {
-      reportId,
-      email
-    });
+    const nextRunStr = nextRun.toISOString().split('T')[0];
     
-    setReports(prevReports => 
-      prevReports.map(report => 
-        report.id === reportId 
-          ? { ...report, lastRun: new Date().toISOString().split('T')[0] } 
+    setReports(prev => 
+      prev.map(report => 
+        report.id === id 
+          ? { ...report, schedule: { frequency, nextRun: nextRunStr } } 
           : report
       )
     );
     
-    toast({
-      title: "Report sent",
-      description: `The report has been sent to ${email}`,
-    });
-    
+    setShowScheduleForm(null);
+  };
+  
+  const handleEmailReport = (id: number, email: string, message: string) => {
+    console.log(`Emailing report ${id} to ${email} with message: ${message}`);
     setEmailReportId(null);
   };
-
-  const value = {
-    reports,
-    filteredReports,
-    filterText,
-    setFilterText,
-    showFavoritesOnly,
-    setShowFavoritesOnly,
-    showScheduledOnly,
-    setShowScheduledOnly,
-    clearFilters,
-    showScheduleForm,
-    setShowScheduleForm,
-    emailReportId,
-    setEmailReportId,
-    handleRunReport,
-    handleToggleFavorite,
-    handleDeleteReport,
-    handleScheduleReport,
-    handleCancelSchedule,
-    handleEmailReport,
-  };
-
+  
+  // Update filtered reports when reports change
+  React.useEffect(() => {
+    setFilteredReports(reports);
+  }, [reports]);
+  
   return (
-    <SavedReportsContext.Provider value={value}>
+    <SavedReportsContext.Provider
+      value={{
+        reports,
+        filteredReports,
+        showScheduleForm,
+        setShowScheduleForm,
+        emailReportId,
+        setEmailReportId,
+        handleRunReport,
+        handleToggleFavorite,
+        handleDeleteReport,
+        handleCancelSchedule,
+        handleScheduleReport,
+        handleEmailReport
+      }}
+    >
       {children}
     </SavedReportsContext.Provider>
   );
