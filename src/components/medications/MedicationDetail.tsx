@@ -1,10 +1,18 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Pill, Calendar, Clock, AlertTriangle, FileText, Download } from "lucide-react";
+import { Pill, Calendar, Clock, AlertTriangle, FileText, Download, X } from "lucide-react";
+import { 
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/hooks/use-toast";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface MedicationDetailProps {
   medication: {
@@ -22,6 +30,8 @@ interface MedicationDetailProps {
       medication: string;
       severity: "low" | "medium" | "high";
       description: string;
+      mechanism?: string;
+      recommendation?: string;
     }[];
     attachments?: string[];
   };
@@ -29,6 +39,9 @@ interface MedicationDetailProps {
 }
 
 const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose }) => {
+  const { toast } = useToast();
+  const [expandedInteraction, setExpandedInteraction] = useState<string | null>(null);
+  
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case "high":
@@ -40,6 +53,26 @@ const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+  
+  const getSeverityIcon = (severity: string) => {
+    switch (severity) {
+      case "high":
+        return <AlertTriangle className="h-5 w-5 text-red-500" />;
+      case "medium":
+        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+      case "low":
+        return <AlertTriangle className="h-5 w-5 text-blue-500" />;
+      default:
+        return <AlertTriangle className="h-5 w-5 text-gray-500" />;
+    }
+  };
+  
+  const handlePrintInteractions = () => {
+    toast({
+      title: "Printing interactions",
+      description: "The interactions report is being prepared for printing.",
+    });
   };
 
   return (
@@ -60,13 +93,21 @@ const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose
             </div>
           </CardDescription>
         </div>
-        <Button variant="outline" onClick={onClose}>Close</Button>
+        <Button variant="ghost" size="icon" onClick={onClose}>
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </Button>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="interactions">Interactions</TabsTrigger>
+            <TabsTrigger value="interactions">
+              Interactions
+              {medication.interactions && medication.interactions.some(i => i.severity === "high") && (
+                <span className="ml-1 text-red-500">•</span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="history">History</TabsTrigger>
             <TabsTrigger value="documents">Documents</TabsTrigger>
           </TabsList>
@@ -137,36 +178,142 @@ const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose
           
           <TabsContent value="interactions" className="mt-4">
             {medication.interactions && medication.interactions.length > 0 ? (
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground mb-2">
-                  The following medications may interact with {medication.name}:
-                </p>
-                {medication.interactions.map((interaction, index) => (
-                  <div key={index} className="border rounded-md p-3 flex items-start gap-3">
-                    <AlertTriangle className={`h-5 w-5 ${
-                      interaction.severity === "high" ? "text-red-500" : 
-                      interaction.severity === "medium" ? "text-amber-500" : 
-                      "text-blue-500"
-                    }`} />
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium">{interaction.medication}</p>
-                        <Badge className={getSeverityColor(interaction.severity)}>
-                          {interaction.severity} severity
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">{interaction.description}</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-muted-foreground">
+                    The following medications may interact with {medication.name}:
+                  </p>
+                  <Button size="sm" variant="outline" onClick={handlePrintInteractions}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Print Report
+                  </Button>
+                </div>
+                
+                <div className="space-y-4">
+                  {medication.interactions.map((interaction, index) => (
+                    <Collapsible
+                      key={index}
+                      open={expandedInteraction === interaction.medication}
+                      onOpenChange={() => {
+                        if (expandedInteraction === interaction.medication) {
+                          setExpandedInteraction(null);
+                        } else {
+                          setExpandedInteraction(interaction.medication);
+                        }
+                      }}
+                      className="border rounded-md overflow-hidden"
+                    >
+                      <CollapsibleTrigger className="w-full p-3 flex items-center justify-between bg-muted/30 hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          {getSeverityIcon(interaction.severity)}
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{interaction.medication}</p>
+                              <Badge className={getSeverityColor(interaction.severity)}>
+                                {interaction.severity} severity
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground text-left">{interaction.description.substring(0, 60)}...</p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm">
+                          {expandedInteraction === interaction.medication ? "Less" : "More"}
+                        </Button>
+                      </CollapsibleTrigger>
+                      
+                      <CollapsibleContent className="p-4 pt-2 border-t bg-muted/10">
+                        <div className="space-y-4">
+                          <div>
+                            <h4 className="text-sm font-medium mb-1">Full Description</h4>
+                            <p className="text-sm">{interaction.description}</p>
+                          </div>
+                          
+                          {interaction.mechanism && (
+                            <div>
+                              <h4 className="text-sm font-medium mb-1">Mechanism of Interaction</h4>
+                              <p className="text-sm">{interaction.mechanism}</p>
+                            </div>
+                          )}
+                          
+                          {interaction.recommendation && (
+                            <div>
+                              <h4 className="text-sm font-medium mb-1">Recommendations</h4>
+                              <p className="text-sm">{interaction.recommendation}</p>
+                            </div>
+                          )}
+                          
+                          <div className="pt-2">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button size="sm">
+                                    Contact Prescriber
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Contact prescriber about this interaction</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  ))}
+                </div>
+                
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-md">
+                  <p className="text-sm flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-blue-500" />
+                    <span className="text-blue-700 dark:text-blue-300">
+                      This list may not be comprehensive. Always consult with a healthcare provider.
+                    </span>
+                  </p>
+                </div>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">No known interactions with other medications.</p>
+              <div className="text-center p-6 bg-muted/20 rounded-md">
+                <AlertTriangle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="font-medium">No known interactions</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  No known interactions with other medications have been identified for this medication.
+                </p>
+              </div>
             )}
           </TabsContent>
           
           <TabsContent value="history" className="mt-4">
-            <p className="text-sm text-muted-foreground">Medication history and changes will appear here.</p>
+            <ScrollArea className="h-[300px] rounded-md border p-4">
+              <div className="space-y-6">
+                <div className="border-l-2 border-l-blue-500 pl-4 relative">
+                  <div className="absolute w-2 h-2 rounded-full bg-blue-500 left-[-5px] top-1.5"></div>
+                  <p className="text-sm font-medium">Prescribed</p>
+                  <p className="text-xs text-muted-foreground">April 15, 2024</p>
+                  <p className="text-sm mt-1">Initial prescription by Dr. Sarah Johnson</p>
+                </div>
+                
+                <div className="border-l-2 border-l-green-500 pl-4 relative">
+                  <div className="absolute w-2 h-2 rounded-full bg-green-500 left-[-5px] top-1.5"></div>
+                  <p className="text-sm font-medium">Dosage Adjusted</p>
+                  <p className="text-xs text-muted-foreground">May 3, 2024</p>
+                  <p className="text-sm mt-1">Dosage increased from 10mg to 20mg daily</p>
+                </div>
+                
+                <div className="border-l-2 border-l-amber-500 pl-4 relative">
+                  <div className="absolute w-2 h-2 rounded-full bg-amber-500 left-[-5px] top-1.5"></div>
+                  <p className="text-sm font-medium">Refill Requested</p>
+                  <p className="text-xs text-muted-foreground">May 28, 2024</p>
+                  <p className="text-sm mt-1">Patient requested refill via online portal</p>
+                </div>
+                
+                <div className="border-l-2 border-l-blue-500 pl-4 relative">
+                  <div className="absolute w-2 h-2 rounded-full bg-blue-500 left-[-5px] top-1.5"></div>
+                  <p className="text-sm font-medium">Refill Approved</p>
+                  <p className="text-xs text-muted-foreground">May 29, 2024</p>
+                  <p className="text-sm mt-1">Refill approved by Dr. Sarah Johnson</p>
+                </div>
+              </div>
+            </ScrollArea>
           </TabsContent>
           
           <TabsContent value="documents" className="mt-4">
@@ -183,7 +330,13 @@ const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">No attachments available for this medication.</p>
+              <div className="text-center p-6 bg-muted/20 rounded-md">
+                <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="font-medium">No Documents</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  No attachments or documentation available for this medication.
+                </p>
+              </div>
             )}
           </TabsContent>
         </Tabs>
