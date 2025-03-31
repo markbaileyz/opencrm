@@ -6,6 +6,7 @@ import { Activity, Users, Calendar, ClipboardList, DollarSign, ArrowUpRightFromS
 import ReferralTrackingPanel from "./referrals/ReferralTrackingPanel";
 import PatientEngagementMetrics from "./metrics/PatientEngagementMetrics";
 import PatientManagementPanel from "./patients/PatientManagementPanel";
+import AppointmentSchedulingPanel from "./appointments/AppointmentSchedulingPanel";
 
 const HealthcareCRMModule: React.FC = () => {
   return (
@@ -52,14 +53,7 @@ const HealthcareCRMModule: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="appointments" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Appointment Scheduling</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Appointment scheduling interface will be displayed here.</p>
-            </CardContent>
-          </Card>
+          <AppointmentSchedulingPanel />
         </TabsContent>
         
         <TabsContent value="treatments" className="mt-4">
