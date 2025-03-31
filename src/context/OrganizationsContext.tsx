@@ -1,242 +1,139 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { Organization, OrganizationFilters } from "@/types/organization";
+import { sampleOrganizations } from "@/data/sampleOrganizations";
+import { v4 as uuidv4 } from "uuid";
+import { useToast } from "@/hooks/use-toast";
 
-// Define the shape of an organization
-interface Organization {
-  id: number;
-  name: string;
-  type?: string;
-  size?: 'Small' | 'Medium' | 'Large' | 'Enterprise';
-  industry?: string;
-  status: 'Active' | 'Inactive' | 'Prospect';
-  website?: string;
-  address?: string;
-  contactInfo?: {
-    email?: string;
-    phone?: string;
-  };
-  primaryContact?: {
-    id: number;
-    name: string;
-  };
-  relationshipStrength?: number;
-  connections?: number[];
-}
-
-// Define the context interface
 interface OrganizationsContextType {
   organizations: Organization[];
   filteredOrganizations: Organization[];
-  filter: {
-    search: string;
-    type: string;
-    status: string;
-    size: string;
-  };
-  setFilter: React.Dispatch<React.SetStateAction<{
-    search: string;
-    type: string;
-    status: string;
-    size: string;
-  }>>;
-  addOrganization: (org: Omit<Organization, 'id'>) => void;
-  updateOrganization: (id: number, org: Partial<Organization>) => void;
-  deleteOrganization: (id: number) => void;
-  getOrganizationById: (id: number) => Organization | undefined;
-  getConnectedOrganizations: (id: number) => Organization[];
+  filters: OrganizationFilters;
+  loading: boolean;
+  error: string | null;
+  setFilters: (filters: OrganizationFilters) => void;
+  addOrganization: (organization: Omit<Organization, "id" | "createdAt" | "updatedAt">) => void;
+  updateOrganization: (organization: Organization) => void;
+  deleteOrganization: (id: string) => void;
 }
 
-// Create the context
-const OrganizationsContext = createContext<OrganizationsContextType>({} as OrganizationsContextType);
+const OrganizationsContext = createContext<OrganizationsContextType | undefined>(undefined);
 
-// Create the provider component
+export const useOrganizations = () => {
+  const context = useContext(OrganizationsContext);
+  if (!context) {
+    throw new Error("useOrganizations must be used within an OrganizationsProvider");
+  }
+  return context;
+};
+
 export const OrganizationsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [organizations, setOrganizations] = useState<Organization[]>([
-    {
-      id: 1,
-      name: 'General Hospital',
-      type: 'Hospital',
-      size: 'Large',
-      industry: 'Healthcare',
-      status: 'Active',
-      website: 'www.generalhospital.org',
-      relationshipStrength: 85,
-      connections: [2, 3]
-    },
-    {
-      id: 2,
-      name: 'MediLab Research',
-      type: 'Research',
-      size: 'Medium',
-      industry: 'Healthcare',
-      status: 'Active',
-      website: 'www.medilabresearch.com',
-      relationshipStrength: 75,
-      connections: [1, 4, 5]
-    },
-    {
-      id: 3,
-      name: 'Community Health Clinic',
-      type: 'Clinic',
-      size: 'Small',
-      industry: 'Healthcare',
-      status: 'Active',
-      website: 'www.communityhealthclinic.org',
-      relationshipStrength: 90,
-      connections: [1, 6]
-    },
-    {
-      id: 4,
-      name: 'NorthStar Medical Supplies',
-      type: 'Supplier',
-      size: 'Medium',
-      industry: 'Medical Equipment',
-      status: 'Active',
-      website: 'www.northstarmed.com',
-      relationshipStrength: 65,
-      connections: [2]
-    },
-    {
-      id: 5,
-      name: 'PharmaPlus',
-      type: 'Pharmacy',
-      size: 'Enterprise',
-      industry: 'Pharmaceuticals',
-      status: 'Active',
-      website: 'www.pharmaplus.com',
-      relationshipStrength: 70,
-      connections: [2, 6]
-    },
-    {
-      id: 6,
-      name: 'Health Insurance Partners',
-      type: 'Insurance',
-      size: 'Large',
-      industry: 'Insurance',
-      status: 'Active',
-      website: 'www.healthinsurancepartners.com',
-      relationshipStrength: 80,
-      connections: [3, 5]
-    },
-    {
-      id: 7,
-      name: 'City Medical University',
-      type: 'Education',
-      size: 'Large',
-      industry: 'Education',
-      status: 'Prospect',
-      website: 'www.citymedicaluniversity.edu',
-      relationshipStrength: 40,
-      connections: []
-    },
-    {
-      id: 8,
-      name: 'BioResearch Labs',
-      type: 'Research',
-      size: 'Small',
-      industry: 'Biotechnology',
-      status: 'Inactive',
-      website: 'www.bioresearchlabs.com',
-      relationshipStrength: 25,
-      connections: []
-    },
-    {
-      id: 9,
-      name: 'Global Medical Conference',
-      type: 'Event',
-      size: 'Small',
-      industry: 'Events',
-      status: 'Prospect',
-      website: 'www.globalmedconf.com',
-      relationshipStrength: 55,
-      connections: []
-    },
-  ]);
-  
-  const [filter, setFilter] = useState({
-    search: '',
-    type: '',
-    status: '',
-    size: ''
-  });
-  
-  // Filter organizations based on the current filter state
-  const filteredOrganizations = organizations.filter(org => {
-    const searchMatch = 
-      !filter.search || 
-      org.name.toLowerCase().includes(filter.search.toLowerCase()) ||
-      (org.industry && org.industry.toLowerCase().includes(filter.search.toLowerCase()));
-      
-    const typeMatch = !filter.type || org.type === filter.type;
-    const statusMatch = !filter.status || org.status === filter.status;
-    const sizeMatch = !filter.size || org.size === filter.size;
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [filteredOrganizations, setFilteredOrganizations] = useState<Organization[]>([]);
+  const [filters, setFilters] = useState<OrganizationFilters>({});
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  // Load sample organizations
+  useEffect(() => {
+    try {
+      setOrganizations(sampleOrganizations);
+      setLoading(false);
+    } catch (err) {
+      setError("Failed to load organizations");
+      setLoading(false);
+    }
+  }, []);
+
+  // Apply filters whenever organizations or filters change
+  useEffect(() => {
+    let result = [...organizations];
     
-    return searchMatch && typeMatch && statusMatch && sizeMatch;
-  });
-  
-  // Add a new organization
-  const addOrganization = (org: Omit<Organization, 'id'>) => {
-    const newId = organizations.length > 0 
-      ? Math.max(...organizations.map(o => o.id)) + 1 
-      : 1;
-      
-    setOrganizations([...organizations, { ...org, id: newId }]);
-  };
-  
-  // Update an organization
-  const updateOrganization = (id: number, updates: Partial<Organization>) => {
-    setOrganizations(organizations.map(org => 
-      org.id === id ? { ...org, ...updates } : org
-    ));
-  };
-  
-  // Delete an organization
-  const deleteOrganization = (id: number) => {
-    setOrganizations(organizations.filter(org => org.id !== id));
-  };
-  
-  // Get an organization by id
-  const getOrganizationById = (id: number) => {
-    return organizations.find(org => org.id === id);
-  };
-  
-  // Get organizations connected to a specific organization
-  const getConnectedOrganizations = (id: number) => {
-    const org = organizations.find(o => o.id === id);
-    
-    if (!org || !org.connections) {
-      return [];
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      result = result.filter((org) => 
+        org.name.toLowerCase().includes(searchTerm) || 
+        org.email.toLowerCase().includes(searchTerm) ||
+        (org.contactPersonName && org.contactPersonName.toLowerCase().includes(searchTerm))
+      );
     }
     
-    return organizations.filter(o => org.connections?.includes(o.id));
+    if (filters.type) {
+      result = result.filter((org) => org.type === filters.type);
+    }
+    
+    if (filters.status) {
+      result = result.filter((org) => org.status === filters.status);
+    }
+    
+    if (filters.size) {
+      result = result.filter((org) => org.size === filters.size);
+    }
+    
+    setFilteredOrganizations(result);
+  }, [organizations, filters]);
+
+  // Add a new organization
+  const addOrganization = (orgData: Omit<Organization, "id" | "createdAt" | "updatedAt">) => {
+    const now = new Date().toISOString();
+    const newOrganization: Organization = {
+      ...orgData,
+      id: uuidv4(),
+      createdAt: now,
+      updatedAt: now,
+    };
+    
+    setOrganizations((prev) => [...prev, newOrganization]);
+    toast({
+      title: "Organization added",
+      description: `${newOrganization.name} has been added successfully.`,
+    });
   };
-  
+
+  // Update an existing organization
+  const updateOrganization = (updatedOrg: Organization) => {
+    setOrganizations((prev) => 
+      prev.map((org) => 
+        org.id === updatedOrg.id 
+          ? { ...updatedOrg, updatedAt: new Date().toISOString() } 
+          : org
+      )
+    );
+    toast({
+      title: "Organization updated",
+      description: `${updatedOrg.name} has been updated successfully.`,
+    });
+  };
+
+  // Delete an organization
+  const deleteOrganization = (id: string) => {
+    const orgToDelete = organizations.find((org) => org.id === id);
+    if (orgToDelete) {
+      setOrganizations((prev) => prev.filter((org) => org.id !== id));
+      toast({
+        title: "Organization deleted",
+        description: `${orgToDelete.name} has been deleted.`,
+        variant: "destructive",
+      });
+    }
+  };
+
   const value = {
     organizations,
     filteredOrganizations,
-    filter,
-    setFilter,
+    filters,
+    loading,
+    error,
+    setFilters,
     addOrganization,
     updateOrganization,
     deleteOrganization,
-    getOrganizationById,
-    getConnectedOrganizations
   };
-  
+
   return (
     <OrganizationsContext.Provider value={value}>
       {children}
     </OrganizationsContext.Provider>
   );
-};
-
-// Custom hook for using the organizations context
-export const useOrganizations = () => {
-  const context = useContext(OrganizationsContext);
-  
-  if (!context) {
-    throw new Error('useOrganizations must be used within an OrganizationsProvider');
-  }
-  
-  return context;
 };

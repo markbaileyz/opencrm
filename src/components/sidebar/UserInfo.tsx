@@ -29,15 +29,8 @@ const UserInfo = () => {
     }
   };
   
-  const formatRole = (role: string | undefined) => {
-    if (!role) return "User";
+  const formatRole = (role: string) => {
     return role.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-  };
-
-  // Get primary role from user's roles array
-  const getPrimaryRole = () => {
-    if (!user || !user.roles || !user.roles.length) return undefined;
-    return user.roles[0];
   };
   
   return (
@@ -53,11 +46,9 @@ const UserInfo = () => {
           </Avatar>
           <div>
             <div className="font-medium text-sm">{user.displayName || user.email}</div>
-            {user.roles && user.roles.length > 0 && (
-              <Badge variant="outline" className={`mt-1 text-xs ${getRoleColor(user.roles[0])}`}>
-                {formatRole(getPrimaryRole())}
-              </Badge>
-            )}
+            <Badge variant="outline" className={`mt-1 text-xs ${getRoleColor(user.role)}`}>
+              {formatRole(user.role)}
+            </Badge>
           </div>
         </div>
       )}

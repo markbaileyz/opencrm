@@ -1,71 +1,134 @@
 
-import React, { useState } from "react";
+import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import CalendarView from "@/components/calendar/CalendarView";
-import { format } from "date-fns";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { CalendarPlus } from "lucide-react";
+
+// Import custom hooks
+import { useCalendar } from "@/hooks/useCalendar";
+import { useAppointmentActions } from "@/hooks/useAppointmentActions";
+import { useCalendarEmailIntegration } from "@/hooks/useCalendarEmailIntegration";
+
+// Import refactored components
+import CalendarHeader from "@/components/calendar/CalendarHeader";
+import CalendarMainContent from "@/components/calendar/CalendarMainContent";
+import EmailIntegrationSection from "@/components/calendar/EmailIntegrationSection";
+import AppointmentForm from "@/components/calendar/AppointmentForm";
 
 const Calendar = () => {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  
-  // Sample appointments - in a real app these would come from an API or context
-  const appointments = [
-    {
-      id: '1',
-      title: 'Dr. Smith with Patient Johnson',
-      start: new Date(2023, 9, 15, 10, 0),
-      end: new Date(2023, 9, 15, 10, 30),
-      patientId: 'p123',
-      patientName: 'Sarah Johnson',
-      type: 'follow-up',
-      status: 'confirmed',
-    },
-    {
-      id: '2',
-      title: 'Dr. Garcia with Patient Thompson',
-      start: new Date(2023, 9, 15, 11, 0),
-      end: new Date(2023, 9, 15, 11, 45),
-      patientId: 'p456',
-      patientName: 'Michael Thompson',
-      type: 'new-patient',
-      status: 'confirmed',
-    },
-  ];
-  
-  const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
-  };
-  
-  const handleMonthChange = (date: Date) => {
-    setCurrentMonth(date);
-  };
-  
-  const handleAppointmentSelect = (appointmentId: string) => {
-    console.log(`Appointment selected: ${appointmentId}`);
-  };
-  
-  const handleCreateAppointment = (date: Date) => {
-    console.log(`Create appointment for: ${format(date, 'PPP')}`);
-  };
-  
-  const handleViewChange = (view: string) => {
-    console.log(`View changed to: ${view}`);
+  const {
+    currentMonth,
+    setCurrentMonth,
+    selectedDate,
+    setSelectedDate,
+    isAddAppointmentOpen,
+    setIsAddAppointmentOpen,
+    isBatchModeOpen,
+    setIsBatchModeOpen,
+    isRecurringModeOpen,
+    setIsRecurringModeOpen,
+    editAppointmentId,
+    setEditAppointmentId,
+    appointments,
+    setAppointments,
+    emails,
+    nextMonth,
+    prevMonth,
+    handleDateSelect
+  } = useCalendar();
+
+  const { findRelatedEmails } = useCalendarEmailIntegration();
+
+  const {
+    handleAddAppointment,
+    handleBatchAppointmentsCreated,
+    handleEditAppointment,
+    handleDeleteAppointment,
+    handleSendReminder,
+    handleGoToEmail,
+    navigateToEmail,
+    handleQuickAddAppointment
+  } = useAppointmentActions({
+    appointments,
+    setAppointments,
+    selectedDate,
+    setIsAddAppointmentOpen,
+    editAppointmentId,
+    setEditAppointmentId
+  });
+
+  // Add a function to handle status changes
+  const handleStatusChange = (id: string, status: "upcoming" | "completed" | "canceled") => {
+    setAppointments(prevAppointments => 
+      prevAppointments.map(app => 
+        app.id === id ? { ...app, status } : app
+      )
+    );
   };
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6 px-4">
-        <h1 className="text-2xl font-bold mb-6">Calendar</h1>
-        <CalendarView 
+      <div className="space-y-6">
+        <CalendarHeader
+          selectedDate={selectedDate}
+          editAppointmentId={editAppointmentId}
+          appointments={appointments}
+          emails={emails}
+          isAddAppointmentOpen={isAddAppointmentOpen}
+          setIsAddAppointmentOpen={setIsAddAppointmentOpen}
+          isBatchModeOpen={isBatchModeOpen}
+          setIsBatchModeOpen={setIsBatchModeOpen}
+          isRecurringModeOpen={isRecurringModeOpen}
+          setIsRecurringModeOpen={setIsRecurringModeOpen}
+          onAddAppointment={handleAddAppointment}
+          onBatchAppointmentsCreated={handleBatchAppointmentsCreated}
+          onGoToEmail={handleGoToEmail}
+        />
+        
+        <CalendarMainContent
           currentMonth={currentMonth}
           selectedDate={selectedDate}
           appointments={appointments}
+          emails={emails}
           onDateSelect={handleDateSelect}
-          onMonthChange={handleMonthChange}
-          onAppointmentSelect={handleAppointmentSelect}
-          onCreateAppointment={handleCreateAppointment}
-          onViewChange={handleViewChange}
+          onMonthChange={setCurrentMonth}
+          onPrevMonth={prevMonth}
+          onNextMonth={nextMonth}
+          onAddAppointment={() => setIsAddAppointmentOpen(true)}
+          onEditAppointment={handleEditAppointment}
+          onDeleteAppointment={handleDeleteAppointment}
+          onReminderSent={handleSendReminder}
+          onViewEmail={navigateToEmail}
+          onStatusChange={handleStatusChange}
+          findRelatedEmails={findRelatedEmails}
+          onDateChange={setSelectedDate}
+          onQuickAdd={handleQuickAddAppointment}
         />
+        
+        <EmailIntegrationSection onGoToEmail={handleGoToEmail} />
+        
+        <Dialog open={isAddAppointmentOpen} onOpenChange={setIsAddAppointmentOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>
+                {editAppointmentId ? "Edit Appointment" : "New Appointment"}
+              </DialogTitle>
+            </DialogHeader>
+            <AppointmentForm
+              selectedDate={selectedDate}
+              editAppointmentId={editAppointmentId}
+              appointments={appointments}
+              emails={emails}
+              onSubmit={handleAddAppointment}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );

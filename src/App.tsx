@@ -1,84 +1,288 @@
-
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import DashboardLayout from "@/components/DashboardLayout";
+import { Routes, Route } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/components/theme-provider";
+import InteractiveGuides from "@/components/guides/InteractiveGuides";
+
+// Import all the pages
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
-import Contacts from "@/pages/Contacts";
-import Email from "@/pages/Email";
-import NotFound from "@/pages/NotFound";
-import ModularCRM from "@/pages/ModularCRM";
-import CRMConfig from "@/pages/CRMConfig";
-import CRMModule from "@/pages/CRMModule";
-import Roadmap from "@/pages/Roadmap";
-import OpenCRMRoadmapPage from "@/pages/OpenCRMRoadmap";
-import DashboardRoadmap from "@/pages/DashboardRoadmap";
-import Calendar from "@/pages/Calendar";
-import Office from "@/pages/Office";
-import Organizations from "@/pages/Organizations";
 import Patients from "@/pages/Patients";
-import Reports from "@/pages/Reports";
-import HealthTracker from "@/pages/HealthTracker";
-import MedicalRecords from "@/pages/MedicalRecords";
-import Medications from "@/pages/Medications";
-import Prescriptions from "@/pages/Prescriptions";
-import PatientVitals from "@/pages/PatientVitals";
-import Compliance from "@/pages/Compliance";
-import FrontDesk from "@/pages/FrontDesk";
+import PatientDetail from "@/pages/PatientDetail";
+import PatientVitalsPage from "@/pages/PatientVitalsPage";
+import MedicalRecordsPage from "@/pages/MedicalRecordsPage";
+import MedicationsPage from "@/pages/MedicationsPage";
+import PrescriptionsPage from "@/pages/PrescriptionsPage";
+import HealthTrackerPage from "@/pages/HealthTrackerPage";
+import Calendar from "@/pages/Calendar";
+import Email from "@/pages/Email";
+import Contacts from "@/pages/Contacts";
 import Deals from "@/pages/Deals";
+import Organizations from "@/pages/Organizations";
+import Reports from "@/pages/Reports";
+import Settings from "@/pages/Settings";
+import AdminSettings from "@/pages/AdminSettings";
+import UserManagement from "@/pages/UserManagement";
+import Roadmap from "@/pages/Roadmap";
+import DashboardRoadmap from "@/pages/DashboardRoadmap";
+import MindMap from "@/pages/MindMap";
+import HealthcareCRM from "@/pages/HealthcareCRM";
+import OpenCRMRoadmap from "@/pages/OpenCRMRoadmap";
+import FrontDesk from "@/pages/FrontDesk";
+import Office from "@/pages/Office";
+import PreCheckIn from "@/pages/PreCheckIn";
+import CheckInConfirmation from "@/pages/CheckInConfirmation";
+import KnowledgeBase from "@/pages/KnowledgeBase";
+import ChallengesSolutions from "@/pages/ChallengesSolutions";
+import NotFound from "@/pages/NotFound";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
+// Import our new pages
 import CallTracking from "@/pages/CallTracking";
 import Workflows from "@/pages/Workflows";
-import Settings from "@/pages/Settings";
-import UserManagement from "@/pages/UserManagement";
-import AdminSettings from "@/pages/AdminSettings";
+import Compliance from "@/pages/Compliance";
+import WorkflowAnalytics from "@/pages/WorkflowAnalytics";
+import OrganizationInsights from "@/pages/OrganizationInsights";
+import Guides from "@/pages/Guides";
+
+import "./App.css";
+import ServiceWorkerManager from "./components/service-worker/ServiceWorkerManager";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/login" element={<Login />} />
-      
-      {/* Dashboard routes */}
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/contacts" element={<Contacts />} />
-      <Route path="/email" element={<Email />} />
-      <Route path="/calendar" element={<Calendar />} />
-      <Route path="/office" element={<Office />} />
-      <Route path="/organizations" element={<Organizations />} />
-      <Route path="/patients" element={<Patients />} />
-      <Route path="/reports" element={<Reports />} />
-      
-      {/* Healthcare specific routes */}
-      <Route path="/health-tracker" element={<HealthTracker />} />
-      <Route path="/medical-records" element={<MedicalRecords />} />
-      <Route path="/medications" element={<Medications />} />
-      <Route path="/prescriptions" element={<Prescriptions />} />
-      <Route path="/patient-vitals" element={<PatientVitals />} />
-      <Route path="/compliance" element={<Compliance />} />
-      <Route path="/front-desk" element={<FrontDesk />} />
-      <Route path="/deals" element={<Deals />} />
-      <Route path="/call-tracking" element={<CallTracking />} />
-      <Route path="/workflows" element={<Workflows />} />
-      
-      {/* Settings routes */}
-      <Route path="/settings" element={<Settings />} />
-      <Route path="/user-management" element={<UserManagement />} />
-      <Route path="/admin-settings" element={<AdminSettings />} />
-      
-      {/* CRM routes */}
-      <Route path="/crm" element={<ModularCRM />} />
-      <Route path="/crm-config" element={<CRMConfig />} />
-      <Route path="/crm/:moduleId" element={<CRMModule />} />
-      
-      {/* Roadmap routes */}
-      <Route path="/roadmap" element={<Roadmap />} />
-      <Route path="/open-crm-roadmap" element={<OpenCRMRoadmapPage />} />
-      <Route path="/dashboard-roadmap" element={<DashboardRoadmap />} />
-      
-      {/* Catch-all route */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <ThemeProvider defaultTheme="light" storageKey="ui-theme">
+      <InteractiveGuides>
+        <ServiceWorkerManager />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Index />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/pre-check-in" element={<PreCheckIn />} />
+          <Route path="/check-in-confirmation" element={<CheckInConfirmation />} />
+          <Route path="/roadmap" element={<Roadmap />} />
+          <Route path="/mind-map" element={<MindMap />} />
+          <Route path="/healthcare-crm" element={<HealthcareCRM />} />
+          <Route path="/opencrm-roadmap" element={<OpenCRMRoadmap />} />
+          <Route path="/knowledge-base" element={<KnowledgeBase />} />
+          <Route path="/challenges-solutions" element={<ChallengesSolutions />} />
+
+          {/* Protected Routes - requires authentication */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patients"
+            element={
+              <ProtectedRoute>
+                <Patients />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patients/:patientId"
+            element={
+              <ProtectedRoute>
+                <PatientDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patient-vitals"
+            element={
+              <ProtectedRoute>
+                <PatientVitalsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/medical-records"
+            element={
+              <ProtectedRoute>
+                <MedicalRecordsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/medications"
+            element={
+              <ProtectedRoute>
+                <MedicationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/prescriptions"
+            element={
+              <ProtectedRoute>
+                <PrescriptionsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/health-tracker"
+            element={
+              <ProtectedRoute>
+                <HealthTrackerPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/calendar"
+            element={
+              <ProtectedRoute>
+                <Calendar />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/email"
+            element={
+              <ProtectedRoute>
+                <Email />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/contacts"
+            element={
+              <ProtectedRoute>
+                <Contacts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/deals"
+            element={
+              <ProtectedRoute>
+                <Deals />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/organizations"
+            element={
+              <ProtectedRoute>
+                <Organizations />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute>
+                <Reports />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin-settings"
+            element={
+              <ProtectedRoute>
+                <AdminSettings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user-management"
+            element={
+              <ProtectedRoute>
+                <UserManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard-roadmap"
+            element={
+              <ProtectedRoute>
+                <DashboardRoadmap />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/front-desk"
+            element={
+              <ProtectedRoute>
+                <FrontDesk />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/office"
+            element={
+              <ProtectedRoute>
+                <Office />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/compliance"
+            element={
+              <ProtectedRoute>
+                <Compliance />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/call-tracking"
+            element={
+              <ProtectedRoute>
+                <CallTracking />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/workflows"
+            element={
+              <ProtectedRoute>
+                <Workflows />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/workflow-analytics"
+            element={
+              <ProtectedRoute>
+                <WorkflowAnalytics />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/organization-insights"
+            element={
+              <ProtectedRoute>
+                <OrganizationInsights />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/guides"
+            element={
+              <ProtectedRoute>
+                <Guides />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 404 Route */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Toaster />
+      </InteractiveGuides>
+    </ThemeProvider>
   );
 }
 

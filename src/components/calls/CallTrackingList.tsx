@@ -21,23 +21,19 @@ import {
   Clock,
   Calendar
 } from "lucide-react";
-import { CallRecord } from "@/types/call";
+import { CallRecord, CallStatus, CallDirection } from "@/types/callTracking";
 import { formatDistanceToNow, format } from "date-fns";
 
 interface CallTrackingListProps {
   calls: CallRecord[];
-  onViewCallDetails: (callId: string) => void;
-  onCreateCall: () => void; 
-  onDeleteCall: (callId: string) => void;
-  onEditCall: (callId: string) => void;
+  onAddCall: () => void;
+  onViewCall: (callId: string) => void;
 }
 
 const CallTrackingList: React.FC<CallTrackingListProps> = ({
   calls,
-  onViewCallDetails,
-  onCreateCall,
-  onDeleteCall,
-  onEditCall
+  onAddCall,
+  onViewCall,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -47,39 +43,33 @@ const CallTrackingList: React.FC<CallTrackingListProps> = ({
     const searchLower = searchQuery.toLowerCase();
     return (
       call.notes?.toLowerCase().includes(searchLower) ||
-      call.patientName?.toLowerCase().includes(searchLower) ||
-      call.contactName.toLowerCase().includes(searchLower) ||
-      call.phoneNumber.toLowerCase().includes(searchLower) ||
+      call.staffMember?.toLowerCase().includes(searchLower) ||
+      call.patientId.toLowerCase().includes(searchLower) ||
       (call.tags && call.tags.some(tag => tag.toLowerCase().includes(searchLower)))
     );
   });
 
-  const getCallStatusBadge = (type: string) => {
-    switch (type) {
-      case "incoming":
-        return <Badge className="bg-green-500">Incoming</Badge>;
-      case "outgoing":
-        return <Badge className="bg-blue-500">Outgoing</Badge>;
+  const getCallStatusBadge = (status: CallStatus) => {
+    switch (status) {
+      case "completed":
+        return <Badge className="bg-green-500">Completed</Badge>;
       case "missed":
         return <Badge variant="destructive">Missed</Badge>;
       case "scheduled":
         return <Badge variant="outline" className="text-blue-500 border-blue-500">Scheduled</Badge>;
+      case "cancelled":
+        return <Badge variant="secondary">Cancelled</Badge>;
       default:
         return null;
     }
   };
 
-  const getCallDirectionIcon = (type: string) => {
-    switch (type) {
-      case "incoming":
-        return <PhoneIncoming className="h-4 w-4 text-green-500" />;
-      case "outgoing":
-        return <PhoneOutgoing className="h-4 w-4 text-blue-500" />;
-      case "missed":
-        return <PhoneMissed className="h-4 w-4 text-red-500" />;
-      default:
-        return <Phone className="h-4 w-4" />;
-    }
+  const getCallDirectionIcon = (direction: CallDirection) => {
+    return direction === "inbound" ? (
+      <PhoneIncoming className="h-4 w-4 text-green-500" />
+    ) : (
+      <PhoneOutgoing className="h-4 w-4 text-blue-500" />
+    );
   };
 
   const formatDuration = (seconds?: number) => {
@@ -103,7 +93,7 @@ const CallTrackingList: React.FC<CallTrackingListProps> = ({
             className="pl-8"
           />
         </div>
-        <Button onClick={onCreateCall}>
+        <Button onClick={onAddCall}>
           <PlusCircle className="h-4 w-4 mr-2" />
           Log Call
         </Button>
@@ -116,17 +106,18 @@ const CallTrackingList: React.FC<CallTrackingListProps> = ({
               <TableRow>
                 <TableHead>Status</TableHead>
                 <TableHead>Date & Time</TableHead>
-                <TableHead>Contact</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Duration</TableHead>
-                <TableHead>Purpose</TableHead>
+                <TableHead>Staff</TableHead>
                 <TableHead>Notes</TableHead>
+                <TableHead>Follow-up</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredCalls.map((call) => (
                 <TableRow key={call.id}>
-                  <TableCell>{getCallStatusBadge(call.type)}</TableCell>
+                  <TableCell>{getCallStatusBadge(call.status)}</TableCell>
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">
@@ -139,15 +130,12 @@ const CallTrackingList: React.FC<CallTrackingListProps> = ({
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      {getCallDirectionIcon(call.type)}
-                      <span>{call.contactName}</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {call.phoneNumber}
+                      {getCallDirectionIcon(call.direction)}
+                      <span className="capitalize text-sm">{call.direction}</span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    {call.type !== "missed" ? (
+                    {call.status === "completed" ? (
                       <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3 text-muted-foreground" />
                         <span>{formatDuration(call.duration)}</span>
@@ -156,34 +144,31 @@ const CallTrackingList: React.FC<CallTrackingListProps> = ({
                       <span className="text-muted-foreground">-</span>
                     )}
                   </TableCell>
-                  <TableCell>{call.purpose || "-"}</TableCell>
+                  <TableCell>{call.staffMember || "-"}</TableCell>
                   <TableCell>
                     <div className="max-w-[200px] truncate" title={call.notes}>
                       {call.notes || "-"}
                     </div>
                   </TableCell>
+                  <TableCell>
+                    {call.followUpRequired && call.followUpDate ? (
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3 text-amber-500" />
+                        <span className="text-sm">
+                          {format(new Date(call.followUpDate), 'MMM dd')}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">None</span>
+                    )}
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      onClick={() => onViewCallDetails(call.id)}
+                      onClick={() => onViewCall(call.id)}
                     >
                       View
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => onEditCall(call.id)}
-                    >
-                      Edit
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      className="text-red-500 hover:text-red-700" 
-                      onClick={() => onDeleteCall(call.id)}
-                    >
-                      Delete
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -200,7 +185,7 @@ const CallTrackingList: React.FC<CallTrackingListProps> = ({
               ? "No calls match your search criteria. Try different keywords or clear your search."
               : "There are no call records yet. Start by logging a new call."}
           </p>
-          <Button onClick={onCreateCall}>
+          <Button onClick={onAddCall}>
             <PlusCircle className="h-4 w-4 mr-2" />
             Log Call
           </Button>

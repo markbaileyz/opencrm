@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useToast } from "@/hooks/use-toast";
 
 export interface VitalReading {
   id: string;
@@ -15,12 +15,6 @@ export interface VitalReading {
   notes?: string;
 }
 
-export interface VitalStats {
-  current: any;
-  trend?: "up" | "down" | "stable";
-  change?: number;
-}
-
 export interface VitalsChartData {
   date: string;
   systolic: number;
@@ -29,326 +23,367 @@ export interface VitalsChartData {
   temperature: number;
   oxygenSaturation: number;
   weight: number;
-  respiratoryRate: number;
 }
 
 export interface VitalsData {
-  bloodPressure: VitalStats;
-  heartRate: VitalStats;
-  temperature: VitalStats;
-  oxygenSaturation: VitalStats;
-  weight: VitalStats;
+  bloodPressure: {
+    current: string;
+    trend?: 'up' | 'down' | 'stable';
+    history?: { date: string; value: string }[];
+  };
+  heartRate: {
+    current: number;
+    trend?: 'up' | 'down' | 'stable';
+    history?: { date: string; value: number }[];
+  };
+  temperature: {
+    current: number;
+    trend?: 'up' | 'down' | 'stable';
+    history?: { date: string; value: number }[];
+  };
+  respiratoryRate: {
+    current: number;
+    trend?: 'up' | 'down' | 'stable';
+    history?: { date: string; value: number }[];
+  };
+  oxygenSaturation: {
+    current: number;
+    trend?: 'up' | 'down' | 'stable';
+    history?: { date: string; value: number }[];
+  };
+  weight: {
+    current: number;
+    trend?: 'up' | 'down' | 'stable';
+    history?: { date: string; value: number }[];
+  };
   readings: VitalReading[];
   chartData: VitalsChartData[];
 }
 
-// Generate sample vital readings for demo purposes
-const generateSampleReadings = (patientId: string): VitalReading[] => {
-  const readings: VitalReading[] = [];
-  const now = new Date();
-  
-  // Generate readings for the past 30 days
-  for (let i = 30; i >= 0; i--) {
-    const date = new Date(now);
-    date.setDate(date.getDate() - i);
-    
-    // Create slight variation in values
-    const systolic = Math.floor(120 + (Math.random() * 20 - 10));
-    const diastolic = Math.floor(80 + (Math.random() * 15 - 7));
-    const heartRate = Math.floor(72 + (Math.random() * 15 - 7));
-    const temperature = 98.6 + (Math.random() * 1.5 - 0.7);
-    const respiratoryRate = Math.floor(16 + (Math.random() * 4 - 2));
-    const oxygenSaturation = Math.floor(98 + (Math.random() * 3 - 1));
-    const weight = 70 + (Math.random() * 2 - 1);
-    
-    readings.push({
-      id: uuidv4(),
-      date: date.toISOString().split('T')[0],
-      bloodPressure: `${systolic}/${diastolic}`,
-      heartRate,
-      temperature,
-      respiratoryRate,
-      oxygenSaturation,
-      weight,
-      recordedBy: i % 5 === 0 ? "Dr. Smith" : (i % 3 === 0 ? "Nurse Johnson" : undefined)
-    });
-  }
-  
-  // Add one outlier for demonstration purposes
-  const outlierIndex = Math.floor(Math.random() * readings.length);
-  readings[outlierIndex].heartRate = 115; // High heart rate
-  readings[outlierIndex].notes = "Patient reported feeling anxious";
-  
-  return readings;
-};
-
-// Process readings to generate chart data
-const processReadingsToChartData = (readings: VitalReading[]): VitalsChartData[] => {
-  return readings.map(reading => {
-    const [systolic, diastolic] = reading.bloodPressure.split('/').map(Number);
-    return {
-      date: reading.date,
-      systolic,
-      diastolic,
-      heartRate: reading.heartRate,
-      temperature: reading.temperature,
-      oxygenSaturation: reading.oxygenSaturation,
-      weight: reading.weight,
-      respiratoryRate: reading.respiratoryRate
-    };
-  });
-};
-
-// Calculate trend based on the last two readings
-const calculateTrend = (current: number, previous: number): "up" | "down" | "stable" => {
-  const difference = current - previous;
-  const percentChange = (difference / previous) * 100;
-  
-  if (percentChange > 3) {
-    return "up";
-  } else if (percentChange < -3) {
-    return "down";
-  } else {
-    return "stable";
-  }
-};
-
-export const useVitalsData = (patientId: string) => {
+export const useVitalsData = (patientId?: string, timeRange: string = "week") => {
   const [vitals, setVitals] = useState<VitalsData | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
-  
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+
   useEffect(() => {
-    const fetchVitalsData = async () => {
+    // In a real app, this would be an API call
+    const fetchVitals = async () => {
+      setIsLoading(true);
       try {
-        // In a real app, this would be an API call
-        // For demo, we'll generate sample data
-        setIsLoading(true);
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 700));
         
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        const readings = generateSampleReadings(patientId);
-        const chartData = processReadingsToChartData(readings);
-        
-        // Sort readings by date descending for display
-        const sortedReadings = [...readings].sort((a, b) => 
-          new Date(b.date).getTime() - new Date(a.date).getTime()
-        );
-        
-        // Extract the latest and second-latest readings for trend calculation
-        const latest = sortedReadings[0];
-        const secondLatest = sortedReadings[1] || null;
-        
-        // Calculate current values and trends
-        const [latestSystolic, latestDiastolic] = latest.bloodPressure.split('/').map(Number);
-        
-        let bloodPressureTrend: "up" | "down" | "stable" = "stable";
-        let heartRateTrend: "up" | "down" | "stable" = "stable";
-        let temperatureTrend: "up" | "down" | "stable" = "stable";
-        let oxygenSaturationTrend: "up" | "down" | "stable" = "stable";
-        let weightTrend: "up" | "down" | "stable" = "stable";
-        
-        // Calculate trends if we have a previous reading
-        if (secondLatest) {
-          const [prevSystolic] = secondLatest.bloodPressure.split('/').map(Number);
-          bloodPressureTrend = calculateTrend(latestSystolic, prevSystolic);
-          heartRateTrend = calculateTrend(latest.heartRate, secondLatest.heartRate);
-          temperatureTrend = calculateTrend(latest.temperature, secondLatest.temperature);
-          oxygenSaturationTrend = calculateTrend(latest.oxygenSaturation, secondLatest.oxygenSaturation);
-          weightTrend = calculateTrend(latest.weight, secondLatest.weight);
-        }
-        
-        // Set the processed vitals data
-        setVitals({
-          bloodPressure: {
-            current: latest.bloodPressure,
-            trend: bloodPressureTrend
+        // Mock readings data with more frequent entries for better visualization
+        const mockReadings: VitalReading[] = [
+          {
+            id: "v1",
+            date: "2024-04-10",
+            bloodPressure: "120/80",
+            heartRate: 72,
+            temperature: 98.6,
+            respiratoryRate: 16,
+            oxygenSaturation: 98,
+            weight: 68.5,
+            recordedBy: "Nurse Johnson",
+            notes: "Patient reports feeling well"
           },
-          heartRate: {
-            current: latest.heartRate,
-            trend: heartRateTrend
+          {
+            id: "v2",
+            date: "2024-04-08",
+            bloodPressure: "118/79",
+            heartRate: 70,
+            temperature: 98.4,
+            respiratoryRate: 15,
+            oxygenSaturation: 99,
+            weight: 68.7,
+            recordedBy: "Self-recorded"
           },
-          temperature: {
-            current: latest.temperature,
-            trend: temperatureTrend
+          {
+            id: "v3",
+            date: "2024-04-05",
+            bloodPressure: "122/82",
+            heartRate: 74,
+            temperature: 98.8,
+            respiratoryRate: 16,
+            oxygenSaturation: 97,
+            weight: 68.9,
+            recordedBy: "Self-recorded"
           },
-          oxygenSaturation: {
-            current: latest.oxygenSaturation,
-            trend: oxygenSaturationTrend
+          {
+            id: "v4",
+            date: "2024-04-02",
+            bloodPressure: "121/81",
+            heartRate: 73,
+            temperature: 98.7,
+            respiratoryRate: 17,
+            oxygenSaturation: 98,
+            weight: 69.0,
+            recordedBy: "Self-recorded"
           },
-          weight: {
-            current: latest.weight,
-            trend: weightTrend
+          {
+            id: "v5",
+            date: "2024-03-30",
+            bloodPressure: "123/83",
+            heartRate: 75,
+            temperature: 98.9,
+            respiratoryRate: 16,
+            oxygenSaturation: 97,
+            weight: 69.1,
+            recordedBy: "Nurse Williams"
           },
-          readings: sortedReadings,
-          chartData
+          {
+            id: "v6",
+            date: "2024-03-27",
+            bloodPressure: "119/80",
+            heartRate: 71,
+            temperature: 98.5,
+            respiratoryRate: 15,
+            oxygenSaturation: 98,
+            weight: 69.3,
+            recordedBy: "Self-recorded"
+          },
+          {
+            id: "v7",
+            date: "2024-03-24",
+            bloodPressure: "120/82",
+            heartRate: 76,
+            temperature: 98.8,
+            respiratoryRate: 16,
+            oxygenSaturation: 96,
+            weight: 69.5,
+            recordedBy: "Self-recorded"
+          },
+          {
+            id: "v8",
+            date: "2024-03-21",
+            bloodPressure: "122/84",
+            heartRate: 77,
+            temperature: 99.0,
+            respiratoryRate: 17,
+            oxygenSaturation: 96,
+            weight: 69.8,
+            recordedBy: "Dr. Thompson",
+            notes: "Patient reports occasional headaches in the afternoon"
+          },
+          {
+            id: "v9",
+            date: "2024-03-15",
+            bloodPressure: "124/83",
+            heartRate: 75,
+            temperature: 98.8,
+            respiratoryRate: 15,
+            oxygenSaturation: 97,
+            weight: 70.0,
+            recordedBy: "Nurse Williams"
+          },
+          {
+            id: "v10",
+            date: "2024-02-28",
+            bloodPressure: "122/81",
+            heartRate: 76,
+            temperature: 98.7,
+            respiratoryRate: 16,
+            oxygenSaturation: 97,
+            weight: 70.2,
+            recordedBy: "Dr. Thompson"
+          },
+          {
+            id: "v11",
+            date: "2024-02-18",
+            bloodPressure: "118/78",
+            heartRate: 78,
+            temperature: 98.7,
+            respiratoryRate: 16,
+            oxygenSaturation: 96,
+            weight: 70.1,
+            recordedBy: "Self-recorded"
+          }
+        ];
+        
+        // Generate chart data from readings
+        const chartData: VitalsChartData[] = mockReadings.map(reading => {
+          const [systolic, diastolic] = reading.bloodPressure.split('/').map(Number);
+          return {
+            date: reading.date,
+            systolic,
+            diastolic,
+            heartRate: reading.heartRate,
+            temperature: reading.temperature,
+            oxygenSaturation: reading.oxygenSaturation,
+            weight: reading.weight
+          };
         });
         
+        // Prepare the history data
+        const bpHistory = mockReadings.map(r => ({ date: r.date, value: r.bloodPressure }));
+        const hrHistory = mockReadings.map(r => ({ date: r.date, value: r.heartRate }));
+        const tempHistory = mockReadings.map(r => ({ date: r.date, value: r.temperature }));
+        const rrHistory = mockReadings.map(r => ({ date: r.date, value: r.respiratoryRate }));
+        const o2History = mockReadings.map(r => ({ date: r.date, value: r.oxygenSaturation }));
+        const weightHistory = mockReadings.map(r => ({ date: r.date, value: r.weight }));
+        
+        // Get systolic values for determining trend
+        const currentSystolic = Number(mockReadings[0].bloodPressure.split('/')[0]);
+        const previousSystolic = Number(mockReadings[1].bloodPressure.split('/')[0]);
+        
+        // Mock vital data structure
+        const mockVitals: VitalsData = {
+          bloodPressure: {
+            current: mockReadings[0].bloodPressure,
+            trend: currentSystolic < previousSystolic ? "down" : 
+                   currentSystolic > previousSystolic ? "up" : "stable",
+            history: bpHistory
+          },
+          heartRate: {
+            current: mockReadings[0].heartRate,
+            trend: mockReadings[0].heartRate < mockReadings[1].heartRate ? "down" : 
+                   mockReadings[0].heartRate > mockReadings[1].heartRate ? "up" : "stable",
+            history: hrHistory
+          },
+          temperature: {
+            current: mockReadings[0].temperature,
+            trend: mockReadings[0].temperature < mockReadings[1].temperature ? "down" : 
+                   mockReadings[0].temperature > mockReadings[1].temperature ? "up" : "stable",
+            history: tempHistory
+          },
+          respiratoryRate: {
+            current: mockReadings[0].respiratoryRate,
+            trend: mockReadings[0].respiratoryRate < mockReadings[1].respiratoryRate ? "down" : 
+                   mockReadings[0].respiratoryRate > mockReadings[1].respiratoryRate ? "up" : "stable",
+            history: rrHistory
+          },
+          oxygenSaturation: {
+            current: mockReadings[0].oxygenSaturation,
+            trend: mockReadings[0].oxygenSaturation < mockReadings[1].oxygenSaturation ? "down" : 
+                   mockReadings[0].oxygenSaturation > mockReadings[1].oxygenSaturation ? "up" : "stable",
+            history: o2History
+          },
+          weight: {
+            current: mockReadings[0].weight,
+            trend: mockReadings[0].weight < mockReadings[1].weight ? "down" : 
+                   mockReadings[0].weight > mockReadings[1].weight ? "up" : "stable",
+            history: weightHistory
+          },
+          readings: mockReadings,
+          chartData
+        };
+        
+        setVitals(mockVitals);
         setIsLoading(false);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error occurred'));
+        console.error("Error fetching vitals data:", err);
+        setError("Failed to load vitals data");
         setIsLoading(false);
+        
+        toast({
+          title: "Error Loading Data",
+          description: "There was a problem loading your vitals data.",
+          variant: "destructive"
+        });
       }
     };
-    
-    fetchVitalsData();
-  }, [patientId]);
-  
+
+    fetchVitals();
+  }, [patientId, timeRange, toast]);
+
   // Function to add a new vital reading
-  const addVitalReading = (newReading: Omit<VitalReading, 'id'>) => {
+  const addVitalReading = (reading: Omit<VitalReading, 'id'>) => {
     if (!vitals) return;
     
-    // Create a new reading with an ID
-    const readingWithId: VitalReading = {
-      ...newReading,
-      id: uuidv4()
+    const newReading: VitalReading = {
+      ...reading,
+      id: `v${Date.now()}` // Generate a unique ID
     };
     
-    // Add the new reading to the list
-    const updatedReadings = [readingWithId, ...vitals.readings];
-    
-    // Process the updated readings for chart data
-    const updatedChartData = processReadingsToChartData(updatedReadings);
-    
-    // Calculate new trends
-    const [newSystolic, newDiastolic] = readingWithId.bloodPressure.split('/').map(Number);
-    const [prevSystolic, prevDiastolic] = vitals.bloodPressure.current.split('/').map(Number);
-    
-    const bloodPressureTrend = calculateTrend(newSystolic, prevSystolic);
-    const heartRateTrend = calculateTrend(readingWithId.heartRate, vitals.heartRate.current);
-    const temperatureTrend = calculateTrend(readingWithId.temperature, vitals.temperature.current);
-    const oxygenSaturationTrend = calculateTrend(readingWithId.oxygenSaturation, vitals.oxygenSaturation.current);
-    const weightTrend = calculateTrend(readingWithId.weight, vitals.weight.current);
-    
-    // Update the vitals data
-    setVitals({
-      bloodPressure: {
-        current: readingWithId.bloodPressure,
-        trend: bloodPressureTrend
-      },
-      heartRate: {
-        current: readingWithId.heartRate,
-        trend: heartRateTrend
-      },
-      temperature: {
-        current: readingWithId.temperature,
-        trend: temperatureTrend
-      },
-      oxygenSaturation: {
-        current: readingWithId.oxygenSaturation,
-        trend: oxygenSaturationTrend
-      },
-      weight: {
-        current: readingWithId.weight,
-        trend: weightTrend
-      },
-      readings: updatedReadings,
-      chartData: updatedChartData
-    });
-  };
-  
-  // Function to add comparative data for analysis
-  const getComparativeAnalysis = (timeRange: "week" | "month" | "year" = "month") => {
-    if (!vitals || vitals.readings.length === 0) return null;
-    
-    const now = new Date();
-    let cutoffDate = new Date();
-    
-    if (timeRange === "week") {
-      cutoffDate.setDate(now.getDate() - 7);
-    } else if (timeRange === "month") {
-      cutoffDate.setMonth(now.getMonth() - 1);
-    } else {
-      cutoffDate.setFullYear(now.getFullYear() - 1);
-    }
-    
-    // Get readings within the specified time range
-    const filteredReadings = vitals.readings.filter(
-      reading => new Date(reading.date) >= cutoffDate
-    );
-    
-    if (filteredReadings.length === 0) return null;
-    
-    // Calculate averages, mins, maxes
-    const analysis = {
-      bloodPressure: {
-        average: { systolic: 0, diastolic: 0 },
-        min: { systolic: Infinity, diastolic: Infinity },
-        max: { systolic: -Infinity, diastolic: -Infinity }
-      },
-      heartRate: {
-        average: 0,
-        min: Infinity,
-        max: -Infinity
-      },
-      temperature: {
-        average: 0,
-        min: Infinity,
-        max: -Infinity
-      },
-      oxygenSaturation: {
-        average: 0,
-        min: Infinity,
-        max: -Infinity
-      },
-      weight: {
-        average: 0,
-        min: Infinity,
-        max: -Infinity
-      }
+    // Update the vitals state with the new reading
+    const [systolic, diastolic] = newReading.bloodPressure.split('/').map(Number);
+    const newChartDataPoint: VitalsChartData = {
+      date: newReading.date,
+      systolic,
+      diastolic,
+      heartRate: newReading.heartRate,
+      temperature: newReading.temperature,
+      oxygenSaturation: newReading.oxygenSaturation,
+      weight: newReading.weight
     };
     
-    // Sum values
-    let totalSystolic = 0;
-    let totalDiastolic = 0;
-    let totalHeartRate = 0;
-    let totalTemperature = 0;
-    let totalOxygenSaturation = 0;
-    let totalWeight = 0;
-    
-    filteredReadings.forEach(reading => {
-      const [systolic, diastolic] = reading.bloodPressure.split('/').map(Number);
+    setVitals(prev => {
+      if (!prev) return null;
       
-      // Update min/max for blood pressure
-      analysis.bloodPressure.min.systolic = Math.min(analysis.bloodPressure.min.systolic, systolic);
-      analysis.bloodPressure.min.diastolic = Math.min(analysis.bloodPressure.min.diastolic, diastolic);
-      analysis.bloodPressure.max.systolic = Math.max(analysis.bloodPressure.max.systolic, systolic);
-      analysis.bloodPressure.max.diastolic = Math.max(analysis.bloodPressure.max.diastolic, diastolic);
+      // Prepare updated history arrays
+      const bpHistory = [{ date: newReading.date, value: newReading.bloodPressure }, ...(prev.bloodPressure.history || [])];
+      const hrHistory = [{ date: newReading.date, value: newReading.heartRate }, ...(prev.heartRate.history || [])];
+      const tempHistory = [{ date: newReading.date, value: newReading.temperature }, ...(prev.temperature.history || [])];
+      const rrHistory = [{ date: newReading.date, value: newReading.respiratoryRate }, ...(prev.respiratoryRate.history || [])];
+      const o2History = [{ date: newReading.date, value: newReading.oxygenSaturation }, ...(prev.oxygenSaturation.history || [])];
+      const weightHistory = [{ date: newReading.date, value: newReading.weight }, ...(prev.weight.history || [])];
       
-      // Update min/max for other vitals
-      analysis.heartRate.min = Math.min(analysis.heartRate.min, reading.heartRate);
-      analysis.heartRate.max = Math.max(analysis.heartRate.max, reading.heartRate);
+      // Get systolic value for determining trend
+      const currentSystolic = Number(newReading.bloodPressure.split('/')[0]);
+      const previousSystolic = Number(prev.bloodPressure.current.split('/')[0]);
       
-      analysis.temperature.min = Math.min(analysis.temperature.min, reading.temperature);
-      analysis.temperature.max = Math.max(analysis.temperature.max, reading.temperature);
+      // Determine trends based on the two most recent readings
+      const bpTrend = currentSystolic < previousSystolic ? "down" : 
+                      currentSystolic > previousSystolic ? "up" : "stable";
+      const hrTrend = newReading.heartRate < prev.heartRate.current ? "down" : 
+                      newReading.heartRate > prev.heartRate.current ? "up" : "stable";
+      const tempTrend = newReading.temperature < prev.temperature.current ? "down" : 
+                        newReading.temperature > prev.temperature.current ? "up" : "stable";
+      const rrTrend = newReading.respiratoryRate < prev.respiratoryRate.current ? "down" : 
+                      newReading.respiratoryRate > prev.respiratoryRate.current ? "up" : "stable";
+      const o2Trend = newReading.oxygenSaturation < prev.oxygenSaturation.current ? "down" : 
+                      newReading.oxygenSaturation > prev.oxygenSaturation.current ? "up" : "stable";
+      const weightTrend = newReading.weight < prev.weight.current ? "down" : 
+                          newReading.weight > prev.weight.current ? "up" : "stable";
       
-      analysis.oxygenSaturation.min = Math.min(analysis.oxygenSaturation.min, reading.oxygenSaturation);
-      analysis.oxygenSaturation.max = Math.max(analysis.oxygenSaturation.max, reading.oxygenSaturation);
-      
-      analysis.weight.min = Math.min(analysis.weight.min, reading.weight);
-      analysis.weight.max = Math.max(analysis.weight.max, reading.weight);
-      
-      // Add to totals
-      totalSystolic += systolic;
-      totalDiastolic += diastolic;
-      totalHeartRate += reading.heartRate;
-      totalTemperature += reading.temperature;
-      totalOxygenSaturation += reading.oxygenSaturation;
-      totalWeight += reading.weight;
+      return {
+        bloodPressure: {
+          current: newReading.bloodPressure,
+          trend: bpTrend,
+          history: bpHistory
+        },
+        heartRate: {
+          current: newReading.heartRate,
+          trend: hrTrend,
+          history: hrHistory
+        },
+        temperature: {
+          current: newReading.temperature,
+          trend: tempTrend,
+          history: tempHistory
+        },
+        respiratoryRate: {
+          current: newReading.respiratoryRate,
+          trend: rrTrend,
+          history: rrHistory
+        },
+        oxygenSaturation: {
+          current: newReading.oxygenSaturation,
+          trend: o2Trend,
+          history: o2History
+        },
+        weight: {
+          current: newReading.weight,
+          trend: weightTrend,
+          history: weightHistory
+        },
+        readings: [newReading, ...prev.readings],
+        chartData: [newChartDataPoint, ...prev.chartData]
+      };
     });
     
-    // Calculate averages
-    const count = filteredReadings.length;
-    analysis.bloodPressure.average.systolic = parseFloat((totalSystolic / count).toFixed(1));
-    analysis.bloodPressure.average.diastolic = parseFloat((totalDiastolic / count).toFixed(1));
-    analysis.heartRate.average = parseFloat((totalHeartRate / count).toFixed(1));
-    analysis.temperature.average = parseFloat((totalTemperature / count).toFixed(1));
-    analysis.oxygenSaturation.average = parseFloat((totalOxygenSaturation / count).toFixed(1));
-    analysis.weight.average = parseFloat((totalWeight / count).toFixed(1));
-    
-    return analysis;
+    toast({
+      title: "Vital Reading Added",
+      description: "Your new vital signs have been recorded successfully.",
+      variant: "success"
+    });
   };
-  
-  return { vitals, isLoading, error, addVitalReading, getComparativeAnalysis };
+
+  return { 
+    vitals, 
+    isLoading, 
+    error,
+    addVitalReading
+  };
 };

@@ -85,25 +85,24 @@ export const Tooltip: React.FC<TooltipProps> = ({
   );
 };
 
-// These components are simplified compatibility versions for shadcn/ui tooltip
-// They're used to maintain compatibility with the shadcn structure
+// These components are simplified compatibility versions for radix-ui/tooltip
+// They're used in read-only files that we can't modify
 export interface TooltipProviderProps {
   children: React.ReactNode;
   delayDuration?: number;
 }
 
-export const TooltipProvider: React.FC<TooltipProviderProps> = ({ children }) => {
+export const TooltipProvider: React.FC<TooltipProviderProps> = ({ children, delayDuration }) => {
   return <>{children}</>;
 };
 
 export interface TooltipTriggerProps {
   children: React.ReactNode;
   asChild?: boolean;
-  className?: string;
 }
 
-export const TooltipTrigger: React.FC<TooltipTriggerProps> = ({ children, className }) => {
-  return <span className={className}>{children}</span>;
+export const TooltipTrigger: React.FC<TooltipTriggerProps> = ({ children, asChild }) => {
+  return <>{children}</>;
 };
 
 export interface TooltipContentProps { 
@@ -111,9 +110,8 @@ export interface TooltipContentProps {
   side?: string;
   align?: string;
   hidden?: boolean;
-  className?: string;
 }
 
-export const TooltipContent: React.FC<TooltipContentProps> = ({ children, className }) => {
-  return <span className={className}>{children}</span>;
+export const TooltipContent: React.FC<TooltipContentProps> = ({ children, side, align, hidden }) => {
+  return <>{children}</>;
 };
