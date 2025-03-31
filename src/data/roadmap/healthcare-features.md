@@ -27,6 +27,8 @@
     - Medication adherence tools (Planned)
     - Integration with pharmacy systems (Planned)
     - Medication education resources (Planned)
+    - Prescription history view with detailed filtering (In Progress)
+    - Prescription approval workflow (Planned)
 
 23. Healthcare Role-Based Views
     - Doctor-specific dashboard and workflows (Planned)

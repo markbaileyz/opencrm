@@ -16,8 +16,9 @@
 
 3. Healthcare-Specific Features (Current Focus)
    - Continue enhancement of Medication Management System (In Progress)
-     - Implement prescription management workflows (In Progress)
-     - Develop medication adherence tracking features (Planned)
+     - Implement prescription history view with filtering (In Progress)
+     - Develop refill request handling functionality (Planned)
+     - Create prescription approval workflow (Planned)
      - Build medication education resources (Planned)
    - Prepare foundation for Role-Based Views (Upcoming)
    - Design Patient Documentation System templates (Upcoming)
@@ -26,10 +27,10 @@
 - None currently tracked
 
 ## Last Updated
-- Added prescription form creation functionality
-- Started implementing prescription management system
+- Added prescription history view with filtering functionality
 - Enhanced medication interaction system with severity indicators
 - Added detailed interaction information with mechanism and evidence
 - Implemented collapsible interaction details
 - Updated roadmap to reflect current progress
-- Updated version to 1.1.5 with build 26
+- Updated version to 1.1.6 with build 27
+
