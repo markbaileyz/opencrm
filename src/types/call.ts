@@ -12,4 +12,28 @@ export interface CallRecord {
   followUpDate?: string;
   assignedTo?: string;
   tags?: string[];
+  
+  // Additional properties used in components
+  name?: string; 
+  phone?: string;
+  date?: string;
+  organization?: string;
+  contactRole?: string;
+  recordingUrl?: string;
+  createdBy?: string;
+  createdAt?: string;
+  
+  // Followup structure
+  followUp?: {
+    date: string;
+    status: 'pending' | 'completed';
+    notes?: string;
+  };
+  
+  // Related records
+  relatedRecords?: Array<{
+    id: string;
+    type: string;
+    name: string;
+  }>;
 }

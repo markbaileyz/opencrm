@@ -35,7 +35,7 @@ const LoginForm = ({ isSignUp = false }: LoginFormProps) => {
           email, 
           displayName: "Admin User", 
           role: "admin" 
-        });
+        }, password);
         toast.success(`Welcome, Admin`);
         navigate("/dashboard");
       } else if (email === "poweruser@example.com") {
@@ -43,7 +43,7 @@ const LoginForm = ({ isSignUp = false }: LoginFormProps) => {
           email, 
           displayName: "Power User", 
           role: "power-user" 
-        });
+        }, password);
         toast.success(`Welcome, Power User`);
         navigate("/dashboard");
       } else if (email === "doctor@example.com") {
@@ -51,7 +51,7 @@ const LoginForm = ({ isSignUp = false }: LoginFormProps) => {
           email, 
           displayName: "Dr. Smith", 
           role: "doctor" 
-        });
+        }, password);
         toast.success(`Welcome, Dr. Smith`);
         navigate("/patients");
       } else if (email === "nurse@example.com") {
@@ -59,7 +59,7 @@ const LoginForm = ({ isSignUp = false }: LoginFormProps) => {
           email, 
           displayName: "Nurse Johnson", 
           role: "nurse" 
-        });
+        }, password);
         toast.success(`Welcome, Nurse Johnson`);
         navigate("/patients");
       } else if (email === "frontdesk@example.com") {
@@ -67,7 +67,7 @@ const LoginForm = ({ isSignUp = false }: LoginFormProps) => {
           email, 
           displayName: "Front Desk Staff", 
           role: "front-desk" 
-        });
+        }, password);
         toast.success(`Welcome to the Front Desk Portal`);
         navigate("/front-desk");
       } else if (email.includes("test") || email === "patient@example.com") {
@@ -75,7 +75,7 @@ const LoginForm = ({ isSignUp = false }: LoginFormProps) => {
           email, 
           displayName: "Patient User", 
           role: "patient" 
-        });
+        }, password);
         toast.success(`Welcome to your patient portal`);
         navigate("/dashboard");
       } else {
