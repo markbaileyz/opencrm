@@ -1,78 +1,85 @@
 
 import React from "react";
-import { TableRow, TableCell } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, FileText, RefreshCw } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { FileCheck, RefreshCw } from "lucide-react";
 import RefillStatusBadge, { RefillStatus } from "./RefillStatusBadge";
+import ApprovalStatusBadge from "../approval/ApprovalStatusBadge";
 import { Prescription } from "./hooks/usePrescriptionFilters";
 
 interface PrescriptionTableRowProps {
   prescription: Prescription;
   onRefillRequest: (prescription: Prescription) => void;
+  onApprovalRequest?: (prescription: Prescription) => void;
   formatDate: (date: Date) => string;
 }
 
 const PrescriptionTableRow: React.FC<PrescriptionTableRowProps> = ({
   prescription,
   onRefillRequest,
+  onApprovalRequest,
   formatDate,
 }) => {
-  const canRequestRefill =
-    prescription.status === "active" && 
-    (prescription.refillsRemaining > 0 || !prescription.refillStatus) && 
-    prescription.refillStatus !== "pending" &&
-    prescription.refillStatus !== "approved" &&
-    prescription.refillStatus !== "processing";
+  const canRequestRefill = prescription.refillsRemaining > 0 && prescription.status !== "expired";
 
+  const handleRefillClick = () => {
+    onRefillRequest(prescription);
+  };
+
+  const handleApprovalClick = () => {
+    if (onApprovalRequest) {
+      onApprovalRequest(prescription);
+    }
+  };
+
+  const needsApproval = prescription.refillStatus === "pending" && !prescription.approvalStatus;
+  
   return (
     <TableRow>
-      <TableCell className="font-medium">{prescription.medicationName}</TableCell>
+      <TableCell>{prescription.medicationName}</TableCell>
       <TableCell>{prescription.id}</TableCell>
-      <TableCell>{`${prescription.dosage}, ${prescription.frequency}`}</TableCell>
+      <TableCell>{prescription.dosage}</TableCell>
       <TableCell>{formatDate(prescription.prescribedDate)}</TableCell>
       <TableCell>{formatDate(prescription.expiryDate)}</TableCell>
       <TableCell>{prescription.refillsRemaining}</TableCell>
       <TableCell>
-        <Badge
-          variant={prescription.status === "active" ? "default" : "secondary"}
-        >
-          {prescription.status}
-        </Badge>
+        <span className={`px-2 py-1 rounded-full text-xs ${
+          prescription.status === "active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+        }`}>
+          {prescription.status === "active" ? "Active" : "Expired"}
+        </span>
       </TableCell>
       <TableCell>
         <RefillStatusBadge status={prescription.refillStatus as RefillStatus} />
       </TableCell>
+      <TableCell>
+        <ApprovalStatusBadge status={prescription.approvalStatus} />
+      </TableCell>
       <TableCell className="text-right">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Open menu</span>
+        <div className="flex justify-end gap-2">
+          {needsApproval && onApprovalRequest && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-8 px-2 text-xs"
+              onClick={handleApprovalClick}
+            >
+              <FileCheck className="h-3 w-3 mr-1" />
+              Approve
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem className="flex items-center">
-              <FileText className="mr-2 h-4 w-4" />
-              View Details
-            </DropdownMenuItem>
-            {canRequestRefill && (
-              <DropdownMenuItem 
-                className="flex items-center"
-                onClick={() => onRefillRequest(prescription)}
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Request Refill
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          )}
+          
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 px-2 text-xs"
+            disabled={!canRequestRefill || prescription.refillStatus === "pending"}
+            onClick={handleRefillClick}
+          >
+            <RefreshCw className="h-3 w-3 mr-1" />
+            Refill
+          </Button>
+        </div>
       </TableCell>
     </TableRow>
   );

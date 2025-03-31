@@ -1,6 +1,8 @@
 
 import { useMemo } from "react";
 import { DateRange } from "react-day-picker";
+import { ApprovalStatus } from "../../approval/ApprovalStatusBadge";
+import { RefillStatus } from "../RefillStatusBadge";
 
 // Define the prescription type to match what we're using
 export interface Prescription {
@@ -15,7 +17,8 @@ export interface Prescription {
   pharmacy: string;
   refillsRemaining: number;
   lastFilled: Date;
-  refillStatus?: string;
+  refillStatus?: RefillStatus;
+  approvalStatus?: ApprovalStatus;
 }
 
 interface UsePrescriptionFiltersProps {

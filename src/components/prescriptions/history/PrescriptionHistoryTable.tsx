@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Table,
@@ -5,13 +6,15 @@ import {
 } from "@/components/ui/table";
 import { DateRange } from "react-day-picker";
 import RefillRequestDialog from "./RefillRequestDialog";
-import { RefillStatus } from "./RefillStatusBadge";
 import PrescriptionTableHeader from "./PrescriptionTableHeader";
 import PrescriptionTableRow from "./PrescriptionTableRow";
 import EmptyPrescriptionState from "./EmptyPrescriptionState";
 import { usePrescriptionFilters, Prescription } from "./hooks/usePrescriptionFilters";
+import PrescriptionApprovalDialog from "../approval/PrescriptionApprovalDialog";
+import { ApprovalStatus } from "../approval/ApprovalStatusBadge";
+import { RefillStatus } from "./RefillStatusBadge";
 
-// Mock data for prescriptions - enhanced with refill information
+// Mock data for prescriptions - enhanced with refill information and approval status
 const MOCK_PRESCRIPTIONS = [
   {
     id: "rx-123456",
@@ -25,7 +28,8 @@ const MOCK_PRESCRIPTIONS = [
     pharmacy: "Walgreens",
     refillsRemaining: 2,
     lastFilled: new Date(2025, 2, 15),
-    refillStatus: undefined,
+    refillStatus: undefined as RefillStatus | undefined,
+    approvalStatus: undefined as ApprovalStatus | undefined,
   },
   {
     id: "rx-123457",
@@ -39,7 +43,8 @@ const MOCK_PRESCRIPTIONS = [
     pharmacy: "CVS Pharmacy",
     refillsRemaining: 3,
     lastFilled: new Date(2025, 2, 10),
-    refillStatus: "pending",
+    refillStatus: "pending" as RefillStatus,
+    approvalStatus: undefined as ApprovalStatus | undefined,
   },
   {
     id: "rx-123458",
@@ -53,7 +58,8 @@ const MOCK_PRESCRIPTIONS = [
     pharmacy: "Walgreens",
     refillsRemaining: 5,
     lastFilled: new Date(2025, 2, 5),
-    refillStatus: "approved",
+    refillStatus: "approved" as RefillStatus,
+    approvalStatus: "approved" as ApprovalStatus,
   },
   {
     id: "rx-123459",
@@ -67,7 +73,8 @@ const MOCK_PRESCRIPTIONS = [
     pharmacy: "Rite Aid",
     refillsRemaining: 0,
     lastFilled: new Date(2025, 1, 20),
-    refillStatus: "completed",
+    refillStatus: "completed" as RefillStatus,
+    approvalStatus: "approved" as ApprovalStatus,
   },
   {
     id: "rx-123460",
@@ -81,7 +88,8 @@ const MOCK_PRESCRIPTIONS = [
     pharmacy: "CVS Pharmacy",
     refillsRemaining: 0,
     lastFilled: new Date(2024, 11, 15),
-    refillStatus: undefined,
+    refillStatus: undefined as RefillStatus | undefined,
+    approvalStatus: undefined as ApprovalStatus | undefined,
   },
   {
     id: "rx-123461",
@@ -95,7 +103,8 @@ const MOCK_PRESCRIPTIONS = [
     pharmacy: "Walgreens",
     refillsRemaining: 0,
     lastFilled: new Date(2024, 10, 10),
-    refillStatus: "denied",
+    refillStatus: "denied" as RefillStatus,
+    approvalStatus: "denied" as ApprovalStatus,
   },
   {
     id: "rx-123462",
@@ -109,7 +118,8 @@ const MOCK_PRESCRIPTIONS = [
     pharmacy: "Rite Aid",
     refillsRemaining: 3,
     lastFilled: new Date(2025, 3, 1),
-    refillStatus: undefined,
+    refillStatus: undefined as RefillStatus | undefined,
+    approvalStatus: undefined as ApprovalStatus | undefined,
   },
   {
     id: "rx-123463",
@@ -123,9 +133,10 @@ const MOCK_PRESCRIPTIONS = [
     pharmacy: "CVS Pharmacy",
     refillsRemaining: 0,
     lastFilled: new Date(2024, 9, 15),
-    refillStatus: "cancelled",
+    refillStatus: "cancelled" as RefillStatus,
+    approvalStatus: undefined as ApprovalStatus | undefined,
   },
-] as Prescription[];
+];
 
 interface PrescriptionHistoryTableProps {
   status: "active" | "expired" | "all";
@@ -141,10 +152,12 @@ const PrescriptionHistoryTable: React.FC<PrescriptionHistoryTableProps> = ({
   medicationFilter,
 }) => {
   const [refillDialogOpen, setRefillDialogOpen] = useState(false);
+  const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null);
+  const [prescriptions, setPrescriptions] = useState<Prescription[]>(MOCK_PRESCRIPTIONS);
 
   const { filteredPrescriptions } = usePrescriptionFilters({
-    prescriptions: MOCK_PRESCRIPTIONS,
+    prescriptions,
     status,
     searchQuery,
     dateRange,
@@ -164,6 +177,29 @@ const PrescriptionHistoryTable: React.FC<PrescriptionHistoryTableProps> = ({
     setRefillDialogOpen(true);
   };
 
+  const handleApprovalRequest = (prescription: Prescription) => {
+    setSelectedPrescription(prescription);
+    setApprovalDialogOpen(true);
+  };
+
+  const handleApprovalComplete = ({ status, notes }: { status: ApprovalStatus, notes: string }) => {
+    if (selectedPrescription) {
+      const updatedPrescriptions = prescriptions.map(p => {
+        if (p.id === selectedPrescription.id) {
+          return {
+            ...p,
+            approvalStatus: status,
+            // If approved, also update the refill status
+            refillStatus: status === "approved" ? "approved" : p.refillStatus
+          };
+        }
+        return p;
+      });
+      
+      setPrescriptions(updatedPrescriptions);
+    }
+  };
+
   return (
     <>
       <div className="border rounded-md">
@@ -178,6 +214,7 @@ const PrescriptionHistoryTable: React.FC<PrescriptionHistoryTableProps> = ({
                   key={prescription.id}
                   prescription={prescription}
                   onRefillRequest={handleRefillRequest}
+                  onApprovalRequest={handleApprovalRequest}
                   formatDate={formatDate}
                 />
               ))
@@ -187,17 +224,31 @@ const PrescriptionHistoryTable: React.FC<PrescriptionHistoryTableProps> = ({
       </div>
 
       {selectedPrescription && (
-        <RefillRequestDialog
-          open={refillDialogOpen}
-          onOpenChange={setRefillDialogOpen}
-          prescriptionData={{
-            id: selectedPrescription.id,
-            medicationName: selectedPrescription.medicationName,
-            dosage: `${selectedPrescription.dosage}, ${selectedPrescription.frequency}`,
-            prescribedBy: selectedPrescription.prescribedBy,
-            pharmacy: selectedPrescription.pharmacy,
-          }}
-        />
+        <>
+          <RefillRequestDialog
+            open={refillDialogOpen}
+            onOpenChange={setRefillDialogOpen}
+            prescriptionData={{
+              id: selectedPrescription.id,
+              medicationName: selectedPrescription.medicationName,
+              dosage: `${selectedPrescription.dosage}, ${selectedPrescription.frequency}`,
+              prescribedBy: selectedPrescription.prescribedBy,
+              pharmacy: selectedPrescription.pharmacy,
+            }}
+          />
+          
+          <PrescriptionApprovalDialog
+            open={approvalDialogOpen}
+            onOpenChange={setApprovalDialogOpen}
+            prescriptionData={{
+              id: selectedPrescription.id,
+              medicationName: selectedPrescription.medicationName,
+              dosage: `${selectedPrescription.dosage}, ${selectedPrescription.frequency}`,
+              prescribedBy: selectedPrescription.prescribedBy,
+            }}
+            onApprovalComplete={handleApprovalComplete}
+          />
+        </>
       )}
     </>
   );

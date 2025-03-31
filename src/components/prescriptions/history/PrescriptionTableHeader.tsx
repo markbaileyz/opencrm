@@ -14,6 +14,7 @@ const PrescriptionTableHeader: React.FC = () => {
         <TableHead>Refills</TableHead>
         <TableHead>Status</TableHead>
         <TableHead>Refill Status</TableHead>
+        <TableHead>Approval</TableHead>
         <TableHead className="text-right">Actions</TableHead>
       </TableRow>
     </TableHeader>
