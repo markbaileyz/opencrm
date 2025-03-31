@@ -20,7 +20,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <div className="flex items-center">
-            {Icon && <Icon className="h-5 w-5 mr-2 text-primary" aria-hidden="true" />}
+            {Icon && <Icon size={20} className="mr-2 text-primary" aria-hidden="true" />}
             <CardTitle className="text-base">{module.name}</CardTitle>
           </div>
         </div>
