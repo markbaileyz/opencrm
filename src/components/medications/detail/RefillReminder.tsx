@@ -1,173 +1,79 @@
 
-import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { Bell, CalendarClock, AlertCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { RefreshCcw, AlertTriangle } from "lucide-react";
 
 interface RefillReminderProps {
   medicationName: string;
   refills?: number;
   expiryDate?: string;
-  daysSupply?: number;
+  onRefillRequest?: () => void;
 }
 
 const RefillReminder: React.FC<RefillReminderProps> = ({
   medicationName,
   refills = 0,
   expiryDate,
-  daysSupply = 30,
+  onRefillRequest
 }) => {
-  const [isReminderSet, setIsReminderSet] = useState(false);
-  const { toast } = useToast();
-  
-  const form = useForm({
-    defaultValues: {
-      daysBeforeRefill: "7",
-      notificationType: "email",
-    },
-  });
-  
-  const handleSetReminder = (data: any) => {
-    toast({
-      title: "Refill Reminder Set",
-      description: `You will be reminded ${data.daysBeforeRefill} days before your ${medicationName} needs to be refilled.`,
-    });
-    
-    setIsReminderSet(true);
-    
-    // In a real application, this would save the reminder to a database
-  };
-  
-  const calculatedRefillDate = () => {
-    const today = new Date();
-    today.setDate(today.getDate() + daysSupply);
-    return today.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-  };
+  const isRefillsLow = refills !== undefined && refills < 2;
+  const isExpiringSoon = expiryDate && new Date(expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+  const showWarning = isRefillsLow || isExpiringSoon;
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Bell className="h-5 w-5 text-blue-500" />
-          Refill Reminders
+    <Card className={`${showWarning ? 'border-yellow-200' : ''}`}>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg flex items-center">
+          Refill Information
+          {showWarning && (
+            <AlertTriangle className="h-5 w-5 ml-2 text-yellow-500" />
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3 mb-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Refills remaining:</span>
-            <span className={`font-medium ${refills <= 1 ? "text-amber-600" : ""}`}>
-              {refills} {refills === 1 ? "refill" : "refills"}
-            </span>
-          </div>
-          
-          {expiryDate && (
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Prescription expires:</span>
-              <span className="font-medium">{expiryDate}</span>
-            </div>
-          )}
-          
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Next refill date (est.):</span>
-            <span className="font-medium">{calculatedRefillDate()}</span>
-          </div>
-        </div>
-        
-        {refills <= 1 && (
-          <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mb-4 flex gap-2">
-            <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-2">
             <div>
-              <p className="text-sm font-medium text-amber-800">Low on refills</p>
-              <p className="text-xs text-amber-700 mt-1">
-                Contact your healthcare provider soon to renew your prescription.
+              <p className="text-sm text-muted-foreground">Refills Remaining</p>
+              <p className={`font-medium ${isRefillsLow ? 'text-yellow-600' : ''}`}>
+                {refills !== undefined ? refills : 'N/A'}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Expires On</p>
+              <p className={`font-medium ${isExpiringSoon ? 'text-yellow-600' : ''}`}>
+                {expiryDate || 'N/A'}
               </p>
             </div>
           </div>
-        )}
-        
-        {!isReminderSet ? (
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSetReminder)} className="space-y-3">
-              <FormField
-                control={form.control}
-                name="daysBeforeRefill"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm">Remind me before refill</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select days" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="3">3 days before</SelectItem>
-                        <SelectItem value="5">5 days before</SelectItem>
-                        <SelectItem value="7">1 week before</SelectItem>
-                        <SelectItem value="14">2 weeks before</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="notificationType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm">Notification type</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select notification type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="email">Email</SelectItem>
-                        <SelectItem value="sms">SMS</SelectItem>
-                        <SelectItem value="app">App notification</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-              
-              <Button type="submit" className="w-full">Set Reminder</Button>
-            </form>
-          </Form>
-        ) : (
-          <div>
-            <div className="bg-green-50 border border-green-200 rounded-md p-3 mb-4 flex gap-2">
-              <CalendarClock className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-green-800">Reminder set</p>
-                <p className="text-xs text-green-700 mt-1">
-                  You'll be notified before your next refill date.
+
+          {showWarning && (
+            <div className="bg-yellow-50 p-3 rounded-md text-sm">
+              {isRefillsLow && (
+                <p className="text-yellow-800">
+                  You have {refills} refill{refills !== 1 ? 's' : ''} remaining for {medicationName}.
+                  {refills === 0 ? ' Please contact your doctor for a new prescription.' : ' Consider requesting a refill soon.'}
                 </p>
-              </div>
+              )}
+              {isExpiringSoon && (
+                <p className="text-yellow-800 mt-1">
+                  Your prescription expires on {expiryDate}. Please schedule a follow-up with your doctor.
+                </p>
+              )}
             </div>
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={() => setIsReminderSet(false)}
-            >
-              Modify Reminder
-            </Button>
-          </div>
-        )}
+          )}
+
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full flex items-center justify-center gap-2"
+            onClick={onRefillRequest}
+          >
+            <RefreshCcw className="h-4 w-4" />
+            Request Refill
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

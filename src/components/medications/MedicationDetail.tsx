@@ -16,6 +16,7 @@ import PrescriptionFormDialog from "./prescriptions/PrescriptionFormDialog";
 
 interface MedicationDetailProps {
   medication: {
+    id?: string;
     name: string;
     dosage: string;
     schedule: string;
@@ -40,6 +41,7 @@ interface MedicationDetailProps {
 
 const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose }) => {
   const [isPrescriptionDialogOpen, setIsPrescriptionDialogOpen] = useState(false);
+  const [dialogType, setDialogType] = useState<"new" | "refill">("new");
   
   // Transform interactions data to match the expected format in MedicationInteractions
   const formattedInteractions = medication.interactions?.map(interaction => ({
@@ -51,6 +53,16 @@ const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose
     evidence: undefined // Adding this field to match the interface
   })) || [];
 
+  const handleNewPrescription = () => {
+    setDialogType("new");
+    setIsPrescriptionDialogOpen(true);
+  };
+
+  const handleRefillRequest = () => {
+    setDialogType("refill");
+    setIsPrescriptionDialogOpen(true);
+  };
+
   return (
     <Card className="w-full">
       <MedicationHeader medication={medication} onClose={onClose} />
@@ -58,7 +70,7 @@ const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose
       <CardContent>
         <div className="flex justify-end mb-4">
           <Button 
-            onClick={() => setIsPrescriptionDialogOpen(true)}
+            onClick={handleNewPrescription}
             size="sm"
             className="flex items-center gap-1"
           >
@@ -94,6 +106,7 @@ const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose
               medicationName={medication.name}
               refills={medication.refills}
               expiryDate={medication.endDate}
+              onRefillRequest={handleRefillRequest}
             />
           </TabsContent>
           
@@ -114,11 +127,13 @@ const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose
         </Tabs>
       </CardContent>
       
-      <MedicationFooter />
+      <MedicationFooter onRefillRequest={handleRefillRequest} />
       
       <PrescriptionFormDialog 
         open={isPrescriptionDialogOpen} 
         onOpenChange={setIsPrescriptionDialogOpen} 
+        prescriptionType={dialogType}
+        medicationId={medication.id}
       />
     </Card>
   );

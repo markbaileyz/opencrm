@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, X } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { currentMedications } from "@/data/medicationsData";
@@ -37,14 +37,21 @@ type FormValues = z.infer<typeof formSchema>;
 interface PrescriptionFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
+  prescriptionType?: "new" | "refill";
+  medicationId?: string;
 }
 
-const PrescriptionForm: React.FC<PrescriptionFormProps> = ({ onSuccess, onCancel }) => {
+const PrescriptionForm: React.FC<PrescriptionFormProps> = ({ 
+  onSuccess, 
+  onCancel,
+  prescriptionType = "new",
+  medicationId
+}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const defaultValues: Partial<FormValues> = {
-    medicationId: "",
+    medicationId: medicationId || "",
     patientName: "",
     dosage: "",
     frequency: "",
@@ -57,6 +64,20 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({ onSuccess, onCancel
     defaultValues,
   });
 
+  // When medicationId prop changes, update the form value
+  useEffect(() => {
+    if (medicationId) {
+      form.setValue("medicationId", medicationId);
+      
+      // Optionally pre-fill other fields based on the selected medication
+      const selectedMedication = currentMedications.find(med => med.id === medicationId);
+      if (selectedMedication) {
+        form.setValue("dosage", selectedMedication.dosage);
+        form.setValue("frequency", selectedMedication.schedule);
+      }
+    }
+  }, [medicationId, form]);
+
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     
@@ -68,15 +89,19 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({ onSuccess, onCancel
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
-        title: "Prescription created",
-        description: `Prescription for ${data.patientName} has been created successfully.`,
+        title: prescriptionType === "new" ? "Prescription created" : "Refill requested",
+        description: prescriptionType === "new" 
+          ? `Prescription for ${data.patientName} has been created successfully.`
+          : `Refill for ${data.patientName} has been requested successfully.`,
       });
       
       if (onSuccess) onSuccess();
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to create prescription. Please try again.",
+        description: prescriptionType === "new"
+          ? "Failed to create prescription. Please try again."
+          : "Failed to request refill. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -87,7 +112,9 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({ onSuccess, onCancel
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Create New Prescription</CardTitle>
+        <CardTitle>
+          {prescriptionType === "new" ? "Create New Prescription" : "Request Prescription Refill"}
+        </CardTitle>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -113,7 +140,12 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({ onSuccess, onCancel
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Medication</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                      value={field.value}
+                      disabled={!!medicationId && prescriptionType === "refill"}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select medication" />
@@ -290,7 +322,9 @@ const PrescriptionForm: React.FC<PrescriptionFormProps> = ({ onSuccess, onCancel
               type="submit"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Creating..." : "Create Prescription"}
+              {isSubmitting 
+                ? prescriptionType === "new" ? "Creating..." : "Requesting..." 
+                : prescriptionType === "new" ? "Create Prescription" : "Request Refill"}
             </Button>
           </CardFooter>
         </form>
