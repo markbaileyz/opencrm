@@ -3,7 +3,7 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Clock, CheckCircle2, AlertCircle, RefreshCcw } from "lucide-react";
 
-type RefillStatus = 
+export type RefillStatus = 
   | "pending" 
   | "approved" 
   | "processing" 
@@ -47,7 +47,7 @@ const RefillStatusBadge: React.FC<RefillStatusBadgeProps> = ({ status }) => {
         };
       case "denied":
         return {
-          label: "Denied",
+          label: "Destructive",
           variant: "destructive" as const,
           icon: <AlertCircle className="h-3 w-3 mr-1" />,
         };

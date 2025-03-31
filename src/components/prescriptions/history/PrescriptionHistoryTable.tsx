@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DateRange } from "react-day-picker";
 import RefillRequestDialog from "./RefillRequestDialog";
-import RefillStatusBadge from "./RefillStatusBadge";
+import RefillStatusBadge, { RefillStatus } from "./RefillStatusBadge";
 
 // Mock data for prescriptions - enhanced with refill information
 const MOCK_PRESCRIPTIONS = [
@@ -239,7 +239,7 @@ const PrescriptionHistoryTable: React.FC<PrescriptionHistoryTableProps> = ({
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <RefillStatusBadge status={prescription.refillStatus} />
+                    <RefillStatusBadge status={prescription.refillStatus as RefillStatus} />
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
