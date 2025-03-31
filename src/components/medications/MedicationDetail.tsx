@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip } from "@/components/ui/tooltip";
 
 interface MedicationDetailProps {
   medication: {
@@ -243,18 +243,11 @@ const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose
                           )}
                           
                           <div className="pt-2">
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button size="sm">
-                                    Contact Prescriber
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Contact prescriber about this interaction</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+                            <Tooltip content="Contact prescriber about this interaction">
+                              <Button size="sm">
+                                Contact Prescriber
+                              </Button>
+                            </Tooltip>
                           </div>
                         </div>
                       </CollapsibleContent>
