@@ -7,8 +7,8 @@
 export const VERSION = {
   major: 1,
   minor: 1,
-  patch: 1,
-  build: 22,
+  patch: 2,
+  build: 23,
   toString: function() {
     return `${this.major}.${this.minor}.${this.patch} (${this.build})`;
   }
@@ -18,6 +18,17 @@ export const VERSION = {
  * Version history for changelog
  */
 export const VERSION_HISTORY = [
+  {
+    version: "1.1.2",
+    date: "2024-04-12",
+    changes: [
+      "Added healthcare-specific roadmap features",
+      "Enhanced vitals tracking requirements",
+      "Added medication management and prescriptions",
+      "Incorporated specialized user views for healthcare roles",
+      "Added security and compliance features"
+    ]
+  },
   {
     version: "1.1.1",
     date: "2023-09-01",
@@ -82,7 +93,8 @@ export const ROADMAP_STATUS = {
   inProgress: {
     sections: [
       "Content Development",
-      "Mobile Responsiveness"
+      "Mobile Responsiveness",
+      "Healthcare-Specific Features"
     ],
     focusArea: "Mobile Responsiveness",
     tasks: [
@@ -93,13 +105,15 @@ export const ROADMAP_STATUS = {
     ],
     percentage: {
       "Content Development": 85,
-      "Mobile Responsiveness": 80
+      "Mobile Responsiveness": 80,
+      "Healthcare-Specific Features": 25
     }
   },
   nextSteps: [
     "Complete Mobile Responsiveness enhancements",
+    "Expand Healthcare-Specific Features",
     "Finish Content Development section",
     "Begin Organizations Module Extensions",
-    "Expand Health Tracker with additional features"
+    "Enhance Patient Vitals tracking with graphing capabilities"
   ]
 };
