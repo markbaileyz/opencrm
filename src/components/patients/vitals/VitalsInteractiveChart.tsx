@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useRef, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -332,7 +333,7 @@ const VitalsInteractiveChart: React.FC<VitalsInteractiveChartProps> = ({
             {filteredData.length > 0 ? (
               <div 
                 className="h-[400px] w-full" 
-                style={{ transform: zoomLevel > 1 ? `scale(${zoomLevel})`, transformOrigin: 'center' }}
+                style={{ transform: zoomLevel > 1 ? `scale(${zoomLevel})` : undefined, transformOrigin: 'center' }}
                 onMouseLeave={() => {
                   if (isSelecting) {
                     setIsSelecting(false);
