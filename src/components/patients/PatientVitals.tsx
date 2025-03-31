@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Plus, Activity, Heart, Thermometer, Droplet, Scale } from "lucide-react";
 import { useVitalsData } from "@/hooks/useVitalsData";
 import VitalsChart from "./vitals/VitalsChart";
+import VitalsInteractiveChart from "./vitals/VitalsInteractiveChart";
+import VitalsComparativeAnalysis from "./vitals/VitalsComparativeAnalysis";
 import VitalsAddForm from "./vitals/VitalsAddForm";
 import VitalsTable from "./vitals/VitalsTable";
 import { AlertDialog, AlertDialogContent, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -206,7 +208,9 @@ const PatientVitals: React.FC<PatientVitalsProps> = ({ patientId }) => {
 
       <Tabs defaultValue="charts">
         <TabsList>
-          <TabsTrigger value="charts">Charts</TabsTrigger>
+          <TabsTrigger value="charts">Standard Charts</TabsTrigger>
+          <TabsTrigger value="interactive">Interactive Charts</TabsTrigger>
+          <TabsTrigger value="comparative">Comparative Analysis</TabsTrigger>
           <TabsTrigger value="table">History</TabsTrigger>
         </TabsList>
         
@@ -248,6 +252,18 @@ const PatientVitals: React.FC<PatientVitalsProps> = ({ patientId }) => {
               normalRange={{ min: 95, max: 100 }}
             />
           </div>
+        </TabsContent>
+        
+        <TabsContent value="interactive">
+          <VitalsInteractiveChart
+            data={vitals.chartData}
+            title="Interactive Vital Signs Explorer"
+            description="Select which vital signs to display and analyze patterns"
+          />
+        </TabsContent>
+        
+        <TabsContent value="comparative">
+          <VitalsComparativeAnalysis patientId={patientId} />
         </TabsContent>
         
         <TabsContent value="table">
