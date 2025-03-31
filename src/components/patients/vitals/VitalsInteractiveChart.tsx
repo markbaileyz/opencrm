@@ -38,12 +38,7 @@ import {
   Check,
   X
 } from "lucide-react";
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
-} from "@/components/ui/tooltip";
+import { Tooltip } from "@/components/ui/tooltip";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { format, subDays, subMonths, subYears, parseISO } from "date-fns";
@@ -190,7 +185,10 @@ const VitalsInteractiveChart: React.FC<VitalsInteractiveChartProps> = ({
 
   const yDomains = useMemo(() => {
     if (yAxisDomain !== "auto" || !visibleSeries.length) {
-      return { left: yAxisDomain, right: yAxisDomain };
+      return { 
+        left: yAxisDomain === "auto" ? [0, 100] as [number, number] : yAxisDomain,
+        right: yAxisDomain === "auto" ? [0, 100] as [number, number] : yAxisDomain
+      };
     }
 
     const leftSeries = visibleSeries.filter(s => s.axis === "left");
@@ -222,8 +220,8 @@ const VitalsInteractiveChart: React.FC<VitalsInteractiveChartProps> = ({
     };
     
     return {
-      left: leftSeries.length ? getMinMax(leftSeries) : [0, 100],
-      right: rightSeries.length ? getMinMax(rightSeries) : [0, 100]
+      left: leftSeries.length ? getMinMax(leftSeries) : [0, 100] as [number, number],
+      right: rightSeries.length ? getMinMax(rightSeries) : [0, 100] as [number, number]
     };
   }, [filteredData, visibleSeries, yAxisDomain]);
 
@@ -250,44 +248,23 @@ const VitalsInteractiveChart: React.FC<VitalsInteractiveChartProps> = ({
             </Select>
             
             <div className="flex items-center space-x-1">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={handleZoomOut} disabled={zoomLevel <= 1}>
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Zoom Out</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Tooltip content="Zoom Out">
+                <Button variant="outline" size="icon" onClick={handleZoomOut} disabled={zoomLevel <= 1}>
+                  <Minus className="h-4 w-4" />
+                </Button>
+              </Tooltip>
               
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={handleZoomIn}>
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Zoom In</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Tooltip content="Zoom In">
+                <Button variant="outline" size="icon" onClick={handleZoomIn}>
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </Tooltip>
               
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={handleResetZoom}>
-                      <RefreshCw className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Reset View</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Tooltip content="Reset View">
+                <Button variant="outline" size="icon" onClick={handleResetZoom}>
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </Tooltip>
             </div>
           </div>
         </div>
@@ -577,16 +554,9 @@ const VitalsInteractiveChart: React.FC<VitalsInteractiveChartProps> = ({
                               <>
                                 {value} {series.unit}
                                 {isOutlierValue && (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger className="ml-1">
-                                        <AlertCircle className="inline h-3 w-3 text-red-500" />
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>Outlier value</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
+                                  <Tooltip content="Outlier value">
+                                    <AlertCircle className="inline h-3 w-3 text-red-500 ml-1" />
+                                  </Tooltip>
                                 )}
                               </>
                             ) : (
