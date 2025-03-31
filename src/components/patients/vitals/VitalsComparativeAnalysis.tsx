@@ -2,8 +2,10 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Heart, Activity, Thermometer, Droplet, Scale } from "lucide-react";
+import { Heart, Activity, Thermometer, Droplet, Scale, AlertTriangle, TrendingUp, TrendingDown } from "lucide-react";
 import { useVitalsData } from "@/hooks/useVitalsData";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
 interface VitalsComparativeAnalysisProps {
   patientId: string;
@@ -51,6 +53,61 @@ const VitalsComparativeAnalysis: React.FC<VitalsComparativeAnalysisProps> = ({ p
     );
   }
 
+  // Define normal range thresholds for vital signs
+  const normalRanges = {
+    systolic: { min: 90, max: 130 },
+    diastolic: { min: 60, max: 85 },
+    heartRate: { min: 60, max: 100 },
+    temperature: { min: 97.0, max: 99.0 },
+    oxygenSaturation: { min: 95, max: 100 },
+    weight: { min: analysis.weight.average * 0.95, max: analysis.weight.average * 1.05 } // 5% range
+  };
+
+  // Helper to check if a value is outside normal range
+  const isOutlier = (value: number, type: keyof typeof normalRanges) => {
+    return value < normalRanges[type].min || value > normalRanges[type].max;
+  };
+
+  // Helper to check if a metric has any outliers
+  const hasOutliers = (metricName: string) => {
+    if (metricName === 'bloodPressure') {
+      return isOutlier(analysis.bloodPressure.min.systolic, 'systolic') || 
+             isOutlier(analysis.bloodPressure.max.systolic, 'systolic') ||
+             isOutlier(analysis.bloodPressure.min.diastolic, 'diastolic') || 
+             isOutlier(analysis.bloodPressure.max.diastolic, 'diastolic');
+    } 
+    // Convert other metric names to match the keys in normalRanges
+    const key = metricName as keyof typeof normalRanges;
+    if (normalRanges[key]) {
+      return isOutlier(analysis[metricName].min, key) || isOutlier(analysis[metricName].max, key);
+    }
+    return false;
+  };
+
+  // Calculate trend indicators
+  const getTrendIndicator = (current: number, prev: number) => {
+    const percentChange = ((current - prev) / prev) * 100;
+    
+    if (Math.abs(percentChange) < 1) return "stable";
+    return percentChange > 0 ? "up" : "down";
+  };
+
+  // Get trend for each metric
+  const getTrend = (metricName: string) => {
+    const readings = vitals.readings;
+    if (readings.length < 2) return "stable";
+
+    if (metricName === 'bloodPressure') {
+      const [currentSystolic] = readings[0].bloodPressure.split('/').map(Number);
+      const [prevSystolic] = readings[1].bloodPressure.split('/').map(Number);
+      return getTrendIndicator(currentSystolic, prevSystolic);
+    }
+    
+    const current = readings[0][metricName as keyof typeof readings[0]] as number;
+    const prev = readings[1][metricName as keyof typeof readings[1]] as number;
+    return getTrendIndicator(current, prev);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -75,126 +132,315 @@ const VitalsComparativeAnalysis: React.FC<VitalsComparativeAnalysisProps> = ({ p
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Blood Pressure */}
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center">
-                <Activity className="h-4 w-4 mr-2 text-primary" />
-                <CardTitle className="text-sm">Blood Pressure</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="rounded-lg bg-muted p-2">
-                    <div className="text-xs text-muted-foreground mb-1">Avg Systolic</div>
-                    <div className="text-xl font-semibold">{analysis.bloodPressure.average.systolic}</div>
+          <TooltipProvider>
+            <Card className={`${hasOutliers('bloodPressure') ? 'border-red-300 dark:border-red-700' : ''} transition-all hover:shadow-md`}>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Activity className="h-4 w-4 mr-2 text-primary" />
+                    <CardTitle className="text-sm">Blood Pressure</CardTitle>
                   </div>
-                  <div className="rounded-lg bg-muted p-2">
-                    <div className="text-xs text-muted-foreground mb-1">Avg Diastolic</div>
-                    <div className="text-xl font-semibold">{analysis.bloodPressure.average.diastolic}</div>
+                  {hasOutliers('bloodPressure') && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Contains readings outside normal range</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  {getTrend('bloodPressure') !== 'stable' && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        {getTrend('bloodPressure') === 'up' ? (
+                          <TrendingUp className="h-4 w-4 text-amber-500" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4 text-blue-500" />
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Trending {getTrend('bloodPressure')}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="rounded-lg bg-muted p-2">
+                      <div className="text-xs text-muted-foreground mb-1">Avg Systolic</div>
+                      <div className="text-xl font-semibold">
+                        {analysis.bloodPressure.average.systolic}
+                        {isOutlier(analysis.bloodPressure.average.systolic, 'systolic') && (
+                          <Badge variant="destructive" className="ml-1 text-xs">!</Badge>
+                        )}
+                      </div>
+                    </div>
+                    <div className="rounded-lg bg-muted p-2">
+                      <div className="text-xs text-muted-foreground mb-1">Avg Diastolic</div>
+                      <div className="text-xl font-semibold">
+                        {analysis.bloodPressure.average.diastolic}
+                        {isOutlier(analysis.bloodPressure.average.diastolic, 'diastolic') && (
+                          <Badge variant="destructive" className="ml-1 text-xs">!</Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="rounded-lg bg-muted/50 p-2">
+                      <div className="text-xs text-muted-foreground mb-1">Min/Max Systolic</div>
+                      <div className="text-sm">
+                        {analysis.bloodPressure.min.systolic} - {analysis.bloodPressure.max.systolic}
+                      </div>
+                    </div>
+                    <div className="rounded-lg bg-muted/50 p-2">
+                      <div className="text-xs text-muted-foreground mb-1">Min/Max Diastolic</div>
+                      <div className="text-sm">
+                        {analysis.bloodPressure.min.diastolic} - {analysis.bloodPressure.max.diastolic}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Normal: 90-130/60-85 mmHg
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="rounded-lg bg-muted/50 p-2">
-                    <div className="text-xs text-muted-foreground mb-1">Min/Max Systolic</div>
-                    <div className="text-sm">{analysis.bloodPressure.min.systolic} - {analysis.bloodPressure.max.systolic}</div>
-                  </div>
-                  <div className="rounded-lg bg-muted/50 p-2">
-                    <div className="text-xs text-muted-foreground mb-1">Min/Max Diastolic</div>
-                    <div className="text-sm">{analysis.bloodPressure.min.diastolic} - {analysis.bloodPressure.max.diastolic}</div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </TooltipProvider>
 
           {/* Heart Rate */}
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center">
-                <Heart className="h-4 w-4 mr-2 text-red-500" />
-                <CardTitle className="text-sm">Heart Rate</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="rounded-lg bg-muted p-2">
-                  <div className="text-xs text-muted-foreground mb-1">Average</div>
-                  <div className="text-xl font-semibold">{analysis.heartRate.average} <span className="text-sm font-normal">bpm</span></div>
+          <TooltipProvider>
+            <Card className={`${hasOutliers('heartRate') ? 'border-red-300 dark:border-red-700' : ''} transition-all hover:shadow-md`}>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Heart className="h-4 w-4 mr-2 text-red-500" />
+                    <CardTitle className="text-sm">Heart Rate</CardTitle>
+                  </div>
+                  {hasOutliers('heartRate') && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Contains readings outside normal range</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  {getTrend('heartRate') !== 'stable' && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        {getTrend('heartRate') === 'up' ? (
+                          <TrendingUp className="h-4 w-4 text-amber-500" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4 text-blue-500" />
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Trending {getTrend('heartRate')}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
                 </div>
-                <div className="rounded-lg bg-muted/50 p-2">
-                  <div className="text-xs text-muted-foreground mb-1">Range</div>
-                  <div className="text-sm">{analysis.heartRate.min} - {analysis.heartRate.max} bpm</div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="rounded-lg bg-muted p-2">
+                    <div className="text-xs text-muted-foreground mb-1">Average</div>
+                    <div className="text-xl font-semibold">
+                      {analysis.heartRate.average} <span className="text-sm font-normal">bpm</span>
+                      {isOutlier(analysis.heartRate.average, 'heartRate') && (
+                        <Badge variant="destructive" className="ml-1 text-xs">!</Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-muted/50 p-2">
+                    <div className="text-xs text-muted-foreground mb-1">Range</div>
+                    <div className="text-sm">{analysis.heartRate.min} - {analysis.heartRate.max} bpm</div>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Normal: 60-100 bpm
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </TooltipProvider>
 
           {/* Temperature */}
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center">
-                <Thermometer className="h-4 w-4 mr-2 text-orange-500" />
-                <CardTitle className="text-sm">Temperature</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="rounded-lg bg-muted p-2">
-                  <div className="text-xs text-muted-foreground mb-1">Average</div>
-                  <div className="text-xl font-semibold">{analysis.temperature.average.toFixed(1)} <span className="text-sm font-normal">°F</span></div>
+          <TooltipProvider>
+            <Card className={`${hasOutliers('temperature') ? 'border-red-300 dark:border-red-700' : ''} transition-all hover:shadow-md`}>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Thermometer className="h-4 w-4 mr-2 text-orange-500" />
+                    <CardTitle className="text-sm">Temperature</CardTitle>
+                  </div>
+                  {hasOutliers('temperature') && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Contains readings outside normal range</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  {getTrend('temperature') !== 'stable' && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        {getTrend('temperature') === 'up' ? (
+                          <TrendingUp className="h-4 w-4 text-amber-500" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4 text-blue-500" />
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Trending {getTrend('temperature')}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
                 </div>
-                <div className="rounded-lg bg-muted/50 p-2">
-                  <div className="text-xs text-muted-foreground mb-1">Range</div>
-                  <div className="text-sm">{analysis.temperature.min.toFixed(1)} - {analysis.temperature.max.toFixed(1)} °F</div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="rounded-lg bg-muted p-2">
+                    <div className="text-xs text-muted-foreground mb-1">Average</div>
+                    <div className="text-xl font-semibold">
+                      {analysis.temperature.average.toFixed(1)} <span className="text-sm font-normal">°F</span>
+                      {isOutlier(analysis.temperature.average, 'temperature') && (
+                        <Badge variant="destructive" className="ml-1 text-xs">!</Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-muted/50 p-2">
+                    <div className="text-xs text-muted-foreground mb-1">Range</div>
+                    <div className="text-sm">{analysis.temperature.min.toFixed(1)} - {analysis.temperature.max.toFixed(1)} °F</div>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Normal: 97.0-99.0 °F
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </TooltipProvider>
 
           {/* Oxygen Saturation */}
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center">
-                <Droplet className="h-4 w-4 mr-2 text-blue-500" />
-                <CardTitle className="text-sm">O₂ Saturation</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="rounded-lg bg-muted p-2">
-                  <div className="text-xs text-muted-foreground mb-1">Average</div>
-                  <div className="text-xl font-semibold">{analysis.oxygenSaturation.average} <span className="text-sm font-normal">%</span></div>
+          <TooltipProvider>
+            <Card className={`${hasOutliers('oxygenSaturation') ? 'border-red-300 dark:border-red-700' : ''} transition-all hover:shadow-md`}>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Droplet className="h-4 w-4 mr-2 text-blue-500" />
+                    <CardTitle className="text-sm">O₂ Saturation</CardTitle>
+                  </div>
+                  {hasOutliers('oxygenSaturation') && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Contains readings outside normal range</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  {getTrend('oxygenSaturation') !== 'stable' && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        {getTrend('oxygenSaturation') === 'up' ? (
+                          <TrendingUp className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4 text-amber-500" />
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Trending {getTrend('oxygenSaturation')}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
                 </div>
-                <div className="rounded-lg bg-muted/50 p-2">
-                  <div className="text-xs text-muted-foreground mb-1">Range</div>
-                  <div className="text-sm">{analysis.oxygenSaturation.min} - {analysis.oxygenSaturation.max} %</div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="rounded-lg bg-muted p-2">
+                    <div className="text-xs text-muted-foreground mb-1">Average</div>
+                    <div className="text-xl font-semibold">
+                      {analysis.oxygenSaturation.average} <span className="text-sm font-normal">%</span>
+                      {isOutlier(analysis.oxygenSaturation.average, 'oxygenSaturation') && (
+                        <Badge variant="destructive" className="ml-1 text-xs">!</Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-muted/50 p-2">
+                    <div className="text-xs text-muted-foreground mb-1">Range</div>
+                    <div className="text-sm">{analysis.oxygenSaturation.min} - {analysis.oxygenSaturation.max} %</div>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Normal: 95-100 %
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </TooltipProvider>
 
           {/* Weight */}
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center">
-                <Scale className="h-4 w-4 mr-2 text-purple-500" />
-                <CardTitle className="text-sm">Weight</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="rounded-lg bg-muted p-2">
-                  <div className="text-xs text-muted-foreground mb-1">Average</div>
-                  <div className="text-xl font-semibold">{analysis.weight.average.toFixed(1)} <span className="text-sm font-normal">kg</span></div>
+          <TooltipProvider>
+            <Card className={`${hasOutliers('weight') ? 'border-amber-300 dark:border-amber-700' : ''} transition-all hover:shadow-md`}>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Scale className="h-4 w-4 mr-2 text-purple-500" />
+                    <CardTitle className="text-sm">Weight</CardTitle>
+                  </div>
+                  {hasOutliers('weight') && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <AlertTriangle className="h-4 w-4 text-amber-500" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Contains significant weight changes</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  {getTrend('weight') !== 'stable' && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        {getTrend('weight') === 'up' ? (
+                          <TrendingUp className="h-4 w-4 text-amber-500" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4 text-blue-500" />
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Trending {getTrend('weight')}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
                 </div>
-                <div className="rounded-lg bg-muted/50 p-2">
-                  <div className="text-xs text-muted-foreground mb-1">Range</div>
-                  <div className="text-sm">{analysis.weight.min.toFixed(1)} - {analysis.weight.max.toFixed(1)} kg</div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="rounded-lg bg-muted p-2">
+                    <div className="text-xs text-muted-foreground mb-1">Average</div>
+                    <div className="text-xl font-semibold">
+                      {analysis.weight.average.toFixed(1)} <span className="text-sm font-normal">kg</span>
+                      {isOutlier(analysis.weight.average, 'weight') && (
+                        <Badge variant="outline" className="ml-1 text-xs border-amber-500 text-amber-500">!</Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-muted/50 p-2">
+                    <div className="text-xs text-muted-foreground mb-1">Range</div>
+                    <div className="text-sm">{analysis.weight.min.toFixed(1)} - {analysis.weight.max.toFixed(1)} kg</div>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {`Expected: ${normalRanges.weight.min.toFixed(1)}-${normalRanges.weight.max.toFixed(1)} kg (±5%)`}
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </TooltipProvider>
         </div>
       </CardContent>
     </Card>
