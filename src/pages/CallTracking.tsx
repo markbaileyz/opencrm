@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import CallTrackingList from "@/components/calls/CallTrackingList";
 import { CallRecord } from "@/types/call";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 // Sample call data - in a real app this would come from an API or context
 const sampleCalls: CallRecord[] = [
