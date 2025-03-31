@@ -232,7 +232,7 @@ const VitalsHistoryChart: React.FC<VitalsHistoryChartProps> = ({
       <CardContent>
         <div className="space-y-4">
           {anomalies.length > 0 && (
-            <Alert variant="warning" className="bg-yellow-50 dark:bg-yellow-950/30">
+            <Alert variant="destructive" className="bg-yellow-50 dark:bg-yellow-950/30">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
                 {anomalies.length} abnormal value{anomalies.length > 1 ? 's' : ''} detected. Highlighted on chart.
