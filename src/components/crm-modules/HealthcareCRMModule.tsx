@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Activity, Users, Calendar, ClipboardList, DollarSign, ArrowUpRightFromSquare, BarChart2 } from "lucide-react";
 import ReferralTrackingPanel from "./referrals/ReferralTrackingPanel";
 import PatientEngagementMetrics from "./metrics/PatientEngagementMetrics";
+import PatientManagementPanel from "./patients/PatientManagementPanel";
 
 const HealthcareCRMModule: React.FC = () => {
   return (
@@ -47,14 +48,7 @@ const HealthcareCRMModule: React.FC = () => {
         </TabsList>
         
         <TabsContent value="patients" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Patient Management</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Patient management interface will be displayed here.</p>
-            </CardContent>
-          </Card>
+          <PatientManagementPanel />
         </TabsContent>
         
         <TabsContent value="appointments" className="mt-4">
