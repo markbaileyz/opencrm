@@ -11,6 +11,9 @@ import NotFound from "@/pages/NotFound";
 import ModularCRM from "@/pages/ModularCRM";
 import CRMConfig from "@/pages/CRMConfig";
 import CRMModule from "@/pages/CRMModule";
+import Roadmap from "@/pages/Roadmap";
+import OpenCRMRoadmapPage from "@/pages/OpenCRMRoadmap";
+import DashboardRoadmap from "@/pages/DashboardRoadmap";
 
 function App() {
   return (
@@ -27,6 +30,11 @@ function App() {
       <Route path="/crm" element={<ModularCRM />} />
       <Route path="/crm-config" element={<CRMConfig />} />
       <Route path="/crm/:moduleId" element={<CRMModule />} />
+      
+      {/* Roadmap routes */}
+      <Route path="/roadmap" element={<Roadmap />} />
+      <Route path="/open-crm-roadmap" element={<OpenCRMRoadmapPage />} />
+      <Route path="/dashboard-roadmap" element={<DashboardRoadmap />} />
       
       {/* Catch-all route */}
       <Route path="*" element={<NotFound />} />
