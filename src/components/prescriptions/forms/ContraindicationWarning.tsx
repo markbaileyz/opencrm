@@ -37,8 +37,9 @@ const ContraindicationWarning: React.FC<ContraindicationWarningProps> = ({
     return null;
   }
   
+  // Fix: Use "default" instead of "warning" to match allowed variants
   return (
-    <Alert variant={warningData.severity === "high" ? "destructive" : "warning"}>
+    <Alert variant={warningData.severity === "high" ? "destructive" : "default"}>
       <AlertCircle className="h-4 w-4" />
       <AlertTitle className="flex items-center gap-2">
         Medication Warning
