@@ -34,6 +34,16 @@ interface MedicationDetailProps {
 }
 
 const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose }) => {
+  // Transform interactions data to match the expected format in MedicationInteractions
+  const formattedInteractions = medication.interactions?.map(interaction => ({
+    medications: [interaction.medication], // Convert single medication string to an array
+    severity: interaction.severity,
+    description: interaction.description,
+    mechanism: interaction.mechanism || undefined,
+    recommendation: interaction.recommendation || "No specific recommendation",
+    evidence: undefined // Adding this field to match the interface
+  })) || [];
+
   return (
     <Card className="w-full">
       <MedicationHeader medication={medication} onClose={onClose} />
@@ -59,7 +69,7 @@ const MedicationDetail: React.FC<MedicationDetailProps> = ({ medication, onClose
           <TabsContent value="interactions" className="mt-4">
             <MedicationInteractions 
               medicationName={medication.name} 
-              interactions={medication.interactions} 
+              interactions={formattedInteractions} 
             />
           </TabsContent>
           
