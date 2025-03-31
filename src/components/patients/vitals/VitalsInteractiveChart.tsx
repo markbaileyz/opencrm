@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useRef, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -227,6 +226,7 @@ const VitalsInteractiveChart: React.FC<VitalsInteractiveChartProps> = ({
     };
   }, [filteredData, visibleSeries, yAxisDomain]);
 
+  
   return (
     <Card className="w-full">
       <CardHeader>
