@@ -1,7 +1,10 @@
 
+import { healthcareRoadmap } from './healthcare-roadmap';
+
 export const nextSteps = [
+  ...healthcareRoadmap,
   {
-    id: 1,
+    id: 11,
     title: "Content Development (Continued)",
     items: [
       "Enhance forum functionality with post creation workflow",
@@ -14,7 +17,7 @@ export const nextSteps = [
     ]
   },
   {
-    id: 2,
+    id: 12,
     title: "Organizations Module Enhancement (Continued)",
     items: [
       "Industry-specific organization templates",
@@ -23,7 +26,7 @@ export const nextSteps = [
     ]
   },
   {
-    id: 3,
+    id: 13,
     title: "Mobile Responsiveness Enhancement (Continued)",
     items: [
       "Add offline capabilities for mobile users",
@@ -33,7 +36,7 @@ export const nextSteps = [
     ]
   },
   {
-    id: 4,
+    id: 14,
     title: "Health Tracker Enhancement (Continued)",
     items: [
       "Implement medication tracking and reminders",
@@ -45,19 +48,7 @@ export const nextSteps = [
     ]
   },
   {
-    id: 5,
-    title: "Call Tracking Enhancement (Continued)",
-    items: [
-      "Add call recording integration",
-      "Implement speech-to-text for call notes",
-      "Create caller ID verification system",
-      "Add call quality assessment tools",
-      "Develop advanced call routing rules",
-      "Add AI-powered call sentiment analysis"
-    ]
-  },
-  {
-    id: 6,
+    id: 15,
     title: "Workflow Automation Enhancement (Continued)",
     items: [
       "Workflow templates library",
