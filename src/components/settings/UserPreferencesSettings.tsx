@@ -13,26 +13,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import SettingsCard from "./SettingsCard";
-import { User, Palette, Bell, Eye } from "lucide-react";
+import { Palette, Bell, Eye } from "lucide-react";
 
 interface UserPreference {
-  darkMode: boolean;
   compactView: boolean;
   emailDigest: "daily" | "weekly" | "never";
   dashboardLayout: "default" | "compact" | "expanded";
   notificationsEnabled: boolean;
   fontSize: "small" | "medium" | "large";
+  highContrast: boolean;
 }
 
 const UserPreferencesSettings = () => {
   const { toast } = useToast();
   const [preferences, setPreferences] = useState<UserPreference>({
-    darkMode: true,
     compactView: false,
     emailDigest: "weekly",
     dashboardLayout: "default",
     notificationsEnabled: true,
     fontSize: "medium",
+    highContrast: false,
   });
   
   const [isSaving, setIsSaving] = useState(false);
@@ -74,17 +74,17 @@ const UserPreferencesSettings = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <Label htmlFor="dark-mode" className="font-medium">
-                Dark Mode
+              <Label htmlFor="high-contrast" className="font-medium">
+                High Contrast Mode
               </Label>
               <p className="text-sm text-muted-foreground">
-                Use dark theme for the application
+                Increase contrast for better readability
               </p>
             </div>
             <Switch
-              id="dark-mode"
-              checked={preferences.darkMode}
-              onCheckedChange={() => handleToggleChange("darkMode")}
+              id="high-contrast"
+              checked={preferences.highContrast}
+              onCheckedChange={() => handleToggleChange("highContrast")}
             />
           </div>
           
@@ -119,7 +119,7 @@ const UserPreferencesSettings = () => {
                 handleSelectChange("fontSize", value as "small" | "medium" | "large")
               }
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] max-w-full">
                 <SelectValue placeholder="Select font size" />
               </SelectTrigger>
               <SelectContent>
@@ -153,7 +153,7 @@ const UserPreferencesSettings = () => {
                 handleSelectChange("dashboardLayout", value as "default" | "compact" | "expanded")
               }
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] max-w-full">
                 <SelectValue placeholder="Select layout" />
               </SelectTrigger>
               <SelectContent>
@@ -203,7 +203,7 @@ const UserPreferencesSettings = () => {
                 handleSelectChange("emailDigest", value as "daily" | "weekly" | "never")
               }
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] max-w-full">
                 <SelectValue placeholder="Select frequency" />
               </SelectTrigger>
               <SelectContent>

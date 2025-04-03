@@ -29,31 +29,38 @@ const PrescriptionTableRow: React.FC<PrescriptionTableRowProps> = ({
   const needsApproval = hasRefillRequest && prescription.refillStatus === "pending" && !prescription.approvalStatus;
   
   return (
-    <TableRow>
+    <TableRow className="hover:bg-slate-50">
       <TableCell>
-        <div className="font-medium">{prescription.medicationName}</div>
-        <div className="text-sm text-muted-foreground">
+        <div className="font-medium text-black">{prescription.medicationName}</div>
+        <div className="text-sm text-gray-700">
           {prescription.dosage}, {prescription.frequency}
         </div>
+        {prescription.diagnosis && (
+          <div className="mt-1">
+            <Badge variant="outline" className="text-xs bg-blue-50 text-blue-800 border-blue-200">
+              {prescription.diagnosis}
+            </Badge>
+          </div>
+        )}
       </TableCell>
       
-      <TableCell>{formatDate(prescription.prescribedDate)}</TableCell>
+      <TableCell className="text-gray-800">{formatDate(prescription.prescribedDate)}</TableCell>
       
-      <TableCell>{formatDate(prescription.expiryDate)}</TableCell>
+      <TableCell className="text-gray-800">{formatDate(prescription.expiryDate)}</TableCell>
       
-      <TableCell>{prescription.prescribedBy}</TableCell>
+      <TableCell className="text-gray-800">{prescription.prescribedBy}</TableCell>
       
       <TableCell>
         <div className="flex items-center">
           {isActive ? (
-            <Badge variant="success" className="capitalize">Active</Badge>
+            <Badge variant="success" className="capitalize bg-green-100 text-green-800 border-green-200">Active</Badge>
           ) : (
-            <Badge variant="destructive" className="capitalize">Expired</Badge>
+            <Badge variant="destructive" className="capitalize bg-red-100 text-red-800 border-red-200">Expired</Badge>
           )}
         </div>
       </TableCell>
       
-      <TableCell>
+      <TableCell className="text-gray-800">
         {prescription.pharmacy || "Not specified"}
       </TableCell>
       
@@ -63,12 +70,13 @@ const PrescriptionTableRow: React.FC<PrescriptionTableRowProps> = ({
       </TableCell>
       
       <TableCell>
-        <div className="flex gap-2 justify-end">
+        <div className="flex flex-wrap gap-2 justify-end">
           {needsApproval && (
             <Button 
               variant="outline"
               size="sm"
               onClick={() => onApprovalRequest(prescription)}
+              className="whitespace-nowrap"
             >
               <Pill className="h-3.5 w-3.5 mr-1" />
               Approve
@@ -81,6 +89,7 @@ const PrescriptionTableRow: React.FC<PrescriptionTableRowProps> = ({
               size="sm"
               onClick={() => onRefillRequest(prescription)}
               disabled={prescription.refillsRemaining > 0}
+              className="whitespace-nowrap"
             >
               <RotateCcw className="h-3.5 w-3.5 mr-1" />
               {prescription.refillsRemaining > 0 ? 

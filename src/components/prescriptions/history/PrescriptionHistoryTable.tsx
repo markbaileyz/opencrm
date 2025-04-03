@@ -14,7 +14,7 @@ import PrescriptionApprovalDialog from "../approval/PrescriptionApprovalDialog";
 import { ApprovalStatus } from "../approval/ApprovalStatusBadge";
 import { RefillStatus } from "./RefillStatusBadge";
 
-// Mock data for prescriptions - enhanced with refill information and approval status
+// Enhanced mock data with diagnosis information
 const MOCK_PRESCRIPTIONS = [
   {
     id: "rx-123456",
@@ -30,6 +30,7 @@ const MOCK_PRESCRIPTIONS = [
     lastFilled: new Date(2025, 2, 15),
     refillStatus: undefined as RefillStatus | undefined,
     approvalStatus: undefined as ApprovalStatus | undefined,
+    diagnosis: "Hypertension",
   },
   {
     id: "rx-123457",
@@ -45,6 +46,7 @@ const MOCK_PRESCRIPTIONS = [
     lastFilled: new Date(2025, 2, 10),
     refillStatus: "pending" as RefillStatus,
     approvalStatus: undefined as ApprovalStatus | undefined,
+    diagnosis: "Type 2 Diabetes",
   },
   {
     id: "rx-123458",
@@ -60,6 +62,7 @@ const MOCK_PRESCRIPTIONS = [
     lastFilled: new Date(2025, 2, 5),
     refillStatus: "approved" as RefillStatus,
     approvalStatus: "approved" as ApprovalStatus,
+    diagnosis: "Hypercholesterolemia",
   },
   {
     id: "rx-123459",
@@ -75,6 +78,7 @@ const MOCK_PRESCRIPTIONS = [
     lastFilled: new Date(2025, 1, 20),
     refillStatus: "completed" as RefillStatus,
     approvalStatus: "approved" as ApprovalStatus,
+    diagnosis: "Atrial Fibrillation",
   },
   {
     id: "rx-123460",
@@ -90,6 +94,7 @@ const MOCK_PRESCRIPTIONS = [
     lastFilled: new Date(2024, 11, 15),
     refillStatus: undefined as RefillStatus | undefined,
     approvalStatus: undefined as ApprovalStatus | undefined,
+    diagnosis: "Hypothyroidism",
   },
   {
     id: "rx-123461",
@@ -105,6 +110,7 @@ const MOCK_PRESCRIPTIONS = [
     lastFilled: new Date(2024, 10, 10),
     refillStatus: "denied" as RefillStatus,
     approvalStatus: "denied" as ApprovalStatus,
+    diagnosis: "Hypertension",
   },
   {
     id: "rx-123462",
@@ -120,6 +126,7 @@ const MOCK_PRESCRIPTIONS = [
     lastFilled: new Date(2025, 3, 1),
     refillStatus: undefined as RefillStatus | undefined,
     approvalStatus: undefined as ApprovalStatus | undefined,
+    diagnosis: "Heart Failure",
   },
   {
     id: "rx-123463",
@@ -135,6 +142,7 @@ const MOCK_PRESCRIPTIONS = [
     lastFilled: new Date(2024, 9, 15),
     refillStatus: "cancelled" as RefillStatus,
     approvalStatus: undefined as ApprovalStatus | undefined,
+    diagnosis: "Hypertension",
   },
 ];
 
@@ -204,7 +212,7 @@ const PrescriptionHistoryTable: React.FC<PrescriptionHistoryTableProps> = ({
 
   return (
     <>
-      <div className="border rounded-md">
+      <div className="border rounded-md overflow-x-auto mobile-friendly-table">
         <Table>
           <PrescriptionTableHeader />
           <TableBody>

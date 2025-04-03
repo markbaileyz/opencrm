@@ -32,7 +32,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
       <aside
         className={cn(
-          "w-64 flex-shrink-0 bg-secondary border-r border-r-muted py-4 px-2 fixed h-full z-40 md:relative",
+          "w-64 flex-shrink-0 bg-white border-r border-r-muted py-4 px-2 fixed h-full z-40 md:relative",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full",
           "transition-transform duration-300 ease-in-out md:translate-x-0"
         )}
@@ -46,7 +46,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         </div>
       </aside>
 
-      <div className="flex-1 p-6 overflow-auto pb-16 md:pb-6">
+      <div className="flex-1 p-3 md:p-6 overflow-auto pb-16 md:pb-6">
         {children}
       </div>
       
