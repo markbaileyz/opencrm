@@ -26,7 +26,7 @@ const FeatureCard = ({
   iconBgColor
 }: FeatureCardProps) => {
   return (
-    <div className={`relative overflow-hidden bg-[#132543] rounded-xl p-6 border border-white/10 shadow-md hover:shadow-lg transition-all duration-300 group animate-fade-up ${delay}`}>
+    <div className={`relative overflow-hidden bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 group animate-fade-up ${delay}`}>
       {/* Accent color top border */}
       <div className={`absolute top-0 left-0 right-0 h-1 ${accentColor}`}></div>
       
@@ -34,11 +34,11 @@ const FeatureCard = ({
         {icon}
       </div>
       
-      <h3 className="text-xl font-bold mb-3 text-white">{title}</h3>
-      <p className="text-white/70 mb-4">{description}</p>
+      <h3 className="text-xl font-bold mb-3 text-gray-900">{title}</h3>
+      <p className="text-gray-600 mb-4">{description}</p>
       {children}
       
-      <Link to="/healthcare-crm" className="inline-flex items-center text-sm mt-4 text-blue-300 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+      <Link to="/healthcare-crm" className="inline-flex items-center text-sm mt-4 text-blue-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
         Learn more <ChevronRight className="h-4 w-4 ml-1" />
       </Link>
     </div>
@@ -51,9 +51,9 @@ interface FeatureItemProps {
 
 const FeatureItem = ({ children }: FeatureItemProps) => {
   return (
-    <li className="flex items-center text-sm text-white/80">
-      <div className="rounded-full bg-green-500/20 p-0.5 mr-2">
-        <Check className="h-3.5 w-3.5 text-green-400" />
+    <li className="flex items-center text-sm text-gray-600">
+      <div className="rounded-full bg-green-100 p-0.5 mr-2">
+        <Check className="h-3.5 w-3.5 text-green-600" />
       </div>
       <span>{children}</span>
     </li>
@@ -64,56 +64,56 @@ const Features = () => {
   // Feature cards data with different accent colors
   const features = [
     {
-      icon: <MessageSquare className="h-6 w-6 text-blue-400" />,
+      icon: <MessageSquare className="h-6 w-6 text-blue-600" />,
       title: "Patient Messaging",
       description: "Secure messaging system to communicate with patients and coordinate care.",
       accentColor: "bg-blue-500",
-      iconBgColor: "bg-blue-500/20",
+      iconBgColor: "bg-blue-50",
       delay: "delay-100",
       items: ["HIPAA-compliant messaging", "File and image sharing", "Message templates"]
     },
     {
-      icon: <Calendar className="h-6 w-6 text-indigo-400" />,
+      icon: <Calendar className="h-6 w-6 text-indigo-600" />,
       title: "Scheduling",
       description: "Streamline appointment scheduling and reduce no-shows.",
       accentColor: "bg-indigo-500",
-      iconBgColor: "bg-indigo-500/20",
+      iconBgColor: "bg-indigo-50",
       delay: "delay-200",
       items: ["Online booking", "Automated reminders", "Flexible scheduling options"]
     },
     {
-      icon: <ClipboardList className="h-6 w-6 text-violet-400" />,
+      icon: <ClipboardList className="h-6 w-6 text-violet-600" />,
       title: "Documentation",
       description: "Create and manage clinical documentation efficiently.",
       accentColor: "bg-violet-500",
-      iconBgColor: "bg-violet-500/20",
+      iconBgColor: "bg-violet-50",
       delay: "delay-300",
       items: ["Customizable templates", "Document collaboration", "Automated workflows"]
     },
     {
-      icon: <Shield className="h-6 w-6 text-green-400" />,
+      icon: <Shield className="h-6 w-6 text-green-600" />,
       title: "Security & Compliance",
       description: "Enterprise-grade security that meets healthcare standards.",
       accentColor: "bg-green-500",
-      iconBgColor: "bg-green-500/20",
+      iconBgColor: "bg-green-50",
       delay: "delay-100",
       items: ["HIPAA compliance", "End-to-end encryption", "Role-based access control"]
     },
     {
-      icon: <Users className="h-6 w-6 text-amber-400" />,
+      icon: <Users className="h-6 w-6 text-amber-600" />,
       title: "Team Collaboration",
       description: "Work efficiently with your entire care team.",
       accentColor: "bg-amber-500",
-      iconBgColor: "bg-amber-500/20",
+      iconBgColor: "bg-amber-50",
       delay: "delay-200",
       items: ["Task assignment", "Care coordination", "Shared calendars"]
     },
     {
-      icon: <ClipboardList className="h-6 w-6 text-rose-400" />,
+      icon: <ClipboardList className="h-6 w-6 text-rose-600" />,
       title: "Patient Portal",
       description: "Give patients access to their health information.",
       accentColor: "bg-rose-500",
-      iconBgColor: "bg-rose-500/20",
+      iconBgColor: "bg-rose-50",
       delay: "delay-300",
       items: ["Medical records access", "Appointment requests", "Secure messaging"]
     }
@@ -122,24 +122,24 @@ const Features = () => {
   return (
     <section id="features" className="relative py-20 md:py-28">
       {/* Background decoration */}
-      <div className="absolute top-0 left-0 w-full h-full bg-[#0a1527]/95 pointer-events-none rounded-2xl border border-white/10 shadow-xl"></div>
-      <div className="absolute top-20 -left-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 -right-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-gray-50/90 pointer-events-none rounded-2xl"></div>
+      <div className="absolute top-20 -left-20 w-64 h-64 bg-blue-100/50 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 -right-20 w-64 h-64 bg-indigo-100/50 rounded-full blur-3xl"></div>
       
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16 animate-fade-up">
-          <Badge variant="primary" className="mb-4 shadow-sm bg-blue-500/20 text-blue-300 border border-blue-400/30">
+          <Badge variant="primary" className="mb-4 shadow-sm bg-blue-100 text-blue-700 border border-blue-200">
             Features
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
             All-in-one healthcare platform
           </h2>
           <div className="flex items-center justify-center mb-6">
-            <Separator className="w-12 bg-blue-400/30" />
-            <span className="mx-4 text-blue-300 font-medium">Powerful Features</span>
-            <Separator className="w-12 bg-blue-400/30" />
+            <Separator className="w-12 bg-blue-200" />
+            <span className="mx-4 text-blue-700 font-medium">Powerful Features</span>
+            <Separator className="w-12 bg-blue-200" />
           </div>
-          <p className="text-lg text-white/70">
+          <p className="text-lg text-gray-600">
             Everything you need to manage your practice and provide the best care for your patients.
           </p>
         </div>

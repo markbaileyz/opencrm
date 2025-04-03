@@ -6,7 +6,6 @@ import { ButtonCustom } from "@/components/ui/button-custom";
 import TestimonialCard from "./TestimonialCard";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface TestimonialsPreviewProps {
   title: string;
@@ -48,31 +47,27 @@ const TestimonialsPreview = ({
   };
 
   return (
-    <div className="animate-fade-up py-12 md:py-16 bg-[#0a1527]/95 backdrop-blur-md rounded-2xl border border-white/10 shadow-xl my-12">
+    <div className="animate-fade-up py-12 md:py-16 bg-white backdrop-blur-md rounded-2xl border border-gray-100 shadow-sm my-12">
       <div className="relative">
         {/* Background decoration */}
-        <div className="absolute -top-10 -left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -top-10 -left-10 w-64 h-64 bg-blue-100/30 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-blue-100/30 rounded-full blur-3xl"></div>
         
         <div className="relative z-10">
-          <div className="flex justify-end px-6 mb-2">
-            <ThemeToggle />
-          </div>
-          
           <div className="text-center mb-12">
-            <Badge variant="primary" className="mb-4 bg-blue-500/20 text-blue-300 border border-blue-400/30">
+            <Badge variant="primary" className="mb-4 bg-blue-100 text-blue-700 border border-blue-200">
               <Quote className="h-3.5 w-3.5 mr-1" />
               Testimonials
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold leading-tight tracking-tight mb-4 text-white">
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight tracking-tight mb-4 text-gray-900">
               {title}
             </h2>
             <div className="flex items-center justify-center mb-6">
-              <Separator className="w-12 bg-blue-400/30" />
-              <span className="mx-4 text-blue-300 font-medium">Trusted by Healthcare Professionals</span>
-              <Separator className="w-12 bg-blue-400/30" />
+              <Separator className="w-12 bg-blue-200" />
+              <span className="mx-4 text-blue-700 font-medium">Trusted by Healthcare Professionals</span>
+              <Separator className="w-12 bg-blue-200" />
             </div>
-            <p className="text-lg text-white/70 max-w-3xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               {description}
             </p>
           </div>
@@ -92,7 +87,7 @@ const TestimonialsPreview = ({
           
           <div className="mt-12 text-center">
             <CustomLink to="#testimonials">
-              <ButtonCustom variant="outline" size="lg" className="font-medium group shadow-sm hover:shadow-md bg-[#132543] text-white border-white/20 hover:bg-[#1a3056]">
+              <ButtonCustom variant="outline" size="lg" className="font-medium group shadow-sm hover:shadow-md bg-white text-blue-700 border-blue-200 hover:bg-blue-50">
                 Read More Success Stories
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </ButtonCustom>

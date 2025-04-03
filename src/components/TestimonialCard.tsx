@@ -20,7 +20,7 @@ const TestimonialCard = ({
   className = "",
 }: TestimonialCardProps) => {
   return (
-    <div className={`glass rounded-xl p-6 shadow-sm ${className}`}>
+    <div className={`bg-white rounded-xl p-6 shadow-sm border border-gray-100 ${className}`}>
       <div className="flex items-center mb-4">
         {Array(5)
           .fill(0)

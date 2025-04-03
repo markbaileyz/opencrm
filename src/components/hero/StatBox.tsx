@@ -7,9 +7,9 @@ interface StatBoxProps {
 }
 
 const StatBox = ({ value, label }: StatBoxProps) => (
-  <div className="bg-[#0a1527]/90 backdrop-blur-sm rounded-xl p-6 text-center hover:shadow-lg transition-all duration-300 border border-white/10 shadow-md">
-    <p className="text-3xl font-bold text-white">{value}</p>
-    <p className="text-sm text-white/70 mt-1 font-medium">{label}</p>
+  <div className="bg-white backdrop-blur-sm rounded-xl p-6 text-center hover:shadow-md transition-all duration-300 border border-gray-100 shadow-sm">
+    <p className="text-3xl font-bold text-gray-900">{value}</p>
+    <p className="text-sm text-gray-500 mt-1 font-medium">{label}</p>
   </div>
 );
 

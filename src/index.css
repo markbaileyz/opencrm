@@ -47,9 +47,9 @@
     font-family: 'Inter', sans-serif;
   }
 
-  /* Glass morphism effects */
+  /* Light-themed glass effect */
   .glass {
-    @apply bg-white/60 backdrop-blur-lg border border-white/20 shadow-md;
+    @apply bg-white/80 backdrop-blur-sm border border-white/40 shadow-sm;
   }
 
   /* Animation delay utilities */

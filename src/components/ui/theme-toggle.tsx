@@ -1,7 +1,7 @@
 
 import React from "react";
 
-// This component is deprecated as dark theme has been removed
+// This component is completely disabled as we only support light theme
 export function ThemeToggle() {
   return null;
 }
