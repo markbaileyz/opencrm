@@ -19,6 +19,7 @@ export interface Prescription {
   lastFilled: Date;
   refillStatus?: RefillStatus;
   approvalStatus?: ApprovalStatus;
+  diagnosis?: string; // Added diagnosis property
 }
 
 interface UsePrescriptionFiltersProps {

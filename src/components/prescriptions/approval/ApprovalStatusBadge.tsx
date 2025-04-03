@@ -7,9 +7,10 @@ export type ApprovalStatus = "approved" | "denied" | "pending" | "pending_inform
 
 interface ApprovalStatusBadgeProps {
   status: ApprovalStatus;
+  className?: string; // Added className prop
 }
 
-const ApprovalStatusBadge: React.FC<ApprovalStatusBadgeProps> = ({ status }) => {
+const ApprovalStatusBadge: React.FC<ApprovalStatusBadgeProps> = ({ status, className = "" }) => {
   if (!status) return null;
 
   const getStatusDetails = () => {
@@ -53,12 +54,12 @@ const ApprovalStatusBadge: React.FC<ApprovalStatusBadgeProps> = ({ status }) => 
     }
   };
 
-  const { label, icon, className } = getStatusDetails();
+  const { label, icon, className: statusClassName } = getStatusDetails();
   
   return (
     <Badge 
       variant="outline" 
-      className={`flex items-center ${className}`}
+      className={`flex items-center ${statusClassName} ${className}`}
     >
       {icon}
       {label}
